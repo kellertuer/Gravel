@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="19"
+   name=""
+   committed-date="2006-11-12T03:51:19.474428Z"
+   url="https://javahelp.dev.java.net/svn/javahelp/trunk/jhMaster/JavaHelp/demos/hs/merge"
+   last-author="brinkley"
+   kind="dir"
+   uuid="8ea2465c-fe21-0410-bc8c-897f37722d07"
+   repos="https://javahelp.dev.java.net/svn/javahelp"
+   revision="52"/>
+<entry
+   committed-rev="19"
+   name="MasterTOC.xml"
+   text-time="2007-06-15T23:00:57.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="82674de70e5a86db63fe1ec845e43156"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:57.000000Z"/>
+<entry
+   committed-rev="19"
+   name="MasterIndex.xml"
+   text-time="2007-06-15T23:00:57.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="e8087b4dc7e44d6ec6518e20c7427383"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:57.000000Z"/>
+<entry
+   committed-rev="19"
+   name="Master.hs"
+   text-time="2007-06-15T23:00:57.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="03c20394a7b4c0bd0fa42a4acb8a32b5"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:57.000000Z"/>
+<entry
+   committed-rev="19"
+   name="GNUmakefile"
+   text-time="2007-06-15T23:00:57.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="fc83b8bc177ed90d0557887119874903"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:57.000000Z"/>
+<entry
+   committed-rev="19"
+   name="Master.jhm"
+   text-time="2007-06-15T23:00:58.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="592ca6db2e43b6f6cedbfb12e0c491b1"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:57.000000Z"/>
+<entry
+   name="master"
+   kind="dir"/>
+<entry
+   committed-rev="19"
+   name="Makefile"
+   text-time="2007-06-15T23:00:58.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="ff629bbc70fc88ed0deff7a7712cce81"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:57.000000Z"/>
+</wc-entries>

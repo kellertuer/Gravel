@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="19"
+   name=""
+   committed-date="2006-11-12T03:51:19.474428Z"
+   url="https://javahelp.dev.java.net/svn/javahelp/trunk/jhMaster/JavaHelp/doc/images"
+   last-author="brinkley"
+   kind="dir"
+   uuid="8ea2465c-fe21-0410-bc8c-897f37722d07"
+   repos="https://javahelp.dev.java.net/svn/javahelp"
+   revision="52"/>
+<entry
+   committed-rev="19"
+   name="beans_scenario.gif"
+   text-time="2007-06-15T23:00:48.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="e8a3ae601601849365926a74dae44712"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:47.000000Z"/>
+<entry
+   committed-rev="19"
+   name="standalone_scenario.gif"
+   text-time="2007-06-15T23:00:48.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="4c2635d657c255acafec2fd17dc26106"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:47.000000Z"/>
+<entry
+   committed-rev="19"
+   name="apidemo.gif"
+   text-time="2007-06-15T23:00:48.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="ffd91a989ecf6e36e979881425ef1705"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:47.000000Z"/>
+<entry
+   committed-rev="19"
+   name="superhero60.gif"
+   text-time="2007-06-15T23:00:48.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="a6f1ae49135bd7581d8d29bca2aa545e"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:47.000000Z"/>
+<entry
+   committed-rev="19"
+   name="merge_scenario.gif"
+   text-time="2007-06-15T23:00:48.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="3435b4b0de82727f50d2bc46eedef406"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:47.000000Z"/>
+<entry
+   committed-rev="19"
+   name="hg_note.gif"
+   text-time="2007-06-15T23:00:48.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="b9d5925b53301c6610bb2a16e5789d25"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:47.000000Z"/>
+<entry
+   committed-rev="19"
+   name="nav_toggle.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="b4e220e33c3c2bfde084338968e49f5d"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:47.000000Z"/>
+<entry
+   committed-rev="19"
+   name="client_search_scenario.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="0a7b3d2a24f56da475f01ea6ff1bf947"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:47.000000Z"/>
+<entry
+   committed-rev="19"
+   name="smi.logo.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="91d9b2c011338f1d015372f6f90e5cb8"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:47.000000Z"/>
+<entry
+   committed-rev="19"
+   name="classviewer.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="2d57103add95aebb6b15026df09dce3c"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:47.000000Z"/>
+<entry
+   committed-rev="19"
+   name="download_scenario.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="cf60d74b268120011ca1dfff82d4bdc6"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:47.000000Z"/>
+<entry
+   committed-rev="19"
+   name="map1.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="cf11315a846588f1b63e1f8989bd7a94"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:47.000000Z"/>
+<entry
+   committed-rev="19"
+   name="map2.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="bae4721cebd517148a68177871d5df6e"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:47.000000Z"/>
+<entry
+   committed-rev="19"
+   name="map3.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="efab56d0bebe8171f22536ce409ca4ba"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="map4.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="8bc9aa5fade4d8ab266e667c89aa47c8"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="superhero.big.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="bf693b02b7c6bfd0590a9f2c7e513388"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="embedded_scenario.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="33408249321bc3420286da9cfbefc149"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="server_search_scenario.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="242bf726f29ec16192e783c298356b43"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="activator_scenario.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="7b7aef8982927544623974c7f6880f84"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="superhero32.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="cdd6dac4f484e17aedc227865f9685e6"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="not_yet.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="3a5ca525ed3c5b6123286fa8e37e04fb"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="hg_proc.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="541cdfb2de51b29a357ad04a9c3e5599"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="Thumbs.db"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="c1b82d9162b0567c68108fb31a45ba54"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="MVC.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="91070bc06618f9634a3e3634f4e22d57"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="server_scenario.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="9a3f4fdccb62a191eeb1616376016d8b"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="hg_see.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="7b5c0b821bc7e2d8ee457a6044ed7edf"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="standalone_search_scenario.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="253fb8f1a22cb14c3b72ffe706d5a9ec"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="stand_net_scenario.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="217cc407b8ff5d4c9ee733140f1f3c19"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="kiosk_scenario.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="74aecad935d64f11232574088bb80735"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="applet_scenario.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="edf4280eaac3c84b12fb530146ce34ab"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="hg_exam.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="ddbbf9f01ed7ef21625b4c34eb32f8de"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+<entry
+   committed-rev="19"
+   name="hg_tip.gif"
+   text-time="2007-06-15T23:00:49.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="f8bf3cbb1176e83e2685086c37261ce3"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:48.000000Z"/>
+</wc-entries>

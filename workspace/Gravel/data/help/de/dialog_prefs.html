@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Gravel - Hilfe - Dialoge - Einstellungen</title>
+	<meta name="generator" content="TextMate http://macromates.com/">
+	<meta name="author" content="Ronny">
+	<!-- Date: 2007-10-12 -->
+</head>
+<body>
+<div align=center><a name="title"><h2>Einstellungen</h2></a></div>
+<a name="Vorbemerkung"><h3>Verwendung der Standardnamen</h3></a>
+<p>Für sowohl den Knoten, die Kante als auch den Untergraphen existieren Felder zur Angabe eines Standardnamens.
+	Diese funktionieren nach dem Prinzip der Ersetzung. Jedes Vorkommen der Zeichenkette "$ID" (Ohne die Anführungszeichen) wird ersetzt durch den Index des Knotens, der Kante bzw. des Untergraphen.
+	<br>Beispiel: Ist als Standard <tt>v_{$ID}</tt> für die Knoten angegeben, erhält der Knoten mit dem Index 4 den Namen <tt>v_{4}</tt>, wenn er erstellt wird. 
+	<br>Zusätzlich kann bei der Kante noch der Index des Start- und Endknotens im Namen verwandt werden. Dazu dienen die Zeichenketten "$SID" für den Startknotenindex und "$EID" für den Endknotenindex.
+	<br>Beispiel: Ist als Standard für eine Kante <tt>e_{$ID, $SID->$EID}</tt> angegeben und erstellt man nun eine Kante (etwa per Drag&Drop) mit dem Index 4, die von Knoten 1 zu Knoten 2 verläuft, so erhält sie als Namen <tt>e_{4, 1->2}</tt>.
+	<br>Damit bei Eingabe dieser Standardnamen ein Eindruck des Ergebnisses entsteht, wird jeweils eine Vorschau angeboten, welche die hier in den Beispielen verwandten Werte enthält. Dabei wird der Name verkürzt, wenn er zu lang wird.<br><br></p> 
+<a name="general"><h3>Allgemein</h3></a>
+<p>Die Registerkarte "Allgemein" bietet die Möglichkeit die Standardwerte erneut aus der Datei zu laden, auf den Anfangszustand zurückzusetzen und die eingegebenen Stanard-Werte jetzt in die Datei <tt>data/xml/preferences.xml</tt> zu speichern. Ein erfolgreiches Beenden des Dialogs mit "Ok" speichert die Werte nur Programm-intern, nicht in der XML-Datei.<br> 
+Zusätzlich lässt sich aktivieren, dass die Einstellungen beim Beenden automatisch gespeichert werden sollen und ob der letzte geladene Graph beim nächsten Start geladen werden soll.
+<br>Zusätzlich läßt sich einstellen, ob ein neu erstellter Graph (etwa über Datei->Neu oder beim Programmstart) gerichtete oder ungerichtete Kanten haben soll.
+<div align=center><a name="Abb1"><img src="img/dialog_prefs_general.png"></a><br><font size="-1">Abbildung 1: Registerkarte "Allgemein" der Einstellungen</font></div>
+<br><br>
+<a name="view"><h3>Ansicht</h3></a>
+<p>In der Ansicht lässt sich die Ansicht der Kontrollpunkte aktivieren, die bei zwei Kantentypen existieren. Dies ist ebenso über das <a href="menu.html">Menü</a> möglich. Hier gibt es zusätzlich die Möglichkeit, die Größe der Kreuze anzugeben, welche an den Positionen der Kontrollpunkte angezeigt werden.<br>
+</p>
+<p>Ebenso über das <a href="menu.html">Menü</a> einzeln verfügbar sind die Einstellungen zum Raster. Ist das Raster aktiviert, so lässt sich der vertikale und horizontale Abstand des Rasters festlegen. Die beiden Abstände lassen sich synchronisieren. Außerdem können Knoten am Raster ausgerichtet werden. Dies wirkt sich auf die Bewegung von einzelnen Knoten im Standard-Modus aus. Werden diese bewegt, so werden sie danach am Raster ausgerichtet.<br>Ist das Raster nicht aktiviert, so sind die Einstellungen dazu ebenso deaktiviert und bleiben in dem Zustand, den sie zuletzt besaßen.</p>  
+<div align=center><a name="Abb2"><img src="img/dialog_prefs_view.png"></a><br><font size="-1">Abbildung 2: Registerkarte "Ansicht" der Einstellungen</font></div>
+<br><br>
+<a name="node"><h3>Knoten</h3></a>
+<p>Die Standardwerte für Knoten können in dieser Registerkarte angegeben werden. Sie werden verwendet, wenn ein neuer Knoten erstellt wird: Im <a href="popup_menus.html#background">Kontextmenü des Hintergrundes</a> werden diese Werte verwendet, um die Felder der Dialoges zu füllen. Im <a href="mouseaction.html#OneClick">OneClick</a>-Modus werden sie beim Erstellen neuer Knoten verwendet.<br>
+Da der Index sowie die Position des Knotens bei jeder Aktion individuell berechnet bzw. durch die Maus angegeben werden, existieren für diese Werte keine Standards. Dadurch sind die im <a href="dialog_node.html">Knotendialog</a> auf zwei Registerkarten verteilten Werte hier auf einer zusammengefasst.</p>
+<p><a name="nodename">Der Standard-Knotenname</a> wird verwendet, wie im <a href="#Vorbemerkung">ersten Abschnitt</a> beschrieben
+<div align=center><a name="Abb3"><img src="img/dialog_prefs_node.png"></a><br><font size="-1">Abbildung 3: Die Registerkarte "Knoten" der Einstellungen enthält Standardwerte für Knoten</font></div>
+<br><br>
+<a name="edge"><h3>Kante</h3></a>
+<p>Analog zu den Standardwerten des Knotens sind hier die Werte eintragbar, mit denen eine neue Kante erstellt werden soll. Neben dem Gewicht und der Breite existiert ein Feld für den Kantennamen (siehe ersten Abschnitt) und ein Drop-Down-Menü für die einzelnen Spezifikationen der Kante.
+Dies umfasst die Standardwerte für
+<ul>
+	<li>den Pfeil</i>
+	<li>die Textanzeige</li>
+	<li>die Linienart</li>
+</ul>
+Bei der Linie empfielt sich als Standard die durchgezogene Linie, die anderen Linienarten sollten nur der Hervorhebung bestimmter Kanten dienen.
+<br>Mehr zu den Werten dieser drei Bereiche und ihrer Bedeutung in der Hilfe zum <a href="dialog_edge.html">Kantendialog</a><br>.
+<div align=center><a name="Abb4"><img src="img/dialog_prefs_edge.png"></a><br><font size="-1">Abbildung 4: Die Registerkarte "Kante" der Einstellungen enthält Standardwerte für Kanten</font></div>
+<br><br>
+<a name="subgraph"><h3>Untergraph</h3></a>
+<p>Untergraphen sind nur bezüglich ihres Namens in den Standardwerten vertreten. Dessen angegebener Wert wird analog zu dem <a href="#nodename">Knotennamen</a> verwendet.<br><br>
+<h3>Validitätsbedingungen</h3>
+<p>Die Größe des Kontrollpunktes muss eine positive ganze Zahl sein.<br>
+Dies gilt ebenso für die Knotengröße und die drei Werte der Knotennamenanzeige. Die drei Werte werden allerdings nur kontrolliert, wenn die Anzeige aktiviert ist.<br>
+Die Breite, das Gewicht und die Pfeilgröße müssen ebenso als ganze positive Zahl angegeben werden.<br>
+An die restlichen Felder bestehen keine Anforderungen.</p>
+<p>Ein Klick auf "Abbrechen" bewirkt, dass die Standard-Werte verwendet werden, die vor Aufruf des Dialogs aktuell waren.<br>
+Sind beim Klick auf "Ok" die Werte so, wie im letzten Absatz erläutert, werden sie Übernommen und bei neuen Knoten, Kanten und Untergraphen als Standard verwendet.
+<br><br>
+</body>
+</html>

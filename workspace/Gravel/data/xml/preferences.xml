@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gravel Preferences File, please do not edit yourself -->
+
+<!DOCTYPE gravel.preferences [
+<!ELEMENT gravel.preferences (group*,value*)>
+<!ELEMENT group (group*,value*)>
+<!ELEMENT value (#PCDATA)>
+<!ATTLIST group
+	 name NMTOKEN #REQUIRED>
+<!ATTLIST value
+	 name NMTOKEN #REQUIRED
+	 type (Integer|Boolean|String) #REQUIRED>
+]>
+
+
+<gravel.preferences>
+	<group name="edge">
+		<value name="arralpha" type="Integer">40</value>
+		<value name="arrpart" type="Integer">75</value>
+		<value name="arrpos" type="Integer">100</value>
+		<value name="arrsize" type="Integer">8</value>
+		<value name="line_distance" type="Integer">10</value>
+		<value name="line_length" type="Integer">10</value>
+		<value name="line_type" type="Integer">1</value>
+		<value name="loopclockwise" type="Boolean">true</value>
+		<value name="loopdirection" type="Integer">0</value>
+		<value name="looplength" type="Integer">33</value>
+		<value name="loopproportion" type="Integer">100</value>
+		<value name="name" type="String">e_{$ID}</value>
+		<value name="orth_verticalfirst" type="Boolean">true</value>
+		<value name="text_distance" type="Integer">7</value>
+		<value name="text_position" type="Integer">25</value>
+		<value name="text_showvalue" type="Boolean">false</value>
+		<value name="text_size" type="Integer">14</value>
+		<value name="text_visible" type="Boolean">false</value>
+		<value name="value" type="Integer">1</value>
+		<value name="width" type="Integer">1</value>
+	</group>
+	<group name="graph">
+		<value name="allowloops" type="Boolean">false</value>
+		<value name="allowmultiple" type="Boolean">true</value>
+		<value name="directed" type="Boolean">true</value>
+		<value name="fileformat" type="String">visual</value>
+		<value name="lastfile" type="String">$NONE</value>
+		<value name="loadfileonstart" type="Boolean">false</value>
+	</group>
+	<group name="grid">
+		<value name="enabled" type="Boolean">false</value>
+		<value name="orientated" type="Boolean">true</value>
+		<value name="synchron" type="Boolean">false</value>
+		<value name="x" type="Integer">50</value>
+		<value name="y" type="Integer">50</value>
+	</group>
+	<group name="node">
+		<value name="name" type="String">v_{$ID}</value>
+		<value name="name_distance" type="Integer">18</value>
+		<value name="name_rotation" type="Integer">270</value>
+		<value name="name_size" type="Integer">12</value>
+		<value name="name_visible" type="Boolean">true</value>
+		<value name="size" type="Integer">10</value>
+	</group>
+	<group name="pref">
+		<value name="saveonexit" type="Boolean">true</value>
+	</group>
+	<group name="statistics">
+		<value name="y" type="Integer">200</value>
+	</group>
+	<group name="subset">
+		<value name="name" type="String">Untergraph #$ID</value>
+	</group>
+	<group name="vgraphic">
+		<value name="cpshow" type="Boolean">true</value>
+		<value name="cpsize" type="Integer">3</value>
+		<value name="directed" type="Boolean">true</value>
+		<value name="framedistance" type="Integer">10</value>
+		<value name="selcolb" type="Integer">225</value>
+		<value name="selcolg" type="Integer">169</value>
+		<value name="selcolr" type="Integer">115</value>
+		<value name="selwidth" type="Integer">6</value>
+		<value name="x" type="Integer">500</value>
+		<value name="y" type="Integer">500</value>
+		<value name="zoom" type="Integer">100</value>
+	</group>
+	<group name="window">
+		<value name="x" type="Integer">600</value>
+		<value name="y" type="Integer">500</value>
+	</group>
+</gravel.preferences>

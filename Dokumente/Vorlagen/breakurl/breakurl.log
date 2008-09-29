@@ -1,0 +1,91 @@
+This is pdfeTeX, Version 3.141592-1.21a-2.2 (Web2C 7.5.4) (format=latex 2007.1.14)  19 SEP 2007 13:21
+entering extended mode
+**breakurl.ins
+(./breakurl.ins
+LaTeX2e <2003/12/01>
+Babel <v3.8d> and hyphenation patterns for american, french, german, ngerman, b
+ahasa, basque, bulgarian, catalan, croatian, czech, danish, dutch, esperanto, e
+stonian, finnish, greek, icelandic, irish, italian, latin, magyar, norsk, polis
+h, portuges, romanian, russian, serbian, slovak, slovene, spanish, swedish, tur
+kish, ukrainian, nohyphenation, loaded.
+(/sw/share/texmf-dist/tex/latex/base/docstrip.tex
+\blockLevel=\count79
+\emptyLines=\count80
+\processedLines=\count81
+\commentsRemoved=\count82
+\commentsPassed=\count83
+\codeLinesPassed=\count84
+\TotalprocessedLines=\count85
+\TotalcommentsRemoved=\count86
+\TotalcommentsPassed=\count87
+\TotalcodeLinesPassed=\count88
+\NumberOfFiles=\count89
+\inFile=\read1
+\inputcheck=\read2
+\off@0=\count90
+\off@1=\count91
+\off@2=\count92
+\off@3=\count93
+\off@4=\count94
+\off@5=\count95
+\off@6=\count96
+\off@7=\count97
+\off@8=\count98
+\off@9=\count99
+\off@10=\count100
+\off@11=\count101
+\off@12=\count102
+\off@13=\count103
+\off@14=\count104
+\off@15=\count105
+\@maxfiles=\count106
+\@maxoutfiles=\count107
+
+Utility: `docstrip' 2.5c <2003/09/18>
+English documentation    <1999/03/31>
+
+**********************************************************
+* This program converts documented macro-files into fast *
+* loadable files by stripping off (nearly) all comments! *
+**********************************************************
+
+********************************************************
+* No Configuration file found, using default settings. *
+********************************************************
+
+)
+
+Generating file(s) ./breakurl.sty 
+\openout0 = `./breakurl.sty'.
+
+
+Processing file breakurl.dtx (package) -> breakurl.sty
+Lines  processed: 727
+Comments removed: 466
+Comments  passed: 0
+Codelines passed: 253
+
+****************************************************
+*                                                  *
+* To finish the installation you have to move the  *
+* following file into a directory searched by TeX: *
+*                                                  *
+* breakurl.sty                                     *
+*                                                  *
+* To produce the documentation run the file        *
+* breakurl.dtx through LaTeX.                      *
+*                                                  *
+* Happy TeXing!                                    *
+*                                                  *
+****************************************************
+ ) 
+Here is how much of TeX's memory you used:
+ 311 strings out of 94501
+ 3129 string characters out of 1176137
+ 53028 words of memory out of 1000000
+ 3573 multiletter control sequences out of 10000+50000
+ 3640 words of font info for 14 fonts, out of 500000 for 2000
+ 580 hyphenation exceptions out of 1000
+ 12i,0n,18p,155b,122s stack positions out of 1500i,500n,5000p,200000b,5000s
+
+No pages of output.

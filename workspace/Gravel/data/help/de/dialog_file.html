@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Gravel - Hilfe - Datei-Dialog</title>
+</head>
+<body>
+<div align=center><a name="title"><h2>Dateidialog</h2></a>
+<br><a name="Abb1"><img src="img/dialog_file.png"></a><br><font size="-1">Abbildung 1: Der Speichern-Dialog am Beispiel GravelML</font>
+</div><br><br>
+Der Dateidialog ist der von Java gestellte Dialog des <i>JFileChoosers</i>.<br>
+Dieser gliedert sich in ein Eingabefeld für den Dateinamen, ein Auswahlfeld für die letzten besuchten Ordner und eine Ansicht des aktuellen Ordnerinhaltes. In Abbildung 1 ist der Inhalt des Gravel-Ordners in der Version 0.2.1 dargestellt. Unter dieser Auflistung ist ein <a name="filter">Filter</a> aktiv.
+Beim Laden und Speichern von Dateien im <a href="gravelml.html">GravelML</a>-Format ist als Dateifilter .xml eingestellt, so dass nur Ordner und Dateien mit dem Format .xml hervorgehoben sind.
+<br>Darunter sind die Buttons zum Abbrechen und Speichern sowie das Erstellen eines neuen Ordners platziert. Diese Buttons werden in den jeweiligen Dialogen textuell angepasst.</p>
+<p><a name="endung">Im</a> <a href="export.html">Export</a> wird über den Dateifilter das Format gewählt in das exportiert werden soll. Wählt mann dann trotzdem eine ausgegraute Datei, so wird dessen Endung verwendet, um das Export-Format festzustellen. Ebenso gilt dies für eine im Eingabefeld oben spezifizierte Datei mit Endung. Auch diese wird anhand ihrer Endung einem Export-Format zugeordnet.</p>
+<p>Wird ein Dateiformat ausgewählt und dann im oberen Eingabefeld ein Dateiname angegeben, der keine Endung hat, so wird die Endung des aktuellen Dateifilters angehängt.<br>Gibt man also beim Speichern "beispiel" in dem oberen Feld ein, so wird der Graph in der Datei "beispiel.xml" gespeichert.</p>
+<br>
+</div>
+</body>
+</html>

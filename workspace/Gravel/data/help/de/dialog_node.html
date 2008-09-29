@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Gravel - Hilfe - Dialoge - Knoten</title>
+</head>
+<body>
+<div align=center><a name="title"><h2>Knotendialog</h2></a></div>
+<br><p>Der Knotendialog ist entweder über das Kontextmenü eines Knotens erreichbar oder über den Eintrag "Neuen Knoten erstellen..." im Kontextmenü des Hintergrundes.<br>
+Im ersten Fall werden die Datenfelder des Dialoges mit den Werten des Knotens initialisiert.
+Beim Erstellen eines neuen Knotens werden die Datenfelder mit den Standard-Werten aus den <a href="dialog_prefs.html">Eigenschaften</a> initialisiert. Als Position wird die aktuelle Position der Maus in dem Graphen verwendet. Als Index wird die erste natürliche Zahl nach dem größten Knotenindex im aktuellen Graphen verwendet.	
+<br><br>
+<h3>Allgemein</h3>
+<div align=center><br><a name="Abb1"><img src="img/dialog_node_general.png"></a><br><font size="-1">Abbildung 1: Die Registerkarte "Allgemein" des Knotendialogs</font></div>
+<br><p>In der Registerkarte "Allgemein" lassen sich die mathematischen und visuellen Eigenschaften des Knotens verändern.<br>
+<a name="math">Zunächst</a> der Name, gefolgt vom Index des Knotens und der Position (in horizontale (X) und vertikale (Y) Komponente getrennt) sowie die Größe des Kreises, den der Knoten in der Darstellung besitzen soll.
+<br>Die <a name="farbe">Farbe</a> des Knotens ergibt sich aus der Zugehörigkeit zu Untergraphen. Eine Liste der Untergraphen befindet sich am unteren Ende dieser Registerkarte und jeder Untergraph ist in dieser Liste klickbar, wodurch der Knoten entweder hinzugefügt oder entfernt wird, je nach vorherigem Zustand. Dann wird die Farbe neu berechnet.</p> 
+<br><br>
+<h3>Ansicht</h3><br>
+<div align=center><a name="Abb2"><img src="img/dialog_node_view.png"></a><br><font size="-1">Abbildung 2: Die Registerkarte "Ansicht" des Knotendialogs</font></div>
+<br>
+<p><a name="name">Unter</a> "Ansicht" sind die Einstellungen des Knotennamens verfügbar. Dieser läßt sich anzeigen oder nicht. Im zweiten Fall sind die Felder darunter deaktiviert.<br>
+ Ist die Anzeige des Knotennamens aktiviert, so wird seine Position angegeben durch den Abstand von der Position des Knotens und dem Winkel in Grad, wobei 0 Grad der Richtung Osten entspricht. Die Größe des Textes ist ebenso einstellbar.</p>
+<br><br>
+<h3>Validitätsbedingungen</h3>
+<p>Ein Klick auf Abbrechen bricht die aktuelle Aktion ab und der Knoten wird nicht gespeichert.
+<br>Wählt man den Button "Änderungen speichern" bzw. "Knoten erstellen", so darf der gewählte Index noch nicht vergeben sein.<br>Ist die Anzeige des Knotennamens aktiv, so müssen alle 3 Felder in der Registerkarte "Ansicht" mit natürlichen ganzen zahlen gefüllt sein. Dann wird die Aktion abgeschlossen, also der Knoten verändert oder erstellt. Andernfalls erscheint eine Fehlermeldung.</p>  
+<br><br>
+</body>
+</html>

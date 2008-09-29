@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="19"
+   name=""
+   committed-date="2006-11-12T03:51:19.474428Z"
+   url="https://javahelp.dev.java.net/svn/javahelp/trunk/jhMaster/JavaHelp/demos/serverhelp"
+   last-author="brinkley"
+   kind="dir"
+   uuid="8ea2465c-fe21-0410-bc8c-897f37722d07"
+   repos="https://javahelp.dev.java.net/svn/javahelp"
+   revision="52"/>
+<entry
+   name="src"
+   kind="dir"/>
+<entry
+   name="etc"
+   kind="dir"/>
+<entry
+   name="web"
+   kind="dir"/>
+<entry
+   committed-rev="19"
+   name="README"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="bd0bd5314d18511e60012a0f72f99298"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="build.xml"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="9979f78d99279618e2ebc7362cd784b3"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+</wc-entries>

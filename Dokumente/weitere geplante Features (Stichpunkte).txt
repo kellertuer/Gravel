@@ -1,0 +1,17 @@
+6- Interface für Algorithmen und so                             
+
+7-Hypergraphen-Visualisierung
+
+done.3-Die Dialogteile Kantentext/Linienart/Pfeil in eigene kleine Klassen die sich selbst prüfen und Knoten/Kanten modifizieren und das in den Dialogen (sind ja je mind. 3) einbauen
+
+done.4-Mehrfachkanten
+
+andere Farbverteilungen in einem Knoten (?) (Lukas)
+
+Import von .dot / GraphML / yEd (--> falls nur Struktur -> Visualisierungs-Wizard)
+
+Visualisierungs-Wizard (abhängig von der Struktur verschiedene Visualisierungen anbieten evtl gewichtet nach "Ästhetik"/"Güte")
+
+t10n (multi-language-support)  
+
+5-History (redo / undo)

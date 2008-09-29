@@ -1,0 +1,29 @@
+%------------------------------
+% Beispiel für eine Abbildung mit 2 nebeneinanderliegenden Graphen,
+% beide mit einer Bildunterschrift und einer gemeinsamen Abbildungsbeschriftung
+%
+%------------------------------
+%
+\documentclass{scrartcl}
+\usepackage{epic}
+\usepackage{eepic}
+\begin{document}
+	%Begin der Abbildung
+	\begin{figure}[htbp] %htbp setzt die Reihenfolge, wo die Grafik gesetzt werden soll 
+		\vspace{0pt} %Abstand der Abbildung zum Text darüber
+		\centering
+		\begin{minipage}{6 cm}  %Breite des ersten Graphenbildes,
+			 					%ist diese Breite Größer als der Graph entsteht ein Abstand zwischen den Graphen
+			%erster Graphen hier einfügen (\unitlength und die gesamte picture Umgebung)
+			\centering\mbox{Graph 1} %Untertitel des ersten Graphen (zentriert unter dem Bild)
+			\label{graph1:label} %Label des ersten Graphen um darauf zu referenzieren
+		\end{minipage}
+		\begin{minipage}{6 cm} %Breite des zweiten Graphenbildes
+			%zweiter Graph analog zum ersten
+			\centering\mbox{Graph 2}
+			\label{graph2:label}
+		\end{minipage}
+		\vspace{2cm}
+		\caption{Ein Vergleich der Graphen vor und nach dem Algorithmus} %Abbildungstext unter beiden Graphen
+	\end{figure}
+\end{document}

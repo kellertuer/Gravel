@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 	===GravelML - Format===
+	Graph Export in an GraphML like format
+	the variation to GraphML is an extra tag <subset> in a graph to save also the subsetgraphs
+	
+	And some special Keys to store the data. These are GraphML valid and are checked on load of a graph
+	Any other program may be able to read this file by ignoring the graph.subset tag or removing the part before.
+	
+	 developed by
+		Ronny Bergmann
+	 adapted from GraphML and the GraphML.dtd (1.0rc) from http://graphml.graphdrawing.org -->
+
+	<!-- change the following Doctype to graphml.dtd if you have no internet running. Then the file must be placed in the same directory as this file-->
+<!DOCTYPE graphml SYSTEM "http://gravel.darkmoonwolf.de/gravelml.dtd">
+
+<graphml>
+<!-- Gravel key Defintition : graph.type is 'math' or 'visual' -->
+	<key id="gt" for="graph" attr.name="type" attr.type="string">
+		<default>math</default>
+	</key>
+
+<!-- Gravel key Definitions for any graph -->
+	<key id="ev" for="edge" attr.name="value" attr.type="integer"> <!-- Value of an edge-->
+		<default>1</default>
+	</key>
+	<key id="nn" for="node" attr.name="name" attr.type="string"><!-- name of a Node -->
+		<default>q_</default><!--This default value is extended by the node id when reading a node without a name -->
+	</key>
+	<key id="sn" for="subset" attr.name="name" attr.type="string"><!-- std name of a subset-->
+		<default>Untergraph #</default><!-- Handled in the same way as mentioned by the node name before -->
+	</key>
+
+
+<!-- Graphel key Definitions for a Graph with visual information -->
+	<key id="nx" for="node" attr.name="x" attr.type="integer" /> <!--X-Position des Knotens -->
+	<key id="ny" for="node" attr.name="y" attr.type="integer" /> <!--Y-Position des Knotens -->
+	<key id="ns" for="node" attr.name="size" attr.type="integer">    <!-- Größe des Knotens -->
+	<default>12</default>
+	</key>
+		<key id="nd" for="node" attr.name="name_distance" attr.type="integer">    <!-- Abstand des Namens vom Knotenpunkt -->
+		<default>0</default>
+	</key>
+	<key id="nr" for="node" attr.name="name_rotation" attr.type="integer">    <!-- Drehung des Namens -->
+		<default>270</default>
+	</key>
+	<key id="nns" for="node" attr.name="name_size" attr.type="integer">    <!-- Textgröße des Namens -->
+	<default>12</default>
+	</key>
+	<key id="nnv" for="node" attr.name="name_visible" attr.type="boolean">    <!-- Name anzeigen -->
+	<default>false</default>
+	</key>
+
+	<key id="ew" for="edge" attr.name="width" attr.type="integer"> <!-- Kantenbreite -->
+	<default>1</default>
+	</key>
+	<key id="es" for="edge" attr.name="arrsize" attr.type="float"> <!--Pfeilgröße -->
+		<default>11.0</default>
+	</key>
+	<key id="ep" for="edge" attr.name="arrpart" attr.type="float"> <!-- Anteil des Pfeils -->
+		<default>0.75</default>
+	</key>
+	<key id="eapos" for="edge" attr.name="arrpos" attr.type="float"> <!-- Anteil des Pfeils -->
+		<default>1.0</default>
+	</key>
+	<key id="ea" for="edge" attr.name="arralpha" attr.type="float"> <!-- Winkel in der Pfeilspitze-->
+		<default>20.0</default>
+	</key>
+	<key id="et" for="edge" attr.name="edgetype" attr.type="string"> <!-- Kantentyp (Orthogonal|QuadCurve|Segmented|StraightLine|)-->
+		<default>StraightLine</default>
+	</key>	<key id="ex" for="edge" attr.name="x" attr.type="integer" /> <!--weitere Kontrollpunkt (Segmented|QuadCurveEdge) -->
+	<key id="ey" for="edge" attr.name="y" attr.type="integer" />	<key id="eo" for="edge" attr.name="orth_verticalfirst" attr.type="boolean"> <!--Nur fuer Orthogonal pflicht-->
+		<default>true</default>
+	</key>
+	<key id="enp" for="edge" attr.name="name_position" attr.type="float">    <!-- Position auf der Kante -->
+	<default>0.5</default>
+	</key>
+	<key id="ens" for="edge" attr.name="name_size" attr.type="integer">    <!-- Textgroesse des Namens -->
+	<default>12</default>
+	</key>
+	<key id="env" for="edge" attr.name="name_visible" attr.type="boolean">    <!-- Name anzeigen -->
+		<default>false</default>
+	</key>
+
+	<key id="sr" for="subset" attr.name="color.r" attr.type="integer" />    <!-- SubSetColor - Red -->
+	<key id="sg" for="subset" attr.name="color.g" attr.type="integer" />    <!-- SubSetColor - Green -->
+	<key id="sb" for="subset" attr.name="color.b" attr.type="integer" />    <!-- SubSetColor - blue -->
+
+	<graph id="G" edgedefault="directed">
+		<data key="gt">visual</data>
+
+		<node id="node4">
+			<data key="nx">130</data>
+			<data key="ny">162</data>
+		</node>
+
+		<node id="node7">
+			<data key="nx">182</data>
+			<data key="ny">169</data>
+		</node>
+
+		<node id="node22">
+			<data key="nn">q_e</data>
+			<data key="nx">618</data>
+			<data key="ny">35</data>
+			<data key="nd">22</data>
+			<data key="nr">90</data>
+			<data key="nnv">true</data>
+		</node>
+
+		<node id="node16">
+			<data key="nx">416</data>
+			<data key="ny">167</data>
+		</node>
+
+		<node id="node6">
+			<data key="nx">95</data>
+			<data key="ny">115</data>
+		</node>
+
+		<node id="node10">
+			<data key="nx">233</data>
+			<data key="ny">79</data>
+		</node>
+
+		<node id="node1">
+			<data key="nn">q_0</data>
+			<data key="nx">133</data>
+			<data key="ny">51</data>
+			<data key="nd">22</data>
+			<data key="nr">90</data>
+			<data key="nnv">true</data>
+		</node>
+
+		<node id="node17">
+			<data key="nx">454</data>
+			<data key="ny">78</data>
+		</node>
+
+		<node id="node15">
+			<data key="nx">374</data>
+			<data key="ny">78</data>
+		</node>
+
+		<node id="node8">
+			<data key="nx">182</data>
+			<data key="ny">78</data>
+		</node>
+
+		<node id="node2">
+			<data key="nx">22</data>
+			<data key="ny">107</data>
+		</node>
+
+		<node id="node20">
+			<data key="nx">571</data>
+			<data key="ny">165</data>
+		</node>
+
+		<node id="node19">
+			<data key="nx">571</data>
+			<data key="ny">118</data>
+		</node>
+
+		<node id="node11">
+			<data key="nx">264</data>
+			<data key="ny">79</data>
+		</node>
+
+		<node id="node13">
+			<data key="nx">330</data>
+			<data key="ny">161</data>
+		</node>
+
+		<node id="node18">
+			<data key="nx">492</data>
+			<data key="ny">118</data>
+		</node>
+
+		<node id="node3">
+			<data key="nx">82</data>
+			<data key="ny">172</data>
+		</node>
+
+		<node id="node5">
+			<data key="nx">130</data>
+			<data key="ny">115</data>
+		</node>
+
+		<node id="node12">
+			<data key="nx">330</data>
+			<data key="ny">114</data>
+		</node>
+
+		<node id="node21">
+			<data key="nx">618</data>
+			<data key="ny">170</data>
+		</node>
+
+		<node id="node23">
+			<data key="nx">261</data>
+			<data key="ny">147</data>
+		</node>
+
+		<node id="node9">
+			<data key="nx">182</data>
+			<data key="ny">97</data>
+		</node>
+
+		<edge id="edge3" source="node4" target="node5">
+		</edge>
+
+		<edge id="edge24" source="node6" target="node2">
+		</edge>
+
+		<edge id="edge44" source="node17" target="node22">
+		</edge>
+
+		<edge id="edge25" source="node6" target="node3">
+		</edge>
+
+		<edge id="edge1" source="node2" target="node1">
+			<data key="et">QuadCurve</data>
+			<data key="ex">30</data>
+			<data key="ey">17</data>
+		</edge>
+
+		<edge id="edge7" source="node9" target="node7">
+		</edge>
+
+		<edge id="edge38" source="node15" target="node17">
+		</edge>
+
+		<edge id="edge30" source="node1" target="node11">
+			<data key="et">QuadCurve</data>
+			<data key="ex">208</data>
+			<data key="ey">22</data>
+		</edge>
+
+		<edge id="edge22" source="node5" target="node1">
+		</edge>
+
+		<edge id="edge31" source="node4" target="node7">
+		</edge>
+
+		<edge id="edge33" source="node7" target="node11">
+		</edge>
+
+		<edge id="edge41" source="node13" target="node16">
+		</edge>
+
+		<edge id="edge19" source="node21" target="node22">
+		</edge>
+
+		<edge id="edge4" source="node3" target="node2">
+			<data key="et">QuadCurve</data>
+			<data key="ex">19</data>
+			<data key="ey">163</data>
+		</edge>
+
+		<edge id="edge6" source="node9" target="node10">
+			<data key="et">QuadCurve</data>
+			<data key="ex">208</data>
+			<data key="ey">76</data>
+		</edge>
+
+		<edge id="edge8" source="node9" target="node8">
+			<data key="es">1.0</data>
+		</edge>
+
+		<edge id="edge20" source="node12" target="node23">
+			<data key="et">QuadCurve</data>
+			<data key="ex">246</data>
+			<data key="ey">117</data>
+		</edge>
+
+		<edge id="edge10" source="node12" target="node13">
+			<data key="et">QuadCurve</data>
+			<data key="ex">330</data>
+			<data key="ey">137</data>
+		</edge>
+
+		<edge id="edge9" source="node12" target="node11">
+			<data key="et">QuadCurve</data>
+			<data key="ex">333</data>
+			<data key="ey">65</data>
+		</edge>
+
+		<edge id="edge43" source="node18" target="node16">
+		</edge>
+
+		<edge id="edge39" source="node17" target="node18">
+		</edge>
+
+		<edge id="edge34" source="node19" target="node22">
+		</edge>
+
+		<edge id="edge35" source="node19" target="node21">
+		</edge>
+
+		<edge id="edge32" source="node7" target="node23">
+		</edge>
+
+		<edge id="edge18" source="node18" target="node20">
+			<data key="et">QuadCurve</data>
+			<data key="ex">488</data>
+			<data key="ey">188</data>
+		</edge>
+
+		<edge id="edge46" source="node15" target="node11">
+			<data key="eapos">0.78999966</data>
+			<data key="et">QuadCurve</data>
+			<data key="ex">338</data>
+			<data key="ey">42</data>
+		</edge>
+
+		<edge id="edge27" source="node1" target="node6">
+			<data key="et">QuadCurve</data>
+			<data key="ex">130</data>
+			<data key="ey">93</data>
+		</edge>
+
+		<edge id="edge40" source="node23" target="node13">
+		</edge>
+
+		<edge id="edge13" source="node16" target="node15">
+		</edge>
+
+		<edge id="edge23" source="node6" target="node1">
+			<data key="et">QuadCurve</data>
+			<data key="ex">98</data>
+			<data key="ey">74</data>
+		</edge>
+
+		<edge id="edge2" source="node5" target="node6">
+		</edge>
+
+		<edge id="edge5" source="node3" target="node4">
+			<data key="et">QuadCurve</data>
+			<data key="ex">114</data>
+			<data key="ey">173</data>
+		</edge>
+
+		<edge id="edge14" source="node17" target="node16">
+		</edge>
+
+		<edge id="edge16" source="node19" target="node18">
+			<data key="et">QuadCurve</data>
+			<data key="ex">529</data>
+			<data key="ey">118</data>
+		</edge>
+
+		<edge id="edge21" source="node13" target="node23">
+			<data key="et">QuadCurve</data>
+			<data key="ex">260</data>
+			<data key="ey">194</data>
+		</edge>
+
+		<edge id="edge36" source="node19" target="node20">
+		</edge>
+
+		<edge id="edge45" source="node17" target="node11">
+			<data key="eapos">0.78999966</data>
+			<data key="et">QuadCurve</data>
+			<data key="ex">341</data>
+			<data key="ey">6</data>
+		</edge>
+
+		<edge id="edge17" source="node18" target="node19">
+			<data key="et">QuadCurve</data>
+			<data key="ex">538</data>
+			<data key="ey">25</data>
+		</edge>
+
+		<edge id="edge29" source="node11" target="node10">
+		</edge>
+
+		<edge id="edge26" source="node6" target="node4">
+		</edge>
+
+		<edge id="edge37" source="node12" target="node15">
+		</edge>
+<!-- == remove these lines to get a valid GraphML-FILE	-->
+
+		<subset id="subset1">
+			<data key="sn">Grey</data>
+			<data key="sr">153</data>
+			<data key="sg">153</data>
+			<data key="sb">153</data>
+
+			<sedge edge="edge24" />
+			<sedge edge="edge44" />
+			<sedge edge="edge25" />
+			<sedge edge="edge38" />
+			<sedge edge="edge30" />
+			<sedge edge="edge22" />
+			<sedge edge="edge31" />
+			<sedge edge="edge33" />
+			<sedge edge="edge41" />
+			<sedge edge="edge43" />
+			<sedge edge="edge39" />
+			<sedge edge="edge34" />
+			<sedge edge="edge35" />
+			<sedge edge="edge32" />
+			<sedge edge="edge46" />
+			<sedge edge="edge27" />
+			<sedge edge="edge40" />
+			<sedge edge="edge23" />
+			<sedge edge="edge36" />
+			<sedge edge="edge45" />
+			<sedge edge="edge29" />
+			<sedge edge="edge26" />
+			<sedge edge="edge37" />
+		</subset><!-- == END remove these lines to get a valid GraphML-FILE	-->
+	</graph>
+</graphml>

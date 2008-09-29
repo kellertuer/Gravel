@@ -1,0 +1,214 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE map
+  PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 1.0//EN"
+         "http://java.sun.com/products/javahelp/map_1_0.dtd">
+
+<map version="2.0">
+<!--
+	
+	Help Pages and anchors inside the pages used on the table of contents
+	
+-->
+	<mapID target="intro" xml:lang="de" url="introduction.html" />
+	<mapID target="intro.versions" xml:lang="de" url="introduction.html#Versionen" />	
+  
+	<mapID target="helppage" xml:lang="de" url="help.html" />
+	
+	<mapID target="definition" xml:lang="de" url="definitions.html" />
+	<mapID target="definition.math" xml:lang="de" url="definitions.html#math">
+	<mapID target="definition.grafik" xml:lang="de" url="definitions.html#grafik">
+	<mapID target="definition.vis" xml:lang="de" url="definitions.html#vis">
+
+  <mapID target="gravelml" xml:lang="de" url="gravelml.html" />
+ 
+	<mapID target="mainwindow" xml:lang="de" url="mainwindow.html" />
+	<mapID target="mainwindow.toolbar" xml:lang="de" url="mainwindow.html#toolbar">
+	<mapID target="mainwindow.graphic" xml:lang="de" url="mainwindow.html#graphic">
+	<mapID target="mainwindow.list" xml:lang="de" url="mainwindow.html#list">
+	<mapID target="mainwindow.stats" xml:lang="de" url="mainwindow.html#stats">
+ 
+  <mapID target="menu" xml:lang="de" url="menu.html">
+
+	<mapID target="popup_menus" xml:lang="de" url="popup_menus.html">
+
+	<mapID target="dialog" xml:lang="de" url="dialog.html">
+	<mapID target="dialog.edge" xml:lang="de" url="dialog_edge.html">
+	<mapID target="dialog.node" xml:lang="de" url="dialog_node.html">
+	<mapID target="dialog.subgraph" xml:lang="de" url="dialog_subgraph.html">
+	<mapID target="dialog.prefs" xml:lang="de" url="dialog_prefs.html">
+	<mapID target="dialog.file" xml:lang="de" url="dialog_file.html">
+ 
+	<mapID target="export" xml:lang="de" url="export.html">
+	<mapID target="export.png" xml:lang="de" url="export_png.html">
+	<mapID target="export.tex" xml:lang="de" url="export_tex.html">
+
+	<mapID target="stats" xml:lang="de" url="statistic.html" />
+	<mapID target="stats.atoms" xml:lang="de" url="statistic.html#Atoms" />	
+
+	<mapID target="license" xml:lang="de" url="license.html" />
+	
+	<mapID target="shortcuts" xml:lang="de" url="shortcuts.html" />
+	<mapID target="mouseaction" xml:lang="de" url="mouseaction.html" />
+	
+<!-- image icons of the toc -->
+	<mapID target="icon.anchor" url="img/anchor.gif" />
+	<mapID target="icon.chapter.closed" url="img/ch_closed.gif" />
+	<mapID target="icon.chapter.open" url="img/ch_open.gif" />
+	<mapID target="icon.page" url="img/page.gif" />
+<!--
+
+	maps used for the Index, single words inside the text anchored
+	sortet by the filenames, inside a file sortet by order of appearance
+	
+-->
+<mapID target="def.grundlagen" url="definitions.html#grundlagen" />
+<mapID target="def.graph" url="definitions.html#graph" />
+
+<mapID target="def.kante" url="definitions.html#kante" />
+<mapID target="def.knoten" url="definitions.html#knoten" />
+<mapID target="def.kante" url="definitions.html#kante" />
+<mapID target="def.start" url="definitions.html#start" />
+<mapID target="def.end" url="definitions.html#end" />
+<mapID target="def.gerichtet" url="definitions.html#gerichtet" />
+<mapID target="def.ungerichtet" url="definitions.html#ungerichtet" />
+<mapID target="def.gewicht" url="definitions.html#gewicht" />
+<mapID target="def.mehrfachkante" url="definitions.html#mehrfachkante" />
+<mapID target="def.schleife" url="definitions.html#schleife" />
+<mapID target="def.gerichtet2" url="definitions.html#gerichtet2" />   <!-- Graph-->
+<mapID target="def.ungerichtet2" url="definitions.html#ungerichtet2" />
+<mapID target="def.inzident" url="definitions.html#inzident" />
+<mapID target="def.benachbart" url="definitions.html#benachbart" />
+<mapID target="def.grad" url="definitions.html#grad" />
+<mapID target="def.untergraph" url="definitions.html#def5" />
+<mapID target="def.pixelgrafik" url="definitions.html#def6" />
+<mapID target="def.breite" url="definitions.html#def6" />       <!--Grafik-->
+<mapID target="def.hoehe" url="definitions.html#def6" />
+<mapID target="def.pixel" url="definitions.html#def6" />
+<mapID target="def.vektorgrafik" url="definitions.html#vektorgrafik" />
+<mapID target="def.breite2" url="definitions.html#breite2" />    <!--Kante-->
+<mapID target="def.groesse" url="definitions.html#groesse" />
+<mapID target="def.typen" url="definitions.html#typen" />
+<mapID target="def.pfeil" url="definitions.html#pfeil" />
+
+<mapID target="dia" url="dialog.html#dia" />
+<mapID target="dia.kantendialog" url="dialog_edge.html#title" />
+<mapID target="dia.kan.index" url="dialog_edge.html#index" />
+<mapID target="dia.kan.farbe" url="dialog_edge.html#farbe" />
+<mapID target="dia.kan.typ" url="dialog_edge.html#kantentyp" />
+<mapID target="dia.kan.groesse" url="dialog_edge.html#groesse" />
+<mapID target="dia.kan.winkel" url="dialog_edge.html#winkel" />
+<mapID target="dia.kan.form" url="dialog_edge.html#form" />
+<mapID target="dia.kan.position" url="dialog_edge.html#position" />
+
+<mapID target="dia.file.title" url="dialog_file.html#title" />
+<mapID target="dia.file.filter" url="dialog_file.html#filter" />
+<mapID target="dia.file.endung" url="dialog_file.html#endung" />
+
+<mapID target="dia.kno.title" url="dialog_node.html#title" />
+<mapID target="dia.kno.math" url="dialog_node.html#math" />
+<mapID target="dia.kno.name" url="dialog_node.html#name" />
+<mapID target="dia.kno.farbe" url="dialog_node.html#farbe" />
+
+<mapID target="dia.pref.title" url="dialog_prefs.html#title" />
+<mapID target="dia.pref.intro" url="dialog_prefs.html#Vorbemerkung" />
+<mapID target="dia.pref.general" url="dialog_prefs.html#general" />
+<mapID target="dia.pref.view" url="dialog_prefs.html#view" />
+<mapID target="dia.pref.node" url="dialog_prefs.html#node" />
+<mapID target="dia.pref.edge" url="dialog_prefs.html#edge" />
+<mapID target="dia.pref.subgraph" url="dialog_prefs.html#subgraph" />
+
+<mapID target="dia.sub.title" url="dialog_subgraph.html#title" />
+<mapID target="dia.sub.index" url="dialog_subgraph.html#abs1" />
+<mapID target="dia.sub.name" url="dialog_subgraph.html#abs1" />
+<mapID target="dia.sub.farbe" url="dialog_subgraph.html#abs1" />
+
+<mapID target="exp.title" url="export.html#title" />
+<mapID target="exp.tex.title" url="export_tex.html#title" />
+<mapID target="exp.tex.abs1" url="export_tex.html#abs1" /> <!-- picture, eepic, epic -->
+<mapID target="exp.tex.abs2" url="export_tex.html#abs2" /><!-- pdflatex -->
+<mapID target="exp.tex.abs3" url="export_tex.html#abs3" /><!--\setlength \unitlength -->
+<mapID target="exp.tex.abs4" url="export_tex.html#abs4" /><!--\path -->
+<mapID target="exp.tex.abs5" url="export_tex.html#abs5" /><!--\circle \fontsize \put -->
+<mapID target="exp.tex.abs6" url="export_tex.html#abs6" /><!--Anordnen, CodeBeispiel, -->
+<mapID target="exp.png.title" url="export_png.html#title" />
+
+<mapID target="gravelml.title" url="gravelml.html#title" />
+<mapID target="gravelml.abs1" url="gravelml.html#abs1" /><!-- Tag, Dokumenttypdefinition -->
+<mapID target="gravelml.abs2" url="gravelml.html#abs2" /><!-- Datenschlüssel, default -->
+<mapID target="gravelml.table" url="gravelml.html#keys" /><!-- Tabelle der Datenschlüssel -->
+<mapID target="gravelml.example" url="gravelml.html#example" /><!-- Beispiel -->
+
+<mapID target="help.title" url="help.html#title" /><!-- Titel, Drucken -->
+<mapID target="help.abs1" url="help.html#abs1" /><!-- Verzeichnis -->
+<mapID target="help.abs2" url="help.html#abs2" /><!-- Links (externe) -->
+
+<mapID target="intro.title" url="introduction.html#title" /><!-- Einleitung -->
+<mapID target="intro.name" url="introduction.html#name" /><!-- Gravel -->
+<mapID target="intro.versions2" url="introduction.html#Versionen" /><!-- Gravel -->
+
+<mapID target="liz.title" url="license.html#title" /><!-- Titel, Drucken -->
+<mapID target="liz.hp" url="license.html#hp" /><!-- gravel.dmw.de -->
+<mapID target="liz.abs1" url="license.html#abs1" /><!-- andre Software -->
+
+<mapID target="main.title" url="mainwindow.html#title" /><!-- Hauptfenster -->
+<mapID target="main.graphic" url="mainwindow.html#graphic" /><!-- Darstellung, grafische -->
+<mapID target="main.toolbar" url="mainwindow.html#toolbar" /><!-- Toolbar, Zoom -->
+<mapID target="main.list" url="mainwindow.html#list" /><!-- Liste -->
+<mapID target="main.stats" url="mainwindow.html#stats" /><!-- Statistik (Hauptfenster) -->
+
+<mapID target="menu.title" url="menu.html#title" />
+<mapID target="menu.table" url="menu.html#table" />
+
+<mapID target="mouse.title" url="mouseaction.html#title" />
+<mapID target="mouse.both" url="mouseaction.html#both" />
+<mapID target="mouse.std" url="mouseaction.html#std" />
+<mapID target="mouse.oneclick" url="mouseaction.html#OneClick" />
+
+<mapID target="pop.title" url="popup_menus.html#title" /><!--Kontextmenü, Maustaste, rechts, Löschen -->
+<mapID target="pop.node" url="popup_menus.html#node" /><!--Kontextmenü (Knoten) -->
+<mapID target="pop.edge" url="popup_menus.html#edge" /><!--Kontextmenü (Kante) -->
+
+<mapID target="stats.title" url="statistic.html#title" /><!-- Funktion der Statistik -->
+<mapID target="stats.abs1" url="statistic.html#abs1" /><!--Buttons(Statistik), -->
+<mapID target="stats.formel" url="statistic.html#formel" /><!--Formel(Statistik), -->
+<mapID target="stats.atoms" url="statistic.html#Atoms" /><!--atomare Werte (Statistik), Tabelle -->
+
+
+
+
+<!--
+	
+	maps to the anchors of the images for the Index of images
+	
+-->
+<mapID target="def.abb1" url="definitions.html#Abb1" />
+<mapID target="def.abb2" url="definitions.html#Abb2" />
+<mapID target="def.abb3" url="definitions.html#Abb3" />
+<mapID target="def.abb4" url="definitions.html#Abb4" />
+<mapID target="def.abb5" url="definitions.html#Abb5" />
+<mapID target="dia.kan.abb1" url="dialog_edge.html#Abb1" />
+<mapID target="dia.kan.abb2" url="dialog_edge.html#Abb2" />
+<mapID target="dia.kan.abb3" url="dialog_edge.html#Abb3" />
+<mapID target="dia.kan.abb4" url="dialog_edge.html#Abb4" />
+<mapID target="dia.file.abb1" url="dialog_file.html#Abb1" />
+<mapID target="dia.kno.abb1" url="dialog_node.html#Abb1" />
+<mapID target="dia.kno.abb2" url="dialog_node.html#Abb2" />
+<mapID target="dia.pref.abb1" url="dialog_prefs.html#Abb1" />
+<mapID target="dia.pref.abb2" url="dialog_prefs.html#Abb2" />
+<mapID target="dia.pref.abb3" url="dialog_prefs.html#Abb3" />
+<mapID target="dia.pref.abb4" url="dialog_prefs.html#Abb4" />
+<mapID target="dia.sub.abb1" url="dialog_subgraph.html#Abb1" />
+<mapID target="exp.tex.abb1" url="export_tex.html#Abb1" />
+<mapID target="exp.tex.abb2" url="export_tex.html#Abb2" />
+<mapID target="exp.png.abb1" url="export_png.html#Abb1" />
+<mapID target="pop.abb1" url="popup_menus.html#Abb1" />
+<mapID target="pop.abb2" url="popup_menus.html#Abb2" />
+<mapID target="main.abb1" url="mainwindow.html#Abb1" />
+<mapID target="main.abb2" url="mainwindow.html#Abb2" />
+<mapID target="main.abb3" url="mainwindow.html#Abb3" />
+<mapID target="main.abb4" url="mainwindow.html#Abb4" />
+<mapID target="stats.abb1" url="statistic.html#Abb1" />
+<mapID target="stats.abb2" url="statistic.html#Abb2" />
+
+	
+</map>

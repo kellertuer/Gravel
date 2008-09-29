@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="19"
+   name=""
+   committed-date="2006-11-12T03:51:19.474428Z"
+   url="https://javahelp.dev.java.net/svn/javahelp/trunk/jhMaster/JavaHelp/doc/jhug"
+   last-author="brinkley"
+   kind="dir"
+   uuid="8ea2465c-fe21-0410-bc8c-897f37722d07"
+   repos="https://javahelp.dev.java.net/svn/javahelp"
+   revision="52"/>
+<entry
+   name="release"
+   kind="dir"/>
+<entry
+   committed-rev="19"
+   name="titlepage.html"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="86871fdd704002679abfafd94f7fe4c4"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="jhugIndex.xml"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="345bfc4dc353c3e3126cf8c19273a0b6"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="jhug.css"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="824e764d90154973928dc5f0e789c558"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="GNUmakefile"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="e6f05f3f2216b51b6bb2775e74832a2c"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="jhugIndex.html"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="6afdcd4f58c79db383fadf0cda3fca36"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   name="locale"
+   kind="dir"/>
+<entry
+   committed-rev="19"
+   name="jhug.html"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="7a36f28269d3baa3e5bec38f933032d0"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="jhugTOC.xml"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="3e0dbb245bbaadf9b8034b2180dcbc97"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:51.000000Z"/>
+<entry
+   name="author"
+   kind="dir"/>
+<entry
+   committed-rev="19"
+   name="jhug.pdf"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="9dce0cb1c837e7cf062ca17e9b324796"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:51.000000Z"/>
+<entry
+   name="images"
+   kind="dir"/>
+<entry
+   committed-rev="19"
+   name="jhug.hs"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="473132df583465a778a8f02851ac2f94"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:53.000000Z"/>
+<entry
+   name="overview"
+   kind="dir"/>
+<entry
+   committed-rev="19"
+   name="jhug.jhm"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="99910ae7915403929730da5033ae1562"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:53.000000Z"/>
+<entry
+   name="dev"
+   kind="dir"/>
+</wc-entries>

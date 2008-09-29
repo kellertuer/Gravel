@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Gravel - Hilfe - Mausaktionen</title>
+
+</head>
+<body>
+<div align=center><a name="title"><h2>Mausaktionen</h2>in der grafischen Darstellung</a></div>
+<p>Mit der Maus lassen sich viele Eigenschaften des Graphen verändern. Dazu stehen zwei unterschiedliche Modi zur Verfügung. Der Standardmodus und den OneClick-Modus.<br>	
+<br>Das Ziehen (Drag) bezieht sich stets auf die linke Maustaste.
+<br>
+<a name="both"><h3>In beiden Modi</h3></a>
+In beiden Modi sind folgende Aktionen möglich:
+<br>
+<table border="0" cellspacing="5" cellpadding="5">
+	<tr><th>Aktion</th><th>Beschreibung</th></tr>	
+	<tr><td>Klicken mit<br>der rechten Maustaste oder<br>Strg+linke Maustaste</td><td>Öfnet das entsprechende <a href="popup_menus.html">Kontextmenüs</a>, je nachdem worauf geklickt wird.</td></tr>
+	<tr><td>Shift und<br>Klicken mit der linken Maustaste</td><td>Erweitert die Selektion. Selektiert angeklickte Knoten und Kanten bzw. deselektiert diese, wenn sie selektiert sind.</td></tr>
+	<tr><td colspan=2>&nbsp;</td></tr>
+	<tr><td>Ziehen (Drag)</td><td>Begonnen auf dem Hintergrund<br>Bewirkt das aufziehen eines Rechtecks, dargestellt in der Selektionsfarbe, in dessen Fläche alle Elemente selektiert werdem.</td></tr>
+	<tr><td>Alt+Ziehen (Drag)</td><td>Begonnen auf einer Kante<br>Verändert die Position des Pfeils entlang der Kante. Dabei wird die X-Achse der Mausbewegung als Eingabe verwendet</td></tr>
+	<tr><td>Alt+Ziehen (Drag)</td><td>Begonnen auf einem Knoten<br>Verändert die Position des Knotennamens, so dieser angezeigt wird.<br>Dabei verändert die X-Achse die Rotation, die Y-Achse den Abstand vom Knotenmittelpunkt.</td></tr>
+	<tr><td>Alt+Shift+Ziehen (Drag)</td><td>Begonnen auf einer selektierten Kante<br>Verändert die Position der Pfeile aller selektierten Kanten, analog zur Veränderung bei einer Kante</td></tr>
+	<tr><td>Alt+Shift+Ziehen (Drag)</td><td>Begonnen auf einem selektierten Knoten<br>Verändert die Position des Knotennamens aller selektierten Knoten, bei denen die Namensanzeige aktiv ist.<br>Dabei verändert die X-Achse die Rotation, die Y-Achse den Abstand vom Knotenmittelpunkt.</td></tr> 
+</table>
+<br><br>
+<a name="std"><h3>Im Standard-Modus</h3></a>
+<br>Der Standard-Modus ist zum verschieben von Knoten und Teilen des Graphen gedacht.
+<table border="0" cellspacing="5" cellpadding="5">
+	<tr><th>Aktion</th><th>Beschreibung</th></tr>	
+	<tr><td>Klicken mit<br>der linken Maustaste</td><td>Selektiert einen Knoten oder eine Kante, wenn auf diese geklickt wird. Dabei wird die vorherige Selektion aufgehoben. Ebenso hebt ein Klick auf den Hintergrund die Selektion auf, ohne etwas zu selektieren</td></tr>
+	<tr><td colspan=2>&nbsp;</td></tr>
+	<tr><td>Ziehen (Drag)</td><td>Begonnen auf einem Knoten<br>"Heftet" Den Knoten an die Maus, so dass er mit einer Mausbewegung verschoben wird. Ist ein Ausrichten am Raster aktiviert, so wird beim Loslassen der Maustaste der Knoten am Raster ausgerichtet.</td></tr>
+	<tr><td>Shift+Ziehen (Drag)</td><td>Bewegt die aktuelle Selektion um die Mausbewegung. Eine Ausrichtung am Raster findet nicht statt.</td></tr> 
+</table>
+<br><br><a name="OneClick"><h3>Im OneClick-Modus</h3></a>
+<div align=center></h2><a name="Abb1"><img src="img/OneClick.png"><br><font size="-1">Abbildung 1: Shift+Drag erzeugt mehrere Kanten.</a></div>
+<br>
+Der OneClick-Modus dient dem zügigen Erstellen eines neuen Graphen, Dabei werden Knoten und Kanten durch einfache Mausaktionen erzeugt.
+<table border="0" cellspacing="5" cellpadding="5">
+	<tr><th>Aktion</th><th>Beschreibung</th></tr>	
+	<tr><td>Klicken mit<br>der linken Maustaste</td><td>Auf den Hintergrund<br>Erstellt einen neuen Knoten an der Mausposition. Dabei wird der Knotendialog nicht verwendet, sondern die Standard-Werte verwendet. Die Knoten werden dabei nicht am Raster ausgerichtet.</td></tr>
+	<tr><td colspan=2>&nbsp;</td></tr>
+	<tr><td>Ziehen (Drag)</td><td>Begonnen auf einem Knoten<br>Erstellt eine Kante von diesem Knoten zum Mauscursor. Endet die Aktion auf einem anderen Knoten als dem Startknoten, so wird eine Kante in den Graphen eingefügt. Andernfalls wird die Kante wieder gelöscht.</td></tr>
+	<tr><td>Shift+Ziehen (Drag)</td><td>Begonnen auf einem selektierten Knoten<br>Erzeugt Kanten von allen selektierten Knoten zum Mauscursor. Entdet die Bewegung auf einem Knoten, so werden Kanten von allen selektierten zu diesem Knoten erstellt. Ist der Endknoten ebenso selektiert, wird die Schleife nicht erstellt. Siehe auch Abbildung 1.</td></tr> 
+</table>
+</body>
+</html>

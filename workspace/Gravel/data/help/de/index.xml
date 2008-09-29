@@ -1,0 +1,248 @@
+<?xml version='1.0' encoding='UTF-8'  ?>
+<!DOCTYPE index
+  PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Index Version 1.0//EN"
+         "http://java.sun.com/products/javahelp/index_1_0.dtd">
+<index version="1.0">
+	<indexitem text="Abbildungsverzeichnis" expand=false>
+		<indexitem text="Beispiel des Exports zweier Graphen nebeneinander" target="exp.tex.abb2"/>
+		<indexitem text="Darstellung der Parameter eines Pfeils" target="def.abb5"/>
+		<indexitem text="Der Bearbeiten-Dialog zum Eintrag 'Grad'" target="stats.abb2"/>
+		<indexitem text="Der Speichern-Dialog am Beispiel GravelML" target="dia.file.abb1"/>
+		<indexitem text="Die Liste zu Beginn und mit Inhalt" target="main.abb3"/>
+		<indexitem text="Die vier Kantentypen im Überblick" target="def.abb4"/>
+		<indexitem text="Die Registerkarte 'Allgemein' der Einstellungen" target="def.abb1"/>
+  	<indexitem text="Die Registerkarte 'Allgemein' des Kantendialogs" target="dia.kan.abb1"/>
+  	<indexitem text="Die Registerkarte 'Allgemein' des Knotendialogs" target="dia.kno.abb1"/>
+		<indexitem text="Die Registerkarte 'Ansicht' der Einstellungen" target="def.abb2"/>
+  	<indexitem text="Die Registerkarte 'Ansicht' des Kantendialogs" target="dia.kan.abb2"/>
+  	<indexitem text="Die Registerkarte 'Ansicht' des Knotendialogs" target="dia.kno.abb2"/>
+		<indexitem text="Die Registerkarte 'Kante' dee Einstellungen" target="def.abb4"/>
+		<indexitem text="Die Registerkarte 'Kantentyp' des Kantendialogs" target="dia.kan.abb3"/>
+		<indexitem text="Die Registerkarte 'Knoten' dee Einstellungen" target="def.abb3"/>
+		<indexitem text="Die Registerkarte 'Pfeil' des Kantendialogs" target="dia.kan.abb4"/>
+		<indexitem text="Die Statistik" target="stats.abb1"/>
+		<indexitem text="Die Statistik zu Beginn und während der Benutzung" target="main.abb4"/>
+		<indexitem text="Die Toolbar" target="main.abb2"/>
+		<indexitem text="Ein Graph mit gerichteten Kanten und sein ungerichtetes Pendant" target="def.abb1"/>
+		<indexitem text="Eine Selektion" target="main.abb1"/>
+		<indexitem text="Einstellungen des LaTeX-Exports nach Wahl einer Datei" target="exp.tex.abb1"/>
+		<indexitem text="Einstellungen des PNG-Exports nach Wahl einer Datei" target="exp.png.abb1"/>
+		<indexitem text="Erstellen eines Untergraphen" target="dia.sub.abb1"/>
+		<indexitem text="Kontextmenü der Kante #2" target="pop.abb2"/>
+		<indexitem text="Kontextmenü des Knotens #1" target="pop.abb1"/>
+		<indexitem text="Shift+Drag erzeugt mehrere Kanten." target="mouse.abb1"/>
+		<indexitem text="Vergrößerung von Vektorgrafik (links) und Pixelgrafik (rechts) im Vergleich" target="def.abb2"/>
+		<indexitem text="Zwei Darstellungen des selben Graphen" target="def.abb3"/>
+	</indexitem>
+	<indexitem text="Stichwortverzeichnis" expand=false>
+		<indexitem text="A" expand=false>
+				<indexitem text="Ausgrad (Knoten)" target="def.grad"/>
+				<indexitem text="Anordnen (Graphen in LaTeX)" target="exp.tex.abs6" />
+				<indexitem text="Ansicht (Einstellungen)" target="dia.pref.view" />
+		</indexitem>
+		<indexitem text="B" expand=false>
+			<indexitem text="Beispiel">
+				<indexitem text="Graphen in LaTeX" target="exp.tex.abs6" />
+				<indexitem text="Graphen in GravelML" target="gravelml.example" />
+			</indexitem>
+			<indexitem text="benachbart" target="def.benachbart"/>
+			<indexitem text="Breite">
+				<indexitem text="Pixelgrafik" target="def.breite"/>
+				<indexitem text="Kante" target="def.breite2"/>
+			</indexitem>
+		</indexitem>
+		<indexitem text="D" expand=false>
+			<indexitem text="Datenschlüssel (GravelML)" target="gravelml.abs2"/>
+			<indexitem text="default-Wert (GravelML)" target="gravelml.abs2"/>
+			<indexitem text="Dialog" target="dia">
+				<indexitem text="Datei" target="dia.file.title" />
+				<indexitem text="Einstellungen" target="dia.pref.title"/>
+				<indexitem text="Kante" target="dia.kantendialog" />
+				<indexitem text="Knoten" target="dia.kno.title" />
+				<indexitem text="Untergraph" target="dia.sub.title" />
+			</indexitem>
+			<indexitem text="Dokumenttypdefinition" target="gravelml.abs1"/>
+			<indexitem text="Drag" target="mouse.title"/>	
+			<indexitem text="Drucken (Hilfe)" target="help.title"/>	
+		</indexitem>
+		<indexitem text="E" expand=false>
+			<indexitem text="Eingrad (Knoten)" target="def.grad"/>
+			<indexitem text="Einleitung" target="intro.title" expand=false />			
+			<indexitem text="Endknoten (Kante)" target="def.end"/>
+			<indexitem text="Endung (Datei)" target="dia.file.endung"/>
+			<indexitem text="Einstellungen" target="dia.pref.title">
+				<indexitem text="Allgemein" target="dia.pref.general" />	
+				<indexitem text="Ansicht" target="dia.pref.view" />	
+				<indexitem text="Knoten" target="dia.pref.node" />	
+				<indexitem text="Kante" target="dia.pref.edge" />	
+				<indexitem text="Untergraph" target="dia.pref.subgraph" />	
+ 	 		</indexitem> 		
+			<indexitem text="eepic (LaTeX-Paket)" target="exp.tex.abs1" />
+			<indexitem text="epic (LaTeX-Paket)" target="exp.tex.abs1" />
+			<indexitem text="Export" target="exp.title">
+				<indexitem text="LaTeX-picture-Umgebung" target="exp.tex.title"/>
+				<indexitem text="Portable Network Graphics" target="exp.png.title"/>
+			</indexitem>
+		</indexitem>
+		<indexitem text="F" expand=false>
+			<indexitem text="Farbe">
+				<indexitem text="Kante" target="dia.kan.farbe" />
+			  <indexitem text="Knoten" target="dia.kno.farbe" />
+			  <indexitem text="Untergraph" target="dia.sub.farbe" />
+			</indexitem>
+	 		<indexitem text="Filter (Dateidialog)" target="dia.file.filter"/>		
+			<indexitem text="Form (Pfeil)" target="dia.kan.form"/>
+			<indexitem text="Formel (Statistik)" target="stats.formel" />
+		</indexitem>
+		<indexitem text="G" expand=false>
+			<indexitem text="gerichtet">
+				 <indexitem text="gerichteter Graph" target="def.gerichtet2"/>
+				 <indexitem text="gerichtete Kante" target="def.gerichtet"/>
+			</indexitem>
+			<indexitem text="Gewicht (Kante)" target="def.gewicht"/>		
+			<indexitem text="Grad (Knoten)" target="def.grad"/>
+			<indexitem text="Graph" target="def.graph"/>
+			<indexitem text="GraphML" target="gravelml.title"/>
+			<indexitem text="Gravel" target="intro.name"/>
+			<indexitem text="GravelML" target="gravelml.title"/>
+		  <indexitem text="Größe">
+				<indexitem text="Knoten" target="def.groesse"/>
+				<indexitem text="Pfeil" target="dia.kan.groesse"/>
+			</indexitem>	
+			<indexitem text="Grundlagen" target="def.grundlagen"/>	  
+		</indexitem>
+		<indexitem text="H" expand=false>
+			<indexitem text="Hauptfenster" target="main.title">
+				<indexitem text="Darstellung, grafische" target="main.graphic" />
+				<indexitem text="Liste" target="main.list" />
+				<indexitem text="Statistik" target="main.stats" />
+				<indexitem text="Toolbar" target="main.toolbar" />
+			</indexitem>					
+			<indexitem text="Hilfe" target="help.title"/>	
+			<indexitem text="Hinweise, rechtliche" target="liz.abs1"/>	
+			<indexitem text="Höhe (Pixelgrafik)" target="def.hoehe"/>			
+			<indexitem text="Homepage" target="liz.hp"/>	
+		</indexitem>
+		<indexitem text="I" expand=false>
+			<indexitem text="Index">
+				 <indexitem text="Kante" target="dia.kan.index" />
+			   <indexitem text="Knoten" target="dia.kno.math" />
+			   <indexitem text="Untergraph" target="dia.sub.index" />
+			</indexitem>
+			<indexitem text="inzident" target="def.inzident"/>
+		</indexitem>
+		<indexitem text="K" expand=false>
+			<indexitem text="Kante">
+			  <indexitem text="Definition" target="def.kante"/>
+			  <indexitem text="Farbe" target="dia.kan.farbe" /> 
+				<indexitem text="gerichtet" target="def.gerichtet" />
+				<indexitem text="Kontextmenü" target="pop.edge" />
+			  <indexitem text="Index" target="dia.kan.index" /> 
+				<indexitem text="Standardwerte" target="dia.pref.edge"/>				
+			  <indexitem text="ungerichtet" target="def.ungerichtet" />
+			</indexitem>
+			<indexitem text="Knoten">
+			 	<indexitem text="Definition" target="def.knoten" />
+			  <indexitem text="Farbe" target="dia.kno.farbe" />
+				<indexitem text="Kontextmenü" target="pop.node" />
+			  <indexitem text="Index" target="dia.kno.math" />
+			  <indexitem text="Position" target="dia.kno.math" />
+				<indexitem text="Standardwerte" target="dia.pref.node" />
+			</indexitem>
+			<indexitem text="Kontextmenü (allgemein)" target="pop.title" />
+		</indexitem>
+		<indexitem text="L" expand=false>
+			<indexitem text="Laden" target="dia.file.title"/>
+			<indexitem text="LaTeX (Export)" target="exp.tex.title"/>
+			<indexitem text="Links (externe, in der Hilfe)" target="help.abs2"/>	
+			<indexitem text="Lizenz " target="liz.title"/>	
+			<indexitem text="Löschen (über Kontextmenü)" target="pop.title"/>	
+		</indexitem>
+		<indexitem text="M" expand=false>
+			<indexitem text="Mausaktionen" target="mouse.title"/>
+			<indexitem text="Mehrfachkante" target="def.mehrfachkante"/>
+			<indexitem text="Menü" target="menu.title"/>
+			<indexitem text="Modus (Mausaktionen)">
+				<indexitem text="OneClick" target="mouse.oneclick" />
+				<indexitem text="Standard" target="mouse.std" />
+			</indexitem>				
+		</indexitem>
+		<indexitem text="O" expand=false>
+			<indexitem text="OneClick (Modus)" target="mouse.oneclick" />
+		</indexitem>
+    <indexitem text="P" expand=false>
+			<indexitem text="Pfeil" target="def.pfeil">
+				<indexitem text="Größe" target="dia.kan.groesse"/>
+				<indexitem text="Winkel (i.d. Spitze)" target="dia.kan.winkel"/>
+				<indexitem text="Form" target="dia.kan.form"/>
+				<indexitem text="Position" target="dia.kan.position"/>
+		  </indexitem>
+			<indexitem text="pdflatex (Compiler)" target="exp.tex.abs2" />
+			<indexitem text="picture (LaTeX-Umgebung)" target="exp.tex.abs1" />
+	    <indexitem text="Pixelgrafik" target="def.pixelgrafik"/>
+			<indexitem text="Pixel" target="def.pixel"/>
+			<indexitem text="Portable Network Graphics (Export)" target="exp.png.title"/>
+			<indexitem text="Position">
+				<indexitem text="Pfeil" target="dia.kan.position"/>	
+			  <indexitem text="Knoten" target="dia.kno.math" />
+			</indexitem>
+		</indexitem>
+		<indexitem text="S" expand=false>
+			<indexitem text="Schleife (Kante)" target="def.schleife"/>
+			<indexitem text="Speichern" target="dia.file.title"/>
+			<indexitem text="Standard (Modus)" target="mouse.std" />
+			<indexitem text="Standardwerte">
+				<indexitem text="Ansicht" target="dia.pref.view" />
+				<indexitem text="Kante" target="dia.pref.edge" />
+				<indexitem text="Knoten" target="dia.pref.node" />
+				<indexitem text="Untergraph" target="dia.pref.subgraph" />	
+			</indexitem>
+			<indexitem text="Startknoten" target="def.start"/>
+			<indexitem text="Statistik" target="stats.title">
+				<indexitem text="Formel" target="stats.formel" />
+				<indexitem text="Hauptfenster" target="main.stats" />
+				<indexitem text="Funktion" target="stats.abs1" />
+			</indexitem>	
+		</indexitem>
+		<indexitem text="T" expand=false>
+			<indexitem text="Tag (GravelML)" target="gravelml.abs1"/>
+			<indexitem text="Tastenkürzel" target="shortcuts"/>
+			<indexitem text="Toolbar" target="main.toolbar" />		
+			<indexitem text="Typ (Kante)" target="def.typen"/>
+		</indexitem>
+		<indexitem text="U" expand=false>
+			<indexitem text="ungerichtet">
+			 <indexitem text="Graph" target="def.ungerichtet2"/>
+			 <indexitem text="Kante" target="def.ungerichtet"/>
+		</indexitem>
+			<indexitem text="Untergraph">
+				<indexitem text="Definition" target="def.untergraph"/>
+				<indexitem text="Farbe" target="dia.sub.farbe" />
+				<indexitem text="Index" target="dia.sub.index" />
+				<indexitem text="Name" target="dia.sub.name" />				
+				<indexitem text="Standardwerte" target="dia.pref.subgraph"/>				
+			</indexitem>
+		</indexitem>
+		<indexitem text="V" expand=false>
+			<indexitem text="Vektorgrafik" target="def.vektorgrafik"/>	
+			<indexitem text="Verzeichnisse" target="help.abs1"/>	
+			<indexitem text="Versionen (Gravel)" target="intro.versions"/>	
+		</indexitem>
+		<indexitem text="W" expand=false>
+			<indexitem text="Winkel (Pfeil)" target="dia.kan.winkel" />
+		</indexitem>					
+		<indexitem text="Z" expand=false>
+			<indexitem text="Zoom (Toolbar)" target="main.toolbar" />
+		</indexitem>
+ </indexitem>  <!-- End of Stichwortverzeichnis  -->
+ <indexitem text="Tabellenverzeichnis" expand=false>
+		<indexitem text="atomare Werte des Graphe für die Statistik" target="stats.atoms" />					
+		<indexitem text="Datenschlüssel in GravelML" target="gravelml.table" />					
+		<indexitem text="Mausaktionen, beide Modi" target="mouse.both" />					
+		<indexitem text="Mausaktionen, OneClick-Modus" target="mouse.oneclick" />					
+		<indexitem text="Mausaktionen, Standard-Modus" target="mouse.std" />					
+		<indexitem text="Menueinträge, tabbelarisch" target="menu.table" />					
+		<indexitem text="Tabelle der Tastenkürzel für Gravel" target="shortcuts" />					
+ </indexitem>  <!-- End of Tabellenverzeichnis -->		  			
+</index>
+

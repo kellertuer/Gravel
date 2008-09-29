@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Gravel - Hilfe - Dialoge - Kanten</title>
+</head>
+<body>
+<div align=center><a name="title"><h2>Kantendialog</h2></a></div>
+Der Dialog für Kanten ist stets über das <a href="popup_menus.html">Kontextmenü</a> auf einer Kante verfügbar. Der Dialog wird dann mit den Werten dieser Kante initialisiert. Der Dialog gliedert sich in vier Registerkarten: 
+<br><br>
+<h3>Allgemein</h3>
+<div align=center><a name="Abb1"><img src="img/dialog_edge_general.png"></a><br><font size="-1">Abbildung 1: Die Registerkarte "Allgemein" des Kantendialogs</font></div>
+<br>
+<p>In der Registerkarte "Allgemein" sind zunächst die mathematischen Eigenschaften aufgelistet. Der <a name="index">Index</a>, Start- und Endknoten, ein Name sowie das Gewicht der Kante.
+<br>Danach die Breite in Pixeln, die die Linie der Kante in der Darstellung einnimmt.
+<br>Die <a name="farbe">Farbe</a> der Kante ergibt sich aus der Zugehörigkeit zu Untergraphen. Eine Liste der Untergraphen befindet sich am unteren Ende dieser Registerkarte und jeder Untergraph ist in dieser Liste klickbar, wodurch die Kante entweder hinzugefügt oder entfernt wird, je nach vorherigem Zustand. Dann wird die Farbe neu berechnet.</p>
+<br>
+<h3>Ansicht</h3>
+<div align=center><a name="Abb2"><img src="img/dialog_edge_view.png"></a><br><font size="-1">Abbildung 2: Die Registerkarte "Ansicht" des Kantendialogs<br>mit aktivierter Textanzeige und gestrichelter Linie</font></div>
+<br>
+<p>In der Ansicht lassen sich die Werte für den Kantentext und die Linienart verändern. Die Anzeige eines Textes an der Kante kann aktiviert werden. Ist die Anzeige deaktiviert, so sind die darauffolgenden Optionen deaktiviert.
+<br>Andernfalls wird die Anzeige durch drei Parameter eingestellt:<br>
+Die Position gibt an, wo entlang der Kante sich der Textmittelpunkt befindet. Dabei ist ein Wert zwischen 0 und 100 anzugeben.<br>
+Ein Wert zwischen 0 und 50 platziert den Text gegen Uhrzeigersinn 90° zur Kantenrichtung (bei einer Kante von links nach rechts also oberhalb der Kante) und dann entlang der Strecke je nach Anteil des Wertes. 0 ist am Startknoten, 50 am Endknoten, also 25 mittig auf der Kante.<br>
+Ein Wert zwischen 51 und 100 platziert den Text im Uhrzeigersinn 90° zur Kantenrichtung, im obigen Beispiel also unterhalb der Kante. Hier dreht sich ebenso die Richtung um: 51 ist am Endknoten und 100 am Startknnoten. Der Wert 75 platziert den Text also etwa mittig.<br>
+Der Abstand bezeichnet die Anzahl Pixel zwischen Textmittelpunkt und Kante. Die Textgröße gibt an, wieviele Pixel der Text hoch ist. Zusätzlich kann noch gewählt werden, ob der Kantenname oder der Kantenwert angezeigt werden soll.</p>  
+<p>Für die Linienart der Kante gibt es vier Möglichkeiten:
+<br>1. Eine durchgezogene Line - hier sind keine weiteren Angaben notwendig.
+<br>2. eine gestrichelte Linie - hier ist die Länge eines Strichs und der Abstand zwischen 2 Strichen anzugegeben
+<br>3. eine gepunktete Linie - der Abstand muss angegeben werden, die Größe der Punkte ergibt sich aus der Kantenbreite
+<br>4. eine Strichpunktlinie - analog zur gestrichelten Linie ist die Strichlänge anzugeben. Der Abstand bezeichnet hier den Abstand Strich-Punkt
+</p>
+<br>
+<h3>Kantentyp</h3>
+<div align=center><a name="Abb3"><img src="img/dialog_edge_type.png"></a><br><font size="-1">Abbildung 3: Die Registerkarte "Kantentyp" des Kantendialogs</font></div>
+<br>
+<p>Die Registerkarte <a name="kantentyp">"Kantentyp"</a> bietet die Möglichkeit, den Typ der Kante zu verändern. Neben der direkten Verbindung der beiden Knoten existieren die vier Typen, die in der <a href="definitions.html#vis">Definition</a> vorgestellt werden.<br>
+Die quadratische Kurve benötigt den Beziér-Punkt, eine segmentierte Kante mindestens einen Wegpunkt und die orthogonale Kante besitzt 2 Möglichkeiten, entweder vertikal oder horizontal am Startknoten anzusetzen. </p>
+<br>
+<h3>Pfeil</h3>
+<div align=center><a name="Abb4"><img src="img/dialog_edge_arrow.png"></a><br><font size="-1">Abbildung 4: Die Registerkarte "Pfeil" des Kantendialogs</div>
+<br>
+<p>Die Registerkarte "Pfeil" ist nur bei gerichteten Graphen sichtbar. Die Einstellungen basieren auf der  Erklärung in Abbildung 5 in den <a href="definitions.html#Abb5">Definitionen</a>. Als numerischer Wert ist die <a name="groesse">Größe</a> des Pfeils spezifizierbar. Regler existieren für den <a name="winkel">Winkel</a> in der Pfeilspitze, die <a name="form">Form</a> des Pfeils, dies entspricht der Füllweite b, und der <a name="position">Position</a> entlang der Kante. All diese Werte werden in der Vorschau am unteren Ende der Registerkarte an einem Pfeil gezeigt.</p>
+<br>
+<h3>Validitätsbedingungen</h3>
+<br>
+Beim Wählen von "Abbruch" werden die Änderungen nicht in die Kante übernommen
+Betätigt man den Button "Änderungen speichern", so müssen folgende Bedingungen erfüllt sein, damit die Kante gespeichert wird:<br>
+Der Index darf noch keiner anderen Kante zugeordnet sein. Es darf keine Kante zwischen den beiden Knoten existieren, im ungerichteten Fall auch keine Kante in Gegenrichtung. Ist die Textanzeige aktiviert, so müssen die drei Werte Größe, Position und Abstand existieren. Bei einer Kurve muss der Beziér-Punkt angegeben sein, bei einer segmentierten kante mindestens ein Kontrollpunkt.
+<br>Sind all diese Bedingungen gegeben, wird die Kante gespeichert und der Graph in der Darstellung neu gezeichnet. Andernfalls wird eine Fehlermeldung ausgegeben.</p>
+</body>
+</html>

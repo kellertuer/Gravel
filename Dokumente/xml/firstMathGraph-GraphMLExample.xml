@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 	===Gravel=== 
+		
+		Graph Export in an GraphML like format
+		the variation to GraphML is an extra tag subset to save also the subsetgraphs 
+		
+		
+		Contains many special Keys that may be used in Gravel, but if ignored you still get a "normal" GraphML Graph,
+		despite that the subsets are in the graph.
+		
+		developed by Ronny Bergmann adapted from GraphML and the GraphML.dtd
+-->
+<!DOCTYPE graphml SYSTEM "graphmlgravel.dtd">
+
+<graphml>
+
+<!-- Gravel key Defintition for determing wether its with or without visual information -->
+
+	<key id="gt" for="graph" attr.name="type" attr.type="string"><!--Graphentyp : VGraph|MGraph -->
+		<default>math</default>
+	</key>
+	
+<!-- Gravel key Definitions for a Graph without visual information -->
+
+	<key id="ev" for="edge" attr.name="value" attr.type="integer"> <!-- Gewicht der Kante-->
+    	<default>1</default>
+	</key>
+
+	<key id="nn" for="node" attr.name="name" attr.type="string"><!--Name des Knotens -->
+    	<default>Knoten #</default>
+	</key>
+  
+	<key id="sn" for="subset" attr.name="name" attr.type="string"><!-- Name des Untergraphen-->
+		<default>Untergraph #</default>
+	</key>
+
+<!-- Graphel key Definitions for a Graph with visual information -->
+	
+	<!-- ==In a node== -->
+	<key id="nx" for="node" attr.name="x" attr.type="integer"></key> <!--X-Position des Knotens -->
+	<key id="ny" for="node" attr.name="y" attr.type="integer"></key> <!--Y-Position des Knotens -->
+	<key id="ns" for="node" attr.name="size" attr.type="integer">    <!-- Größe des Knotens -->
+		<default>30</default>
+	</key>
+	<key id="na" for="node" attr.name="name.abstand" attr.type="integer">    <!-- Abstand des Namens vom Knotenpunkt -->
+		<default>35</default>
+	</key>
+	<key id="nr" for="node" attr.name="name.rotation" attr.type="integer">    <!-- Drehung des Namens -->
+		<default>90</default>
+	</key>
+	<key id="nns" for="node" attr.name="name.size" attr.type="integer">    <!-- Textgröße des Namens -->
+		<default>12</default>
+	</key>
+	<key id="nnv" for="node" attr.name="name.visible" attr.type="boolean">    <!-- Name anzeigen -->
+		<default>false</default>
+	</key>	
+
+	<!-- ==In an edge== -->
+		
+	<key id="ew" for="edge" attr.name="width" attr.type="integer"> <!-- Kantenbreite -->
+		<default>2</default>
+	</key>
+	<key id="es" for="edge" attr.name="arrowsize" attr.type="float"> <!--Pfeilgröße -->
+		<default>20.0</default>
+	</key>
+	<key id="ep" for="edge" attr.name="arrowpart" attr.type="float"> <!-- Anteil des Pfeils -->
+		<default>0.75</default>
+	</key>
+	<key id="ea" for="edge" attr.name="alpha" attr.type="float"> <!-- Winkel in der Pfeilspitze-->
+		<default>25.0</default>
+	</key>
+	<key id="et" for="edge" attr.name="edgetype" attr.type="string"> <!-- Kantentyp (Orthogonal|QuadCurve|Segmented|StraightLine|)-->
+		<default>StraightLine</default>
+	</key>
+	<key id="ex" for="edge" attr.name="x" attr.type="integer"></key> <!--weitere Kontrollpunkt (Segmented|QuadCurveEdge) -->
+	<key id="ey" for="edge" attr.name="y" attr.type="integer"></key>
+	<key id="eo" for="edge" attr.name="Orthogonal.vericalfirst" attr.type="boolean"> <!--Nur fuer Orthogonal pflicht-->
+		<default>true</default>
+	</key>
+	
+	<key id="enp" for="node" attr.name="name.position" attr.type="float">    <!-- Position auf der Kante -->
+		<default>0.5</default>
+	</key>
+	<key id="ens" for="node" attr.name="name.size" attr.type="integer">    <!-- Textgroesse des Namens -->
+		<default>12</default>
+	</key>
+	<key id="env" for="node" attr.name="name.visible" attr.type="boolean">    <!-- Name anzeigen -->
+		<default>false</default>
+	</key>	
+	
+	<!-- ==In a subset== (remove to get a normal GraphML-File) -->
+  	<key id="sr" for="subset" attr.name="color.r" attr.type="integer">    <!-- SubSetColor - Red -->
+		<default>0</default>
+	</key>	
+	<key id="sg" for="subset" attr.name="color.g" attr.type="integer">    <!-- SubSetColor - Green -->
+		<default>0</default>
+	</key>	
+	<key id="sb" for="subset" attr.name="color.b" attr.type="integer">    <!-- SubSetColor - blue -->
+		<default>0</default>
+	</key>	
+
+
+<!-- Finally the graph -->
+<graph id="G" edgedefault="undirected">
+    
+	<!--Type -->
+	<data key="gt">visual</data>
+
+	<node id="node1">
+      	<data key="nn">Knoten #1</data>
+		<data key="nx">27</data>
+		<data key="ny">88</data>
+		<data key="ns">30</data>
+    </node>
+
+    <node id="node2">
+  		<data key="nn">komischer Knoten</data>
+		<data key="nx">66</data>
+		<data key="ny">88</data>
+		<data key="ns">18</data>
+	</node>	
+    <node id="node3">
+		<data key="nn">blauer Knoten</data>
+		<data key="nx">66</data>
+		<data key="ny">133</data>
+		<data key="ns">30</data>
+    </node>
+   
+ 	<edge id="edge1" source="node1" target="node2">
+    	<data key="ew">1</data>
+	  	<data key="et">StraightLine</data>
+	  	<data key="es">20.0</data>
+		<data key="ep">0.75</data>
+		<data key="ea">30</data>
+	</edge>
+	<edge id="edge2" source="node2" target="node3">
+    	<data key="ew">1</data>
+	  	<data key="et">QuadCurve</data>
+	  	<data key="es">20.0</data>
+		<data key="ep">0.75</data>
+		<data key="ea">30</data>
+		<data key="ex">88</data>
+		<data key="ey">110</data>
+	</edge>
+
+<!-- == REMOVE THESE LINES TO GET A GraphML-FILE	-->
+	<subset id="subset1">
+		
+		<snode node="node1"/>
+		
+	</subset>
+<!-- == END OF REMOVE THESE LINES TO GET A GraphML-FILE	-->	
+  </graph>
+</graphml>

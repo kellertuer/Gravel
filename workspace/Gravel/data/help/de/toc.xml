@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'  ?>
+
+<!DOCTYPE toc
+  PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN"
+         "http://java.sun.com/products/javahelp/toc_2_0.dtd">
+<toc version="2.0">
+    <tocitem expand=false openimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Einleitung" target="intro">
+			<tocitem image="icon.page" text="Verwendung der Hilfe" target="helppage"/>			
+			<tocitem image="icon.anchor" text="Versionen" target="intro.versions"/>
+		</tocitem>
+		
+		            
+    <tocitem expand=false openimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Definition" target="definition">
+			<tocitem image="icon.anchor" text="Graphen" target="definition.math"/>
+			<tocitem image="icon.anchor" text="Grafik" target="definition.grafik"/>
+			<tocitem image="icon.anchor" text="Visualisierung" target="definition.vis"/>
+		</tocitem>            
+    
+		<tocitem image="icon.page" text="GravelML" target="gravelml"/>			
+
+		<tocitem expand=false openimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Oberfläche">
+		 	<tocitem expand=false openimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Hauptfenster" target="mainwindow">
+				<tocitem image="icon.anchor" text="Toolbar" target="mainwindow.toolbar"/>
+				<tocitem image="icon.anchor" text="grafische Darstellung" target="mainwindow.graphic"/>
+				<tocitem image="icon.anchor" text="Liste" target="mainwindow.list"/>
+				<tocitem image="icon.anchor" text="Statistik" target="mainwindow.stats"/>
+			</tocitem> <!--Ende Hauptfenster -->            
+			<tocitem image="icon.page" text="Menü" target="menu"/>
+			<tocitem image="icon.page" text="Kontextmenüs" target="popup_menus"/>
+		 <tocitem expand=false openimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Dialoge" target="dialog">
+				<tocitem image="icon.page" text="Einstellungen" target="dialog.prefs"/>   
+				<tocitem image="icon.page" text="Kanten" target="dialog.edge"/>
+				<tocitem image="icon.page" text="Knoten" target="dialog.node"/>
+				<tocitem image="icon.page" text="Untergraphen" target="dialog.subgraph"/>
+				<tocitem image="icon.page" text="Datei" target="dialog.file"/>
+			</tocitem> <!--Ende Dialoge -->            
+		</tocitem><!--Ende Oberfläche -->            
+     
+
+		<tocitem expand=false openimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Export" target="export">
+  			<tocitem image="icon.page" text="Portable Network Graphics" target="export.png"/>
+				<tocitem image="icon.page" text="LaTeX-Picture-Umgebung" target="export.tex"/>
+			</tocitem> <!--Ende Export -->
+
+
+			<tocitem expand=false categoryclosedimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Statistik" target="stats">
+			<tocitem image="icon.anchor" text="atomare Werte" target="stats.atoms"/>
+		</tocitem>
+		
+		
+		<tocitem image="icon.page" text="Mausaktionen" target="mouseaction" />
+		
+		
+		<tocitem image="icon.page" text="Tastenkürzel" target="shortcuts" />
+    
+
+		 <tocitem image="icon.page" text="Lizenzbestimmungen" target="license"/>
+</toc>

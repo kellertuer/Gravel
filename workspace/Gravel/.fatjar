@@ -1,0 +1,20 @@
+#Fat Jar Configuration File
+#Fri Apr 04 00:14:10 CEST 2008
+onejar.expand=
+autojar.enable=false
+excludes=
+manifest.removesigners=true
+manifest.mergeall=true
+manifest.file=<createnew>
+manifest.vmarguments=
+jarname=/Users/ronny/Uni/Gravel/builds/Gravel 0.2.2/gravel.jar
+onejar.checkbox=false
+autojar.visitclasses=main.Gravel
+jarname.isextern=true
+manifest.mainclass=Gravel
+onejar.license.required=true
+launchconfigname=<default>
+includes=
+autojar.classforname=false
+manifest.classpath=
+manifest.arguments=

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="19"
+   name=""
+   committed-date="2006-11-12T03:51:19.474428Z"
+   url="https://javahelp.dev.java.net/svn/javahelp/trunk/jhMaster/JavaHelp/doc/jhug/dev"
+   last-author="brinkley"
+   kind="dir"
+   uuid="8ea2465c-fe21-0410-bc8c-897f37722d07"
+   repos="https://javahelp.dev.java.net/svn/javahelp"
+   revision="52"/>
+<entry
+   committed-rev="19"
+   name="embed.html"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="e81706bd8a422db49ffe2d7dc63af624"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:53.000000Z"/>
+<entry
+   committed-rev="19"
+   name="csh.html"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="93a2f0aa677760ea8ccc7e1ecd386b1a"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:53.000000Z"/>
+<entry
+   committed-rev="19"
+   name="dev.html"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="09a5f154499ef2e2722857eae120540a"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:53.000000Z"/>
+<entry
+   committed-rev="19"
+   name="lwcomp.html"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="4b193dcb99be904eca375b32ace9bd59"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:53.000000Z"/>
+<entry
+   committed-rev="19"
+   name="dynamicmerge.html"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="38333dbbaa8a8f45d80ed7dba08cf372"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:53.000000Z"/>
+<entry
+   committed-rev="19"
+   name="basics.html"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="b9463d71a46d6ff6f7b80b5ccbee648a"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:53.000000Z"/>
+<entry
+   committed-rev="19"
+   name="serverhlp.html"
+   text-time="2007-06-15T23:00:53.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="975783ffbce48d766bbbd24e9c4e1a56"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:53.000000Z"/>
+</wc-entries>

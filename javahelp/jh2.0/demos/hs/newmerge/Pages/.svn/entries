@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="19"
+   name=""
+   committed-date="2006-11-12T03:51:19.474428Z"
+   url="https://javahelp.dev.java.net/svn/javahelp/trunk/jhMaster/JavaHelp/demos/hs/newmerge/Pages"
+   last-author="brinkley"
+   kind="dir"
+   uuid="8ea2465c-fe21-0410-bc8c-897f37722d07"
+   repos="https://javahelp.dev.java.net/svn/javahelp"
+   revision="52"/>
+<entry
+   committed-rev="19"
+   name="Introduction.html"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="882e31f31beddd22fd9c274cf0ad1050"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="hg_proc.gif"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="3b698be1c23d534935ecad0188e555f4"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="main.html"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="b6df2a8d4e2481bae0991ab6d6a48782"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="add.jpg"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="f01c68ee38bd6e7e8e031cd9110c754c"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="add"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="3477525c87302dd59b5d469854da84cb"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="view.jpg"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="f66cefbd793de8f7f54e39ca183800d3"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="add.html"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="5ca69ec63960b73c3a46b1c116d1ac3b"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="add.gif"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="2b6909ac2e915ec969d649f85b6a1538"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="view.html"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="0b93583ab9d741c7cb9c800adaf9b97f"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+</wc-entries>

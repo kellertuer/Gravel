@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="19"
+   name=""
+   committed-date="2006-11-12T03:51:19.474428Z"
+   url="https://javahelp.dev.java.net/svn/javahelp/trunk/jhMaster/JavaHelp/demos/serverhelp/web/altpres"
+   last-author="brinkley"
+   kind="dir"
+   uuid="8ea2465c-fe21-0410-bc8c-897f37722d07"
+   repos="https://javahelp.dev.java.net/svn/javahelp"
+   revision="52"/>
+<entry
+   committed-rev="19"
+   name="invalidhelp.html"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="867f9a925ab7237723263e404d4e700e"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="help.jsp"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="7a8707d3571b429c542ce773bcddb796"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="navigator.jsp"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="4ac1955735f137d3e1e8462b9f733fe8"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+</wc-entries>

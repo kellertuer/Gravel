@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="19"
+   name=""
+   committed-date="2006-11-12T03:51:19.474428Z"
+   url="https://javahelp.dev.java.net/svn/javahelp/trunk/jhMaster/JavaHelp/doc/jhug/locale"
+   last-author="brinkley"
+   kind="dir"
+   uuid="8ea2465c-fe21-0410-bc8c-897f37722d07"
+   repos="https://javahelp.dev.java.net/svn/javahelp"
+   revision="52"/>
+<entry
+   committed-rev="19"
+   name="loc_xml.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="e2cea7849987485a78f8024673905855"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="loc.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="057a20fa4f38ce9a1c4fef16029a3059"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="loc_html.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="cb853c5a29c4fdb1232ed18864eed21c"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="loc_helpset.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="fb74dfe9bc34f34b7d2741cecdd8ef36"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="loc_search.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="2272174771f6674573ff96ef077fa2cb"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="loc_font.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="5209ef91bbb0fe8a8f9ab136207e7b88"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="loc_pres.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="6361a20936493b846809033513eef180"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+</wc-entries>

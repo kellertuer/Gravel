@@ -1,0 +1,16 @@
+aaa
+<!-- not yet supported by Java -->
+
+body { color:#333333; background-color:#FFFFFF }
+
+pre.normal { color:#FFFFFF; }
+
+a:link { color:#5555FF; text-decoration:underline; }
+
+a:visited { color:#3333AA; text-decoration:underline; }
+
+a:active { color:#3333AA; text-decoration:none; }
+
+#titel { background-color:#222288;}
+#dmw { color:#666666; font-style:italic; }
+#tabtitel { color:#000099; }

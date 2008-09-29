@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<session version="1.0">
+<refactoring comment="Rename type 'model.VEdgeLoop' to 'VLoopEdge'&#10;- Original element: 'model.VEdgeLoop'&#10;- Renamed element: 'model.VLoopEdge'&#10;- Update references to refactored element&#10;- Update textual occurrences in comments and strings" description="Rename type 'VEdgeLoop'" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/&lt;model{VEdgeLoop.java[VEdgeLoop" matchStrategy="1" name="VLoopEdge" qualified="false" references="true" similarDeclarations="false" stamp="1201088047169" textual="false" version="1.0"/>
+</session>

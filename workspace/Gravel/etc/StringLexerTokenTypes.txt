@@ -1,0 +1,13 @@
+// $ANTLR : Stringparser.g -> StringLexerTokenTypes.txt$
+StringLexer    // output token vocab name
+WS=4
+LKLAMMER=5
+RKLAMMER=6
+MUL=7
+DIV=8
+EXP=9
+PLUS=10
+MINUS=11
+SEMI=12
+ZIFFER=13
+NUM=14

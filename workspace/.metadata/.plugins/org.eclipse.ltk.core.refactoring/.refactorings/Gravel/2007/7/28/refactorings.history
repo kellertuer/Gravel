@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<session version="1.0">
+<refactoring comment="Rename type 'main.Grave' to 'Gravel'&#10;- Original element: 'main.Grave'&#10;- Renamed element: 'main.Gravel'&#10;- Update references to refactored element&#10;- Update textual occurrences in comments and strings" description="Rename type 'Grave'" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/&lt;main{Grave.java[Grave" matchStrategy="1" name="Gravel" qualified="false" references="true" similarDeclarations="false" stamp="1184352612695" textual="false" version="1.0"/>
+</session>

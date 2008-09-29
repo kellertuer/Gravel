@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="19"
+   name=""
+   committed-date="2006-11-12T03:51:19.474428Z"
+   url="https://javahelp.dev.java.net/svn/javahelp/trunk/jhMaster/JavaHelp/doc/jhug/release"
+   last-author="brinkley"
+   kind="dir"
+   uuid="8ea2465c-fe21-0410-bc8c-897f37722d07"
+   repos="https://javahelp.dev.java.net/svn/javahelp"
+   revision="52"/>
+<entry
+   committed-rev="19"
+   name="limitations.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="c929f49e25f0466b7dd23e167107d875"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="libraries.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="1acf31f1fbb626e542d7360322093197"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="contents.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="e8923c97810eca2fb5fb4295f4cf9f95"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="release.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="4fccebd3a0027e87dae2693d88381ebd"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="requirements.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="4a4be6f014b7ef1c305de72d5bad5156"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="helpsets.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="f2e72c11dcceaf11c0986b168e90fab0"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="demos.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="4ac03c5bfe69b35347d06b2782b90b70"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="changes.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="cc216d5ace8b42057a97b85f2f058c56"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+<entry
+   committed-rev="19"
+   name="file_list.html"
+   text-time="2007-06-15T23:00:50.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="fde6b067871a85fe1e42cae397fc4ca3"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:50.000000Z"/>
+</wc-entries>

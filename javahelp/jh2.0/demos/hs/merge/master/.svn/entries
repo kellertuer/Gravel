@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="19"
+   name=""
+   committed-date="2006-11-12T03:51:19.474428Z"
+   url="https://javahelp.dev.java.net/svn/javahelp/trunk/jhMaster/JavaHelp/demos/hs/merge/master"
+   last-author="brinkley"
+   kind="dir"
+   uuid="8ea2465c-fe21-0410-bc8c-897f37722d07"
+   repos="https://javahelp.dev.java.net/svn/javahelp"
+   revision="52"/>
+<entry
+   name="images"
+   kind="dir"/>
+<entry
+   committed-rev="19"
+   name="main.html"
+   text-time="2007-06-15T23:00:57.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="e98151399465a174c26d6055d9894fe0"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:57.000000Z"/>
+<entry
+   committed-rev="19"
+   name="add.html"
+   text-time="2007-06-15T23:00:57.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="d54f353602d849434359acf98bf7f114"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:57.000000Z"/>
+<entry
+   committed-rev="19"
+   name="intro.html"
+   text-time="2007-06-15T23:00:57.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="dfe2622c5be900104f79c6b53e862498"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:57.000000Z"/>
+</wc-entries>

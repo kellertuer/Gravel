@@ -1,0 +1,4 @@
+#Wed Dec 19 16:15:59 CET 2007
+PLUGINS_NOT_ACTIVATED_ON_STARTUP=
+eclipse.preferences.version=1
+ENABLED_DECORATORS=org.antlr.eclipse.ui.decorator\:true,org.eclipse.jdt.ui.override.decorator\:true,org.eclipse.jdt.ui.interface.decorator\:false,org.eclipse.pde.ui.binaryProjectDecorator\:false,org.eclipse.team.cvs.ui.decorator\:false,org.eclipse.ui.LinkedResourceDecorator\:true,org.tigris.subversion.subclipse.ui.decorator\:true,

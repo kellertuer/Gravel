@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="19"
+   name=""
+   committed-date="2006-11-12T03:51:19.474428Z"
+   url="https://javahelp.dev.java.net/svn/javahelp/trunk/jhMaster/JavaHelp/demos/serverhelp/web"
+   last-author="brinkley"
+   kind="dir"
+   uuid="8ea2465c-fe21-0410-bc8c-897f37722d07"
+   repos="https://javahelp.dev.java.net/svn/javahelp"
+   revision="52"/>
+<entry
+   committed-rev="19"
+   name="loading.html"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="6610383346f44c61dff36ea2ad9571b2"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="nonavigator.jsp"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="5d47be27b01b0c0f8f2adf5795904b20"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="help.jsp"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="6ddf0bc6fc5fd2ea4accb6fc5724ee8a"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="navigator.jsp"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="0699a5934d90a6a0f854e20fd1307068"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="util.js"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="7cf1cc7602e00eb8abb6527e913168b1"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="javax.help.SearchView.jsp"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="e478031106d7ae089995b3c6ff3f0688"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="javax.help.IndexView.jsp"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="3ed7748ac7f9c8512638acb35e56355e"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="README"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="91a12da6be9bffb4883654923013e298"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="invalidhelp.html"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="867f9a925ab7237723263e404d4e700e"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="index.jsp"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="88f49fe4f9368297e8cacafe32382b22"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="toolbar.html"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="84fcae4316bed8b9fafd82b083c29d45"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   name="images"
+   kind="dir"/>
+<entry
+   committed-rev="19"
+   name="banner.html"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="430d23e38aaa8496b7665ac11053b49b"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="jhlib.tld"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="4327dd22c5ca54f6dfa6e374069207b3"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   name="altpres"
+   kind="dir"/>
+<entry
+   committed-rev="19"
+   name="javax.help.TOCView.jsp"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="045eb3bf655922cba2bab05602bcc0a1"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="tree.js"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="cd440602dfd8aa54a16c90bb4d2a1b59"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="searchlist.js"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="85f7ce6254a3247dec70bf0828c8e511"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+<entry
+   committed-rev="19"
+   name="update.jsp"
+   text-time="2007-06-15T23:00:54.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="2950023644383c832216f8a99da2cedd"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:54.000000Z"/>
+</wc-entries>

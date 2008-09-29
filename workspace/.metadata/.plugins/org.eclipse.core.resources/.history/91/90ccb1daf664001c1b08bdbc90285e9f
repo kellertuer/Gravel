@@ -1,0 +1,75 @@
+package view.pieces;
+
+import io.GeneralPreferences;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+public class ZoomComponent extends Observable implements ChangeListener
+{
+	
+	private JPanel content;
+	private JSlider zoomslider;
+	private JLabel zoomfield;
+	private int value;
+	public ZoomComponent()
+	{
+		value = GeneralPreferences.getInstance().getIntValue("vgraphic.zoom");
+		content = new JPanel();
+		content.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(0,0,0,0);
+		c.anchor = GridBagConstraints.CENTER;
+		c.gridy = 0;
+		c.gridx = 0;		
+		zoomslider = new JSlider(JSlider.HORIZONTAL,15,800,value);
+		zoomslider.setSize(250, 30);
+		zoomslider.addChangeListener(this);
+		zoomslider.setMajorTickSpacing(100);
+		zoomslider.setPaintTicks(true);
+		content.add(zoomslider,c);
+		zoomfield = new JLabel("<html>Ma"+main.CONST.html_sz+"stab: "+value+"%</html>");
+		c.gridy++;
+		content.add(zoomfield,c);
+		content.revalidate();
+	}
+	/**
+	 * someone moved the Slider so the state changed, notify others
+	 */
+	public void stateChanged(ChangeEvent arg0)
+	{
+				value = (int)zoomslider.getValue();
+				zoomfield.setText("<html>Ma"+main.CONST.html_sz+"stab: "+value+"%</html>");
+				setChanged();
+				notifyObservers("Zoom");
+	}
+	public JPanel getContent()
+	{
+		return content;
+	}
+	public int getZoom()
+	{
+		return value;
+	}
+	/**
+	  * Set the Zoom (activates stateChanged)
+	  * @param v
+	  */
+	public void setZoom(int v)
+	{
+			zoomslider.setValue(value);
+			value = (int)zoomslider.getValue();
+			zoomfield.setText("<html>Ma"+main.CONST.html_sz+"stab: "+value+"%</html>");
+			setChanged();
+			notifyObservers("Zoom");
+	}
+}

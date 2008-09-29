@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="22"
+   name=""
+   committed-date="2006-11-12T07:08:22.600507Z"
+   url="https://javahelp.dev.java.net/svn/javahelp/trunk/jhMaster/JavaHelp/demos/hs/newmerge"
+   last-author="brinkley"
+   kind="dir"
+   uuid="8ea2465c-fe21-0410-bc8c-897f37722d07"
+   repos="https://javahelp.dev.java.net/svn/javahelp"
+   revision="52"/>
+<entry
+   name="Pages"
+   kind="dir"/>
+<entry
+   committed-rev="22"
+   name="MergeHelp.hs"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T07:08:22.600507Z"
+   checksum="70cff7f88237fb9ecbd2c606e553b4af"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="MergeTOC.xml"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="306f04be05b077181506cae3d73b3af0"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="MergeIndex.xml"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="1ac5be368f9c3ce17e2aeaba22a329b0"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="jhexamples.css"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="56211792bf8176469e18768ff6eb1e48"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="GNUmakefile"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="f340e3236a324e999cf2c8ee860690fa"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="Map.jhm"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="9982e4966f89d98bf4bafd07b8f78186"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+<entry
+   committed-rev="19"
+   name="Makefile"
+   text-time="2007-06-15T23:01:13.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="1e5c5fedd95cf5d88972586a0ead15de"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:01:13.000000Z"/>
+</wc-entries>

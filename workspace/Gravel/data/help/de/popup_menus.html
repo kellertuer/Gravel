@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Gravel - Hilfe - Kontextmenüs</title>
+
+</head>
+<body>
+<div align=center><a name="title"><h2>Kontextmenüs</h2></a></div>
+<p>In der <a href="mainwindow.html#graphic">grafischen Darstellung</a> existieren für Knoten und Kanten Kontextmenüs. Diese sind entweder über die rechte Maustaste oder über die Taste Strg und die linke Maustaste verfügbar.<br>
+Ebenso sind in der <a href="mainwindows.html#list">Liste der Elemente</a> bei jedem Element des Graphen ebenso Kontextmenüs vorhanden, die jeweils die beiden Einträge "Eigenschaften" und "Löschen" enthalten. Unter dem ersten wird der entsprechende <a href="dialog.html">Dialog</a> aufgerufen. Vor dem Löschen wird eine Bestätigung verlangt.</p>
+<p>Im Folgenden werden tabellarisch die Kontextmenüs der Knoten und Kanten in der <a href="mainwindow.html#graphic">grafischen Darstellung</a> aufgeführt und ihre einzelnen Menüpunkte erläutert.
+<br><br>
+<a name="node"><h3>Das Knoten-Kontextmenü</h3></a>
+<div align=center>
+<a name="Abb1"><img src="img/popup_node.png"></a><br>
+<font size=-1>Abbildung 1: Kontextmenü des Knotens #1</font></div>                                      
+<br>
+<table border="0" cellspacing="5" cellpadding="5">
+	<tr><td>Knoten #1 - (#1)</td><td>Der Name des Knotens und mit "-" getrennt der Index des Knotens<br>Dieser Eintrags ist stets deaktiv</td></tr>
+	<tr><td>Kanten zu selektierten Knoten</td><td>Fügt Kanten in den Graphen ein mit dem aktuellen Knoten als Startknoten und jeweils den selektierten als Endknoten, so diese nicht existieren. Ist der Knoten selektiert, bei dem dieser Punkt gewählt wird, wird die Schleife nicht erstellt.<br>Dieser Eintrag ist deaktiviert, falls keine Selektion existiert</td></tr>
+	<tr><td>Kanten von selektioerten Knoten</td><td>Analog zum vorherigen Eintrag, nur dass hier die selektierten Knoten Start und der gewählte Knoten Endknoten ist<br><br>Ist der Graph ungerichtet, sind beide Einträge identisch.</td></tr>
+	<tr><td>Eigenschaften...</td><td>ruft den <a href="dialog_node.html">Dialog der Knoteneigenschaften</a> auf</td></tr>	
+	<tr><td>Knoten hinzufügen zu</td><td>Öffnet ein Untermenü mit allen Untergraphen, in denen der Knoten nicht enthalten ist. Auswählen eines Untergraphen bewirkt, dass der Knoten zu diesem Untergraphen hinzugefügt wird. <br>Dieser Eintrag ist deaktiviert, falls der Knoten in allen Untergraphen enthalten ist oder keine Untergraphen existieren</td></tr>
+	<tr><td>Knoten entfernen aus</td><td>Listet alle Untergraphen auf, in denen der Knoten enthalten ist. Hier bewirkt die Auswahl das Entfernen des Knotens aus dem Untergraphen.<br>Dieser Eintrag ist deaktiviert, falls der Knoten in keinem Untergraphen enthalten ist oder keine Untergraphen existieren.</td></tr>
+	<tr><td>Löschen</td><td>Löscht den Knoten (ohne Nachfrage)</td></tr>
+	<tr><td>Selektion löschen</td><td>löscht die aktuelle Selektion (ohne Nachfrage)<br>Dieser Eintrag ist deaktiviert, falls keine Selektion existiert.</td></tr>
+</table>
+<br><br>
+<a name="edge"><h3>Das Kanten-Kontextmenü</h3></a>
+<div align=center>
+<a name="Abb2"><img src="img/popup_edge.png"></a><br>
+<font size=-1>Abbildung 2: Kontextmenü der Kante #2</font></div>                                      
+<br>
+<table border="0" cellspacing="5" cellpadding="5">
+
+	<tr><td>Value: 1 Index: 2</td><td>Gewicht und Index der Kante<br>Dieser Eintrags ist stets deaktiv</td></tr>
+	<tr><td>Eigenschaften...</td><td>ruft den <a href="dialog_edge.html">Dialog der Kanteneigenschaften</a> auf</td></tr>	
+	<tr><td>Kanten hinzufügen zu</td><td>Öffnet ein Untermenü mit allen Untergraphen, in denen die Kante nicht enthalten ist. Auswählen eines Untergraphen bewirkt, dass die Kante zu diesem Untergraphen hinzugefügt wird. <br>Dieser Eintrag ist deaktiviert, falls die Kante in allen Untergraphen enthalten ist oder keine Untergraphen existieren</td></tr>
+	<tr><td>Kanten entfernen aus</td><td>Listet alle Untergraphen auf, in denen die Kanten enthalten ist. Hier bewirkt die Auswahl das Entfernen der Kante aus dem Untergraphen.<br>Dieser Eintrag ist deaktiviert, falls die Kante in keinem Untergraphen enthalten ist oder keine Untergraphen existieren.</td></tr>
+	<tr><td>Löschen</td><td>Löscht die Kante (ohne Nachfrage)</td></tr>
+	<tr><td>Selektion löschen</td><td>löscht die aktuelle Selektion (ohne Nachfrage)<br>Dieser Eintrag ist deaktiviert, falls keine Selektion existiert.</td></tr>
+</table>
+<br><br>
+<a name="background"><h3>Das Hintergrund-Kontextmenü</h3></a>
+<table border="0" cellspacing="5" cellpadding="5">
+<tr><td>Neuen Knoten einfügen...</td><td>erstellt einen neuen Knoten, dafür wird der <a href="dialog_node.html">Knotendialog</a> aufgreufen</td></tr>
+	<tr><td>Neuen Untergraphen...</td><td>erstellt einen neuen Untergraphen unter benutzung des <a href="dialog_subgraph.html">Dialogs des Untergraphen</a></td></tr>	
+</table>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="19"
+   name=""
+   committed-date="2006-11-12T03:51:19.474428Z"
+   url="https://javahelp.dev.java.net/svn/javahelp/trunk/jhMaster/JavaHelp/doc/jhug/images/overview"
+   last-author="brinkley"
+   kind="dir"
+   uuid="8ea2465c-fe21-0410-bc8c-897f37722d07"
+   repos="https://javahelp.dev.java.net/svn/javahelp"
+   revision="52"/>
+<entry
+   committed-rev="19"
+   name="bullet10x10.gif"
+   text-time="2007-06-15T23:00:52.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="8f986b1ac567b697b6dae158e7c7bc6d"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:52.000000Z"/>
+<entry
+   committed-rev="19"
+   name="viewer.gif"
+   text-time="2007-06-15T23:00:52.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="a1c9a835ea70144dbcd0bda7c003a048"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:52.000000Z"/>
+<entry
+   committed-rev="19"
+   name="toc.gif"
+   text-time="2007-06-15T23:00:52.000000Z"
+   committed-date="2006-11-12T03:51:19.474428Z"
+   checksum="69459daad87bbc10d696e11884666b6f"
+   last-author="brinkley"
+   kind="file"
+   prop-time="2007-06-15T23:00:52.000000Z"/>
+</wc-entries>

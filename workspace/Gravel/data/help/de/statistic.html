@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Gravel - Hilfe - Statistik</title>
+</head>
+<body>
+	<div align=center><a name="title"><h2>Statistik</h2></title></div>
+	<div align=center>
+	<a name="Abb1"><img src="img/stats_inuse.png"></a><br>
+	<font size=-1>Abbildung 1: Die Statistik</font></div>                                      
+	<p>Die Statistik dient zum Vergleich zweier Graphen. Sie wird sowohl im <a href="mainwindow.html">Hauptfenster</a> als auch während des Ablaufs eines Algorithmus' angezeigt.</p>
+	<p><a name="abs1">Zum</a> Erstellen eines neuen Eintrages gelangt man durch klicken auf das "+". Der "-"Button entfernt einen selektierten Eintrag der Statistik, der Stift-Button ruft einen Dialog zum Bearbeiten des selektierten Eintrags auf.<br>
+Beim Hinzufügen oder Verändern eines Eintrags öffnet sich ein Dialog, wie er in Abbildung 2 dargstellt ist. Dabei wurde in Abbildung 1 der Eintrag "Grad" ausgewählt und bearbeiten gewählt.
+<br>
+<div align=center>
+<a name="Abb2"><img src="img/stats_dialog.png"></a><br>
+<font size=-1>Abbildung 2: Der Bearbeiten-Dialog zum Eintrag "Grad"</font></div>                                      
+<br>
+Dort lässt sich ein Name und eine Formel eingeben. Der Name darf nicht der Anfang eines anderen Namens sein (Präfixfreiheit der Namen).</p>
+<p><a name="formel">Die Formel</a> kann ein beliebiger arithmetischer Ausdruck sein, der alle 4 Grundrechenarten und Exponentialrechnung (mittels des ^-Operators) sowie Klammerung enthalten darf. Zusätzlich sind einige Werte des Graphen verfügbar, die in der folgenden Tabelle aufgeführt sind. Außerdem können auch die bisherigen Statistik-Einträge über ihren Namen eingesetzt werden.<br>Während der Eingabe wird außerdem geprüft, ob sich während der Auswertung eine Rekursion ergäbe. Ist dies der Fall, kann die Formel nicht akzeptiert werden. Liegt einer dieser Fehler, etwa eine Rekursion, vor, so wird der Fehler angezeigt.
+<p><a name="Atoms"><b>Liste der atomaren Werte für die Statistik</a></p><br>
+<table border="0" rules="groups" cellspacing="1" cellpadding="2">
+			<tr><th>Name</th><th>Beschreibung</th></tr>
+			<tr><td>$Edge.Count</td><td>Kantenanzahl</td></tr>
+			<tr><td>$Edge.Bends.Av</td><td>durchschnittliche Anzahl Kantenknicks<sup>1</sup></td></tr>
+			<tr><td>$Edge.Bends.Max</td><td>maximale Anzahl Kantenknicks<sup>1</sup></td></tr>
+			<tr><td>$Edge.Bends.Min</td><td>minimale Anzahl Kantenknicks<sup>1</sup></td></tr>
+			<tr><td>$Edge.Length.Av</td><td>durchschnittliche Kantenlänge</td></tr>
+			<tr><td>$Edge.Length.Max</td><td>Länger der längsten Kante</td></tr>
+			<tr><td>$Edge.Length.Min</td><td>Länge der kürzesten Kante</td></tr>
+			<tr><td>$Graph.Area</td><td>Vom Graph benutzte Fläche<sup>2</sup></td></tr>
+			<tr><td>$Graph.MaxX</td><td>der größte vom Graph belegte X-Wert<sup>2</sup></td></tr>
+			<tr><td>$Graph.MaxY</td><td>der größte vom Graph belegte Y-Wert<sup>2</sup></td></tr>
+			<tr><td>$Graph.MinX</td><td>der kleinste vom Graph belegte X-Wert<sup>2</sup></td></tr>
+			<tr><td>$Graph.MinY</td><td>der kleinste vom Graph belegte Y-Wert<sup>2</sup></td></tr>
+			<tr><td>$Node.Count</td><td>Knotenanzahl</td></tr>
+			<tr><td>$Node.Degree.Av</td><td>durchschnittlicher Grad der Knoten</td></tr>
+			<tr><td>$Node.Degree.Max</td><td>maximaler Grad eines Knotens</td></tr>
+			<tr><td>$Node.Degree.Min</td><td>minimaler Grad eines Knotens</td></tr>
+			<tr><td>$Node.Distance.Av</td><td>durchschnittlicher Knotenabstand</td></tr>
+			<tr><td>$Node.Distance.Max</td><td>maximaler Abstand zweier Knoten</td></tr>
+			<tr><td>$Node.Distance.Min</td><td>minimaler Abstand zweier Knoten</td></tr>
+			<tr><td>$Node.InDegree.Av</td><td>durchschnittlicher Eingrad der Knoten<sup>3</sup></td></tr>
+			<tr><td>$Node.InDegree.Max</td><td>maximaler Eingrad eines Knotens<sup>3</sup></td></tr>
+			<tr><td>$Node.InDegree.Min</td><td>minimaler Eingrad eines Knotens<sup>3</sup></td></tr>
+			<tr><td>$Node.OutDegree.Av</td><td>durchschnittlicher Ausgrad der Knoten<sup>3</sup></td></tr>
+			<tr><td>$Node.OutDegree.Max</td><td>maximaler Ausgrad eines Knotens<sup>3</sup></td></tr>
+			<tr><td>$Node.OutDegree.Min</td><td>minimaler Ausgrad eines Knotens<sup>3</sup></td></tr>
+		</table>
+		<br><br><hr>
+		<sup>1</sup> Die Anzahl Knicks einer Kante bestimmt sich wie folgt : Eine direkte oder gebogene Kante hat keinen Knick. Eine orthogonale Kante hat genau einen Knick. Eine in Segmente unterteilte Kante hat so viele Knicks, wie sie Kontrollpunkte hat. 
+		<br><sup>2</sup> Bei der belegten Fläche werden neben den Kanten und Knoten auch sichtbare Knotennamen bedacht.
+		<br><sup>3</sup> In einem ungerichteten Graphen sind Ein-, Aus- und Grad identisch. Im gerichteten Fall ergibt sich der Grad aus der Summe von ein und Ausgrad. 
+	</p> 
+</body>
+</html>
