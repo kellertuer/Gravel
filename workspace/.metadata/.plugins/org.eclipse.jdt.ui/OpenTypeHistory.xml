@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<typeInfoHistroy>
-<typeInfo enclosingTypes="" modifiers="513" name="VAlgorithmIF" package="algorithm.model" path="/Gravel/algorithm/model/VAlgorithmIF.java" timestamp="1188044116000"/>
-<typeInfo enclosingTypes="" modifiers="1025" name="VEdge" package="model" path="/Gravel/model/VEdge.java" timestamp="1207029284000"/>
-<typeInfo enclosingTypes="" modifiers="33" name="Container" package="java.awt" path="/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/classes.jar|java/awt/Container.class" timestamp="1221240411000"/>
-</typeInfoHistroy>

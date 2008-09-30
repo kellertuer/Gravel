@@ -1,5 +1,4 @@
 BUGS
-- Selektion verändern vereinheitlicht leider den Kantenstil!
 - 
 
 

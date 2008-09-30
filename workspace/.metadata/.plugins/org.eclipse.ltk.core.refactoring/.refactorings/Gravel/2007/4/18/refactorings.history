@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<session version="1.0">
-<refactoring comment="Rename compilation unit 'visual.gui.java' to 'Gui.java'&#10;- Original element: 'visual.gui.java'&#10;- Renamed element: 'visual.Gui.java'" description="Rename compilation unit 'gui.java'" flags="589830" id="org.eclipse.jdt.ui.rename.compilationunit" input="/&lt;visual{gui.java" name="Gui.java" stamp="1177948459492" version="1.0"/>
-<refactoring comment="Rename type 'main.grave' to 'Grave'&#10;- Original element: 'main.grave'&#10;- Renamed element: 'main.Grave'&#10;- Update references to refactored element&#10;- Update textual occurrences in comments and strings" description="Rename type 'grave'" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/&lt;main{grave.java[grave" matchStrategy="1" name="Grave" qualified="false" references="true" similarDeclarations="false" stamp="1177948758005" textual="false" version="1.0"/>
-</session>

@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<session version="1.0">
-<refactoring comment="Rename type 'data.GraphStats' to 'GraphStatisticAtoms'&#10;- Original element: 'data.GraphStats'&#10;- Renamed element: 'data.GraphStatisticAtoms'&#10;- Update references to refactored element&#10;- Update textual occurrences in comments and strings" description="Rename type 'GraphStats'" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/&lt;data{GraphStats.java[GraphStats" matchStrategy="1" name="GraphStatisticAtoms" qualified="false" references="true" similarDeclarations="false" stamp="1186325961302" textual="false" version="1.0"/>
-</session>

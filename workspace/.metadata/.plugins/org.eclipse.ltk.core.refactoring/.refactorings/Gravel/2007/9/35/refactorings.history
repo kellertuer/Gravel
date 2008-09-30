@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<session version="1.0">
-<refactoring comment="Rename type 'io.ImageWriter' to 'PNGWriter'&#10;- Original element: 'io.ImageWriter'&#10;- Renamed element: 'io.PNGWriter'&#10;- Update references to refactored element&#10;- Update textual occurrences in comments and strings" description="Rename type 'ImageWriter'" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/&lt;io{ImageWriter.java[ImageWriter" matchStrategy="1" name="PNGWriter" qualified="false" references="true" similarDeclarations="false" stamp="1188758974030" textual="true" version="1.0"/>
-</session>

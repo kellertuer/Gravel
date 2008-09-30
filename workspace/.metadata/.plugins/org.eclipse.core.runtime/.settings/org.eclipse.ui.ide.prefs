@@ -1,5 +1,0 @@
-#Tue Dec 11 16:38:49 CET 2007
-PROBLEMS_FILTERS=<?xml version\="1.0" encoding\="UTF-8"?>\n<filters>\n<filter IMemento.internal.id\="Default" contains\="true" description\="" enabled\="true" onResource\="0" selectBySeverity\="false" selectionStatus\="org.eclipse.core.resources.problemmarker\:true\:org.eclipse.pde.validation-marker\:true\:org.eclipse.jdt.launching.jreContainerMarker\:true\:org.eclipse.jdt.core.buildpath_problem\:true\:org.eclipse.jdt.apt.core.buildproblem\:true\:org.eclipse.ant.ui.buildFileProblem\:true\:org.eclipse.jdt.apt.core.configproblem\:true\:org.eclipse.jdt.core.problem\:true\:org.eclipse.jdt.apt.core.compile.problem\:true\:" severity\="0" workingSet\="Aggregate for window 1165252020058"/>\n</filters>
-eclipse.preferences.version=1
-tipsAndTricks=true
-platformState=1187464882566
