@@ -859,7 +859,7 @@ public class VGraph extends Observable {
 	 */
 	public void addEdge(VEdge edge, int s, int e, int v) 
 	{
-		if (similarPathEdgeExists(edge,s,e))
+		if (similarPathEdgeIndex(edge,s,e) > 0)
 		{
 			System.err.println("DEBUG : Similar Edge Exists, doing nothing");
 			return;
@@ -916,12 +916,12 @@ public class VGraph extends Observable {
 	 * @param edge edge to be checked to similarity existence
 	 * @param s start node index
 	 * @param e end node index
-	 * @return true if an similar edge exists, else false
+	 * @return the index of the similar dge, if it exists, else 0
 	 */
-	public boolean similarPathEdgeExists(VEdge edge, int s, int e)
+	public int similarPathEdgeIndex(VEdge edge, int s, int e)
 	{
 		if (edge==null)
-			return false;
+			return 0;
 		//Check whether an edge is the same as this if multiples are allowed
 		if (mG.isMultipleAllowed())
 		{
@@ -934,20 +934,20 @@ public class VGraph extends Observable {
 				//ungerichtet, beide orthogonal und entgegengesetz gespeichert
 				{
 					if (((VOrthogonalEdge)act).getVerticalFirst()!=((VOrthogonalEdge)edge).getVerticalFirst())
-						return true;
+						return act.index;
 				}
 				else if ((edge.PathEquals(act))&&(edge.index!=act.index)) //same path but different indexx
 				{
-					return true;
+					return act.index;
 				}
 
 			}
 		}
 		else if (mG.getEdgeIndices(s,e).size()>0)
 		{
-			return true;
+			return mG.getEdgeIndices(s,e).firstElement();
 		}
-		return false;
+		return 0;
 	}
 	/**
 	 * get the edge with a given index, if existens

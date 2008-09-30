@@ -693,7 +693,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 				return;
 			}
 			//Existiert schon eine Kante zwischen den beiden Knoten (ungerichtet) oder gar in die Richtung ?
-			if (graphref.similarPathEdgeExists(typeedge, startindex, endindex)) //ähnliche Kante existiert schon Doppelkanten darf es nicht geben
+			if (graphref.similarPathEdgeIndex(typeedge, startindex, endindex) > 0) //ähnliche Kante existiert schon Doppelkanten darf es nicht geben
 			{
 				//TODO : Multiple abfragen -> noch testen
 				JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Eine Kante zwischen den Knoten existiert bereits.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					
@@ -744,11 +744,14 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			}
 			if (CheckType()==null)
 				return;
-			if (graphref.similarPathEdgeExists(CheckType(),startindex,endindex)) //do the actual input fields create an edge similar to an existing ?
+			if (graphref.similarPathEdgeIndex(CheckType(),startindex,endindex) > 0) //do the actual input fields create an edge similar to an existing ?
 			{
 				//TODO Multiple abfragen
-				JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"ndern der Kante nicht m&ouml;glich.<br><br>Eine Kante zwischen den Knoten existiert bereits.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					
-				return;
+				if ((!graphref.isMultipleAllowed())&&(graphref.similarPathEdgeIndex(CheckType(),startindex,endindex) != oldindex)) //ist nicht die alte Kante
+				{	
+					JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"ndern der Kante nicht m&ouml;glich.<br><br>Eine Kante zwischen den Knoten existiert bereits.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					
+					return;
+				}
 			}
 		
 			//Alles in Ordnung, aendern also loeschen

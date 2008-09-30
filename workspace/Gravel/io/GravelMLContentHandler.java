@@ -545,7 +545,7 @@ public class GravelMLContentHandler implements ContentHandler
 			//Everythings okay, add the VEdge (puh, that was work!)
 			//For multiple edges - similar exist ? (non multiple : edge between start end end ?)
 			//Check for the visual Part
-			if (vG.similarPathEdgeExists(toAdd, start, ende)) //old : vG.getEdgeIndices(start, ende)!=-1) 
+			if (vG.similarPathEdgeIndex(toAdd, start, ende) > 0) //old : vG.getEdgeIndices(start, ende)!=-1) 
 			{
 				isValid= false; 
 				System.err.println("An (similar) Edge already existst between the two Nodes"); 

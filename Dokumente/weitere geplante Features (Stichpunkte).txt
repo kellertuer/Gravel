@@ -1,3 +1,8 @@
+BUGS
+- Selektion verändern vereinheitlicht leider den Kantenstil!
+- 
+
+
 6- Interface für Algorithmen und so                             
 
 7-Hypergraphen-Visualisierung

@@ -242,18 +242,18 @@ public class CEdgeLineParameters extends Observable implements ActionListener, C
 		//Text bauen
 		if (checksEnabled)
 		{
-			VEdgeLinestyle newline = new VEdgeLinestyle();
+			VEdgeLinestyle actualline = e.getLinestyle(); //get old style
 			if (bChLineDistance.isSelected())
-				newline.setDistance(iLineDistance.getValue());
+				actualline.setDistance(iLineDistance.getValue());
 			if (bChLineLength.isSelected())
-				newline.setLength(iLineLength.getValue());
+				actualline.setLength(iLineLength.getValue());
 			if (bChLineType.isSelected())
-				newline.setType(cLineTypes.getSelectedIndex()+1);
-			e.setLinestyle(newline);
+				actualline.setType(cLineTypes.getSelectedIndex()+1);
+			e.setLinestyle(actualline);
 		}
 		else
 		{
-			VEdgeLinestyle newline = new VEdgeLinestyle(); //Set every value that is possible in the nonglobal case
+			VEdgeLinestyle newline = e.getLinestyle(); //Set every value that is possible in the nonglobal case
 			if (global||(iLineLength.getValue()!=-1))
 				newline.setLength(iLineLength.getValue());
 			if (global||iLineDistance.getValue()!=-1)

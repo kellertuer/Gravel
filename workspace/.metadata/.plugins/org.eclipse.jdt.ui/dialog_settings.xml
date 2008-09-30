@@ -32,8 +32,8 @@
 	</section>
 	<section name="DialogBounds_SuperInterfaceSelectionDialog">
 		<item key="DIALOG_X_ORIGIN" value="34"/>
-		<item key="DIALOG_FONT_NAME" value="1|Lucida Grande|11|0|CARBON|1|"/>
 		<item key="DIALOG_HEIGHT" value="396"/>
+		<item key="DIALOG_FONT_NAME" value="1|Lucida Grande|11|0|CARBON|1|"/>
 		<item key="DIALOG_Y_ORIGIN" value="71"/>
 		<item key="DIALOG_WIDTH" value="463"/>
 	</section>
@@ -53,17 +53,17 @@
 	<section name="OptionalMessageDialog.hide.">
 		<item key="org.eclipse.jdt.ui.typecomment.deprecated" value="true"/>
 	</section>
-	<section name="completion_proposal_size">
-		<item key="size.y" value="289"/>
-		<item key="size.x" value="773"/>
-	</section>
 	<section name="">
 		<item key="expanded2" value="false"/>
 		<item key="expanded6" value="false"/>
-		<item key="expanded4" value="false"/>
 		<item key="expanded1" value="false"/>
+		<item key="expanded4" value="false"/>
 		<item key="expanded0" value="true"/>
 		<item key="expanded5" value="false"/>
 		<item key="expanded3" value="false"/>
+	</section>
+	<section name="completion_proposal_size">
+		<item key="size.y" value="289"/>
+		<item key="size.x" value="773"/>
 	</section>
 </section>

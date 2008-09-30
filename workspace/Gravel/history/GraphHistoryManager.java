@@ -49,9 +49,9 @@ public class GraphHistoryManager implements Observer
 						}	
 						switch (msg.charAt(0))
 						{
-							case 'N': output+="A Node"; break;
-							case 'E': output+="An Edge"; break;
-							case 'S': output+="A Subset"; break;
+							case 'N': output+=" (A Node"; break;
+							case 'E': output+=" (An Edge"; break;
+							case 'S': output+=" (A Subset"; break;
 						}
 						output +="with index #"+value+")";
 					}
