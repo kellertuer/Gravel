@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<session version="1.0">
-<refactoring comment="Rename type 'dialogs.SelectionModifyDialog' to 'JSelectionModifyDialog'&#10;- Original element: 'dialogs.SelectionModifyDialog'&#10;- Renamed element: 'dialogs.JSelectionModifyDialog'&#10;- Update references to refactored element&#10;- Update textual occurrences in comments and strings" description="Rename type 'SelectionModifyDialog'" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/&lt;dialogs{SelectionModifyDialog.java[SelectionModifyDialog" matchStrategy="1" name="JSelectionModifyDialog" qualified="false" references="true" similarDeclarations="false" stamp="1199892426808" textual="false" version="1.0"/>
-</session>

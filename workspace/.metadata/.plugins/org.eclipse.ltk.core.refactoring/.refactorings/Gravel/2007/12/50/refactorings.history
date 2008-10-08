@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<session version="1.0">
-<refactoring comment="Rename type 'io.MyXMLGraphWriter' to 'GravelMLWriter'&#10;- Original element: 'io.MyXMLGraphWriter'&#10;- Renamed element: 'io.GravelMLWriter'&#10;- Update references to refactored element&#10;- Update textual occurrences in comments and strings" description="Rename type 'MyXMLGraphWriter'" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/&lt;io{MyXMLGraphWriter.java[MyXMLGraphWriter" matchStrategy="1" name="GravelMLWriter" qualified="false" references="true" similarDeclarations="false" stamp="1197737216132" textual="false" version="1.0"/>
-</session>

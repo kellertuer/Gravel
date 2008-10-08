@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<session version="1.0">
-<refactoring comment="Rename compilation unit 'algorithm.forms.RandomVisualize.java' to 'RandomVisualizeForm.java'&#10;- Original element: 'algorithm.forms.RandomVisualize.java'&#10;- Renamed element: 'algorithm.forms.RandomVisualizeForm.java'" description="Rename compilation unit 'RandomVisualize.java'" flags="589830" id="org.eclipse.jdt.ui.rename.compilationunit" input="/&lt;algorithm.forms{RandomVisualize.java" name="RandomVisualizeForm.java" stamp="1184697421447" version="1.0"/>
-<refactoring comment="Rename type 'visual.VAlgorithmGUI' to 'AlgorithmGUI'&#10;- Original element: 'visual.VAlgorithmGUI'&#10;- Renamed element: 'visual.AlgorithmGUI'&#10;- Update references to refactored element&#10;- Update textual occurrences in comments and strings" description="Rename type 'VAlgorithmGUI'" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/&lt;visual{VAlgorithmGUI.java[VAlgorithmGUI" matchStrategy="1" name="AlgorithmGUI" qualified="false" references="true" similarDeclarations="false" stamp="1184700476722" textual="false" version="1.0"/>
-</session>
