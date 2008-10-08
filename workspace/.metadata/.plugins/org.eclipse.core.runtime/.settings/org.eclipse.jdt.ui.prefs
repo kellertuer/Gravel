@@ -1,0 +1,25 @@
+#Tue Jan 15 17:43:57 CET 2008
+content_assist_autoactivation_delay=100
+spelling_locale=de_DE
+org.eclipse.jdt.ui.overrideannotation=true
+org.eclipse.jdt.ui.gettersetter.use.is=true
+formatter_profile=org.eclipse.jdt.ui.default_profile
+org.eclipse.jdt.ui.text.templates_migrated=true
+useAnnotationsPrefPage=true
+eclipse.preferences.version=1
+org.eclipse.jface.textfont=1|Monaco|11|0|CARBON|1|;
+tabWidthPropagated=true
+org.eclipse.jdt.ui.editor.tab.width=
+org.eclipse.jdt.ui.exception.name=e
+fontPropagated=true
+org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UTF-8"?><templates/>
+org.eclipse.jdt.ui.javadoclocations.migrated=true
+proposalOrderMigrated=true
+Refactoring.savealleditors=true
+org.eclipse.jdt.ui.formatterprofiles.version=10
+useQuickDiffPrefPage=true
+org.eclipse.jdt.ui.text.custom_templates=<?xml version\="1.0" encoding\="UTF-8"?><templates/>
+formatter_settings_version=10
+internal.default.compliance=default
+content_assist_lru_history=<?xml version\="1.0" encoding\="UTF-8"?><history maxLHS\="100" maxRHS\="10"><lhs name\="java.awt.Shape"><rhs name\="java.awt.geom.Line2D$Float"/><rhs name\="java.awt.geom.Line2D$Double"/></lhs><lhs name\="java.awt.geom.Point2D"><rhs name\="java.awt.geom.Point2D$Double"/></lhs><lhs name\="java.lang.Cloneable"><rhs name\="java.awt.geom.Line2D$Double"/><rhs name\="java.awt.geom.Point2D$Double"/></lhs><lhs name\="java.awt.geom.Point2D$Double"><rhs name\="java.awt.geom.Point2D$Double"/></lhs><lhs name\="java.awt.geom.Line2D"><rhs name\="java.awt.geom.Line2D$Double"/></lhs><lhs name\="java.util.Comparator"><rhs name\="model.VNode$NODEINDEXCOMPARATOR"/><rhs name\="model.VEdge$EdgeIndexComparator"/></lhs></history>
+org.eclipse.jdt.ui.text.code_templates_migrated=true

@@ -1,0 +1,1516 @@
+package dialogs;
+
+import io.GeneralPreferences;
+
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.Hashtable;
+import java.util.Iterator;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+
+import view.Gui;
+import view.VGraphic;
+
+import model.MGraph;
+import model.VEdge;
+import model.VGraph;
+import model.VNode;
+import model.VStraightLineEdge;
+/**
+ * 
+ * 
+ * 
+ * IM Uhrzeigersinn oben beginnend
+ * 
+ * @author ronny
+ *
+ */
+public class JSelectionModifyDialog extends JDialog implements ActionListener, CaretListener 
+{
+	private static final long serialVersionUID = 1L;
+	VGraph vg;
+	boolean show_position, show_nodeprop, show_edgeprop, show_subsets;
+	
+	JTabbedPane tabs;
+	//
+	//Erstes Tab  Positionierung
+	//
+	
+	//Position Tab fields
+	private JComboBox cPosition;
+	private String[] Positionnames;
+	//Translate selected
+	private IntegerTextField iPosMoveX, iPosMoveY;
+	//Arrange - General
+	private JComboBox cOrderBy;
+	//On A Circle
+	private IntegerTextField iOriginX, iOriginY, iCircleRadius, iFirstNodeAtDegree;
+	//
+	private Container[] Positioncontent;
+	
+	//
+	//Zweites Tab - Knoteneigenschaften
+	//
+	private JLabel NodePreview, NodeName, NodeSize, NodeNameSize, NodeNameDistance, NodeNameRotation;
+	private IntegerTextField iNodeSize;
+	private JTextField sNodeName;
+	private IntegerTextField iNodeNameSize, iNodeNameDistance, iNodeNameRotation;
+	private JCheckBox bShowNodeName;
+	//Aktivierungsbuttons
+	private JCheckBox bChNodeSize, bChNodeName, bChNodeNameSize, bChNodeNameDistance, bChNodeNameRotation, bChShowNodeName;
+	
+	//
+	//drittes Tab - Kanteneigenschaften
+	//
+	private JLabel EdgeName, EdgeWidth, EdgeValue, EdgePreview;
+	private JTextField sEdgeName;
+	private IntegerTextField iEdgeWidth, iEdgeValue;
+	private JCheckBox bChEdgeName, bChEdgeWidth, bChEdgeValue;
+	private JTabbedPane EdgeTabs;
+	
+	//Subtabs - (1) Text
+	private JLabel EdgeTextPosition, EdgeTextDistance, EdgeTextSize, EdgeTextChoice;
+	private JCheckBox bEdgeShowText;
+	private IntegerTextField iEdgeTextPosition, iEdgeTextDistance, iEdgeTextSize;
+	private ButtonGroup bEdgeTextChoice;
+	private JRadioButton rEdgeTextShowValue, rEdgeTextShowText;
+	private JCheckBox bChEdgeShowText, bChEdgeTextChoice, bChEdgeTextPosition, bChEdgeTextDistance, bChEdgeTextSize; ;
+	
+	
+	//Subtabs - (2) Line
+	private JLabel EdgeLineDistance, EdgeLineLength, EdgeLineType;
+	private IntegerTextField iEdgeLineDistance, iEdgeLineLength;
+	private String[] EdgeLineTypenames; 
+	private JComboBox cEdgeLineTypes;
+	private JCheckBox bChEdgeLineDistance, bChEdgeLineLength, bChEdgeLineType;
+	
+	//Subtabs - (3) Arrow
+	private JLabel EdgeArrowSize, EdgeArrowAngle, EdgeArrowPart, EdgeArrowPos;
+	private IntegerTextField iEdgeArrowSize;
+	private JSlider sEdgeArrowAngle, sEdgeArrowPart, sEdgeArrowPos;
+	private JCheckBox bChEdgeArrowSize, bChEdgeArrowAngle, bChEdgeArrowPart, bChEdgeArrowPos;
+	
+	private JButton bCancel, bOk;
+	/**
+	 * Initializes the Dialog and shows all possible tabs
+	 * 
+	 * @param vg the corresponding VGraph
+	 */
+	public JSelectionModifyDialog(VGraph vg)
+	{
+		this(true, true, true, "Selektion bearbeiten", vg);
+	}
+	/**
+	 * Initializes the Dialog with the possibility to disable some tabs
+	 * and specify a title for the window
+	 * 
+	 * @param translate
+	 * @param properties
+	 * @param subgraphs
+	 * @param title
+	 * @param graph
+	 */
+	public JSelectionModifyDialog(boolean translate, boolean properties, boolean subgraphs, String title, VGraph graph)
+	{
+		vg = graph;
+		//If selected nodes exist and the tab should be shown
+		show_position = translate & vg.selectedNodeExists();
+		//If selected nodes exist and the porperties should be shown
+		show_nodeprop = properties & vg.selectedNodeExists();
+		show_edgeprop = properties & vg.selectedEdgeExists();
+		show_subsets = subgraphs & (vg.selectedEdgeExists() || vg.selectedNodeExists());
+		//None of the tabs should be shown, that would be quite wrong
+		setTitle(title);
+		tabs = new JTabbedPane();
+		if (show_position)
+			tabs.addTab("Position",buildPositionTab());
+		if (show_nodeprop)
+			tabs.addTab("Knoten",buildNodePropContent());
+		if (show_edgeprop)
+			tabs.addTab("Kanten",buildEdgePropContent());
+		if (show_subsets)
+			tabs.addTab("Untergraphen",new JLabel("TODO"));
+		
+		Container ContentPane = this.getContentPane();
+		ContentPane.removeAll();
+		ContentPane.setLayout(new GridBagLayout());
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(7,7,7,7);
+		c.anchor = GridBagConstraints.WEST;
+	
+		c.gridy=0;c.gridx=0;c.gridwidth=2;
+		if (tabs.getTabCount()==0) //then all bool values were false, this should not happen...but who knows...
+		{
+			//in the normal cse, this should not happen
+			//because the menu does only activate the item for this Dialog if there is anything selected, but ... to be sure...
+			JOptionPane.showMessageDialog(this, "<html><p>Es wurden im Graphen weder Kanten noch Knoten selektiert.<br>Dadurch k"+main.CONST.html_oe+"nnen auch keine Ver"+main.CONST.html_ae+"nderungen vorgenommen werden.</p></html>","Initialisierungsfehler",JOptionPane.ERROR_MESSAGE);
+			this.dispose();
+			return;
+		}
+		else if (tabs.getTabCount() == 1)
+		{
+			this.setTitle(this.getTitle() + " - " +tabs.getTitleAt(0));
+			ContentPane.add(tabs.getComponent(0),c);
+		}
+		else
+		{
+			ContentPane.add(tabs,c);	
+		}		
+		c.gridy++;c.gridx = 0;c.gridwidth=1;
+		c.anchor = GridBagConstraints.WEST;
+		
+		bCancel = new JButton("Abbrechen");
+		bCancel.addActionListener(this);
+		ContentPane.add(bCancel,c);
+		
+		c.gridx = 1;
+		bOk = new JButton("Ok");
+		bOk.setMnemonic(KeyEvent.VK_ENTER);
+		bOk.addActionListener(this);
+		ContentPane.add(bOk,c);
+		
+		
+		this.getRootPane().setDefaultButton(bOk);
+		setResizable(false);
+		this.setModal(true);
+		pack();
+		if (show_position)
+		{
+			cPosition.setSelectedItem(Positionnames[0]);
+			Dimension maxsize = new Dimension(0,0);
+			for (int i=0; i<Positioncontent.length; i++)
+			{
+				int h = Positioncontent[i].getHeight();
+				if (h > maxsize.height)
+					maxsize.height = h;
+				int b = Positioncontent[i].getWidth();
+				if (b > maxsize.width)
+					maxsize.width = b;
+			}
+			for (int i=0; i<Positioncontent.length; i++)
+			{
+				Positioncontent[i].setPreferredSize(maxsize);
+			}
+		}
+		Point p = new Point(0,0);
+		p.y += Math.round(Gui.getInstance().getParentWindow().getHeight()/2);
+		p.x += Math.round(Gui.getInstance().getParentWindow().getWidth()/2);
+		p.y -= Math.round(getHeight()/2);
+		p.x -= Math.round(getWidth()/2);
+
+		//TODO : Improve Performance !
+		if (show_nodeprop)
+			fillCommonNodeValues();
+		if (show_edgeprop)
+			fillCommonEdgeValues();
+
+		setLocation(p.x,p.y);
+		this.setVisible(true);
+	}
+	
+	private JPanel buildPositionTab()
+	{
+		JPanel content = new JPanel();
+		content.setLayout(new GridBagLayout());
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(7,7,7,7);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridy = 0;
+		c.gridx = 0;
+		c.gridwidth = 2;
+		content.add(new JLabel("Verändern der Positionen der selektierten Knoten"),c);
+	
+		c.gridy++;
+		c.gridwidth = 1;
+		
+		c.gridx++;
+		String[] name = {"keine Veränderung","Verschieben","Im Kreis anordnen"};
+		Positionnames = name;
+		cPosition = new JComboBox(name);
+		cPosition.addActionListener(this);
+		content.add(cPosition,c);
+		
+		c.gridy++;
+		c.gridx=0;
+		c.gridwidth=2;
+		Positioncontent = new Container[name.length];
+		Positioncontent[0] = new Container();
+		//Positioncontent[0].add(new JLabel(""))
+		Positioncontent[1] = buildPosTranslateContent(); //Position - Verschieben
+		Positioncontent[2] = buildPosArrangeCircle(); //Position - Verschieben
+		for (int i=0; i<Positioncontent.length; i++)
+		{
+			Positioncontent[i].validate();
+			Positioncontent[i].setIgnoreRepaint(true);
+			content.add(Positioncontent[i],c);
+		}
+
+		c.gridy++;
+		c.gridx=0;
+		return content;
+	}
+	
+	//
+	//
+	// Veränderungen an der Knotenposition, verschieben, im Kreis anordnen
+	//
+	//
+	
+	private Container buildPosTranslateContent()
+	{
+		Container PosContent = new Container();
+		PosContent.setLayout(new GridBagLayout());
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(7,7,7,7);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridy = 0;
+		c.gridx = 0;
+		c.gridwidth=1;
+		PosContent.add(new JLabel("Verschiebung in X-Richtung"),c);
+		iPosMoveX = new IntegerTextField();
+		iPosMoveX.setMinValue(Integer.MIN_VALUE+1);
+		iPosMoveX.setPreferredSize(new Dimension(150,20));
+		
+		c.gridx++;
+		PosContent.add(iPosMoveX,c);
+		
+		c.gridy++;
+		c.gridx=0;
+		PosContent.add(new JLabel("Verschiebung in Y-Richtung"),c);
+		iPosMoveY = new IntegerTextField();
+		iPosMoveY.setPreferredSize(new Dimension(150,20));
+		iPosMoveY.setMinValue(Integer.MIN_VALUE+1);
+		c.gridx++;
+		PosContent.add(iPosMoveY,c);
+		
+		return PosContent;
+	}
+	private Container buildPosArrangeCircle()
+	{
+		Container PosContent = new Container();
+		PosContent.setLayout(new GridBagLayout());
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(7,7,7,7);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridy = 0;
+		c.gridx = 0;
+		c.gridwidth=1;
+		
+		PosContent.add(new JLabel("Sortiere Knoten nach"),c);
+		c.gridx++;
+		String[] ordernames = {"ID","Name"};
+		cOrderBy = new JComboBox(ordernames);
+		cOrderBy.setSelectedIndex(0);
+		cOrderBy.setEnabled(false); //TODO Knotenname einbauen
+		PosContent.add(cOrderBy,c);
+		
+		c.gridy++;
+		c.gridx=0;
+		PosContent.add(new JLabel("Kreismittelpunkt, X"),c);
+		iOriginX = new IntegerTextField();
+		iOriginX.setPreferredSize(new Dimension(150,20));
+		c.gridx++;
+		PosContent.add(iOriginX,c);
+		
+		c.gridy++;
+		c.gridx=0;
+		PosContent.add(new JLabel("Kreismittelpunkt, Y"),c);
+		iOriginY = new IntegerTextField();
+		iOriginY.setPreferredSize(new Dimension(150,20));
+		c.gridx++;
+		PosContent.add(iOriginY,c);
+		
+		c.gridy++;
+		c.gridx=0;
+		PosContent.add(new JLabel("Kreisradius, X"),c);
+		iCircleRadius = new IntegerTextField();
+		iCircleRadius.setPreferredSize(new Dimension(150,20));
+		c.gridx++;
+		PosContent.add(iCircleRadius,c);
+		
+		c.gridy++;
+		c.gridx=0;
+		PosContent.add(new JLabel("Ersten Knoten bei (Grad)"),c);
+		iFirstNodeAtDegree = new IntegerTextField();
+		iFirstNodeAtDegree.setPreferredSize(new Dimension(150,20));
+		c.gridx++;
+		PosContent.add(iFirstNodeAtDegree,c);
+		
+		return PosContent;
+	}
+	
+	//
+	//
+	// Knoteneigenschaften verändern
+	//
+	//
+	
+	private Container buildNodePropContent()
+	{
+		Container NodeContent = new Container();
+		NodeContent.setLayout(new GridBagLayout());
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(7,7,7,7);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridy = 0;
+		c.gridx = 0;
+		c.gridwidth=1;
+		bChNodeName = new JCheckBox();
+		NodeContent.add(bChNodeName, c);
+		bChNodeName.addActionListener(this);
+		c.gridx++;
+		NodeName = new JLabel("Name");
+		NodeContent.add(NodeName,c);
+		c.gridx++;
+		sNodeName = new JTextField();
+		sNodeName.setPreferredSize(new Dimension(200, 20));
+		sNodeName.addCaretListener(this);
+		NodeContent.add(sNodeName,c);		
+		//Vorschau
+		NodePreview = new JLabel();
+		c.insets = new Insets(0,14,7,0);	c.gridy++;c.gridx = 2;
+		NodeContent.add(NodePreview,c);
+		NodePreview.setPreferredSize(new Dimension(150, 20));
+		
+		c.gridy++;
+		c.gridx=0; 		c.insets = new Insets(7,7,7,7);
+		bChNodeSize = new JCheckBox();
+		NodeContent.add(bChNodeSize, c);
+		bChNodeSize.addActionListener(this);
+		c.gridx++;
+		NodeSize = new JLabel("<html><p>Gr"+main.CONST.html_oe+main.CONST.html_sz+"e</p></html>");
+		NodeContent.add(NodeSize,c);
+		c.gridx++;
+		iNodeSize = new IntegerTextField();
+		iNodeSize.setPreferredSize(new Dimension(200, 20));
+		NodeContent.add(iNodeSize,c);		
+		
+		c.gridy++;
+		c.gridx = 0;
+		bChShowNodeName = new JCheckBox();
+		NodeContent.add(bChShowNodeName, c);
+		bChShowNodeName.addActionListener(this);
+		c.gridx++;
+		c.gridwidth=2;
+		bShowNodeName = new JCheckBox("Knotenname anzeigen");
+		NodeContent.add(bShowNodeName,c);		
+		c.gridwidth=1;
+		
+		c.gridy++;
+		c.gridx = 0;
+		bChNodeNameRotation = new JCheckBox();
+		NodeContent.add(bChNodeNameRotation, c);
+		bChNodeNameRotation.addActionListener(this);
+		c.gridx++;
+		NodeNameRotation = new JLabel("<html><p>Textausrichtung</p></html>");
+		NodeContent.add(NodeNameRotation,c);
+		c.gridx++;
+		iNodeNameRotation = new IntegerTextField();
+		iNodeNameRotation.setPreferredSize(new Dimension(200, 20));
+		NodeContent.add(iNodeNameRotation,c);		
+
+		c.gridy++;
+		c.gridx = 0;
+		bChNodeNameDistance = new JCheckBox();
+		NodeContent.add(bChNodeNameDistance, c);
+		bChNodeNameDistance.addActionListener(this);
+		c.gridx++;
+		NodeNameDistance = new JLabel("<html><p>Textabstand</p></html>");
+		NodeContent.add(NodeNameDistance,c);
+		c.gridx++;
+		iNodeNameDistance = new IntegerTextField();
+		iNodeNameDistance.setPreferredSize(new Dimension(200, 20));
+		NodeContent.add(iNodeNameDistance,c);		
+
+		c.gridy++;
+		c.gridx = 0;
+		bChNodeNameSize = new JCheckBox();
+		NodeContent.add(bChNodeNameSize, c);
+		bChNodeNameSize.addActionListener(this);
+		c.gridx++;
+		NodeNameSize = new JLabel("<html><p>Textgr"+main.CONST.html_oe+main.CONST.html_sz+"e</p></html>");
+		NodeContent.add(NodeNameSize,c);
+		c.gridx++;
+		iNodeNameSize = new IntegerTextField();
+		iNodeNameSize.setPreferredSize(new Dimension(200, 20));
+		NodeContent.add(iNodeNameSize,c);		
+
+		return NodeContent;
+
+	}	
+	private void fillCommonNodeValues()
+	{
+		//Werte suchen fuer die Initialisierung/Gemeinsame werte der Selektion
+		Iterator<VNode> nodeiter = vg.getNodeIterator();
+		int preNodeSize=-1, preNodeTextSize=-1, preNodeTextDis=-1, preNodeTextRot=-1;
+		//ShowText ist der wert und given sagt, ob der allgemeingültig ist
+		boolean preNodeShowText=false, preNodeShowTextgiven=true,beginning = true;
+		String nodename=null;
+		while (nodeiter.hasNext())
+		{
+			VNode temp = nodeiter.next();
+			if (temp.isSelected())
+			{
+				if (beginning)
+				{
+					beginning = false;
+					preNodeShowText = temp.isNameVisible();
+					preNodeShowTextgiven = true;
+					preNodeSize = temp.getSize();
+					preNodeTextSize = temp.getNameSize();
+					preNodeTextDis = temp.getNameDistance();
+					preNodeTextRot = temp.getNameRotation();
+					nodename = vg.getNodeName(temp.index);
+					//Replace the id numer by $ID (at least try to get a common name
+					nodename = GeneralPreferences.replace(nodename,""+temp.index, "$ID");
+				}
+				else
+				{ // if a node differs set common name to -1
+					if (temp.isNameVisible()!=preNodeShowText)
+						preNodeShowTextgiven = false;
+					if (temp.getSize()!=preNodeSize)
+						preNodeSize = -1;
+					if (temp.getNameSize()!=preNodeTextSize)
+						preNodeTextSize=-1;
+					if (temp.getNameDistance()!=preNodeTextDis)
+						preNodeTextDis=-1;
+					if (temp.getNameRotation()!=preNodeTextRot)
+						preNodeTextRot=-1;
+					if (nodename!=null)
+					{
+						if (!GeneralPreferences.replace(nodename,"$ID",""+temp.index).equals(vg.getNodeName(temp.index)))
+							nodename = null;
+					}	
+				}	
+			} //end is selected
+		} //End while
+		//Werte - fill name
+	    if (nodename!=null)
+		{
+	    	sNodeName.setText(nodename);
+			NodePreview.setText("<html><p>Vorschau :<i>"+GeneralPreferences.replace(nodename,"$ID","4")+"</i>");
+		}
+			bChNodeName.setSelected(nodename==null);bChNodeName.doClick();
+
+		//fill Node Size
+		if (preNodeSize!=-1)
+			iNodeSize.setValue(preNodeSize);
+		bChNodeSize.setSelected(preNodeSize==-1);bChNodeSize.doClick();
+
+		//fill ShowNodeName
+		if (preNodeShowTextgiven)
+			this.bShowNodeName.setSelected(preNodeShowText);
+		bChShowNodeName.setSelected(!preNodeShowTextgiven);	bChShowNodeName.doClick();
+
+		//fill TextSize
+		if (preNodeTextSize!=-1)
+			iNodeNameSize.setValue(preNodeTextSize);
+		bChNodeNameSize.setSelected(preNodeTextSize==-1);bChNodeNameSize.doClick();
+
+		//fill TextDistance
+		if (preNodeTextDis!=-1)
+			iNodeNameDistance.setValue(preNodeTextDis);
+		bChNodeNameDistance.setSelected(preNodeTextDis==-1); bChNodeNameDistance.doClick();
+		
+		//	fill TextRotation
+		if (preNodeTextRot!=-1)
+			iNodeNameRotation.setValue(preNodeTextRot);
+		bChNodeNameRotation.setSelected(preNodeTextRot==-1); bChNodeNameRotation.doClick();
+	}
+	
+	//
+	//
+	//Kanten Eigenschaften Tab
+	//
+	//
+	private Container buildEdgePropContent()
+	{
+		Container EdgeContent = new Container();
+		EdgeContent.setLayout(new GridBagLayout());
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(7,7,7,7);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridy = 0;
+		c.gridx = 0;
+		c.gridwidth=1;
+		bChEdgeName = new JCheckBox();
+		EdgeContent.add(bChEdgeName, c);
+		bChEdgeName.addActionListener(this);
+		c.gridx++;
+		EdgeName = new JLabel("Name");
+		EdgeContent.add(EdgeName,c);
+		c.gridx++;
+		sEdgeName = new JTextField();
+		sEdgeName.setPreferredSize(new Dimension(200, 20));
+		sEdgeName.addCaretListener(this);
+		EdgeContent.add(sEdgeName,c);		
+		//Vorschau
+		EdgePreview = new JLabel();
+		c.insets = new Insets(0,14,7,0);	c.gridy++;c.gridx = 2;
+		EdgeContent.add(EdgePreview,c);
+		EdgePreview.setPreferredSize(new Dimension(150, 20));
+		c.gridy++;
+		c.gridx=0; 		c.insets = new Insets(7,7,7,7);
+
+		bChEdgeValue = new JCheckBox();
+		EdgeContent.add(bChEdgeValue,c);
+		bChEdgeValue.addActionListener(this);
+		c.gridx++;
+		EdgeValue = new JLabel("Gewicht");
+		EdgeContent.add(EdgeValue,c);
+		c.gridx++;
+		iEdgeValue = new IntegerTextField();
+		iEdgeValue.setPreferredSize(new Dimension(200, 20));
+		iEdgeValue.addCaretListener(this);
+		EdgeContent.add(iEdgeValue,c);		
+		
+		c.gridy++;
+		c.gridx=0;
+		bChEdgeWidth = new JCheckBox();
+		EdgeContent.add(bChEdgeWidth,c);
+		bChEdgeWidth.addActionListener(this);
+		c.gridx++;
+		EdgeWidth = new JLabel("Breite");
+		EdgeContent.add(EdgeWidth,c);
+		c.gridx++;
+		iEdgeWidth = new IntegerTextField();
+		iEdgeWidth.setPreferredSize(new Dimension(200, 20));
+		iEdgeWidth.addCaretListener(this);
+		EdgeContent.add(iEdgeWidth,c);		
+		
+		c.gridy++;
+		c.gridx=0;
+		c.gridwidth = 3;
+		EdgeTabs = new JTabbedPane();
+		EdgeTabs.add("Beschriftung",buildEdgeTextProps());
+		EdgeTabs.add("Linienart", buildEdgeLineProps());
+		if (vg.isDirected())
+			EdgeTabs.add("Pfeil", buildEdgeArrowProps());
+		EdgeContent.add(EdgeTabs,c);
+		return EdgeContent;
+	}
+	private Container buildEdgeTextProps()
+	{
+		Container EdgeTextContent = new Container();
+		EdgeTextContent.setLayout(new GridBagLayout());
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(7,7,7,7);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridy = 0;
+		c.gridx = 0;
+		c.gridwidth=1;
+		bChEdgeShowText = new JCheckBox();
+		bChEdgeShowText.addActionListener(this);
+		EdgeTextContent.add(bChEdgeShowText,c);
+		c.gridx++;
+		bEdgeShowText = new JCheckBox("Kantenbeschriftung anzeigen");
+		c.gridwidth = 2;
+		EdgeTextContent.add(bEdgeShowText,c);
+		c.gridwidth = 1;
+			
+		c.gridy++;
+		c.gridx = 0;
+		
+		bChEdgeTextPosition = new JCheckBox();
+		EdgeTextContent.add(bChEdgeTextPosition, c);
+		bChEdgeTextPosition.addActionListener(this);
+		c.gridx++;
+		EdgeTextPosition = new JLabel("Position");
+		EdgeTextContent.add(EdgeTextPosition,c);
+		c.gridx++;
+		iEdgeTextPosition = new IntegerTextField();
+		iEdgeTextPosition.setPreferredSize(new Dimension(100, 20));
+		EdgeTextContent.add(iEdgeTextPosition,c);
+		
+		c.gridy++;
+		c.gridx = 0;
+		bChEdgeTextDistance = new JCheckBox();
+		bChEdgeTextDistance.addActionListener(this);
+		EdgeTextContent.add(bChEdgeTextDistance,c);
+		c.gridx++;
+		EdgeTextDistance = new JLabel("Abstand von der Kante");
+		EdgeTextContent.add(EdgeTextDistance,c);
+		c.gridx++;
+		iEdgeTextDistance = new IntegerTextField();
+		iEdgeTextDistance.setPreferredSize(new Dimension(100, 20));
+		EdgeTextContent.add(iEdgeTextDistance,c);
+		
+		c.gridy++;
+		c.gridx = 0;
+		bChEdgeTextSize = new JCheckBox();
+		bChEdgeTextSize.addActionListener(this);
+		EdgeTextContent.add(bChEdgeTextSize,c);
+		EdgeTextSize = new JLabel("<html><p>Textgr"+main.CONST.html_oe+main.CONST.html_sz+"e</p></html>");
+		c.gridx++;
+		EdgeTextContent.add(EdgeTextSize,c);
+		iEdgeTextSize = new IntegerTextField();
+		iEdgeTextSize.setPreferredSize(new Dimension(100, 20));
+		c.gridx++;
+		EdgeTextContent.add(iEdgeTextSize,c);
+		
+		c.gridy++;
+		c.gridx = 0;
+		bChEdgeTextChoice = new JCheckBox();
+		bChEdgeTextChoice.addActionListener(this);
+		EdgeTextContent.add(bChEdgeTextChoice,c);
+		c.gridx++;
+		bEdgeTextChoice = new ButtonGroup();
+		rEdgeTextShowValue = new JRadioButton("Kantengewicht");
+		rEdgeTextShowText = new JRadioButton("Kantenname");
+		EdgeTextChoice = new JLabel("<html><p>Anzeige von</p></html>");
+		EdgeTextChoice.add(rEdgeTextShowValue); EdgeTextChoice.add(rEdgeTextShowText);
+		c.gridwidth=2;
+		EdgeTextContent.add(EdgeTextChoice,c);
+		c.gridwidth=1;
+		c.gridy++;
+		EdgeTextContent.add(rEdgeTextShowValue,c);
+		c.gridx++;
+		EdgeTextContent.add(rEdgeTextShowText,c);
+
+		return EdgeTextContent;
+	}
+	private Container buildEdgeLineProps()
+	{	
+		Container EdgeLineContent = new Container();
+		EdgeLineContent.setLayout(new GridBagLayout());
+	
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(7,7,7,7);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridy = 0;
+		c.gridx = 0;
+		c.gridwidth=1;
+
+		bChEdgeLineType = new JCheckBox();
+		bChEdgeLineType.addActionListener(this);
+		EdgeLineContent.add(bChEdgeLineType,c);
+		c.gridx++;
+		EdgeLineType = new JLabel("Linienstil");
+		EdgeLineContent.add(EdgeLineType,c);
+		c.gridx++;
+		String[] typetemp = {	"\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500", //Solid
+								" \u2500  \u2500  \u2500  \u2500  \u2500 ", //Dashed
+								"\u25cf    \u25cf    \u25cf    \u25cf    \u25cf", //Dotted
+								"\u25cf   \u2500   \u25cf   \u2500   \u25cf"}; //Dotdashed
+		EdgeLineTypenames = typetemp;
+		cEdgeLineTypes = new JComboBox(EdgeLineTypenames);
+		cEdgeLineTypes.addActionListener(this);
+		EdgeLineContent.add(cEdgeLineTypes,c);
+		c.gridy++; c.gridx = 0;
+		bChEdgeLineDistance = new JCheckBox();
+		bChEdgeLineDistance.addActionListener(this);
+		EdgeLineContent.add(bChEdgeLineDistance,c);
+		EdgeLineDistance = new JLabel("<html>Abstand</html>");
+		c.gridx++;
+		EdgeLineContent.add(EdgeLineDistance,c);
+		iEdgeLineDistance = new IntegerTextField();
+		iEdgeLineDistance.addCaretListener(this);
+		iEdgeLineDistance.setPreferredSize(new Dimension(100, 20));
+		c.gridx++;
+		EdgeLineContent.add(iEdgeLineDistance,c);
+		c.gridy++; c.gridx = 0;
+		bChEdgeLineLength = new JCheckBox();
+		bChEdgeLineLength.addActionListener(this);
+		EdgeLineContent.add(bChEdgeLineLength,c);
+		c.gridx++;
+		EdgeLineLength = new JLabel("<html><p>L"+main.CONST.html_ae+"nge</p></html>");
+		EdgeLineContent.add(EdgeLineLength,c);
+		
+		c.gridx++;
+		iEdgeLineLength = new IntegerTextField();
+		iEdgeLineLength.addCaretListener(this);
+		iEdgeLineLength.setPreferredSize(new Dimension(100, 20));
+		EdgeLineContent.add(iEdgeLineLength,c);
+		return EdgeLineContent;
+	}
+	private Container buildEdgeArrowProps()
+	{
+		Container EdgeArrowContent = new Container();
+		EdgeArrowContent.setLayout(new GridBagLayout());
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(7,7,7,7);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridy = 0;
+		c.gridx = 0;
+		bChEdgeArrowSize = new JCheckBox();
+		bChEdgeArrowSize.addActionListener(this);
+		EdgeArrowContent.add(bChEdgeArrowSize,c);
+		c.gridx++;
+		EdgeArrowSize = new JLabel("<html>Gr"+main.CONST.html_oe+""+main.CONST.html_sz+"e</html>");
+		EdgeArrowContent.add(EdgeArrowSize,c);
+		c.gridx++; 
+		iEdgeArrowSize = new IntegerTextField();
+		iEdgeArrowSize.setPreferredSize(new Dimension(100,20));
+		iEdgeArrowSize.addActionListener(this);
+		//IedgeArrowSize.addCaretListener(this);
+		EdgeArrowContent.add(iEdgeArrowSize,c);
+		c.gridy++;
+		c.gridx = 0;
+		bChEdgeArrowAngle = new JCheckBox();
+		bChEdgeArrowAngle.addActionListener(this);
+		EdgeArrowContent.add(bChEdgeArrowAngle,c);
+		EdgeArrowAngle = new JLabel("Winkel");
+		c.gridx++;
+		EdgeArrowContent.add(EdgeArrowAngle,c);
+		c.gridx++; 
+		sEdgeArrowAngle = new JSlider();
+		sEdgeArrowAngle.setMinimum(0);
+		sEdgeArrowAngle.setMaximum(90);
+		sEdgeArrowAngle.setMajorTickSpacing(15); //ArrowAngle.setMinorTickSpacing(10);
+		sEdgeArrowAngle.setPaintLabels(true); sEdgeArrowAngle.setPaintTicks(true);
+		//sEdgeArrowAngle.addChangeListener(this);
+		EdgeArrowContent.add(sEdgeArrowAngle,c);
+		c.gridy++;
+		c.gridx = 0;
+		bChEdgeArrowPart = new JCheckBox();
+		EdgeArrowContent.add(bChEdgeArrowPart,c);
+		c.gridx++;
+		EdgeArrowPart = new JLabel("Form");
+		EdgeArrowContent.add(EdgeArrowPart,c);
+		c.gridx++; 
+		sEdgeArrowPart = new JSlider();
+		sEdgeArrowPart.setMinimum(0);
+		sEdgeArrowPart.setMaximum(100);
+		sEdgeArrowPart.setMajorTickSpacing(25);	
+		sEdgeArrowPart.setPaintLabels(true); sEdgeArrowPart.setPaintTicks(true);
+		//sEdgeArrowPart.addChangeListener(this);
+		EdgeArrowContent.add(sEdgeArrowPart,c);
+		c.gridy++;
+		c.gridx = 0;
+		bChEdgeArrowPos = new JCheckBox();
+		bChEdgeArrowPos.addActionListener(this);
+		EdgeArrowContent.add(bChEdgeArrowPos,c);
+		c.gridx++;
+		EdgeArrowPos = new JLabel("Position");
+		EdgeArrowContent.add(EdgeArrowPos,c);
+		c.gridx++; 
+		sEdgeArrowPos = new JSlider();
+		sEdgeArrowPos.setMinimum(0);
+		sEdgeArrowPos.setMaximum(100);
+		Hashtable<Integer, JLabel> t = new Hashtable<Integer, JLabel>();
+		t.put(new Integer(0),new JLabel("Start")); t.put(new Integer(25),new JLabel("")); t.put(new Integer(50),new JLabel("Mitte")); t.put(new Integer(75),new JLabel("")); t.put(new Integer(100),new JLabel("Ende"));	
+		sEdgeArrowPos.setLabelTable(t);
+		sEdgeArrowPos.setPaintLabels(true); sEdgeArrowPos.setPaintTicks(true);
+		//sEdgeArrowPos.addChangeListener(this);
+		EdgeArrowContent.add(sEdgeArrowPos,c);
+		return EdgeArrowContent;
+	}
+	private void fillCommonEdgeValues()
+	{
+		//Werte suchen fuer die Initialisierung/Gemeinsame werte der Selektion
+		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+		VEdge pre = new VStraightLineEdge(0,0);
+		int preEdgeValue=0;
+		boolean preEdgeShowTextgiven=true,beginning = true, preEdgeTextShowValuegiven=true, preEdgeLineTypegiven=true;
+		String preEdgeName=null;
+		while (edgeiter.hasNext())
+		{
+			VEdge temp = edgeiter.next();
+			if (temp.isSelected())
+			{
+				if (beginning)
+				{
+					beginning = false;
+					pre = temp.clone();
+					preEdgeValue = vg.getEdgeProperties(temp.index).get(MGraph.EDGEVALUE);
+					preEdgeName = vg.getEdgeName(temp.index);
+					//Replace the id numer by $ID (at least try to get a common name
+					preEdgeName = GeneralPreferences.replace(preEdgeName,""+temp.index, "$ID");
+					preEdgeName = GeneralPreferences.replace(preEdgeName,""+vg.getEdgeProperties(temp.index).get(MGraph.EDGESTARTINDEX), "$SID");
+					preEdgeName = GeneralPreferences.replace(preEdgeName,""+vg.getEdgeProperties(temp.index).get(MGraph.EDGEENDINDEX), "$EID");					
+				}
+				else
+				{ // if an edge value differs set common name to -1
+					if (vg.getEdgeProperties(temp.index).get(MGraph.EDGEVALUE)!=preEdgeValue)
+						preEdgeValue=-1;
+					if (pre.getWidth()!=temp.getWidth())
+						pre.setWidth(-1);
+					
+					if (pre.getTextProperties().getDistance()!=temp.getTextProperties().getDistance())
+						pre.getTextProperties().setDistance(-1);
+					if (pre.getTextProperties().getPosition()!=temp.getTextProperties().getPosition())
+						pre.getTextProperties().setPosition(-1);
+					if (pre.getTextProperties().getSize()!=temp.getTextProperties().getSize())
+						pre.getTextProperties().setSize(-1);
+					if (pre.getTextProperties().isVisible()!=temp.getTextProperties().isVisible())
+						preEdgeShowTextgiven=false;
+					if (pre.getTextProperties().isshowvalue()!=temp.getTextProperties().isshowvalue())
+						preEdgeTextShowValuegiven=false;
+					
+					if (pre.getLinestyle().getDistance()!=temp.getLinestyle().getDistance())
+						pre.getLinestyle().setDistance(-1);
+					if (pre.getLinestyle().getLength()!=temp.getLinestyle().getLength())
+						pre.getLinestyle().setLength(-1);
+					if (pre.getLinestyle().getType()!=temp.getLinestyle().getType())
+						preEdgeLineTypegiven=false;
+					
+					if (pre.getArrowAngle()!=temp.getArrowAngle())
+						pre.setArrowAngle(-1f);
+					if (pre.getArrowPart()!=temp.getArrowPart())
+						pre.setArrowPart(-1f);
+					if (pre.getArrowPos()!=temp.getArrowPos())
+						pre.setArrowPos(-1f);
+					if (pre.getArrowSize()!=temp.getArrowSize())
+						pre.setArrowSize(-1f);
+					if (preEdgeName!=null)
+					{
+						String tname = GeneralPreferences.replace(preEdgeName,"$ID",""+temp.index);
+						tname = GeneralPreferences.replace(tname,"$SID",""+vg.getEdgeProperties(temp.index).get(MGraph.EDGESTARTINDEX));
+						tname = GeneralPreferences.replace(tname,"$EID",""+vg.getEdgeProperties(temp.index).get(MGraph.EDGEENDINDEX));
+						if (!tname.equals(vg.getEdgeName(temp.index)))
+							preEdgeName = null;
+					}	
+				}	
+			} //end is selected
+		} //End while
+		//Werte - fill name
+		if (preEdgeValue!=-1)
+			iEdgeValue.setValue(preEdgeValue);
+		bChEdgeValue.setSelected(preEdgeValue==-1);bChEdgeValue.doClick();
+		
+		if (pre.getWidth()!=-1)
+			iEdgeWidth.setValue(pre.getWidth());
+		bChEdgeWidth.setSelected(pre.getWidth()==-1);bChEdgeWidth.doClick();
+		
+		if (pre.getTextProperties().getDistance()!=-1)
+			iEdgeTextDistance.setValue(pre.getTextProperties().getDistance());
+		bChEdgeTextDistance.setSelected(pre.getTextProperties().getDistance()==-1); bChEdgeTextDistance.doClick();
+		if (pre.getTextProperties().getPosition()!=-1)
+			iEdgeTextPosition.setValue(pre.getTextProperties().getPosition());
+		bChEdgeTextPosition.setSelected(pre.getTextProperties().getPosition()==-1); bChEdgeTextPosition.doClick();
+		if (pre.getTextProperties().getSize()!=-1)
+			iEdgeTextSize.setValue(pre.getTextProperties().getSize());
+		bChEdgeTextSize.setSelected(pre.getTextProperties().getSize()==-1); bChEdgeTextSize.doClick();
+		if (preEdgeShowTextgiven)
+			bEdgeShowText.setSelected(pre.getTextProperties().isVisible());
+		bChEdgeShowText.setSelected(!preEdgeShowTextgiven); bChEdgeShowText.doClick();
+		if (preEdgeTextShowValuegiven)
+		{
+			this.rEdgeTextShowText.setSelected(!pre.getTextProperties().isshowvalue());
+			this.rEdgeTextShowValue.setSelected(pre.getTextProperties().isshowvalue());
+		}
+		bChEdgeTextChoice.setSelected(!preEdgeTextShowValuegiven); bChEdgeTextChoice.doClick();
+		
+		if (pre.getLinestyle().getDistance()!=-1)
+			iEdgeLineDistance.setValue(pre.getLinestyle().getDistance());
+		bChEdgeLineDistance.setSelected(pre.getLinestyle().getDistance()==-1); bChEdgeLineDistance.doClick();
+		if (pre.getLinestyle().getLength()!=-1)
+			iEdgeLineLength.setValue(pre.getLinestyle().getLength());
+		bChEdgeLineLength.setSelected(pre.getLinestyle().getLength()==-1); bChEdgeLineLength.doClick();
+		if (preEdgeLineTypegiven)
+			cEdgeLineTypes.setSelectedIndex(pre.getLinestyle().getType()-1);
+		bChEdgeLineType.setSelected(!preEdgeLineTypegiven); bChEdgeLineType.doClick();	
+		
+		if (pre.getArrowAngle()!=-1f)
+			sEdgeArrowAngle.setValue((new Float(pre.getArrowAngle())).intValue());
+		bChEdgeArrowAngle.setSelected(pre.getArrowAngle()==-1f); bChEdgeArrowAngle.doClick();
+		if (pre.getArrowPart()!=-1f)
+			sEdgeArrowPart.setValue((new Float(pre.getArrowPart())).intValue());
+		bChEdgeArrowPart.setSelected(pre.getArrowPart()==-1f); bChEdgeArrowPart.doClick();
+		if (pre.getArrowPos()!=-1f)
+			sEdgeArrowPos.setValue((new Float(pre.getArrowPos())).intValue());
+		bChEdgeArrowPos.setSelected(pre.getArrowPos()==-1f); bChEdgeArrowPos.doClick();
+		if (pre.getArrowSize()==-1f)
+			iEdgeArrowSize.setValue((new Float(pre.getArrowSize())).intValue());
+		bChEdgeArrowSize.setSelected(pre.getArrowSize()==-1f); bChEdgeArrowSize.doClick();
+		
+		if (preEdgeName!=null)
+		{
+			sEdgeName.setText(preEdgeName);
+			String t = sEdgeName.getText();
+			t = GeneralPreferences.replace(t,"$ID","4");
+			t = GeneralPreferences.replace(t,"$SID","1");
+			t = GeneralPreferences.replace(t,"$EID","2");
+			if (t.length() > 10)
+				t = t.substring(0,10)+"...";
+			EdgePreview.setText("<html><font size=-1>Vorschau: <i>"+t+"</i></font></html>");
+			EdgePreview.validate();			
+		}	
+		bChEdgeName.setSelected(preEdgeName==null); bChEdgeName.doClick();
+	}
+	
+	//
+	//Modify Graph
+	//
+	
+	private void translateAdjacentEdges(int nodeindex, int x, int y)
+	{
+		x = Math.round(x/2);
+		y = Math.round(y/2);
+		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+		while (edgeiter.hasNext())
+		{
+			VEdge e = edgeiter.next();
+			int start = vg.getEdgeProperties(e.index).elementAt(MGraph.EDGESTARTINDEX);
+			int ende = vg.getEdgeProperties(e.index).elementAt(MGraph.EDGEENDINDEX);
+			if ((start==nodeindex)||(ende==nodeindex))
+					e.translate(x, y);
+		}
+	}
+	private void translate()
+	{
+		Iterator<VNode> nodeiter = vg.getNodeIterator();
+		while (nodeiter.hasNext())
+		{
+			VNode t = nodeiter.next();
+			if (t.isSelected())
+			{
+					Point newpoint = t.getPosition(); //bisherige Knotenposition
+					newpoint.translate(iPosMoveX.getValue(),iPosMoveY.getValue()); //Bewegung im Graphen aber mit Rungungsfehlern, also nur zurbetrachtung der Gesamtgraphbewegung
+					if (newpoint.x < 0)
+					{
+						vg.translate(Math.abs(newpoint.x), 0); //Um die Differenz verschieben (Zoomfactor aufheben)
+						newpoint.x=0;
+					}
+					if (newpoint.y < 0)
+					{
+						vg.translate(0,Math.abs(newpoint.y));
+						newpoint.y = 0;
+					}
+					t.setPosition(newpoint); //Translate selected node
+					//move Adjacent Edges
+					translateAdjacentEdges(t.index,iPosMoveX.getValue(),iPosMoveY.getValue());
+			}
+		}
+	}
+	private void arrangeCircle()
+	{
+		
+		//Verschieben noetig ?
+		int x=0,y=0;
+		if (iOriginX.getValue() - iCircleRadius.getValue() < 0)
+			x = -(iOriginX.getValue() - iCircleRadius.getValue());
+		if (iOriginY.getValue() - iCircleRadius.getValue() < 0)
+			y = -(iOriginY.getValue() - iCircleRadius.getValue());
+		//Graph verschieben
+		vg.translate(x, y);
+		//Kreismittelpunkt auch verschieben
+		iOriginX.setValue(iOriginX.getValue()+x);
+		iOriginY.setValue(iOriginY.getValue()+y);
+
+		//Knoten zaehlen
+		int nodecount = 0;
+		Iterator<VNode> nodeiter = vg.getNodeIterator();
+		while (nodeiter.hasNext())
+		{
+			if (nodeiter.next().isSelected())
+				nodecount++;				
+		}
+		//System.err.println("Found "+nodecount+" selected nodes");
+		
+		//loslegen
+		double start = (new Integer(iFirstNodeAtDegree.getValue())).doubleValue();
+		double part = (new Integer(360)).doubleValue()/(new Integer(nodecount)).doubleValue();
+		
+		int mx = iOriginX.getValue();
+		int my = iOriginY.getValue();
+		int mr = iCircleRadius.getValue();
+		double actualdeg = start;
+		nodeiter = vg.getNodeIterator();
+		while (nodeiter.hasNext()) 
+		{
+			VNode temp = nodeiter.next();
+			if (temp.isSelected())
+			{
+				double posy = - (new Integer(mr)).doubleValue()*Math.cos(2*Math.PI*actualdeg/360d);
+				double posx = (new Integer(mr)).doubleValue()*Math.sin(2*Math.PI*actualdeg/360d);
+						
+				Point newpos = new Point(mx+Math.round((new Double(posx)).floatValue()),my+Math.round((new Double(posy)).floatValue()));
+			//	System.err.println("Now placing node #"+temp.index+"("+vg.getNodeName(temp.index)+") at "+actualdeg+" Degree - Position on Circle ("+posx+","+posy+") and in RL ("+newpos.x+","+newpos.y+")");
+				int diffx = temp.getPosition().x - newpos.x;
+				int diffy = temp.getPosition().y - newpos.y;
+				temp.setPosition(newpos);	
+				//move adjacent edges also
+				translateAdjacentEdges(temp.index, diffx, diffy);
+				actualdeg += part % 360;
+			}
+		}		
+	}
+	private void modifyNodes()
+	{ //Set all nodes to the selected values, if they are selected
+		Iterator<VNode> nodeiter = vg.getNodeIterator();
+		while (nodeiter.hasNext())
+		{
+			VNode actual = nodeiter.next();
+			if (actual.isSelected())
+			{
+				//Node Name
+				if (bChNodeName.isSelected())
+					vg.setNodeName(actual.index, GeneralPreferences.replace(sNodeName.getText(), "$ID",""+actual.index));
+				//Node Size
+				if (bChNodeSize.isSelected())
+					actual.setSize(iNodeSize.getValue());
+				//Node Text Visible
+				if (bChShowNodeName.isSelected())
+					actual.setNameVisible(bShowNodeName.isSelected());
+				//Node Text Distance
+				if (bChNodeNameDistance.isSelected())
+					actual.setNameDistance(iNodeNameDistance.getValue());
+				//Node Text Rotation
+				if (bChNodeNameRotation.isSelected())
+					actual.setNameRotation(iNodeNameRotation.getValue());
+				//Node Text Size
+				if (bChNodeNameSize.isSelected())
+					actual.setNameSize(iNodeNameSize.getValue());
+			} //end if selected
+		} //end while
+		
+	}
+	private void modifyEdges()
+	{
+		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+		while (edgeiter.hasNext())
+		{
+			VEdge actual = edgeiter.next();
+			if (actual.isSelected())
+			{
+				//stupidly apply all values that are selected to do so
+				if (bChEdgeName.isSelected())
+				{
+					String t = sEdgeName.getText();
+					t = GeneralPreferences.replace(t,"$ID",actual.index+"");
+					t = GeneralPreferences.replace(t,"$SID",vg.getEdgeProperties(actual.index).get(MGraph.EDGESTARTINDEX)+"");
+					t = GeneralPreferences.replace(t,"$EID",vg.getEdgeProperties(actual.index).get(MGraph.EDGEENDINDEX)+"");
+					vg.setEdgeName(actual.index, t);
+				}
+				if (bChEdgeValue.isSelected())
+					vg.getMathGraph().setEdgeValue(actual.index, iEdgeValue.getValue());
+				if (bChEdgeWidth.isSelected())
+					actual.setWidth(iEdgeWidth.getValue());
+				
+				if (bChEdgeTextDistance.isSelected())
+					actual.getTextProperties().setDistance(iEdgeTextDistance.getValue());
+				if (bChEdgeTextPosition.isSelected())
+					actual.getTextProperties().setPosition(iEdgeTextPosition.getValue());
+				if (bChEdgeTextSize.isSelected())
+					actual.getTextProperties().setSize(iEdgeTextSize.getValue());
+				if (bChEdgeShowText.isSelected())
+					actual.getTextProperties().setVisible(bEdgeShowText.isSelected());
+				if (bChEdgeTextChoice.isSelected())
+					actual.getTextProperties().setshowvalue(rEdgeTextShowValue.isSelected());
+				
+				if (bChEdgeLineDistance.isSelected())
+					actual.getLinestyle().setDistance(iEdgeLineDistance.getValue());
+				if (bChEdgeLineLength.isSelected())
+					actual.getLinestyle().setLength(iEdgeLineLength.getValue());
+				if (bChEdgeLineType.isSelected())
+					actual.getLinestyle().setType(cEdgeLineTypes.getSelectedIndex()+1);
+				
+				if (bChEdgeArrowSize.isSelected())
+					actual.setArrowSize((new Integer(iEdgeArrowSize.getValue())).floatValue());
+				if (bChEdgeArrowAngle.isSelected())
+					actual.setArrowAngle(sEdgeArrowAngle.getValue());
+				if (bChEdgeArrowPart.isSelected())
+					actual.setArrowPart(sEdgeArrowPart.getValue());
+				if (bChEdgeArrowPos.isSelected())
+					actual.setArrowPos(sEdgeArrowPos.getValue());
+			} // fi selected
+		} //end while (Edge Iteration
+	} //end modify Edges
+	
+	//
+	//
+	//Checks
+	//
+	//
+	private boolean checkPosition()
+	{
+		if (cPosition.getSelectedIndex()==1)
+		{
+			if ((iPosMoveX.getValue()<iPosMoveX.getMinValue())||(iPosMoveY.getValue()<iPosMoveX.getMinValue()))
+			{
+				JOptionPane.showMessageDialog(this, "<html><p>Verschieben nicht m"+main.CONST.html_oe+"glich.<br>Einer der beiden Werte wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+		}
+		if (cPosition.getSelectedIndex()==2) //Arrange in Circle
+		{
+			if ((iCircleRadius.getValue()==-1)||(iOriginX.getValue()==-1)||(iOriginY.getValue()==-1)||(iFirstNodeAtDegree.getValue()==-1))
+			{
+				JOptionPane.showMessageDialog(this, "<html><p>Anordnen nicht m"+main.CONST.html_oe+"glich.<br>Einer der vier Werte wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+			int negX = iOriginY.getValue() - iCircleRadius.getValue();
+			int negY = iOriginX.getValue() - iCircleRadius.getValue();
+			if ((negX < 0)||(negY < 0))
+			{
+				int sel = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html><p>Die Anordnung im Kreis verschiebt den Graphen,<br>da der Kreis aus der Zeichenfl"+main.CONST.html_ae+"che herausragt.</p></html>"
+						, "Verschieben bestätigen", JOptionPane.OK_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE);
+				if (sel == JOptionPane.CANCEL_OPTION)
+					return false;
+			}
+		}
+		return true;
+	}
+	private boolean checkNode()
+	{
+		if (bChNodeSize.isSelected()&&(iNodeSize.getValue()==-1))
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>Ver"+main.CONST.html_ae+"ndern der Werte nicht m"+main.CONST.html_oe+"glich.<br>Die neue Knotengr"+main.CONST.html_oe+main.CONST.html_sz+"e wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+			return false;				
+		}
+		if (bChNodeNameSize.isSelected()&&(iNodeNameSize.getValue()==-1))
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>Ver"+main.CONST.html_ae+"ndern der Werte nicht m"+main.CONST.html_oe+"glich.<br>Die neue Textgr"+main.CONST.html_oe+main.CONST.html_sz+"e der Knoten wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+			return false;				
+		}
+		if (bChNodeNameDistance.isSelected()&&(iNodeNameDistance.getValue()==-1))
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>Ver"+main.CONST.html_ae+"ndern der Werte nicht m"+main.CONST.html_oe+"glich.<br>Der neue Textabstand der Knoten wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+			return false;				
+		}
+		if (bChNodeNameRotation.isSelected()&&(iNodeNameRotation.getValue()==-1))
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>Ver"+main.CONST.html_ae+"ndern der Werte nicht m"+main.CONST.html_oe+"glich.<br>Die neue Textausrichtung der Knoten wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+			return false;				
+		}
+		return true;
+	}
+	private boolean checkEdge()
+	{
+		if (bChEdgeValue.isSelected()&&(iEdgeValue.getValue()==-1))
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>Ver"+main.CONST.html_ae+"ndern der Werte nicht m"+main.CONST.html_oe+"glich.<br>Das neue Kantengewicht wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+			return false;				
+		}
+		if (bChEdgeWidth.isSelected()&&(iEdgeWidth.getValue()==-1))
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>Ver"+main.CONST.html_ae+"ndern der Werte nicht m"+main.CONST.html_oe+"glich.<br>Die neue Kantenbreite wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+			return false;				
+		}
+		if (bChEdgeTextDistance.isSelected()&&(iEdgeTextDistance.getValue()==-1))
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>Ver"+main.CONST.html_ae+"ndern der Werte nicht m"+main.CONST.html_oe+"glich.<br>Der neue Textabstand der Kante(n) wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+			return false;				
+		}
+		if (bChEdgeTextPosition.isSelected()&&(iEdgeTextPosition.getValue()==-1))
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>Ver"+main.CONST.html_ae+"ndern der Werte nicht m"+main.CONST.html_oe+"glich.<br>Die neue Textposition an der Kante(n) wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+			return false;				
+		}
+		if (bChEdgeTextSize.isSelected()&&(iEdgeTextSize.getValue()==-1))
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>Ver"+main.CONST.html_ae+"ndern der Werte nicht m"+main.CONST.html_oe+"glich.<br>Die neue Textgr"+main.CONST.html_oe+main.CONST.html_sz+"e der Kante(n) wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+			return false;				
+		}
+		if (bChEdgeLineDistance.isSelected()&&(iEdgeLineDistance.getValue()==-1))
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>Ver"+main.CONST.html_ae+"ndern der Werte nicht m"+main.CONST.html_oe+"glich.<br>Die neue Abstand von Linienelementen der Kante(n) wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+			return false;				
+		}
+		if (bChEdgeLineLength.isSelected()&&(iEdgeLineLength.getValue()==-1))
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>Ver"+main.CONST.html_ae+"ndern der Werte nicht m"+main.CONST.html_oe+"glich.<br>Die neue Linienl"+main.CONST.html_ae+"nge der Kante(n) wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+			return false;				
+		}
+		if (bChEdgeArrowSize.isSelected()&&(iEdgeArrowSize.getValue()==-1))
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>Ver"+main.CONST.html_ae+"ndern der Werte nicht m"+main.CONST.html_oe+"glich.<br>Die neue Pfeilgr"+main.CONST.html_oe+main.CONST.html_sz+"e der Kante(n) wurde nicht angegeben.</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
+			return false;				
+		}
+
+		return true;
+	}
+	private boolean check()
+	{
+		if (show_position)
+		{
+			if (!checkPosition())
+				return false;
+		}
+		if (show_nodeprop)
+		{
+			if (!checkNode())
+				return false;
+		}
+		if (show_edgeprop)
+		{
+			if (!checkEdge())
+				return false;
+		}
+		if (show_subsets)
+		{
+			System.err.println("Untergraphen prüfen - TODO");
+		}
+		
+		return true;
+	}
+	private boolean doModify()
+	{
+		if (!check())
+			return false;
+		
+		if (show_position)
+		{
+			if (cPosition.getSelectedIndex()==1)
+			{
+				translate();
+			}
+			if (cPosition.getSelectedIndex()==2)
+			{
+				arrangeCircle();
+			}
+		}
+		if (show_nodeprop)
+			modifyNodes();
+		if (show_edgeprop)
+			modifyEdges();
+		if (show_subsets)
+			System.err.println("Untergraphen ändern - TODO");
+		vg.pushNotify("NES");
+		return true;
+	}
+	public void actionPerformed(ActionEvent event) {
+		if (event.getSource()==cPosition)
+		{
+			for (int i=0; i<Positioncontent.length; i++)
+			{
+				Positioncontent[i].setVisible(false);
+			}
+			Positioncontent[cPosition.getSelectedIndex()].setVisible(true);
+			this.invalidate();
+		}
+		else if (event.getSource()==bCancel)
+		{
+			this.dispose();
+		}
+		else if (event.getSource()==bOk)
+		{
+			if (doModify())
+				dispose();
+		}
+		//
+		//Knoten Enable Checkboxes
+		else if (event.getSource()==bChNodeName)
+		{
+			sNodeName.setEnabled(bChNodeName.isSelected());
+			if (bChNodeName.isSelected())
+			{
+				NodeName.setForeground(Color.BLACK);
+				NodePreview.setForeground(Color.BLACK);
+			}
+			else
+			{
+				NodeName.setForeground(Color.GRAY);
+				NodePreview.setForeground(Color.GRAY);
+			}
+		}
+		else if (event.getSource()==bChNodeSize)
+		{
+			iNodeSize.setEnabled(bChNodeSize.isSelected());
+			if (bChNodeSize.isSelected())
+				NodeSize.setForeground(Color.BLACK);
+			else
+				NodeSize.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChShowNodeName)
+		{
+			bShowNodeName.setEnabled(bChShowNodeName.isSelected());
+			if (bChShowNodeName.isSelected())
+				bShowNodeName.setForeground(Color.BLACK);
+			else
+				bShowNodeName.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChNodeNameRotation)
+		{
+			iNodeNameRotation.setEnabled(bChNodeNameRotation.isSelected());
+			if (bChNodeNameRotation.isSelected())
+				NodeNameRotation.setForeground(Color.BLACK);
+			else
+				NodeNameRotation.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChNodeNameDistance)
+		{
+			iNodeNameDistance.setEnabled(bChNodeNameDistance.isSelected());
+			if (bChNodeNameDistance.isSelected())
+				NodeNameDistance.setForeground(Color.BLACK);
+			else
+				NodeNameDistance.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChNodeNameSize)
+		{
+			iNodeNameSize.setEnabled(bChNodeNameSize.isSelected());
+			if (bChNodeNameSize.isSelected())
+				NodeNameSize.setForeground(Color.BLACK);
+			else
+				NodeNameSize.setForeground(Color.GRAY);
+		}
+		//KantenDatenfelder
+		else if (event.getSource()==bChEdgeName)
+		{
+			sEdgeName.setEnabled(bChEdgeName.isSelected());
+			if (bChEdgeName.isSelected())
+				EdgeName.setForeground(Color.BLACK);
+			else
+				EdgeName.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChEdgeWidth)
+		{
+			iEdgeWidth.setEnabled(bChEdgeWidth.isSelected());
+			if (bChEdgeWidth.isSelected())
+				EdgeWidth.setForeground(Color.BLACK);
+			else
+				EdgeWidth.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChEdgeValue)
+		{
+			iEdgeValue.setEnabled(bChEdgeValue.isSelected());
+			if (bChEdgeValue.isSelected())
+				EdgeValue.setForeground(Color.BLACK);
+			else
+				EdgeValue.setForeground(Color.GRAY);
+		}
+		//Edge Text Stuff
+		else if (event.getSource()==bChEdgeShowText)
+		{
+			bEdgeShowText.setEnabled(bChEdgeShowText.isSelected());
+		}
+
+		else if (event.getSource()==bChEdgeTextPosition)
+		{
+			iEdgeTextPosition.setEnabled(bChEdgeTextPosition.isSelected());
+			if (bChEdgeTextPosition.isSelected())
+				EdgeTextPosition.setForeground(Color.BLACK);
+			else
+				EdgeTextPosition.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChEdgeTextDistance)
+		{
+			iEdgeTextDistance.setEnabled(bChEdgeTextDistance.isSelected());
+			if (bChEdgeTextDistance.isSelected())
+				EdgeTextDistance.setForeground(Color.BLACK);
+			else
+				EdgeTextDistance.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChEdgeTextSize)
+		{
+			iEdgeTextSize.setEnabled(bChEdgeTextSize.isSelected());
+			if (bChEdgeTextSize.isSelected())
+				EdgeTextSize.setForeground(Color.BLACK);
+			else
+				EdgeTextSize.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChEdgeTextChoice)
+		{
+			rEdgeTextShowValue.setEnabled(bChEdgeTextChoice.isSelected());
+			rEdgeTextShowText.setEnabled(bChEdgeTextChoice.isSelected());
+			if (bChEdgeTextChoice.isSelected())
+				EdgeTextChoice.setForeground(Color.BLACK);
+			else
+				EdgeTextChoice.setForeground(Color.GRAY);
+		}
+		//Edge Line Stuff
+		else if (event.getSource()==bChEdgeLineType)
+		{
+			cEdgeLineTypes.setEnabled(bChEdgeLineType.isSelected());
+			if (bChEdgeLineType.isSelected())
+				EdgeLineType.setForeground(Color.BLACK);
+			else
+				EdgeLineType.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChEdgeLineDistance)
+		{
+			iEdgeLineDistance.setEnabled(bChEdgeLineDistance.isSelected());
+			if (bChEdgeLineDistance.isSelected())
+				EdgeLineDistance.setForeground(Color.BLACK);
+			else
+				EdgeLineDistance.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChEdgeLineLength)
+		{
+			iEdgeLineLength.setEnabled(bChEdgeLineLength.isSelected());
+			if (bChEdgeLineLength.isSelected())
+				EdgeLineLength.setForeground(Color.BLACK);
+			else
+				EdgeLineLength.setForeground(Color.GRAY);
+		} //Arrows
+		else if (event.getSource()==bChEdgeArrowSize)
+		{
+			iEdgeArrowSize.setEnabled(bChEdgeArrowSize.isSelected());
+			if (bChEdgeArrowSize.isSelected())
+				EdgeArrowSize.setForeground(Color.BLACK);
+			else
+				EdgeArrowSize.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChEdgeArrowAngle)
+		{
+			sEdgeArrowAngle.setEnabled(bChEdgeArrowAngle.isSelected());
+			if (bChEdgeArrowAngle.isSelected())
+				EdgeArrowAngle.setForeground(Color.BLACK);
+			else
+				EdgeArrowAngle.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChEdgeArrowPart)
+		{
+			sEdgeArrowPart.setEnabled(bChEdgeArrowPart.isSelected());
+			if (bChEdgeArrowPart.isSelected())
+				EdgeArrowPart.setForeground(Color.BLACK);
+			else
+				EdgeArrowPart.setForeground(Color.GRAY);
+		}
+		else if (event.getSource()==bChEdgeArrowPos)
+		{
+			sEdgeArrowPos.setEnabled(bChEdgeArrowPos.isSelected());
+			if (bChEdgeArrowPos.isSelected())
+				EdgeArrowPos.setForeground(Color.BLACK);
+			else
+				EdgeArrowPos.setForeground(Color.GRAY);
+		}
+		
+
+		
+	}
+	public void caretUpdate(CaretEvent event) 
+	{
+	    if (event.getSource()==sNodeName)
+		{
+			String t = GeneralPreferences.replace(sNodeName.getText(),"$ID","4");
+			if (t.length() > 10)
+				t = t.substring(0,10)+"...";	
+			NodePreview.setText("<html><font size=-1>Vorschau: <i>"+t+"</i></font></html>");
+			NodePreview.validate();
+		}
+		else if (event.getSource()==sEdgeName)
+		{
+			String t = sEdgeName.getText();
+			t = GeneralPreferences.replace(t,"$ID","4");
+			t = GeneralPreferences.replace(t,"$SID","1");
+			t = GeneralPreferences.replace(t,"$EID","2");
+			if (t.length() > 10)
+				t = t.substring(0,10)+"...";
+			EdgePreview.setText("<html><font size=-1>Vorschau: <i>"+t+"</i></font></html>");
+			EdgePreview.validate();
+		}
+}
+
+}
