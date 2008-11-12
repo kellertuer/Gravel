@@ -327,7 +327,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		String[] ordernames = {"ID","Name"};
 		cOrderBy = new JComboBox(ordernames);
 		cOrderBy.setSelectedIndex(0);
-		cOrderBy.setEnabled(false); //TODO Knotenname einbauen
+		cOrderBy.setEnabled(false); //TODO Selection-Modify - Order by Nodename and so on einbauen
 		PosContent.add(cOrderBy,c);
 		
 		c.gridy++;

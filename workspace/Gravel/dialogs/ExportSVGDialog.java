@@ -22,34 +22,29 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
 /**
- * Class for the Dialog, that displays properties of the TeX-Export
  * 
- * @author Ronny Bergmann
+ * @author ronny
+ *
  */
-public class ExportTeXDialog extends JDialog implements ActionListener, CaretListener
-{
+public class ExportSVGDialog extends JDialog implements ActionListener, CaretListener {
 	private IntegerTextField iSizeX,iSizeY;
 	private JButton bOk, bCancel;
 	private JRadioButton selX,selY;
-	private ButtonGroup DocumentChoice, TypeChoice;
-	private JRadioButton rWholeDocument, rOnlyFigure, rPlainTeX, rTikZ;
 	private boolean accepted = false;
 	private int origx,origy;
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-
 	/**
-	 * Initialize the Dialog to a parent Frame with a given picture size of the TeX-Picture (in mm)
+	 * Initialize the Dialog with a parent frame below (this Dialog is modal)
+	 * and a preset size of the picture
 	 * 
-	 * @param parent frame deactivated by this modal fra,e
-	 * @param ox horizontal and
-	 * @param oy vertical preset values for the input fields
+	 * @param parent Frame which is deaactivated by this dialog
+	 * 
+	 * @param ox Presetz size of the picture - x-value
+	 * @param oy y-value
 	 */
-	public ExportTeXDialog(Frame parent, int ox, int oy)
+	public ExportSVGDialog(Frame parent, int ox, int oy)
 	{
-		super(parent,"Einstellungen für TeX-Export");
+		super(parent,"Einstellungen für SVG-Export");
 		origx = ox; origy = oy;
 		Container content = getContentPane();
 		GridBagConstraints c = new GridBagConstraints();
@@ -61,7 +56,7 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 		c.gridy=0;
 		c.gridx = 0;
 		c.gridwidth=3;
-		content.add(new JLabel("<html>Bitte eine Breite bzw H"+main.CONST.html_oe+"he (in mm) f"+main.CONST.html_ue+"r die Grafik in TeX angeben<br>Ausgehend von der selektierten Gr"+main.CONST.html_oe+""+main.CONST.html_sz+"e wird die andere berechnet</html>"),c);
+		content.add(new JLabel("<html>Alle Angaben sind in Pixel<br>Ausgehend von der selektierten Gr"+main.CONST.html_oe+""+main.CONST.html_sz+"e<br> wird die andere Berechnet</html>"),c);
 		c.gridy++;
 		c.gridwidth=1;
 		selX = new JRadioButton("Breite :");
@@ -85,43 +80,14 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 		iSizeY.setPreferredSize(new Dimension(200, 20));
 		iSizeY.addCaretListener(this);
 		content.add(iSizeY,c);
-		c.gridy++;
-		c.gridwidth=2;
-		c.gridx=0;
-		content.add(new JLabel("<html>Art des Exports</html>"),c);
-		c.gridwidth=1;
-		c.gridy++;
-		c.gridx=0;
-		DocumentChoice = new ButtonGroup();
-		rWholeDocument = new JRadioButton("Gesamtes TeX-Dokument");
-		rOnlyFigure = new JRadioButton("<html>nur die <i>figure</i>-Umgebung");
-		DocumentChoice.add(rWholeDocument);
-		DocumentChoice.add(rOnlyFigure);
-		rOnlyFigure.setSelected(true);
-		content.add(rWholeDocument,c);
-		c.gridx++;
-		content.add(rOnlyFigure,c);
-		c.gridy++;
-		c.gridx = 0;
-		TypeChoice = new ButtonGroup();
-		rPlainTeX = new JRadioButton("TeX-Picture (epic,eepic)");
-		rTikZ = new JRadioButton("TikZ-Export");
-		TypeChoice.add(rPlainTeX);
-		TypeChoice.add(rTikZ);
-		rPlainTeX.setSelected(true);
-		content.add(rPlainTeX,c);
-		c.gridx++;
-		content.add(rTikZ,c);		
-		c.gridy++;
-		c.gridx = 0;
-		c.gridwidth=3;
-		content.add(new JLabel("<html><b>Achtung</b> : Im TeX-Picture-Export werden Farben ignoriert.<br>Schriftgr"+main.CONST.html_oe+main.CONST.html_sz+"en k"+main.CONST.html_oe+"nnen leicht varriieren, da TeX einen anderen Font verwendet.</html>"),c);
-		c.gridy++;
-		c.gridx = 1;
-		ButtonGroup b = new ButtonGroup();
-		b.add(selX); b.add(selY);
 		c.gridwidth=1;
 		c.anchor = GridBagConstraints.EAST;
+		c.gridy++;
+		c.gridx = 1;
+		
+		ButtonGroup b = new ButtonGroup();
+		b.add(selX); b.add(selY);
+	
 		bCancel = new JButton("Abbrechen");
 		bCancel.addActionListener(this);
 		content.add(bCancel,c);	
@@ -134,7 +100,7 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 	
 		this.getRootPane().setDefaultButton(bOk);
 		selX.doClick();
-		iSizeX.setValue(70);
+		iSizeX.setValue(ox);
 		setResizable(false);
 		this.setModal(true);
 		pack();
@@ -147,57 +113,34 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 		this.setVisible(true);
 	}
 	/**
-	 * @return the horizontal pictrue size in mm
+	 * returns the x-Value of the actual user input size
+	 * 
+	 * @return hoizontal size of the picture in px
 	 */
 	public int getSizeX()
 	{
 		return iSizeX.getValue();
 	}
 	/**
-	 * @return the vertical pictrue size in mm
+	 * returns the y-Value of the actual user input size
+	 * 
+	 * @return vertical size of the picture in px
 	 */
 	public int getSizeY()
 	{
 		return iSizeY.getValue();
 	}
 	/**
-	 * Indicated whether the user acceted his data in the end
+	 * Indicates, whether the user pressed okay in the dialog
 	 * 
-	 * @return true, if the user pressed OK, else false
+	 * @return
 	 */
 	public boolean IsAccepted()
 	{
 		return accepted;
 	}
 	/**
-	 * Get the Value, whether the user wants the whole document exported or not
-	 * 
-	 * @return true, if the whole document should be created
-	 */
-	public boolean IsWholeDocument()
-	{
-		return rWholeDocument.isSelected();
-	}
-	/**
-	 * Indicates, whether only the figure should be created in the tex-File
-	 * 
-	 * @return true, if only the figure must be created in the tex-File
-	 */
-	public boolean IsOnlyFigure()
-	{
-		return rOnlyFigure.isSelected();
-	}
-	public boolean IsPlainTeX()
-	{
-		System.err.println("PlainTeX is Selected: "+rPlainTeX.isSelected());
-		return rPlainTeX.isSelected();
-	}
-	public boolean IsTikZ()
-	{
-		return rTikZ.isSelected();
-	}
-	/**
-	 * Handle actions of the (radio-)buttons
+	 * handling user input action on the (radio-) buttons
 	 */
 	public void actionPerformed(ActionEvent e) 
 	{
@@ -226,7 +169,7 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 		}
 	}
 	/**
-	 * handle caret updates in the integer text fields
+	 * handle caret updates in the two integertextfield-Components and calculate the deactivated value
 	 */
 	public void caretUpdate(CaretEvent e) {
 		 if ((e.getSource()==iSizeX)||(e.getSource()==iSizeY))

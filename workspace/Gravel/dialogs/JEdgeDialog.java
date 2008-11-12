@@ -746,7 +746,6 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 				return;
 			if (graphref.similarPathEdgeIndex(CheckType(),startindex,endindex) > 0) //do the actual input fields create an edge similar to an existing ?
 			{
-				//TODO Multiple abfragen
 				if ((!graphref.isMultipleAllowed())&&(graphref.similarPathEdgeIndex(CheckType(),startindex,endindex) != oldindex)) //ist nicht die alte Kante
 				{	
 					JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"ndern der Kante nicht m&ouml;glich.<br><br>Eine Kante zwischen den Knoten existiert bereits.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					

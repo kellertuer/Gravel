@@ -24,7 +24,7 @@ import view.VGraphic;
  * @author ronny
  *
  */
-public class MyLaTeXPictureWriter {
+public class MyLaTeXPictureWriter implements TeXWriter {
 
 	private final static String NL = "\r\n";
 	private final static double LINESPPT = 4.0d;
@@ -360,6 +360,9 @@ public class MyLaTeXPictureWriter {
 	{
 	       //SubSets - Umrandungen hier einbauen
 	}
+	/* (non-Javadoc)
+	 * @see io.TeXWriter#saveToFile(java.io.File)
+	 */
 	public String saveToFile(File f)
 	{
 		if (!f.exists())
@@ -399,10 +402,16 @@ public class MyLaTeXPictureWriter {
 	{	
 		return NL+"\\put("+x+","+y+"){\\circle*{"+s+"}}";
 	}
+	/* (non-Javadoc)
+	 * @see io.TeXWriter#isWholeDoc()
+	 */
 	public boolean isWholeDoc() {
 		return wholedoc;
 	}
 
+	/* (non-Javadoc)
+	 * @see io.TeXWriter#setWholedoc(boolean)
+	 */
 	public void setWholedoc(boolean wholedoc) {
 		this.wholedoc = wholedoc;
 	}

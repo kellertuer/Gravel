@@ -3,7 +3,10 @@ package dialogs;
 import io.GeneralPreferences;
 import io.PNGWriter;
 import io.GravelMLReader;
+import io.SVGWriter;
+import io.TeXWriter;
 import io.MyLaTeXPictureWriter;
+import io.MyTikZPictureWriter;
 import io.GravelMLWriter;
 
 import java.awt.Component;
@@ -34,9 +37,9 @@ import view.VGraphic;
  * 
  * 		PNG Export
  * 		LaTeX Picture Export
+ * 		SVG		Export als Vektorgrafik
  * (	GraphML Export mit oder ohne visuelle Informationen, Subsets gehen verloren
  * 		.dot	Export das Format von Graphviz
- * 		SVG		Export als Vektorgrafik
  * 
  * 		GraphML Import eines mathematischen Graphen => Wizard starten
  *		.dot	Import so jeder Knoten mindestens x und y enthält VGraph sonst MGraph
@@ -348,8 +351,10 @@ public class JFileDialogs implements Observer
 		//Wenn man schon nen File hat das Directory davon verwenden
 		FileFilter png = new SimpleFilter("PNG","Portable Network Graphics");
 		FileFilter tex = new SimpleFilter("TEX","LaTeX-Picture-Grafik");
+		FileFilter svg = new SimpleFilter("SVG","Scalable Vector Graphics");
 		fc.addChoosableFileFilter(png);
 		fc.addChoosableFileFilter(tex);
+		fc.addChoosableFileFilter(svg);
 		if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
 			fc.setCurrentDirectory(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getParentFile());
 
@@ -359,13 +364,25 @@ public class JFileDialogs implements Observer
 			    File f = fc.getSelectedFile();
 	    		if (png.accept(f))
 	    		{
-	    			ExportPNGDialog epngd = new ExportPNGDialog(Gui.getInstance().getParentWindow(),
+	    			ExportPNGDialog esvgd = new ExportPNGDialog(Gui.getInstance().getParentWindow(),
 	    					(vGc.getVGraph().getMaxPoint(vGc.getGraphics()).x-vGc.getVGraph().getMinPoint(vGc.getGraphics()).x),
 	    					(vGc.getVGraph().getMaxPoint(vGc.getGraphics()).y-vGc.getVGraph().getMinPoint(vGc.getGraphics()).y));
-	    			if (epngd.IsAccepted())
+	    			if (esvgd.IsAccepted())
 	    			{
 	    				PNGWriter iw = new PNGWriter(vGc); 
-	    				iw.PNGExport(f,epngd.getSizeX(),epngd.getSizeY());
+	    				iw.PNGExport(f,esvgd.getSizeX(),esvgd.getSizeY());
+	    				return true;
+	    			}
+	    		}
+	    		if (svg.accept(f))
+	    		{
+	    			ExportSVGDialog esvgd = new ExportSVGDialog(Gui.getInstance().getParentWindow(),
+	    					(vGc.getVGraph().getMaxPoint(vGc.getGraphics()).x-vGc.getVGraph().getMinPoint(vGc.getGraphics()).x),
+	    					(vGc.getVGraph().getMaxPoint(vGc.getGraphics()).y-vGc.getVGraph().getMinPoint(vGc.getGraphics()).y));
+	    			if (esvgd.IsAccepted())
+	    			{
+	    				SVGWriter iw = new SVGWriter(vGc,esvgd.getSizeX(),""); 
+	    				iw.saveToFile(f);
 	    				return true;
 	    			}
 	    		}
@@ -381,8 +398,12 @@ public class JFileDialogs implements Observer
 	    					type="doc";
 	    				else if (etexd.IsOnlyFigure())
 	    					type="fig";
-		    			MyLaTeXPictureWriter lp = new MyLaTeXPictureWriter(vGc,etexd.getSizeX(),type);
-		    			String error = lp.saveToFile(f);
+	    				TeXWriter lp;
+	    				if (etexd.IsPlainTeX())
+	    					lp = new MyLaTeXPictureWriter(vGc,etexd.getSizeX(),type);
+	    				else
+	    					lp = new MyTikZPictureWriter(vGc,etexd.getSizeX(),type);
+	    				String error = lp.saveToFile(f);
 		    			if (error.equals(""))
 		    				return true;
 		    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(),"<html>Beim Exportieren des Graphen ist folgener Fehler aufgetreten: <br>"+error,"Fehler",JOptionPane.ERROR_MESSAGE);

@@ -28,7 +28,6 @@ public class GraphHistoryManager implements Observer
 		lastMsg="";
 	}
 	public void update(Observable o, Object arg) {
-		// TODO Auto-generated method stub
 		if (o.equals(trackedGraph))
 		{
 			if (!((String) arg).startsWith("M"))
@@ -37,48 +36,30 @@ public class GraphHistoryManager implements Observer
 				{
 					String output = "Action tracked: "+arg;
 					String msg = (String) arg;
+					int value = 0;
 					if (msg.length() > 1)
 					{
-						int value = 0;
 						int j=1;
 						while (Character.isDigit(msg.charAt(j)))
 						{
 							value = value*10+Character.getNumericValue(msg.charAt(j));
 							if ( (++j) >= msg.length())
 								break;
-						}	
+						}
 						switch (msg.charAt(0))
 						{
 							case 'N': output+=" (A Node"; break;
 							case 'E': output+=" (An Edge"; break;
 							case 'S': output+=" (A Subset"; break;
 						}
-						output +="with index #"+value+")";
+						output +=" with index #"+value+")";
 					}
 					lastMsg = msg;
-					System.err.println(output);
+					if (value > 0)
+						System.err.println(output);
 
 				}		
 			}
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
