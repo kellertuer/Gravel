@@ -162,7 +162,7 @@ public class VGraph extends Observable {
 						while (n2.hasNext())
 						{
 							VNode t2 = n2.next();
-							if (t.index <= t2.index)
+							if (t.index < t2.index)
 							{
 								Vector<Integer> ttot2 = getEdgeIndices(t.index,t2.index);
 								Vector<Integer> t2tot = getEdgeIndices(t2.index,t.index);

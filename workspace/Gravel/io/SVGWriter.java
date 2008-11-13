@@ -93,7 +93,7 @@ public class SVGWriter
 				return c;
 			//Count Subsets
 			Color col = v.getColor();
-			c +="rgb("+col.getRed()+","+col.getGreen()+","+col.getBlue()+") ";
+			c +="rgb("+col.getRed()+","+col.getGreen()+","+col.getBlue()+")";
 			return c;
 		}
 
@@ -162,7 +162,7 @@ public class SVGWriter
 				return c;
 			//Count Subsets
 			Color col = e.getColor();
-			c +="rgb("+col.getRed()+","+col.getGreen()+","+col.getBlue()+") ";
+			c +="rgb("+col.getRed()+","+col.getGreen()+","+col.getBlue()+")";
 			return c;
 		}
 
@@ -213,24 +213,22 @@ public class SVGWriter
 	    		   Point m = l.getControlPoints().firstElement();
 	    		   Point n = vg.getNode(vg.getEdgeProperties(actual.index).elementAt(MGraph.EDGEENDINDEX)).getPosition();
 	    		   //Mitte zwischen Kontrollpunkt und Start/Endknoten der hier der selbe ist
-	    		   System.err.print("("+m.x+","+m.y+") CP und ("+n.x+","+n.y+") Node");
 	    		   m.x = (n.x+m.x)/2;
 	    		   m.y = (n.y+m.y)/2;
-	    		   System.err.println("("+m.x+","+m.y+") Ellipse MP");	    		   
 	    		   int mainaxis = Math.round(((float)l.getLength())/2f);
 	    		   int minoraxis = Math.round((((float)l.getLength())/2f)*((float)l.getProportion()));
 	    		   s.write("<ellipse cx=\""+m.x+"\" cy=\""+m.y+"\" rx=\""+mainaxis+"\" ry=\""+minoraxis+"\" transform=\"rotate(-"+l.getDirection()+","+m.x+","+m.y+")\""+NL);
 	    	   }
 	    	  VEdgeLinestyle style = actual.getLinestyle();
-	    	 s.write(" style=\"stroke-dashoffset:"+style.getDistance()+";");
+	    	 s.write(" style=\"stroke-dashoffset:0;");
 	    	  if (style.getType()==VEdgeLinestyle.DASHED)
 	    		s.write(" stroke-dasharray:"+style.getLength()+","+style.getDistance()+";");  
 		      if (style.getType()==VEdgeLinestyle.DOTTED)
-		    		s.write(" stroke-dasharray:"+actual.getWidth()+","+style.getDistance()+";");  		    	  
+		    		s.write(" stroke-dasharray:0,"+style.getDistance()+";");  		    	  
 		      if (style.getType()==VEdgeLinestyle.DOTDASHED)
-		    		s.write(" stroke-dasharray:"+style.getLength()+","+style.getDistance()+","+actual.getWidth()+","+style.getDistance()+";");  
+		    		s.write(" stroke-dasharray:"+style.getLength()+","+style.getDistance()+",0,"+style.getDistance()+";");  
 		      
-			  s.write(" stroke:"+getEdgeColorString(actual.index)+"; stroke-width:"+actual.getWidth()+"px; fill:none;\"/>"+NL);
+			  s.write(" stroke-linecap:round; stroke-linejoin:round; stroke:"+getEdgeColorString(actual.index)+"; stroke-width:"+actual.getWidth()+"px; fill:none;\"/>"+NL);
 		      
 			  if (actual.getTextProperties().isVisible()) //draw name
 				{	

@@ -255,7 +255,7 @@ public class CLoopParameters extends Container implements ActionListener{
 				vle.setProportion(((double)iProportion.getValue())/100.0d);
 			if (bDirection.isSelected())
 				vle.setDirection(iDirection.getValue());
-			if (bLoop.isSelected())
+			if (directed&&bLoop.isSelected())
 				vle.setClockwise(rClockwise.isSelected());
 		}
 		else //No checks - change all values

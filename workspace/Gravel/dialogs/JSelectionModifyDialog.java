@@ -612,6 +612,10 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 					preEdgeName = GeneralPreferences.replace(preEdgeName,""+temp.index, "$ID");
 					preEdgeName = GeneralPreferences.replace(preEdgeName,""+vg.getEdgeProperties(temp.index).get(MGraph.EDGESTARTINDEX), "$SID");
 					preEdgeName = GeneralPreferences.replace(preEdgeName,""+vg.getEdgeProperties(temp.index).get(MGraph.EDGEENDINDEX), "$EID");					
+					if (pre.getType()==VEdge.LOOP) // very first is a Loop
+					{
+						vle = (VLoopEdge)pre.clone();
+					}
 				}
 				else
 				{ // if an edge value differs set common name to -1
