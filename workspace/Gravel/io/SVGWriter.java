@@ -210,6 +210,16 @@ public class SVGWriter
 	    	   if (actual.getType()==VEdge.LOOP) // SVG Export
 	    	   {
 	    		   VLoopEdge l = (VLoopEdge)actual;
+	    		   Point m = l.getControlPoints().firstElement();
+	    		   Point n = vg.getNode(vg.getEdgeProperties(actual.index).elementAt(MGraph.EDGEENDINDEX)).getPosition();
+	    		   //Mitte zwischen Kontrollpunkt und Start/Endknoten der hier der selbe ist
+	    		   System.err.print("("+m.x+","+m.y+") CP und ("+n.x+","+n.y+") Node");
+	    		   m.x = (n.x+m.x)/2;
+	    		   m.y = (n.y+m.y)/2;
+	    		   System.err.println("("+m.x+","+m.y+") Ellipse MP");	    		   
+	    		   int mainaxis = Math.round(((float)l.getLength())/2f);
+	    		   int minoraxis = Math.round((((float)l.getLength())/2f)*((float)l.getProportion()));
+	    		   s.write("<ellipse cx=\""+m.x+"\" cy=\""+m.y+"\" rx=\""+mainaxis+"\" ry=\""+minoraxis+"\" transform=\"rotate(-"+l.getDirection()+","+m.x+","+m.y+")\""+NL);
 	    	   }
 	    	  VEdgeLinestyle style = actual.getLinestyle();
 	    	 s.write(" style=\"stroke-dashoffset:"+style.getDistance()+";");
@@ -274,9 +284,35 @@ public class SVGWriter
 		 * @param nodeende
 		 * @return
 		 */
-		private String drawArrow(VEdge edge, int nodestart, int nodeende)
+		private String drawArrow(VEdge edge, int start, int ende)
 		{
-			return "";
+			double[] coords = new double[2];
+			int x = 0, y = 0;
+			//Point2D.Double arrowhead = new Point2D.Double(),line1start = new Point2D.Double(),line1 = new Point2D.Double(),line2start = new Point2D.Double(),line2 = new Point2D.Double();
+			String s = "";
+			if (vg.isDirected())
+			{
+			  	Shape arrow = edge.getArrowShape(vg.getNode(start).getPosition(),vg.getNode(ende).getPosition(),Math.round(vg.getNode(start).getSize()/2),Math.round(vg.getNode(ende).getSize()/2),1.0f);
+			  	PathIterator path = arrow.getPathIterator(null, 0.001);
+//			  	int i=0;
+			  	s += "<path d=\"";
+			    while( !path.isDone() ) 
+			      {
+			      int type = path.currentSegment(coords);
+			    	x = Math.round((float)coords[0]); y = Math.round((float)coords[1]);
+			    	if (type==PathIterator.SEG_MOVETO)
+			    	{
+			    		s += NL+"M "+(x)+","+(y)+" ";
+			    	}
+			    	else if (type==PathIterator.SEG_LINETO)	
+			    	{
+			    		s += "L "+x+","+y+" ";
+			    	}
+			    	path.next();
+			    }
+			  s +="z\" style=\"fill:"+getEdgeColorString(edge.index)+"\"/>";
+			}
+			return s;
 		}
 		private void writeSubSets(OutputStreamWriter s) throws IOException
 		{

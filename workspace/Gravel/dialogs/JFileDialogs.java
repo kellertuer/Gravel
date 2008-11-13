@@ -5,7 +5,7 @@ import io.PNGWriter;
 import io.GravelMLReader;
 import io.SVGWriter;
 import io.TeXWriter;
-import io.MyLaTeXPictureWriter;
+import io.LaTeXPictureWriter;
 import io.MyTikZPictureWriter;
 import io.GravelMLWriter;
 
@@ -400,7 +400,7 @@ public class JFileDialogs implements Observer
 	    					type="fig";
 	    				TeXWriter lp;
 	    				if (etexd.IsPlainTeX())
-	    					lp = new MyLaTeXPictureWriter(vGc,etexd.getSizeX(),type);
+	    					lp = new LaTeXPictureWriter(vGc,etexd.getSizeX(),type);
 	    				else
 	    					lp = new MyTikZPictureWriter(vGc,etexd.getSizeX(),type);
 	    				String error = lp.saveToFile(f);

@@ -24,7 +24,7 @@ import view.VGraphic;
  * @author ronny
  *
  */
-public class MyLaTeXPictureWriter implements TeXWriter {
+public class LaTeXPictureWriter implements TeXWriter {
 
 	private final static String NL = "\r\n";
 	private final static double LINESPPT = 4.0d;
@@ -41,7 +41,7 @@ public class MyLaTeXPictureWriter implements TeXWriter {
 	 * @param w width of the picture in LaTeX in mm
 	 * @param type eiter "doc" for al whole LaTeX-Document or "fig" for just the figure
 	 */
-	public MyLaTeXPictureWriter(VGraphic a_picture, int w, String type)
+	public LaTeXPictureWriter(VGraphic a_picture, int w, String type)
 	{
 		vgc = a_picture;
 		vg = vgc.getVGraph();
