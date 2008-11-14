@@ -177,19 +177,19 @@ public class CLoopParameters extends Container implements ActionListener{
 			else if (checksEnabled)
 				Direction.setForeground(Color.GRAY);
 
-			if (checksEnabled)
+			if ((bLoop!=null)&&checksEnabled)
 			{	
 				bLoop.setSelected(setClockwise);
 				rClockwise.setEnabled(setClockwise);
 				rClockwise.setEnabled(setClockwise);
 				if (!setClockwise)
 					Loop.setForeground(Color.GRAY);
+				if (setClockwise)
+				{
+					rClockwise.setSelected(vle.isClockwise());
+					rCounterClockwise.setSelected(!vle.isClockwise());
+				}				
 			}
-			if (setClockwise)
-			{
-				rClockwise.setSelected(vle.isClockwise());
-				rCounterClockwise.setSelected(!vle.isClockwise());
-			}				
 		}
 		else
 		{

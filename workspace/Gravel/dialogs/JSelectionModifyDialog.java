@@ -484,7 +484,8 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			iNodeSize.setValue(preNodeSize);
 		else
 			NodeSize.setForeground(Color.GRAY);
-		bChNodeSize.setSelected(preNodeSize!=-1);iNodeSize.setEnabled(preNodeSize!=1);
+		bChNodeSize.setSelected(preNodeSize!=-1);
+		iNodeSize.setEnabled(preNodeSize!=-1);
 		//fill ShowNodeName
 		VNode v = new VNode(0,0,0,0,preNodeTextDis,preNodeTextRot,preNodeTextSize,preNodeShowText);
 		cNodeName.InitValues(v, preNodeShowTextgiven);
