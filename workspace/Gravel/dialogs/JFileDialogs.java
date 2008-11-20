@@ -402,11 +402,13 @@ public class JFileDialogs implements Observer
 	    				if (etexd.IsPlainTeX())
 	    					lp = new LaTeXPictureWriter(vGc,etexd.getSizeX(),type);
 	    				else
+	    				{	    			
 	    					lp = new MyTikZPictureWriter(vGc,etexd.getSizeX(),type);
+	    				}
 	    				String error = lp.saveToFile(f);
 		    			if (error.equals(""))
 		    				return true;
-		    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(),"<html>Beim Exportieren des Graphen ist folgener Fehler aufgetreten: <br>"+error,"Fehler",JOptionPane.ERROR_MESSAGE);
+		    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(),"<html>Beim Exportieren des Graphen ist folgener Fehler aufgetreten: <br>"+error+"</html>","Fehler",JOptionPane.ERROR_MESSAGE);
 	    			}
 	    		}
 	    		else

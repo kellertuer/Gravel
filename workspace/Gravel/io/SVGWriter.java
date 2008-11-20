@@ -1,11 +1,8 @@
 package io;
 import model.*;
 
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Point;
 import java.awt.Shape;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.io.BufferedOutputStream;
@@ -57,7 +54,7 @@ public class SVGWriter
 			max = vg.getMaxPoint(vgc.getGraphics());
 			int x = max.x-offset.x; //Breite
 			int y = max.y-offset.y; //Hoehe
-			int height = Math.round(((float)width)*(((float)x)/((float)y)));
+			int height = Math.round((float)width*(float)y/(float)x);
 			String name_escaped = replace(filename,"_","\\_");
 			name_escaped = replace(name_escaped,"&","\\&");
 			

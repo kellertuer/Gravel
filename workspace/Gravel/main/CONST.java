@@ -19,6 +19,8 @@ public class CONST {
 
 	public final static String html_sz = "&szlig;";
 
+	public final static String html_times = "&times;";
+
 	public final static String utf8_ae = "\u00E4";
 	public final static String utf8_oe = "\u00F6";
 	public final static String utf8_ue = "\u00FC";

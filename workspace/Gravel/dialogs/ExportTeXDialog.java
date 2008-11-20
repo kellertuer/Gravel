@@ -29,8 +29,9 @@ import javax.swing.event.CaretListener;
 public class ExportTeXDialog extends JDialog implements ActionListener, CaretListener
 {
 	private IntegerTextField iSizeX,iSizeY;
+	private FloatTextField iSizeU;
 	private JButton bOk, bCancel;
-	private JRadioButton selX,selY;
+	private JRadioButton selX,selY,selU;
 	private ButtonGroup DocumentChoice, TypeChoice;
 	private JRadioButton rWholeDocument, rOnlyFigure, rPlainTeX, rTikZ;
 	private boolean accepted = false;
@@ -61,10 +62,10 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 		c.gridy=0;
 		c.gridx = 0;
 		c.gridwidth=3;
-		content.add(new JLabel("<html>Bitte eine Breite bzw H"+main.CONST.html_oe+"he (in mm) f"+main.CONST.html_ue+"r die Grafik in TeX angeben<br>Ausgehend von der selektierten Gr"+main.CONST.html_oe+""+main.CONST.html_sz+"e wird die andere berechnet</html>"),c);
+		content.add(new JLabel("<html>Bitte eine Gr"+main.CONST.html_oe+main.CONST.html_sz+"e angeben. Aus einem Wert ergeben sich die anderen beiden.<br><b>Originalgr"+main.CONST.html_oe+main.CONST.html_sz+"e (Graph ohne Rand): </b> "+ox+"px "+main.CONST.html_times+" "+oy+"px</html>"),c);
 		c.gridy++;
 		c.gridwidth=1;
-		selX = new JRadioButton("Breite :");
+		selX = new JRadioButton("Breite (mm) :");
 		selX.addActionListener(this);
 		content.add(selX,c);
 		c.gridx = 1;
@@ -76,7 +77,7 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 		c.gridwidth=1;
 		c.gridy++;
 		c.gridx = 0;
-		selY = new JRadioButton("<html>H"+main.CONST.html_oe+"he :</html>");
+		selY = new JRadioButton("<html>H"+main.CONST.html_oe+"he (mm):</html>");
 		selY.addActionListener(this);
 		content.add(selY,c);
 		c.gridx = 1;
@@ -85,6 +86,18 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 		iSizeY.setPreferredSize(new Dimension(200, 20));
 		iSizeY.addCaretListener(this);
 		content.add(iSizeY,c);
+		c.gridy++;
+		c.gridx = 0;
+		selU = new JRadioButton("<html>Aufl"+main.CONST.html_oe+"sung (px pro mm):</html>");
+		selU.addActionListener(this);
+		content.add(selU,c);
+		c.gridx = 1;
+		c.gridwidth=2;
+		iSizeU = new FloatTextField();
+		iSizeU.setPreferredSize(new Dimension(200, 20));
+		iSizeU.addCaretListener(this);
+		content.add(iSizeU,c);
+		
 		c.gridy++;
 		c.gridwidth=2;
 		c.gridx=0;
@@ -119,7 +132,7 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 		c.gridy++;
 		c.gridx = 1;
 		ButtonGroup b = new ButtonGroup();
-		b.add(selX); b.add(selY);
+		b.add(selX); b.add(selY); b.add(selU);
 		c.gridwidth=1;
 		c.anchor = GridBagConstraints.EAST;
 		bCancel = new JButton("Abbrechen");
@@ -201,15 +214,16 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 	 */
 	public void actionPerformed(ActionEvent e) 
 	{
-		if ((e.getSource()==selX)||(e.getSource()==selY))
+		if ((e.getSource()==selX)||(e.getSource()==selY)||(e.getSource()==selU))
 		{
 			iSizeX.setEnabled(selX.isSelected());
 			iSizeY.setEnabled(selY.isSelected());
+			iSizeU.setEnabled(selU.isSelected());
 		}
 		else
 		if (e.getSource()==bOk)
 		{
-			if ((iSizeX.getValue()==-1)||(iSizeY.getValue()==-1))
+			if ((iSizeX.getValue()==-1)||(iSizeY.getValue()==-1)||(iSizeU.getValue()==-1))
 			{
 				JOptionPane.showMessageDialog(this, "<html><p>Bitte eine positive Zahl angeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 			}
@@ -229,19 +243,34 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 	 * handle caret updates in the integer text fields
 	 */
 	public void caretUpdate(CaretEvent e) {
-		 if ((e.getSource()==iSizeX)||(e.getSource()==iSizeY))
+		 if ((e.getSource()==iSizeX)||(e.getSource()==iSizeY)||(e.getSource()==iSizeU))
 			{
 				if ((selX.isSelected())&&(iSizeX.getValue()!=-1))
 				{
 					iSizeY.removeCaretListener(this); //So it doesn't ivoke itself
 					iSizeY.setValue(Math.round((float)iSizeX.getValue()*(float)origy/(float)origx));
 					iSizeY.addCaretListener(this); //So it doesn't ivoke itself
+					iSizeU.removeCaretListener(this); //So it doesn't ivoke itself
+					iSizeU.setValue((float)iSizeX.getValue()/(float)origx);
+					iSizeU.addCaretListener(this); //So it doesn't ivoke itself
 				}
 				if ((selY.isSelected())&&(iSizeY.getValue()!=-1))
 				{
 					iSizeX.removeCaretListener(this); //So it doesn't evoke itself
 					iSizeX.setValue(Math.round((float)iSizeY.getValue()*(float)origx/(float)origy));
 					iSizeX.addCaretListener(this);
+					iSizeU.removeCaretListener(this); //So it doesn't ivoke itself
+					iSizeU.setValue((float)iSizeX.getValue()/(float)origx);
+					iSizeU.addCaretListener(this); //So it doesn't ivoke itself
+				}
+				if ((selU.isSelected())&&(iSizeU.getValue()!=-1d))
+				{
+					iSizeX.removeCaretListener(this); //So it doesn't evoke itself
+					iSizeX.setValue(Math.round(iSizeU.getValue()*(float)origx));
+					iSizeX.addCaretListener(this);
+					iSizeY.removeCaretListener(this); //So it doesn't ivoke itself
+					iSizeY.setValue(Math.round((float)iSizeX.getValue()*(float)origy/(float)origx));
+					iSizeY.addCaretListener(this); //So it doesn't ivoke itself
 				}
 			}
 	}	
