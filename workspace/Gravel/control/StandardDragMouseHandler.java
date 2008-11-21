@@ -11,6 +11,7 @@ import java.util.Vector;
 import model.MGraph;
 import model.VEdge;
 import model.VGraph;
+import model.VItem;
 import model.VNode;
 /**
  * Standard Mouse Drag Hanlder extends the DragMouseHandler to the standard actions
@@ -58,7 +59,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 	 */
 	public boolean dragged()
 	{
-		return ((movingNode!=null)||(movingControlPointEdge!=null));
+		return ((movingNode!=null)||(movingControlPointEdge!=null)||(selrect!=null));
 	}
 	/** set whether the nodes are set to a gridpoint after dragging or not. 
 	 * 
@@ -119,7 +120,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			while (nodeiter.hasNext()) // drawNodes
 			{
 				VNode temp = nodeiter.next();
-				if (temp.isSelected())
+				if ((temp.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 				{
 					Point newpoint = temp.getPosition(); //bisherige Knotenposition
 					newpoint.translate(Gtransx,Gtransy); //Bewegung im Graphen aber mit Rungungsfehlern, also nur zurbetrachtung der Gesamtgraphbewegung
@@ -214,13 +215,13 @@ public class StandardDragMouseHandler extends DragMouseHandler
 		else
 		{//Shift - only handle stuff that beginns on a selected Node
 			movingNode = vg.getNodeinRange(p);
-			if ((movingNode!=null)&&(!movingNode.isSelected()))
+			if ((movingNode!=null)&&((movingNode.getSelectedStatus() & VItem.SELECTED) != VItem.SELECTED))
 			{
 				movingNode=null; //do not start anything
 				firstdrag = true;
 			}
 			VEdge selE = vg.getEdgeinRange(p, 2.0);
-			if ((selE!=null)&&(selE.isSelected()))
+			if ((selE!=null)&&((selE.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED))
 			{ //Selected Edge, we move the selection so set the node to one of the edge adjacent nodes
 				movingNode = vg.getNode(vg.getEdgeProperties(selE.index).get(MGraph.EDGESTARTINDEX)); 
 			}

@@ -146,9 +146,9 @@ public class VGraphic extends Component implements 	Observer
 			VNode EndNode = vG.getNode(val.get(MGraph.EDGEENDINDEX)); //Endknoten
 			VNode StartNode = vG.getNode(val.get(MGraph.EDGESTARTINDEX)); //Endknoten
 			Point p2 = EndNode.getPosition();
-			if (((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)&&((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))
+			if ((((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)||((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))&&((temp.getSelectedStatus()&VItem.SOFT_DESELECTED)!=VItem.SOFT_DESELECTED))
 			{
-				//Falls die Kante Selektiert ist, zeichne drunter eine etwas dickere Kante in der selectioncolor
+				//Falls die Kante Selektiert ist (und nicht temporär deselektiert, zeichne drunter eine etwas dickere Kante in der selectioncolor
 				g2.setColor(selColor);
 				vEdgeStyle = new BasicStroke(Math.round((temp.getWidth()+selWidth)*zoomfactor),BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 				g2.setStroke(vEdgeStyle);
@@ -224,7 +224,7 @@ public class VGraphic extends Component implements 	Observer
 		while (nodeiter.hasNext()) // drawNodes
 		{
 			VNode temp = nodeiter.next();
-			if (((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)&&((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))
+			if ((((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)||((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))&&((temp.getSelectedStatus()&VItem.SOFT_DESELECTED)!=VItem.SOFT_DESELECTED))
 			{ //Draw all Nodes that are selected or temporarily selected as selected in the GUI
 				g2.setColor(selColor);
 				g2.fillOval(Math.round((temp.getdrawpoint().x-selWidth/2)*zoomfactor), 

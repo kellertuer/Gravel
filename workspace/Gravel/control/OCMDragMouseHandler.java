@@ -8,6 +8,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
 import model.VGraph;
+import model.VItem;
 import model.VLoopEdge;
 import model.VNode;
 import model.VStraightLineEdge;
@@ -129,7 +130,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 					return;
 				if (vg.getNodeinRange(p)==null) //Es muss auf einem Knoten sein, der...
 					return;
-				if (!(vg.getNodeinRange(p).isSelected())) //selektiert ist
+				if (!((vg.getNodeinRange(p).getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)) //selektiert ist
 					return;
 				DragNode = new VNode(0,p.x,p.y,1,0,0,0,false);
 				DragNode.addColor(Color.white);

@@ -7,10 +7,12 @@ package model;
 public abstract class VItem {
 	//Definetly not selected
 	public static int DESELECTED = 0;
+	//Just ATM not selected e.g. while you drag a mouse or sth like that
+	public static int SOFT_DESELECTED = 1;
 	//Definetly selected
-	public static int SELECTED = 1;
+	public static int SELECTED = 2;
 	//Just ATM selected e.g. while you drag a mouse or sth like that
-	public static int SOFT_SELECTED = 2;
+	public static int SOFT_SELECTED = 4;
 	
 	private int status;
 	/**

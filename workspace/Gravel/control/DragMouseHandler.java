@@ -17,6 +17,7 @@ import java.util.Vector;
 import model.MGraph;
 import model.VEdge;
 import model.VGraph;
+import model.VItem;
 import model.VNode;
 import model.VSegmentedEdge;
 import model.VOrthogonalEdge;
@@ -80,10 +81,12 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		return selrect;
 	}
 	/**
-	 * Update the selection of nodes and edges in the rectangle the user just dragges on the background
+	 * Update the selection of nodes and edges in the rectangle the user just dragges 
+	 * on the background to the new status given and set all non selected to nonsoft
 	 *
+	 * @param the status the selection is set to resp. the non selected part is removed from
 	 */
-	private void updateSelection()
+	private void updateSelection(int status)
 	{
 		float zoom = ((float)gp.getIntValue("vgraphic.zoom")/100);
 		Iterator<VNode> nodeiter = vg.getNodeIterator();
@@ -92,27 +95,27 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 			VNode act = nodeiter.next();
 			//rectangle of the node w/ zoom
 			Rectangle noderect = new Rectangle(Math.round((float)act.getPosition().x*zoom-(float)act.getSize()*zoom/2.0f),Math.round((float)act.getPosition().y*zoom-(float)act.getSize()*zoom/2.0f),Math.round((float)act.getSize()*zoom),Math.round((float)act.getSize()*zoom));
-			if (selrect.intersects(noderect)) 
-				act.select();
+			if (selrect.intersects(noderect)) //If Node is Inside selrect
+				act.setSelectedStatus(act.getSelectedStatus() | status);
 			else
-				act.deselect();
+				act.setSelectedStatus(act.getSelectedStatus() & (~status));
 		}
 		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
 		while (edgeiter.hasNext())
 		{
 			VEdge e = edgeiter.next();
-			e.deselect();
 			int start = vg.getEdgeProperties(e.index).elementAt(MGraph.EDGESTARTINDEX);
 			int ende = vg.getEdgeProperties(e.index).elementAt(MGraph.EDGEENDINDEX);
 			Point sp = (Point) vg.getNode(start).getPosition().clone();
 			sp.x = Math.round((float)sp.x*zoom);sp.y = Math.round((float)sp.y*zoom);
 			Point ep = (Point) vg.getNode(ende).getPosition().clone();
 			ep.x = Math.round((float)ep.x*zoom);ep.y = Math.round((float)ep.y*zoom);
+			boolean intersects = false;
+			//Switch Type and check for intersection (special checks for some types)
 			switch (e.getType())
 			{
 				case VEdge.STRAIGHTLINE:{
-					if (selrect.intersectsLine(new Line2D.Double(sp,ep)))
-						e.select();
+					intersects = selrect.intersectsLine(new Line2D.Double(sp,ep));
 					break;
 				}
 				case VEdge.SEGMENTED : {
@@ -120,124 +123,35 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 					Point last = sp;
 					for (int i=0; i<p.size(); i++)
 					{
-						if (selrect.intersectsLine(new Line2D.Double(last,p.get(i))))
-							e.select();
+						intersects = selrect.intersectsLine(new Line2D.Double(last,p.get(i)));
 						last = p.get(i);
 					}
-					if (selrect.intersectsLine(new Line2D.Double(last,ep)))
-						e.select();
+					intersects = selrect.intersectsLine(new Line2D.Double(last,ep));
 					break;
 				}
 				case VEdge.ORTHOGONAL : {
 					if (((VOrthogonalEdge)e).getVerticalFirst())
-					{
-						if (selrect.intersectsLine(new Line2D.Double(sp, new Point(sp.x,ep.y))))
-							e.select();
-						if (selrect.intersectsLine(new Line2D.Double(new Point(sp.x,ep.y),ep)))
-							e.select();
-					}
+						intersects = ((selrect.intersectsLine(new Line2D.Double(sp, new Point(sp.x,ep.y))))||(selrect.intersectsLine(new Line2D.Double(new Point(sp.x,ep.y),ep))));
 					else
-					{	
-						if (selrect.intersectsLine(new Line2D.Double(sp, new Point(ep.x,sp.y))))
-							e.select();
-						if (selrect.intersectsLine(new Line2D.Double(new Point(ep.x,sp.y),ep)))
-							e.select();
-					}
+						intersects = ((selrect.intersectsLine(new Line2D.Double(sp, new Point(ep.x,sp.y))))||(selrect.intersectsLine(new Line2D.Double(new Point(ep.x,sp.y),ep))));
 					break;
 				}
 				case VEdge.QUADCURVE: {
 					Point bz = ((VQuadCurveEdge)e).getControlPoints().get(0);
 					QuadCurve2D.Double q = new QuadCurve2D.Double(sp.x,sp.y,bz.x,bz.y,ep.x,ep.y);
-					if (q.intersects(selrect))
-						e.select();
+					intersects = (q.intersects(selrect));
 				}
 				default: { //e.g. Loops or any other new kind, where we don't know any optimization to compute the untersection 
 					GeneralPath p = e.getPath(vg.getNode(start).getPosition(),vg.getNode(ende).getPosition(), zoom);
-					if (p.intersects(selrect))
-						e.select();
+					intersects = p.intersects(selrect);
 				}
 			} //end switch
-		} //End while edges
-	}
-	/**
-	 * Update the selection of nodes and edges by adding all edges and nodes in the rectangle to the previous selection
-	 *
-	 */
-	private void updateShiftSelection()
-	{
-		float zoom = ((float)gp.getIntValue("vgraphic.zoom")/100);
-		Iterator<VNode> nodeiter = vg.getNodeIterator();
-		while (nodeiter.hasNext())
-		{
-			VNode act = nodeiter.next();
-			//rectangle of the node w/ zoom
-			Rectangle noderect = new Rectangle(Math.round((float)act.getPosition().x*zoom-(float)act.getSize()*zoom/2.0f),Math.round((float)act.getPosition().y*zoom-(float)act.getSize()*zoom/2.0f),Math.round((float)act.getSize()*zoom),Math.round((float)act.getSize()*zoom));
-			if (selrect.intersects(noderect)) 
-				act.select();
+			if (intersects) //edge lies somewhere in the rect
+				e.setSelectedStatus(e.getSelectedStatus() | status);
 			else
-				act.deselect();
-		}
-		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
-		while (edgeiter.hasNext())
-		{
-			VEdge e = edgeiter.next();
-			e.deselect();
-			int start = vg.getEdgeProperties(e.index).elementAt(MGraph.EDGESTARTINDEX);
-			int ende = vg.getEdgeProperties(e.index).elementAt(MGraph.EDGEENDINDEX);
-			Point sp = (Point) vg.getNode(start).getPosition().clone();
-			sp.x = Math.round((float)sp.x*zoom);sp.y = Math.round((float)sp.y*zoom);
-			Point ep = (Point) vg.getNode(ende).getPosition().clone();
-			ep.x = Math.round((float)ep.x*zoom);ep.y = Math.round((float)ep.y*zoom);
-			switch (e.getType())
-			{
-				case VEdge.STRAIGHTLINE:{
-					if (selrect.intersectsLine(new Line2D.Double(sp,ep)))
-						e.select();
-					break;
-				}
-				case VEdge.SEGMENTED : {
-					Vector<Point> p = ((VSegmentedEdge)e).getControlPoints();
-					Point last = sp;
-					for (int i=0; i<p.size(); i++)
-					{
-						if (selrect.intersectsLine(new Line2D.Double(last,p.get(i))))
-							e.select();
-						last = p.get(i);
-					}
-					if (selrect.intersectsLine(new Line2D.Double(last,ep)))
-						e.select();
-					break;
-				}
-				case VEdge.ORTHOGONAL : {
-					if (((VOrthogonalEdge)e).getVerticalFirst())
-					{
-						if (selrect.intersectsLine(new Line2D.Double(sp, new Point(sp.x,ep.y))))
-							e.select();
-						if (selrect.intersectsLine(new Line2D.Double(new Point(sp.x,ep.y),ep)))
-							e.select();
-					}
-					else
-					{	
-						if (selrect.intersectsLine(new Line2D.Double(sp, new Point(ep.x,sp.y))))
-							e.select();
-						if (selrect.intersectsLine(new Line2D.Double(new Point(ep.x,sp.y),ep)))
-							e.select();
-					}
-					break;
-				}
-				case VEdge.QUADCURVE: {
-					Point bz = ((VQuadCurveEdge)e).getControlPoints().get(0);
-					QuadCurve2D.Double q = new QuadCurve2D.Double(sp.x,sp.y,bz.x,bz.y,ep.x,ep.y);
-					if (q.intersects(selrect))
-						e.select();
-				}
-				default: { //e.g. Loops or any other new kind, where we don't know any optimization to compute the untersection 
-					GeneralPath p = e.getPath(vg.getNode(start).getPosition(),vg.getNode(ende).getPosition(), zoom);
-					if (p.intersects(selrect))
-						e.select();
-				}
-			} //end switch
+				e.setSelectedStatus(e.getSelectedStatus() & (~status));
 		} //End while edges
+		System.err.println("");
 	}
 	/**
 	 * inherited from the mouse drag handler
@@ -256,30 +170,39 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		else
 			inrangeE=null;
 		
-		if (!((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)) //no alt ?
+		boolean alt = ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK); // alt ?
+		boolean shift = ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK); //shift ?
+		boolean cpnonactive = ((vg.getControlPointinRange(p,gp.getIntValue("vgraphic.cpsize"))==null)||(!gp.getBoolValue("vgraphic.cpshow")));
+		if ((!alt)&&(!shift))
 		{// insgesamt auf dem Hintergrund ohne shift und ohne alt
-			if (!((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))
-				if ((inrangeN==null)&&(vg.getEdgeinRange(p,2.0d)==null)&&(vg.getControlPointinRange(p,gp.getIntValue("vgraphic.cpsize"))==null))
+			if ((inrangeN==null)&&(vg.getEdgeinRange(p,2.0d)==null)&&(cpnonactive))
 					selstart = MouseOffSet;	
 		}
-		else if (!((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))
+		else if ((alt)&&(!shift))
 		{ //Alt and not shift
 			movingNode = inrangeN; //kein Shift == moving Node merken, sonst werden alle selected Bewegt
 			movingEdge = inrangeE;
 			altwaspressed = true;
-			if ((inrangeN==null)&&(vg.getEdgeinRange(p,2.0d)==null)&&(vg.getControlPointinRange(p,gp.getIntValue("vgraphic.cpsize"))==null))
+			//Both Null and no Controllpoint ?
+			if ((inrangeN==null)&&(vg.getEdgeinRange(p,2.0d)==null)&&(cpnonactive))
 				selstart = MouseOffSet;	
+		}
+		else if ((!alt)&&(shift))
+		{
+			shiftwaspressed=true;
+			if ((inrangeN==null)&&(vg.getEdgeinRange(p,2.0d)==null)&&(cpnonactive))
+				selstart = MouseOffSet;				
 		}
 		else
 		{//Shift and Alt
 			shiftwaspressed=true;
-			if ((inrangeN!=null)&&(inrangeN.isSelected()))
+			if ((inrangeN!=null)&&((inrangeN.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED))
 			{
 				multiplemoving = true;
 				multipleisNode = true;
 			}
 			else
-			if ((inrangeE!=null)&&(inrangeE.isSelected()))
+			if ((inrangeE!=null)&&((inrangeE.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED))
 			{
 				multiplemoving = true;
 				multipleisNode = false;
@@ -344,15 +267,24 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 			}
 		} //End handling ALT
 		//Handling selection Rectangle
-		else if ((selstart!=null)&&((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) != InputEvent.SHIFT_DOWN_MASK)) //weder shift noch alt
+		if (selstart!=null)
 		{
+			//Update Rectangle
 			int rx,ry,rw,rh;
 			rx = Math.min(selstart.x,e.getPoint().x);				
 			ry = Math.min(selstart.y,e.getPoint().y);
 			rw = Math.abs(selstart.x-e.getPoint().x);
 			rh = Math.abs(selstart.y-e.getPoint().y);
 			selrect = new Rectangle(rx,ry,rw,rh);
-			updateSelection();
+			if ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK)
+			 //Handle Shift selection
+				updateSelection(VItem.SOFT_SELECTED);	
+			else if ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)
+			 //Handle ALT Selection
+				updateSelection(VItem.SOFT_DESELECTED);				
+			else
+			 //weder shift noch alt -> Selektiertes auf SELECTED
+				updateSelection(VItem.SELECTED);
 			vg.pushNotify("M");
 		}
 		MouseOffSet = e.getPoint();
@@ -369,7 +301,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		while (nodeiter.hasNext()) // drawNodes
 		{
 			VNode temp = nodeiter.next();
-			if ((temp.isSelected())&&(temp.isNameVisible()))
+			if (((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)&&(temp.isNameVisible()))
 			{
 				int rotation = (temp.getNameRotation()+x*4)%360;
 				if (rotation < 0)
@@ -396,7 +328,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		while (edgeiter.hasNext()) // drawNodes
 		{
 			VEdge temp = edgeiter.next();
-			if ((temp.isSelected()))
+			if ((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
 			{
 				float arrpos = temp.getArrowPos()+(float)x/100;
 				if (arrpos>1.0f)
@@ -418,8 +350,26 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		{
 			if (!((e.getPoint().x==-1)||(e.getPoint().y==-1))) //kein Reset von außerhalb wegen modusumschaltung
 			mouseDragged(e); //Das gleiche wie als wenn man bewegt, nur ist danach kein Knoten mehr bewegter Knoten		
-		
 		}
+		// Remove all Soft stuff and set them HARD
+		Iterator<VNode> nodeiter = vg.getNodeIterator();
+		while (nodeiter.hasNext())
+		{
+			VNode act = nodeiter.next();
+			if ((act.getSelectedStatus() & VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED)
+				act.setSelectedStatus(VItem.SELECTED);
+			if ((act.getSelectedStatus() & VItem.SOFT_DESELECTED)==VItem.SOFT_DESELECTED)
+				act.setSelectedStatus(VItem.DESELECTED);
+		}
+		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+		while (edgeiter.hasNext())
+		{
+			VEdge act = edgeiter.next();
+			if ((act.getSelectedStatus() & VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED)
+				act.setSelectedStatus(VItem.SELECTED);
+			if ((act.getSelectedStatus() & VItem.SOFT_DESELECTED)==VItem.SOFT_DESELECTED)
+				act.setSelectedStatus(VItem.DESELECTED);
+		} //End while edges
 		reset();
 	}
 	/**
