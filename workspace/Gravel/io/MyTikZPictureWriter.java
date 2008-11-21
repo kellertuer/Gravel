@@ -3,10 +3,6 @@ package io;
 import model.*;
 
 import java.awt.Point;
-import java.awt.Shape;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;

@@ -18,7 +18,7 @@ import java.util.Vector;
  * @author Ronny Bergmann
  *
  */
-public abstract class VEdge {
+public abstract class VEdge extends VItem {
 	
 	public static class EdgeIndexComparator implements Comparator<VEdge>
 	{
@@ -42,7 +42,6 @@ public abstract class VEdge {
 	
 	public int index;  //kind of Edgekey, same as in the mgraph, unique and not changeable
 	protected int width;
-	private boolean selected;
 	private Color colour; //Farbe des Knotens
 	private int setCount; //Anzahl Mengen in denen der Knoten beteiligt ist, f�r Color 
 	
@@ -65,7 +64,6 @@ public abstract class VEdge {
 	{
 		index = i;
 		width=w;
-		selected = false;
 		setCount = 0;
 		colour = Color.black;
 		Textvalues = new VEdgeText();
@@ -85,7 +83,6 @@ public abstract class VEdge {
 	{
 		index = i;
 		width=w;
-		selected = false;
 		setCount = 0;
 		colour = Color.black;
 		arrSize = size;
@@ -465,31 +462,6 @@ public abstract class VEdge {
 			colour = Color.black;
 			setCount = 0;
 		}
-	}
-	/**
-	 * an selected Edge is drawn with a shape around itself
-	 * this method deselects the edge
-	 */
-	public void deselect()
-	{
-		selected = false;
-	}
-	/**
-	 * an selected Edge is drawn with a shape around itself
-	 * this method selects the edge
-	 */
-	public void select()
-	{
-		selected = true;
-	}
-	/**
-	 * this method indicated whether the edge i selected or not
-	 * 
-	 * @return true, if the edge is selected, else false 
-	 */
-	public boolean isSelected()
-	{
-		return selected;
 	}
 	/**
 	 * Get the Width of the edge

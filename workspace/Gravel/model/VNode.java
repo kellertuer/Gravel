@@ -10,7 +10,7 @@ import java.util.Comparator;
  * - an indicator whether the node is selected or not
  * @author Ronny Bergmann
  */
-public class VNode {
+public class VNode extends VItem {
 	
 		public static class NodeIndexComparator implements Comparator<VNode>
 		{
@@ -31,7 +31,6 @@ public class VNode {
 		public int index;  //kind of Nodekey
 		private Point Pos; //Position in the middle
 		private int size; //Radius des Knotens
-		private boolean selected;
 		
 		private int name_distance, name_rotation, name_size;
 		private boolean name_visible=false;
@@ -52,7 +51,6 @@ public class VNode {
 			index = i;
 			Pos = new Point(x,y);
 			size = s;
-			selected = false;
 			setCount = 0;
 			colour = Color.black;
 		}
@@ -162,29 +160,6 @@ public class VNode {
 				Pos.x=0;
 			if (Pos.y < 0)
 				Pos.y = 0;
-		}
-		/**
-		 * Deselect the node
-		 */
-		public void deselect()
-		{
-			selected = false;
-		}
-		/**
-		 * Select the node
-		 *
-		 */
-		public void select()
-		{
-			selected = true;
-		}
-		/**
-		 * Indicator of Selection
-		 * @return return true, if the node is selected else false
-		 */
-		public boolean isSelected()
-		{
-			return selected;
 		}
 		/**
 		 * Get the size of the node

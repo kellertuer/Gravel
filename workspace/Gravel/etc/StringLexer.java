@@ -7,23 +7,16 @@ import antlr.TokenStreamIOException;
 import antlr.TokenStreamRecognitionException;
 import antlr.CharStreamException;
 import antlr.CharStreamIOException;
-import antlr.ANTLRException;
 import java.io.Reader;
 import java.util.Hashtable;
-import antlr.CharScanner;
 import antlr.InputBuffer;
 import antlr.ByteBuffer;
 import antlr.CharBuffer;
 import antlr.Token;
-import antlr.CommonToken;
 import antlr.RecognitionException;
 import antlr.NoViableAltForCharException;
-import antlr.MismatchedCharException;
 import antlr.TokenStream;
-import antlr.ANTLRHashString;
 import antlr.LexerSharedInputState;
-import antlr.collections.impl.BitSet;
-import antlr.SemanticException;
 
 public class StringLexer extends antlr.CharScanner implements StringLexerTokenTypes, TokenStream
  {
@@ -145,7 +138,7 @@ tryAgain:
 	public final void mWS(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = WS;
-		int _saveIndex;
+//		int _saveIndex;
 		
 		{
 		switch ( LA(1)) {
@@ -187,7 +180,7 @@ tryAgain:
 	public final void mLKLAMMER(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = LKLAMMER;
-		int _saveIndex;
+//		int _saveIndex;
 		
 		match('(');
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -200,7 +193,7 @@ tryAgain:
 	public final void mRKLAMMER(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = RKLAMMER;
-		int _saveIndex;
+//		int _saveIndex;
 		
 		match(')');
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -213,7 +206,7 @@ tryAgain:
 	public final void mMUL(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = MUL;
-		int _saveIndex;
+//		int _saveIndex;
 		
 		match('*');
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -226,7 +219,7 @@ tryAgain:
 	public final void mDIV(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = DIV;
-		int _saveIndex;
+//		int _saveIndex;
 		
 		match('/');
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -239,7 +232,7 @@ tryAgain:
 	public final void mEXP(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = EXP;
-		int _saveIndex;
+//		int _saveIndex;
 		
 		match('^');
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -252,7 +245,7 @@ tryAgain:
 	public final void mPLUS(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = PLUS;
-		int _saveIndex;
+//		int _saveIndex;
 		
 		match('+');
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -265,7 +258,7 @@ tryAgain:
 	public final void mMINUS(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = MINUS;
-		int _saveIndex;
+//		int _saveIndex;
 		
 		match('-');
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -278,7 +271,7 @@ tryAgain:
 	public final void mSEMI(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = SEMI;
-		int _saveIndex;
+//		int _saveIndex;
 		
 		match(';');
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -291,7 +284,7 @@ tryAgain:
 	protected final void mZIFFER(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = ZIFFER;
-		int _saveIndex;
+//		int _saveIndex;
 		
 		matchRange('0','9');
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -304,7 +297,7 @@ tryAgain:
 	public final void mNUM(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = NUM;
-		int _saveIndex;
+//		int _saveIndex;
 		
 		{
 		int _cnt14=0;

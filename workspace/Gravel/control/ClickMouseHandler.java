@@ -24,6 +24,7 @@ import dialogs.JSubSetDialog;
 import model.MGraph;
 import model.VEdge;
 import model.VGraph;
+import model.VItem;
 import model.VNode;
 import model.VSubSet;
 /**
@@ -246,10 +247,10 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		if (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.SHIFT_MASK) // mit SHIFTlinks angeklickt, Selektion erweitern
 		{
 			VNode r = vg.getNodeinRange(p);
-			if (r != null) 
+			if (r != null) //Clicked on a node -> Select it
 			{
-				if (!r.isSelected())
-					r.select();
+				if ((r.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED)
+					r.setSelectedStatus(VItem.SELECTED);
 				else
 					r.deselect();
 				vg.pushNotify("M");
@@ -257,7 +258,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 				VEdge s = vg.getEdgeinRange(p,2.0);
 				if (s != null) 
 				{
-					if (!s.isSelected())
+					if ((s.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED)
 						s.select();
 					else
 						s.deselect();

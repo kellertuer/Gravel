@@ -101,7 +101,7 @@ public class VGraph extends Observable {
 		HashSet<VNode> selected = new HashSet<VNode>();
 		while (n.hasNext()) {
 			VNode node = n.next();
-			if (node.isSelected())
+			if ((node.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
 				selected.add(node);
 		}
 		n = selected.iterator();
@@ -797,7 +797,7 @@ public class VGraph extends Observable {
 		while (iter.hasNext()) 
 		{
 				VNode temp = iter.next();
-				if ((temp.isSelected()) && (temp != Ende)) 
+				if (((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED) && (temp != Ende)) 
 				{
 					int i = getNextEdgeIndex();
 					//Standard ist eine StraightLineEdge
@@ -1091,7 +1091,7 @@ public class VGraph extends Observable {
 	public boolean selectedEdgeExists() {
 		Iterator<VEdge> n = vEdges.iterator();
 		while (n.hasNext()) {
-			if (n.next().isSelected())
+			if ((n.next().getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
 				return true;
 		}
 		return false;

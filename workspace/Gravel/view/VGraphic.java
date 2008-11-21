@@ -23,6 +23,7 @@ import control.StandardDragMouseHandler;
 import model.MGraph;
 import model.VEdge;
 import model.VGraph;
+import model.VItem;
 import model.VNode;
 
 import view.pieces.GridComponent;
@@ -145,7 +146,7 @@ public class VGraphic extends Component implements 	Observer
 			VNode EndNode = vG.getNode(val.get(MGraph.EDGEENDINDEX)); //Endknoten
 			VNode StartNode = vG.getNode(val.get(MGraph.EDGESTARTINDEX)); //Endknoten
 			Point p2 = EndNode.getPosition();
-			if (temp.isSelected())
+			if (((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)&&((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))
 			{
 				//Falls die Kante Selektiert ist, zeichne drunter eine etwas dickere Kante in der selectioncolor
 				g2.setColor(selColor);
@@ -223,8 +224,8 @@ public class VGraphic extends Component implements 	Observer
 		while (nodeiter.hasNext()) // drawNodes
 		{
 			VNode temp = nodeiter.next();
-			if (temp.isSelected())
-			{
+			if (((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)&&((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))
+			{ //Draw all Nodes that are selected or temporarily selected as selected in the GUI
 				g2.setColor(selColor);
 				g2.fillOval(Math.round((temp.getdrawpoint().x-selWidth/2)*zoomfactor), 
 						Math.round((temp.getdrawpoint().y-selWidth/2)*zoomfactor),
