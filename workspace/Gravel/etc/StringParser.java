@@ -1,17 +1,25 @@
 // $ANTLR : "Stringparser.g" -> "StringParser.java"$
 
 	package etc;
+
 import antlr.TokenBuffer;
 import antlr.TokenStreamException;
+import antlr.TokenStreamIOException;
+import antlr.ANTLRException;
+import antlr.LLkParser;
 import antlr.Token;
 import antlr.TokenStream;
 import antlr.RecognitionException;
 import antlr.NoViableAltException;
+import antlr.MismatchedTokenException;
+import antlr.SemanticException;
 import antlr.ParserSharedInputState;
 import antlr.collections.impl.BitSet;
 import antlr.collections.AST;
+import java.util.Hashtable;
 import antlr.ASTFactory;
 import antlr.ASTPair;
+import antlr.collections.impl.ASTArray;
 
 public class StringParser extends antlr.LLkParser       implements StringLexerTokenTypes
  {
@@ -57,7 +65,7 @@ public StringParser(ParserSharedInputState state) {
 			r=mexpr();
 			astFactory.addASTChild(currentAST, returnAST);
 			{
-			_loop20:
+			_loop104:
 			do {
 				switch ( LA(1)) {
 				case PLUS:
@@ -84,7 +92,7 @@ public StringParser(ParserSharedInputState state) {
 				}
 				default:
 				{
-					break _loop20;
+					break _loop104;
 				}
 				}
 			} while (true);
@@ -111,7 +119,7 @@ public StringParser(ParserSharedInputState state) {
 			r=dexpr();
 			astFactory.addASTChild(currentAST, returnAST);
 			{
-			_loop23:
+			_loop107:
 			do {
 				switch ( LA(1)) {
 				case MUL:
@@ -138,7 +146,7 @@ public StringParser(ParserSharedInputState state) {
 				}
 				default:
 				{
-					break _loop23;
+					break _loop107;
 				}
 				}
 			} while (true);
@@ -165,7 +173,7 @@ public StringParser(ParserSharedInputState state) {
 			r=atom();
 			astFactory.addASTChild(currentAST, returnAST);
 			{
-			_loop26:
+			_loop110:
 			do {
 				if ((LA(1)==EXP)) {
 					AST tmp5_AST = null;
@@ -177,7 +185,7 @@ public StringParser(ParserSharedInputState state) {
 					r = Math.pow(r,x);
 				}
 				else {
-					break _loop26;
+					break _loop110;
 				}
 				
 			} while (true);

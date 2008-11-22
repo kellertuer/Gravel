@@ -63,10 +63,7 @@ public class SVGWriter
 			s.write("  \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">"+NL);
 			s.write("<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\""+width+"\" height=\""+height+"\" viewBox=\""+offset.x+" "+offset.y+" "+x+" "+y+"\">"+NL);
 			s.write("<style type=\"text/css\">"+NL+"<![CDATA["+NL+"\ttext {");
-			if (true) //TODO: Serif/Sans-Serif im SVG-Export
-				s.write("font-family:serif;");
-			else
-				s.write("font-family:sans-serif");
+			s.write("font-family:serif;");
 			s.write("text-anchor:middle;}"+NL+"]]>"+NL+"</style>");
 						
 			s.write("<title>Gravel-Export als SVG - "+name_escaped+"</title>"+NL);			

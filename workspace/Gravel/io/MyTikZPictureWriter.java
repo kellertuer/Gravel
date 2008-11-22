@@ -12,7 +12,6 @@ import java.io.OutputStreamWriter;
 import java.util.Iterator;
 import java.util.Vector;
 import java.awt.Color;
-import model.*;
 
 
 import view.VGraphic;

@@ -245,7 +245,6 @@ public class LaTeXPictureWriter implements TeXWriter {
 		// 0.005/sizeppt =  = the flatness; reduce if result is not accurate enough!
 		Point2D.Double dir, orth_n_h;
 		double dlength=0.0d,movx=0.0d,movy=0.0d;
-		int ccount=0;
 		int testcount=0; //don't let paths grow tooo long
 		boolean moved=false;
 		while( !path.isDone() ) 

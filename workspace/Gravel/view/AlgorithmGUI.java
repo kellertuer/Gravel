@@ -112,7 +112,6 @@ public class AlgorithmGUI extends JDialog implements ActionListener
 		else
 		{
 			//Am Stück ausführen
-			//TODO: Warteanzeige ?
 			Algorithm.run();
 			vGc.getVGraph().replace(Algorithm.getactualState());
 			Algorithm.getactualState().addObserver(vGc);

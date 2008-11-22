@@ -94,14 +94,14 @@ public class TreeFunctions implements Observer {
 			if (acount==1) //Case (a)
 			{
 				order.put(aindex,nextorderindex++);
-				startnode = mg.getNode(aindex);
+				startnode = new MNode(aindex, mg.getNodeName(aindex));
 				if (!isDirectedTreeRecursive(false,startnode))
 						return false; //No Tree
 			}
 			else if (bcount==1)
 			{
 				order.put(bindex,nextorderindex++);
-				startnode = mg.getNode(bindex);
+				startnode = new MNode(aindex, mg.getNodeName(aindex));
 				if (!isDirectedTreeRecursive(true,startnode))
 					return false; //No Tree
 			}
@@ -169,14 +169,14 @@ public class TreeFunctions implements Observer {
 			if (acount==1) //Case (a)
 			{
 				order.put(aindex,nextorderindex++);
-				startnode =  mg.getNode(aindex);
+				startnode =  new MNode(aindex, mg.getNodeName(aindex));
 				if (!isDirectedTreeRecursive(false,startnode))
 						return false; //No Tree
 			}
 			else if (bcount==1)
 			{
 				order.put(bindex,nextorderindex++);
-				startnode =  mg.getNode(bindex);
+				startnode =  new MNode(aindex, mg.getNodeName(aindex));
 				if (!isDirectedTreeRecursive(true,startnode))
 					return false; //No Tree
 			}

@@ -1,8 +1,9 @@
 package model;
 /**
  * Abstract superclass for both nodes and edges wdich contains the similar stuff for both
- * @author ronny
- *
+ * 
+ * @author Ronny Bergmann
+ * @since Gravel 0.2.3
  */
 public abstract class VItem {
 	//Definetly not selected
@@ -32,7 +33,7 @@ public abstract class VItem {
 		status = s;
 	}
 	/**
-	 * reset to nonselected Standard
+	 * reset to the nonselected Standard
 	 *
 	 */
 	public void deselect()
@@ -61,6 +62,7 @@ public abstract class VItem {
 	/**
 	 * Setselected - deprecated since the VItem Stuff
 	 *
+	 * @deprecated
 	 */
 	public void select()
 	{

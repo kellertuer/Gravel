@@ -410,7 +410,7 @@ public class MGraph extends Observable
 	 * returns the MNode with index i
 	 * @param i node index
 	 * @return MNode with index i if it exits else null
-	 * @deprecated
+	 * @deprecated use getNodeName instead
 	 */
 	public MNode getNode(int i)
 	{

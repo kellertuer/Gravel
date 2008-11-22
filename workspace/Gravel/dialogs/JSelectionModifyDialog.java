@@ -35,6 +35,7 @@ import view.Gui;
 import model.MGraph;
 import model.VEdge;
 import model.VGraph;
+import model.VItem;
 import model.VLoopEdge;
 import model.VNode;
 import model.VStraightLineEdge;
@@ -431,7 +432,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		while (nodeiter.hasNext())
 		{
 			VNode temp = nodeiter.next();
-			if (temp.isSelected())
+			if ((temp.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
 				if (beginning)
 				{
@@ -573,7 +574,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		while (edgeiter.hasNext())
 		{
 			VEdge e = edgeiter.next();
-			loops |= (e.getType()==VEdge.LOOP)&&(e.isSelected()); //Existiert eine selectierte Schleife ?
+			loops |= (e.getType()==VEdge.LOOP)&&((e.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED); //Existiert eine selectierte Schleife ?
 		}
 		if (loops)
 		{
@@ -601,7 +602,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		while (edgeiter.hasNext())
 		{
 			VEdge temp = edgeiter.next();
-			if (temp.isSelected())
+			if (((temp.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED))
 			{
 				if (beginning)
 				{
@@ -786,7 +787,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		while (nodeiter.hasNext())
 		{
 			VNode actual = nodeiter.next();
-			if (actual.isSelected())
+			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
 				Iterator<VSubSet> subsetiter = vg.getSubSetIterator();
 				while (subsetiter.hasNext())
@@ -807,7 +808,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		while (edgeiter.hasNext())
 		{
 			VEdge actual = edgeiter.next();
-			if (actual.isSelected())
+			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
 				Iterator<VSubSet> subsetiter = vg.getSubSetIterator();
 				while (subsetiter.hasNext())
@@ -877,7 +878,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		while (nodeiter.hasNext())
 		{
 			VNode t = nodeiter.next();
-			if (t.isSelected())
+			if ((t.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
 					Point newpoint = t.getPosition(); //bisherige Knotenposition
 					newpoint.translate(iPosMoveX.getValue(),iPosMoveY.getValue()); //Bewegung im Graphen aber mit Rungungsfehlern, also nur zurbetrachtung der Gesamtgraphbewegung
@@ -922,7 +923,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		Iterator<VNode> nodeiter = vg.getNodeIterator();
 		while (nodeiter.hasNext())
 		{
-			if (nodeiter.next().isSelected())
+			if ((nodeiter.next().getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 				nodecount++;				
 		}
 		//System.err.println("Found "+nodecount+" selected nodes");
@@ -939,7 +940,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		while (nodeiter.hasNext()) 
 		{
 			VNode temp = nodeiter.next();
-			if (temp.isSelected())
+			if (((temp.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED))
 			{
 				double posx = (new Integer(mr)).doubleValue()*Math.cos(2*Math.PI*actualdeg/360d);
 				double posy = (new Integer(mr)).doubleValue()*Math.sin(2*Math.PI*actualdeg/360d);
@@ -965,7 +966,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		while (nodeiter.hasNext())
 		{
 			VNode actual = nodeiter.next();
-			if (actual.isSelected())
+			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
 				//Node Name
 				if (bChNodeName.isSelected())
@@ -988,7 +989,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		while (edgeiter.hasNext())
 		{
 			VEdge actual = edgeiter.next();
-			if (actual.isSelected())
+			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
 				//stupidly apply all values that are selected to do so
 				if (bChEdgeName.isSelected())
@@ -1032,7 +1033,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		while (nodeiter.hasNext())
 		{
 			VNode actual = nodeiter.next();
-			if (actual.isSelected())
+			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
 				Vector<String> names = vg.getSetNames();
 				int position = 0;
@@ -1054,7 +1055,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		while (edgeiter.hasNext())
 		{
 			VEdge actual = edgeiter.next();
-			if (actual.isSelected())
+			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
 				Vector<String> names = vg.getSetNames();
 				int position = 0;

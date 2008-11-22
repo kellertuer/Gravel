@@ -1,5 +1,6 @@
 header {
-	package etc;}
+	package etc;
+}
 class StringLexer extends Lexer;
 
 

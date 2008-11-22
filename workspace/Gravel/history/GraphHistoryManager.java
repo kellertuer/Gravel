@@ -1,10 +1,6 @@
 package history;
 
-import model.MGraph;
-import model.VEdge;
-import model.VGraph;
-import model.VNode;
-
+import model.*;
 import java.util.Observable;
 import java.util.Observer;
 

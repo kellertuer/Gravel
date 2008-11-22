@@ -1,6 +1,7 @@
 // $ANTLR : "Stringparser.g" -> "StringParser.java"$
 
 	package etc;
+
 public interface StringLexerTokenTypes {
 	int EOF = 1;
 	int NULL_TREE_LOOKAHEAD = 3;

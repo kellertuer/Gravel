@@ -259,7 +259,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 				if (s != null) 
 				{
 					if ((s.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED)
-						s.select();
+						s.setSelectedStatus(VItem.SELECTED);
 					else
 						s.deselect();
 					vg.pushNotify("M");

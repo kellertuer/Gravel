@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 
 import model.VEdge;
 import model.VGraph;
+import model.VItem;
 import model.VNode;
 /**
  * Standard Cick Mouse Handler
@@ -46,9 +47,9 @@ public class StandardClickMouseHandler extends ClickMouseHandler {
 			VNode r = vg.getNodeinRange(p);
 			if (r != null) 
 			{	//Auf einen Knoten klicken bewirkt, dass dieser selektiert wird
-				if (!r.isSelected()) {
+				if ((r.getSelectedStatus() & VItem.SELECTED) != VItem.SELECTED) {
 					vg.deselect();
-					r.select();
+					r.setSelectedStatus(VItem.SELECTED);
 				} else
 					vg.deselect();
 				vg.pushNotify("M");
@@ -56,10 +57,10 @@ public class StandardClickMouseHandler extends ClickMouseHandler {
 				VEdge s = vg.getEdgeinRange(p,2.0);
 				if (s != null) 
 				{
-					if (!s.isSelected()) 
+					if ((s.getSelectedStatus() & VItem.SELECTED) != VItem.SELECTED) 
 					{
 						vg.deselect();
-						s.select();
+						s.setSelectedStatus(VItem.SELECTED);
 					} else
 						vg.deselect();
 				} 

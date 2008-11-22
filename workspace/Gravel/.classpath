@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry excluding="img/|xml/|data/" kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="ANTLR_HOME/antlr.jar" sourcepath="/ANTLR_HOME/antlr.jar"/>
 	<classpathentry kind="lib" path="jhall.jar" sourcepath="/Users/ronny/Uni/Gravel/workspace/Gravel/jhall.jar"/>
+	<classpathentry kind="var" path="ANTLR_HOME/antlr.jar" sourcepath="ANTLR_HOME/antlrsrc.zip"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

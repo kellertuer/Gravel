@@ -34,6 +34,7 @@ import model.VEdge;
 import model.VEdgeLinestyle;
 import model.VEdgeText;
 import model.VGraph;
+import model.VItem;
 import model.VOrthogonalEdge;
 import model.VQuadCurveEdge;
 import model.VSegmentedEdge;
@@ -695,7 +696,6 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			//Existiert schon eine Kante zwischen den beiden Knoten (ungerichtet) oder gar in die Richtung ?
 			if (graphref.similarPathEdgeIndex(typeedge, startindex, endindex) > 0) //ähnliche Kante existiert schon Doppelkanten darf es nicht geben
 			{
-				//TODO : Multiple abfragen -> noch testen
 				JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Eine Kante zwischen den Knoten existiert bereits.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					
 				return;
 			}
@@ -837,8 +837,9 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			{
 				retvalue = cArrow.modifyEdge(retvalue);
 			}
-			if ((chEdge!=null)&&(chEdge.isSelected()))
-				retvalue.select();
+			//If Edge exists and is selected
+			if ((chEdge!=null)&&((chEdge.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED))
+				retvalue.setSelectedStatus(VItem.SELECTED);
 		}
 		return retvalue;
 	}
