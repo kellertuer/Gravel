@@ -1,5 +1,6 @@
 package view;
 
+import history.GraphHistoryManager;
 import io.GeneralPreferences;
 
 import java.awt.*;
@@ -375,6 +376,12 @@ public class VGraphic extends Component implements 	Observer
 		this.removeMouseListener(Click);
 		Drag = null;
 		Click = null;
+	}
+	public boolean MouseIsDragged()
+	{
+		if (Drag!=null)
+			return Drag.dragged();
+		return false;
 	}
 	public void setZoomEnabled(boolean activity)
 	{

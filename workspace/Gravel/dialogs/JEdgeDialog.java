@@ -756,8 +756,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			graphref.removeEdge(oldindex);
 		}
 		//hinzufuegen
-		 graphref.addEdge(CheckType(), startindex, endindex, iValue.getValue());
-		 graphref.setEdgeName(iEdgeIndex.getValue(), EdgeName.getText());
+		 graphref.addEdge(CheckType(), startindex, endindex, iValue.getValue(),EdgeName.getText());
 		//Gruppen einbauen
 		int temp = 0;
 		for (int i=0; i<subsetlist.size(); i++)

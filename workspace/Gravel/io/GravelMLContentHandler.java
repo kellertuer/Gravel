@@ -551,8 +551,7 @@ public class GravelMLContentHandler implements ContentHandler
 				System.err.println("An (similar) Edge already existst between the two Nodes"); 
 				return;
 			}
-			vG.addEdge(toAdd,start,ende,ev);
-			vG.setEdgeName(toAdd.index,en);
+			vG.addEdge(toAdd,start,ende,ev,en);
 			this.EdgeIdtoIndex.put(idString,id);
 		}
 	}

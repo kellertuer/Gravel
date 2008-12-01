@@ -83,8 +83,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 				if (!multiple)
 				{
 					int i = vg.getNextEdgeIndex();
-					vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),StartNode.index,DragNode.index,gp.getIntValue("edge.value"));
-					vg.setEdgeName(i,"\u22C6");
+					vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),StartNode.index,DragNode.index,gp.getIntValue("edge.value"),"\u22C6");
 				}
 				else
 				{
@@ -159,6 +158,9 @@ public class OCMDragMouseHandler extends DragMouseHandler
 		{	
 			if (vg.getNode(DragNode.index)!=null)
 				vg.removeNode(DragNode.index);
+			//End Drag Indication
+			DragNode = null;
+			
 			VNode EndNode = vg.getNodeinRange(p);
 			if (EndNode!=null)
 			{
@@ -168,20 +170,21 @@ public class OCMDragMouseHandler extends DragMouseHandler
 					if ((StartNode.index==EndNode.index)&&(vg.isLoopAllowed()))
 					{
 						VLoopEdge t = new VLoopEdge(i,gp.getIntValue("edge.width"),gp.getIntValue("edge.looplength"),gp.getIntValue("edge.loopdirection"),(double)gp.getIntValue("edge.loopproportion")/100.0d,gp.getBoolValue("edge.loopclockwise"));
-						vg.addEdge(t,StartNode.index,EndNode.index,gp.getIntValue("edge.value"));							
+						vg.addEdge(t,StartNode.index,EndNode.index,gp.getIntValue("edge.value"),gp.getEdgeName(i,StartNode.index,EndNode.index));							
 					}
 					else if (StartNode.index!=EndNode.index)
-						vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),StartNode.index,EndNode.index,gp.getIntValue("edge.value"));
-					
-					vg.setEdgeName(i,gp.getEdgeName(i,StartNode.index,EndNode.index));		
+						vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),
+									StartNode.index,
+									EndNode.index,
+									gp.getIntValue("edge.value"),
+									gp.getEdgeName(i,StartNode.index,EndNode.index));
 				}
 				else
 				{	
 						vg.addEdgesfromSelectedNodes(EndNode);
 				}
 			}
+			StartNode = null;
 		}
-		StartNode = null;
-		DragNode = null;
 	}
 }

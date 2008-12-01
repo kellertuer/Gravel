@@ -858,7 +858,40 @@ public class VGraph extends Observable {
 	 * 				the target of the VEdge
 	 */
 	public void addEdge(VEdge edge, int s, int e) {
-		addEdge(edge, s, e, 1);
+		addEdge(edge, s, e, 1,"");
+	}
+	/**
+	 * add a new edge with given visual information in a VEdge from a source to a target
+	 * the value of the edge is set to 1
+	 * 
+	 * @param edge 
+	 * 				the new VEdge
+	 * @param s 
+	 * 				the source of the VEdge
+	 * @param e
+	 * 				the target of the VEdge
+	 * @param name 
+	 * 				name of the edge (optional)
+	 */
+	public void addEdge(VEdge edge, int s, int e, String name) {
+		addEdge(edge, s, e, 1,name);
+	}
+	/**
+	 * add a new edge with given visual information in a VEdge from a source to a target and a value without a name 
+	 * 
+	 * @param edge 
+	 * 				the new VEdge
+	 * @param s 
+	 * 				the source of the edge
+	 * @param e
+	 * 				the target of the edge
+	 * @param v
+	 * 				the value of the  edge
+	 * 
+	 */
+	public void addEdge(VEdge edge, int s, int e, int v)
+	{
+		addEdge(edge,s,e,v,"");
 	}
 	/**
 	 * add a new edge with given visual information in a VEdge from a source to a target and a value 
@@ -871,8 +904,10 @@ public class VGraph extends Observable {
 	 * 				the target of the edge
 	 * @param v
 	 * 				the value of the  edge
+	 * @param name
+	 * 				name of the edge
 	 */
-	public void addEdge(VEdge edge, int s, int e, int v) 
+	public void addEdge(VEdge edge, int s, int e, int v, String name) 
 	{
 		if (similarPathEdgeIndex(edge,s,e) > 0)
 		{
@@ -915,6 +950,7 @@ public class VGraph extends Observable {
 					vEdges.add(temp); //add modified edge in counter directtion
 				}
 				vEdges.add(edge); //add edge
+				mG.setEdgeName(edge.index, name);
 			} 
 			finally {EdgeLock.unlock();}
 			setChanged();

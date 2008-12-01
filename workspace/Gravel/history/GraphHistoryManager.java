@@ -4,6 +4,8 @@ import model.*;
 import java.util.Observable;
 import java.util.Observer;
 
+import view.VGraphic;
+
 /**
  * This class tacks all actions happening to a graph and saves the last few ones.
  * 
@@ -15,11 +17,13 @@ import java.util.Observer;
 public class GraphHistoryManager implements Observer
 {
 	VGraph trackedGraph;
+	VGraphic vg;
 	String lastMsg;
 	boolean active = true;
-	public GraphHistoryManager(VGraph g)
+	public GraphHistoryManager(VGraphic pvg)
 	{
-		trackedGraph = g;
+		trackedGraph = pvg.getVGraph();
+		vg = pvg;
 		trackedGraph.addObserver(this);
 		System.err.println("Added HistoryManager to the VGraph");
 		lastMsg="";
@@ -38,10 +42,10 @@ public class GraphHistoryManager implements Observer
 			if (m.getChangeStatus()==GraphMessage.START_BLOCK)
 			{
 				System.err.println("Ended Block - activating");
-				active = false;
+				active = true;
 				System.err.println("Block was: "+lastMsg);
 			}
-			if (!active)
+			if ((!active)||(vg.MouseIsDragged()))
 				return;
 			if (m.getElementID() > 0)
 			{
