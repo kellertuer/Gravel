@@ -20,6 +20,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
+import model.GraphMessage;
+
 import dialogs.JFileDialogs;
 import dialogs.JPreferencesDialog;
 import dialogs.JSelectionModifyDialog;
@@ -325,7 +327,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			else if (item == mFWinPrefs)
 			{
 		    	new JPreferencesDialog();
-		    	Gui.getInstance().getVGraph().pushNotify("NESM");
+		    	Gui.getInstance().getVGraph().pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.ALL_ELEMENTS,GraphMessage.UPDATED));
 			}
 			else if (item == mFExport)
     			fileDialogs.Export();
@@ -461,28 +463,31 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 	}
 	public void update(Observable arg0, Object arg1) 
 	{
-		String s = (String) arg1;
-		if (s.contains("M"))
+		GraphMessage m = (GraphMessage)arg1;
+		if (m==null)
+			return;
+		//either Selection changed or was affected
+		if (((m.getAffectedTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION)||((m.getElements()&GraphMessage.SELECTION)==GraphMessage.SELECTION))
 		{
 			mEdDelSelection.setEnabled(graphpart.getVGraph().selectedEdgeExists()||graphpart.getVGraph().selectedNodeExists());		
 			mEdModifySelection.setEnabled(graphpart.getVGraph().selectedEdgeExists()||graphpart.getVGraph().selectedNodeExists());		
 			mEdArrangeSelection.setEnabled(graphpart.getVGraph().selectedNodeExists());
 		}
-		else if (s.contains("D")) //directed changed
+		else if ((m.getElements()&GraphMessage.DIRECTION)==GraphMessage.DIRECTION) //directed changed
 		{
 	    	if (graphpart.getVGraph().isDirected())
 	        	mVGDirCh.setText("ungerichtet");
 	        else
 	        	mVGDirCh.setText("gerichtet");        	
 		}
-		else if (s.contains("L")) //directed changed
+		else if ((m.getElements()&GraphMessage.LOOPS)==GraphMessage.LOOPS) //Loops changed
 		{
 	    	if (graphpart.getVGraph().isLoopAllowed())
 	        	mVGLoopCh.setText("entferne Schleifen");
 	        else
 	        	mVGLoopCh.setText("erlaube Schleifen");        	
 		}
-		else if (s.contains("A")) //directed changed
+		else if ((m.getElements()&GraphMessage.MULTIPLE)==GraphMessage.MULTIPLE) //Multiple Edges Changed
 		{
 	    	if (graphpart.getVGraph().isMultipleAllowed())
 	        	mVGMultipleCh.setText("entferne Mehrfachkanten");

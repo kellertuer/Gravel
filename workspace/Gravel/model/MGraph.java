@@ -173,7 +173,11 @@ public class MGraph extends Observable
 		}
 		directed = d;
 		setChanged();
-		notifyObservers("ED");	
+		notifyObservers(
+				new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION, //Type
+								GraphMessage.UPDATED) //Status 
+			);
+
 		return removed;
 	}
 	/**
@@ -218,7 +222,7 @@ public class MGraph extends Observable
 		}	
 		this.allowloops = a;
 		setChanged();
-		notifyObservers("EL");	
+		notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATED,GraphMessage.EDGE));	
 		return removed;
 	}
 	/**
@@ -277,7 +281,7 @@ public class MGraph extends Observable
 		}
 		this.allowmultiple = a;
 		setChanged();
-		notifyObservers("EA");	
+		notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATED,GraphMessage.EDGE));	
 		return removed;
 	}
 
@@ -298,6 +302,7 @@ public class MGraph extends Observable
 			mNodes.add(new MNode(i,n));
 			setChanged();
 			notifyObservers("N"+i);
+			notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.ADDED,GraphMessage.NODE));	
 		} 
 		finally
 		{
@@ -361,7 +366,7 @@ public class MGraph extends Observable
 		}
 		finally {EdgeLock.unlock();}
 		setChanged();
-		notifyObservers("NE");
+		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.REMOVED,GraphMessage.ALL_ELEMENTS));	
 		return ergebnis;
 	}
 	/**
@@ -452,7 +457,7 @@ public class MGraph extends Observable
 		if (index!=0) //found the node, notify observers
 		{
 			setChanged();
-			notifyObservers("N"+index);
+			notifyObservers(new GraphMessage(GraphMessage.NODE,index,GraphMessage.UPDATED,GraphMessage.NODE));	
 		}
 	}
 	/**
@@ -517,7 +522,7 @@ public class MGraph extends Observable
 			}
 		} finally {NodeLock.unlock();}
 		setChanged();
-		notifyObservers("NE");
+		notifyObservers(new GraphMessage(GraphMessage.NODE,newindex,GraphMessage.UPDATED,GraphMessage.NODE));	
 	}
 	
 	//
@@ -559,7 +564,7 @@ public class MGraph extends Observable
 		{
 			mEdges.add(new MEdge(i,s,e,v));
 			setChanged();
-			notifyObservers("E"+i);
+			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.ADDED,GraphMessage.EDGE));	
 		} 
 		finally
 		{
@@ -599,7 +604,7 @@ public class MGraph extends Observable
 		{
 			mEdges.remove(toDel);
 			setChanged();
-			notifyObservers("E"+i);
+			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.REMOVED,GraphMessage.EDGE));	
 		}
 	}
 	/**
@@ -684,11 +689,11 @@ public class MGraph extends Observable
 			if (change)
 			{
 				setChanged();
-				notifyObservers("E"+i);
+				notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.UPDATED,GraphMessage.EDGE));	
 			}
 	}
 	/**
-	 * Reurns the number of edges between two given nodes. For the non-multiple case 0 means no edge 1 means an edge exists
+	 * Returns the number of edges between two given nodes. For the non-multiple case 0 means no edge 1 means an edge exists
 	 *
 	 * @param start start node index
 	 * @param ende end node index
@@ -777,7 +782,7 @@ public class MGraph extends Observable
 		if (change)
 		{
 			setChanged();
-			notifyObservers("E"+i);
+			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.UPDATED,GraphMessage.EDGE));	
 		}
 	}
 	/**
@@ -828,7 +833,8 @@ public class MGraph extends Observable
 		{
 			mSubSets.add(new MSubSet(index,name));
 			setChanged();
-			notifyObservers("S"+index);
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,index,GraphMessage.ADDED,GraphMessage.SUBSET));	
+
 		}
 		//TODO if Subsetindex already in use -> Exception ?
 	}
@@ -853,6 +859,7 @@ public class MGraph extends Observable
 		{
 			mSubSets.remove(toDelete);
 			setChanged();
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,index,GraphMessage.REMOVED,GraphMessage.ALL_ELEMENTS));	
 			notifyObservers("S"+index);
 			return true;
 		}
@@ -932,7 +939,7 @@ public class MGraph extends Observable
 		if (change)
 		{
 			setChanged();
-			notifyObservers("S"+index);
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,index,GraphMessage.UPDATED,GraphMessage.SUBSET));	
 		}
 	}
 	/**
@@ -960,7 +967,7 @@ public class MGraph extends Observable
 		if (change)
 		{
 			setChanged();
-			notifyObservers("N"+nodeindex+"S"+SetIndex);
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATED,GraphMessage.SUBSET|GraphMessage.NODE));	
 		}
 	}
 	/**
@@ -986,7 +993,7 @@ public class MGraph extends Observable
 		if (change)
 		{
 			setChanged();
-			notifyObservers("N"+nodeindex+"S"+SetIndex);
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATED,GraphMessage.SUBSET|GraphMessage.NODE));	
 		}
 		return change;
 	}
@@ -1030,8 +1037,7 @@ public class MGraph extends Observable
 			}
 		}
 		setChanged();
-		notifyObservers("ES");
-
+		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATED,GraphMessage.SUBSET|GraphMessage.EDGE));	
 	}
 	/**
 	 * Removes an edge from a subset, if both exist. If a change is done (edge is also contained in the subset). 
@@ -1060,7 +1066,7 @@ public class MGraph extends Observable
 		if (change)
 		{
 			setChanged();
-			notifyObservers("E"+edgeindex+"S"+SetIndex);
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATED,GraphMessage.SUBSET|GraphMessage.EDGE));	
 		}
 		return change;
 	}

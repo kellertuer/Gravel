@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import javax.swing.*;
 
+import model.GraphMessage;
 import model.VGraph;
 
 import dialogs.JPreferencesDialog;
@@ -108,7 +109,7 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
     public void handlePreferences(ApplicationEvent e)
     {
     	new JPreferencesDialog();
-    	normalgui.getVGraph().pushNotify("NESM");
+    	normalgui.getVGraph().pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.ALL_ELEMENTS,GraphMessage.UPDATED));
     	//e.setHandled(true);
     }
 	public void handleQuit(ApplicationEvent e)

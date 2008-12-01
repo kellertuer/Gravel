@@ -27,6 +27,7 @@ import javax.swing.JOptionPane;
 
 import view.Gui;
 
+import model.GraphMessage;
 import model.MGraph;
 import model.VEdge;
 import model.VGraph;
@@ -341,6 +342,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 						colorgone = true;
 			}
 			int SetIndex = iSubSetIndex.getValue();
+			GraphMessage startblock = new GraphMessage(0,GraphMessage.START_BLOCK);
 			//TESTS
 			//1. Falls der Graph neu ist
 			if (chSubSet==null) //neuer Untergraph, index testen
@@ -357,7 +359,8 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 					JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Untergraphen Nicht m"+main.CONST.html_oe+"glich.<br><br>Die Farbe ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				
+				startblock.setMessagey("Untergraph #"+SetIndex+"erstellt");
+				graphref.pushNotify(startblock);
 			}
 			else //2. Untergraphenaenderungsdialog
 			{
@@ -375,6 +378,8 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 					return;
 				}
 				//Sonst läßt sich das alles ändern, also entfernen
+				startblock.setMessagey("Untergraph #"+SetIndex+" verändert");
+				graphref.pushNotify(startblock);
 				graphref.removeSubSet(oldindex);
 			}
 			//Und (im zweiten Fall neu, sonst allgemein) einfuegen
@@ -405,6 +410,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 				}	
 				
 			}
+			graphref.pushNotify(new GraphMessage(0,GraphMessage.END_BLOCK));
 			this.dispose();
 		}
 	}

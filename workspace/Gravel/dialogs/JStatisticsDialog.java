@@ -193,14 +193,12 @@ public class JStatisticsDialog extends JDialog implements ActionListener, TextLi
 			if (Expr.contains(actKey)) //Enthalten
 			{
 				bT[belegt++] = actKey;
-			//	System.err.println("Füge "+actKey+" ein.");
 			}
 		}
 		while ((index < bT.length)&&(bT[index]!=null))
 		{
 			//(1) enth�lt der aktuelle Wert den Namen ? dann liegt eine Rekursion vor
 			String Check_Expr = bisherige_formeln.get(bT[index]);
-		//	System.err.println("Prüfe "+bT[index]+" ("+Check_Expr+").");
 			index++;
 			if (Check_Expr.contains(Name))
 				return true;
@@ -220,7 +218,6 @@ public class JStatisticsDialog extends JDialog implements ActionListener, TextLi
 					if (!enthalten) //und noch nich im Array
 					{
 						bT[belegt++] = actKey;
-	//					System.err.println("F�ge "+actKey+" ein.");
 					}
 				}
 			}

@@ -16,6 +16,7 @@ public class GraphHistoryManager implements Observer
 {
 	VGraph trackedGraph;
 	String lastMsg;
+	boolean active = true;
 	public GraphHistoryManager(VGraph g)
 	{
 		trackedGraph = g;
@@ -23,38 +24,42 @@ public class GraphHistoryManager implements Observer
 		System.err.println("Added HistoryManager to the VGraph");
 		lastMsg="";
 	}
-	public void update(Observable o, Object arg) {
-		if (o.equals(trackedGraph))
+	public void update(Observable o, Object arg) 
+	{
+		GraphMessage m = (GraphMessage) arg;
+		if ((m!=null)&&(m.getElements()!=GraphMessage.SELECTION))
 		{
-			if (!((String) arg).startsWith("M"))
+			if (m.getChangeStatus()==GraphMessage.START_BLOCK)
 			{
-				if (!(lastMsg.equals((String) arg)))
-				{
-					String output = "Action tracked: "+arg;
-					String msg = (String) arg;
-					int value = 0;
-					if (msg.length() > 1)
-					{
-						int j=1;
-						while (Character.isDigit(msg.charAt(j)))
-						{
-							value = value*10+Character.getNumericValue(msg.charAt(j));
-							if ( (++j) >= msg.length())
-								break;
-						}
-						switch (msg.charAt(0))
-						{
-							case 'N': output+=" (A Node"; break;
-							case 'E': output+=" (An Edge"; break;
-							case 'S': output+=" (A Subset"; break;
-						}
-						output +=" with index #"+value+")";
-					}
-					lastMsg = msg;
-					if (value > 0)
-						System.err.println(output);
-
-				}		
+				System.err.println("Started Block - deactivating");
+				active = false;
+				lastMsg = m.getMessage();
+			}			
+			if (m.getChangeStatus()==GraphMessage.START_BLOCK)
+			{
+				System.err.println("Ended Block - activating");
+				active = false;
+				System.err.println("Block was: "+lastMsg);
+			}
+			if (!active)
+				return;
+			if (m.getElementID() > 0)
+			{
+				String type = "unbekannt";
+				if (m.getElements()==GraphMessage.NODE) //Unique because of ID:
+					type="Knoten";
+				else if (m.getElements()==GraphMessage.EDGE) //Unique because of ID:
+					type="Kante";
+				else if (m.getElements()==GraphMessage.SUBSET)
+					type="Untergraph";
+				String action = "";
+				if (m.getChangeStatus() == GraphMessage.ADDED)
+					action = "hinzugefügt";
+				if (m.getChangeStatus() == GraphMessage.UPDATED)
+					action = "verändert";
+				if (m.getChangeStatus() == GraphMessage.REMOVED)
+					action = "entfernt";
+				System.err.println("Einzelaktion: "+type+" (ID #"+m.getElementID()+") "+action+".");
 			}
 		}
 	}

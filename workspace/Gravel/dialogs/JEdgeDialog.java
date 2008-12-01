@@ -724,7 +724,6 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 				return;
 			}
 			//Falls sich Start oder Ende geaendert haben, darf keine Zweite Kante existieren
-			//System.err.println("Neuer Startknoten "+startindex+" alt: "+oldstart+" (Eintrag "+cStart.getSelectedIndex()+")- Neuer Endknoten "+endindex+" (Eintrag "+cEnd.getSelectedIndex()+") alt "+oldend);
 			if ((startindex!=oldstart)||(endindex!=oldend))//Kante wurde umgebaut
 			{
 				if (startindex==endindex)

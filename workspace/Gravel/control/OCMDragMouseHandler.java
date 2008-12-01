@@ -7,6 +7,7 @@ import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
+import model.GraphMessage;
 import model.VGraph;
 import model.VItem;
 import model.VLoopEdge;
@@ -90,7 +91,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 					vg.addEdgesfromSelectedNodes(DragNode);
 				}
 			}
-			vg.pushNotify("N");
+			vg.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.UPDATED));
 		}
 	}
 

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
+import model.GraphMessage;
 import model.MGraph;
 import model.VEdge;
 import model.VGraph;
@@ -120,7 +121,7 @@ public class MagnetismAndSprings implements VAlgorithmIF
 			int y = v.getPosition().y + Math.round((new Double(force_y*movepart)).floatValue());
 			movement += Math.abs(Math.round((new Double(force_x*movepart)).floatValue())) + Math.abs(Math.round((new Double(force_y*movepart)).floatValue()));
 			v.setPosition(new Point(x,y));
-			vg.pushNotify("NE");
+			vg.pushNotify(new GraphMessage(GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.UPDATED));
 		} //End while
 		//All Nodes moved by a part of its force
 		if (movement==0)

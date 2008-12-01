@@ -20,6 +20,7 @@ import control.OCMDragMouseHandler;
 import control.StandardClickMouseHandler;
 import control.StandardDragMouseHandler;
 
+import model.GraphMessage;
 import model.MGraph;
 import model.VEdge;
 import model.VGraph;
@@ -389,10 +390,10 @@ public class VGraphic extends Component implements 	Observer
 	}
 	public void update(Observable o, Object arg) 
 	{
-		if (o.equals(vG)&&(((String)arg)!=null)) //Der Graph wurde aktualisiert und auch echt ein String gegeben
+		if (o.equals(vG)&&(((GraphMessage)arg)!=null)) //Der Graph wurde aktualisiert und auch echt ein String gegeben
 		{
-			String todo = (String)arg;
-			if (todo.contains("N") || todo.contains("E") || todo.contains("M")) //Dann Knoten/Kanten/Zoom aktualisiert
+			GraphMessage m = (GraphMessage)arg;
+			if ((m.getAffectedTypes()&(GraphMessage.ALL_ELEMENTS|GraphMessage.SELECTION)) > 0) //Anything in Elements or selections changed
 			{
 				Point MouseOffSet = new Point(0,0);
 				if (Drag!=null)
@@ -412,25 +413,16 @@ public class VGraphic extends Component implements 	Observer
 					//System.err.print("Move Me : "+r+" and "+MouseOffSet);
 					int xdiff = MouseOffSet.x-r.x-r.width;
 					if (xdiff > 0) //Dann ist die Maus nach rechts rausgewandert
-					{
 						r.x += xdiff;
-					}
 					xdiff = r.x - MouseOffSet.x;
 					if (xdiff > 0) //nach Links rausgewandert
-					{
-
 						r.x -= xdiff;
-					}
 					int ydiff = MouseOffSet.y-r.y-r.height;
 					if (ydiff > 0) //nach unten rausgewandert
-					{
 						r.y += ydiff;
-					}
 					ydiff = r.y - MouseOffSet.y;
 					if (ydiff > 0) //nach oben rausgewandert
-					{
 						r.y -=ydiff;
-					}
 					if (r.y < 0) r.y = 0;
 					if (r.x < 0) r.x = 0;
 					vp.setViewPosition(new Point(r.x,r.y));
@@ -440,7 +432,7 @@ public class VGraphic extends Component implements 	Observer
 				vp.getParent().validate();
 				repaint();	
 			}
-			else if (todo.contains("S"))
+			else if ((m.getElements()&GraphMessage.SUBSET)==GraphMessage.SUBSET)
 			{
 				repaint();
 				if (Click!=null)
@@ -493,7 +485,7 @@ public class VGraphic extends Component implements 	Observer
 			}
 			selColor = new Color(gp.getIntValue("vgraphic.selcolr"),gp.getIntValue("vgraphic.selcolg"),gp.getIntValue("vgraphic.selcolb"));
 			selWidth = gp.getIntValue("vgraphic.selwidth");
-			vG.pushNotify("M"); //Zoom and Selection stuff belong to the mark actions on a graph - they don't change the state to "not saved yet"
+			vG.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATED)); //Zoom and Selection stuff belong to the mark actions on a graph - they don't change the state to "not saved yet"
 			repaint();
 		}
 	}

@@ -202,7 +202,6 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 	}
 	public boolean IsPlainTeX()
 	{
-		System.err.println("PlainTeX is Selected: "+rPlainTeX.isSelected());
 		return rPlainTeX.isSelected();
 	}
 	public boolean IsTikZ()

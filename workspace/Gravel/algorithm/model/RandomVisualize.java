@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 
+import model.GraphMessage;
 import model.MEdge;
 import model.MGraph;
 import model.MNode;
@@ -121,7 +122,7 @@ public class RandomVisualize implements VAlgorithmIF {
 						ErgebnisGraph.addEdge(new VStraightLineEdge(e.index,width),e.StartIndex,e.EndIndex,e.Value);
 					}		
 				}
-				ErgebnisGraph.pushNotify("NE");
+				ErgebnisGraph.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATED));
 			}
 			else
 				return;

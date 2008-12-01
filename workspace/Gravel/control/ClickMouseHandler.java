@@ -21,6 +21,7 @@ import dialogs.JEdgeDialog;
 import dialogs.JNodeDialog;
 import dialogs.JSubSetDialog;
 
+import model.GraphMessage;
 import model.MGraph;
 import model.VEdge;
 import model.VGraph;
@@ -253,7 +254,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 					r.setSelectedStatus(VItem.SELECTED);
 				else
 					r.deselect();
-				vg.pushNotify("M");
+				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATED));
 			} else {
 				VEdge s = vg.getEdgeinRange(p,2.0);
 				if (s != null) 
@@ -262,7 +263,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 						s.setSelectedStatus(VItem.SELECTED);
 					else
 						s.deselect();
-					vg.pushNotify("M");
+					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATED));
 				}
 			}
 		}
@@ -293,7 +294,11 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 	 * Then the subsetlist ist updated
 	 */
 	public void update(Observable o, Object arg) {
-		updateSubSetList();
+		if (((GraphMessage)arg)!=null)
+		{ //If we get an GraphMessage and a SUBSET is AFFECTED
+			if ((((GraphMessage)arg).getAffectedTypes()&GraphMessage.SUBSET)==GraphMessage.SUBSET)
+				updateSubSetList();
+		}
 	}
 	/**
 	 * inherited from the Action LIstener to handle all clicks on the popup menus and call the specific functions

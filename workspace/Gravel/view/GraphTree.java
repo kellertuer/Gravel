@@ -16,6 +16,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import model.GraphMessage;
 import model.MGraph;
 import model.VGraph;
 
@@ -267,23 +268,23 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	}
 	public void update(Observable o, Object arg) 
 	{
-		if (o.equals(vG)&&(((String)arg)!=null)) //Der Graph wurde aktualisiert und auch echt ein String gegeben, der Auftr�ge enth�lt
+		if (o.equals(vG)&&(((GraphMessage)arg)!=null)) //Der Graph wurde aktualisiert und auch echt ein String gegeben, der Auftr�ge enth�lt
 		{
-			String todo = (String)arg;
-			if (todo.contains("N")) //Ein Knoten ist beteiligt
+			GraphMessage m = (GraphMessage)arg;
+			if ((m.getAffectedTypes()&GraphMessage.NODE)==GraphMessage.NODE) //Ein Knoten ist beteiligt
 			{
 				updateNodes();
 				updateEdges();
 			}
-			if (todo.contains("E")) //Kanten beteiligt
+			if ((m.getAffectedTypes()&GraphMessage.EDGE)==GraphMessage.EDGE) //Kanten beteiligt
 			{
 				updateEdges();
 			}
-			if (todo.contains("S")) //Sets beteiligt
+			if ((m.getAffectedTypes()&GraphMessage.SUBSET)==GraphMessage.SUBSET) //Sets beteiligt
 			{
 				updateSets();
 			}
-			if (todo.contains("M"))
+			if ((m.getAffectedTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION)
 			{
 				//updateSelection();
 			}

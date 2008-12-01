@@ -14,6 +14,7 @@ import java.awt.geom.QuadCurve2D;
 import java.util.Iterator;
 import java.util.Vector;
 
+import model.GraphMessage;
 import model.MGraph;
 import model.VEdge;
 import model.VGraph;
@@ -151,7 +152,6 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 			else
 				e.setSelectedStatus(e.getSelectedStatus() & (~status));
 		} //End while edges
-		System.err.println("");
 	}
 	/**
 	 * inherited from the mouse drag handler
@@ -246,7 +246,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 
 				movingNode.setNameDistance(distance); //Y Richtung setzt Distance
 				movingNode.setNameRotation(rotation); //X Setzt Rotation
-				vg.pushNotify("N");
+				vg.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.UPDATED));
 			}
 			else if (movingEdge!=null)
 			{//Single Edge moving
@@ -256,7 +256,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 				else if (arrpos<0.0f)
 					arrpos = 0.0f;
 				movingEdge.setArrowPos(arrpos);
-				vg.pushNotify("E");
+				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATED));
 			}
 			else if (((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK)&&(multiplemoving))
 			{ //Moving multiple elements
@@ -285,7 +285,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 			else
 			 //weder shift noch alt -> Selektiertes auf SELECTED
 				updateSelection(VItem.SELECTED);
-			vg.pushNotify("M");
+			vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATED));
 		}
 		MouseOffSet = e.getPoint();
 	}
@@ -313,7 +313,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 				temp.setNameRotation(rotation); //X Setzt Rotation
 			}
 		}
-		vg.pushNotify("N");
+		vg.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.UPDATED));
 	}
 	/**
 	 * moving selected Edges. The start and end point might not be moved, but every controlpoint is moved
@@ -338,7 +338,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 				temp.setArrowPos(arrpos);
 			}
 		}
-		vg.pushNotify("E");
+		vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATED));
 	}
 	/**
 	 * And any motion of nodes if movemnt was activ

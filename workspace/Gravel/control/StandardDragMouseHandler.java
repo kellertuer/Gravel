@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.util.Iterator;
 import java.util.Vector;
 
+import model.GraphMessage;
 import model.MGraph;
 import model.VEdge;
 import model.VGraph;
@@ -139,7 +140,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 					translateAdjacentEdges(temp.index, Gtransx,Gtransy);
 				}
 			}
-			vg.pushNotify("NE");
+			vg.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATED));
 		}
 		else if ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)
 		{} //bei alt hier nichts tun
@@ -159,7 +160,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			}
 			translateAdjacentEdges(movingNode.index,Gtransx,Gtransy);	
 			movingNode.setPosition(GPos);
-			vg.pushNotify("N"); //Knoten aktualisiert
+			vg.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.UPDATED)); //Knoten aktualisiert
 		}
 		else if (movingControlPointEdge!=null)
 		{
@@ -179,7 +180,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			}
 			points.set(movingControlPointIndex, GPos);
 			movingControlPointEdge.setControlPoints(points);
-			vg.pushNotify("E"); //Kanten aktualisiert
+			vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATED)); //Kanten aktualisiert
 		}
 		MouseOffSet = e.getPoint();
 	}

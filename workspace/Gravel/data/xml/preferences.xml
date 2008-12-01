@@ -69,7 +69,7 @@
 		<value name="name" type="String">Untergraph #$ID</value>
 	</group>
 	<group name="vgraphic">
-		<value name="cpshow" type="Boolean">true</value>
+		<value name="cpshow" type="Boolean">false</value>
 		<value name="cpsize" type="Integer">3</value>
 		<value name="directed" type="Boolean">true</value>
 		<value name="framedistance" type="Integer">10</value>

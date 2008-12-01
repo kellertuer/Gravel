@@ -19,6 +19,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import model.GraphMessage;
 import model.VGraph;
 
 import view.Gui;
@@ -472,23 +473,27 @@ public class JFileDialogs implements Observer
 		if (!actualgraphsaved) //Not saved yet
 			return;
 		
-		String todo = (String)arg1;
-		if (todo.contains("N") || todo.contains("E") || todo.contains("S"))
-		{	//Graph Changed => not Saved anymore
-			actualgraphsaved = false;
-			if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
-			{
-				if (saveVisual)
+		GraphMessage m = (GraphMessage)arg1;
+		if (m!=null)
+		{
+			//If anything other than selection is Affected or changed
+			if (((m.getAffectedTypes()!=0)&&(m.getAffectedTypes()!=GraphMessage.SELECTION))||((m.getElements()!=GraphMessage.SELECTION)&&(m.getElements()!=0)))
+			{	//Graph Changed => not Saved anymore
+				actualgraphsaved = false;
+				if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
 				{
-					Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName())+"*");
+					if (saveVisual)
+					{
+						Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName())+"*");
+					}
+					else
+					{
+						Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName())+"* (math only)");					
+					}
 				}
 				else
-				{
-					Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName())+"* (math only)");					
-				}
+				Gui.getInstance().getParentWindow().setTitle(Gui.WindowName);
 			}
-			else
-				Gui.getInstance().getParentWindow().setTitle(Gui.WindowName);									
 		}
 	}
 

@@ -32,6 +32,7 @@ import dialogs.components.*;
 
 import view.Gui;
 
+import model.GraphMessage;
 import model.MGraph;
 import model.VEdge;
 import model.VGraph;
@@ -926,7 +927,6 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			if ((nodeiter.next().getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 				nodecount++;				
 		}
-		//System.err.println("Found "+nodecount+" selected nodes");
 		
 		//loslegen
 		double start = - (new Integer(iFirstNodeAtDegree.getValue())).doubleValue();
@@ -1225,13 +1225,17 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				arrangeCircle();
 			}
 		}
+		GraphMessage startblock = new GraphMessage(0,GraphMessage.START_BLOCK);
+		startblock.setMessagey("Selektion verändert");
+		vg.pushNotify(startblock);
 		if (show_nodeprop)
 			modifyNodes();
 		if (show_edgeprop)
 			modifyEdges();
 		if (show_subsets)
 			modifySubSets();
-		vg.pushNotify("NES");
+		vg.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.UPDATED));
+		vg.pushNotify(new GraphMessage(0,GraphMessage.END_BLOCK));
 		return true;
 	}
 	public void actionPerformed(ActionEvent event) {

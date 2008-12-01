@@ -62,7 +62,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		vgc = g;
 		vg = vgc.getVGraph();
 		vg.addObserver(this);
-		update(vg,"NESM");
+		update(vg,new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.ADDED,GraphMessage.ALL_ELEMENTS));
 	}
 	/**
 	 * Get the Value of an Atom Value, if there is no Value with the given Name, NaN is returned
