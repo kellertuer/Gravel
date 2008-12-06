@@ -285,7 +285,11 @@ public class VGraph extends Observable {
 										GraphMessage.ALL_ELEMENTS) //Affected		
 		);
 		setChanged();
-		notifyObservers("NESMR");
+		notifyObservers(
+				new GraphMessage(GraphMessage.ALL_ELEMENTS, //Type
+						GraphMessage.UPDATED, //Status 
+						GraphMessage.ALL_ELEMENTS) //Affected		
+		);
 	}
 	/**
 	 * Clone the VGraph and
@@ -781,7 +785,7 @@ public class VGraph extends Observable {
 	 * 				the source of all new edges
 	 */
 	public void addEdgestoSelectedNodes(VNode Start) {
-		pushNotify(new GraphMessage(0,GraphMessage.START_BLOCK));
+		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDED|GraphMessage.START_BLOCK));
 		Iterator<VNode> iter = vNodes.iterator();
 		while (iter.hasNext()) 
 		{
@@ -797,7 +801,7 @@ public class VGraph extends Observable {
 						setEdgeName(i,GeneralPreferences.getInstance().getEdgeName(i, Start.index, temp.index));
 				}
 		}
-		this.pushNotify(new GraphMessage(0,GraphMessage.END_BLOCK));
+		this.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.END_BLOCK));
 	}
 	/**
 	 * add edges from evey selected node to a given node
@@ -806,7 +810,7 @@ public class VGraph extends Observable {
 	 * 				the target of all new edges
 	 */
 	public void addEdgesfromSelectedNodes(VNode Ende) {
-		this.pushNotify(new GraphMessage(0,GraphMessage.START_BLOCK));
+		this.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDED|GraphMessage.START_BLOCK));
 		Iterator<VNode> iter = vNodes.iterator();
 		while (iter.hasNext()) 
 		{
@@ -822,7 +826,7 @@ public class VGraph extends Observable {
 						setEdgeName(i,GeneralPreferences.getInstance().getEdgeName(i, temp.index, Ende.index));
 				}
 		}
-		this.pushNotify(new GraphMessage(0,GraphMessage.END_BLOCK));
+		this.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.END_BLOCK));
 	}
 	/**
 	 * get the number of nodes

@@ -477,7 +477,7 @@ public class JFileDialogs implements Observer
 		if (m!=null)
 		{
 			//If anything other than selection is Affected or changed
-			if (((m.getAffectedTypes()!=0)&&(m.getAffectedTypes()!=GraphMessage.SELECTION))||((m.getElements()!=GraphMessage.SELECTION)&&(m.getElements()!=0)))
+			if (((m.getAffectedTypes()!=0)&&(m.getAffectedTypes()!=GraphMessage.SELECTION))||((m.getAction()!=GraphMessage.SELECTION)&&(m.getAction()!=0)))
 			{	//Graph Changed => not Saved anymore
 				actualgraphsaved = false;
 				if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))

@@ -467,27 +467,27 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 		if (m==null)
 			return;
 		//either Selection changed or was affected
-		if (((m.getAffectedTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION)||((m.getElements()&GraphMessage.SELECTION)==GraphMessage.SELECTION))
+		if (((m.getAffectedTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION)||((m.getAction()&GraphMessage.SELECTION)==GraphMessage.SELECTION))
 		{
 			mEdDelSelection.setEnabled(graphpart.getVGraph().selectedEdgeExists()||graphpart.getVGraph().selectedNodeExists());		
 			mEdModifySelection.setEnabled(graphpart.getVGraph().selectedEdgeExists()||graphpart.getVGraph().selectedNodeExists());		
 			mEdArrangeSelection.setEnabled(graphpart.getVGraph().selectedNodeExists());
 		}
-		else if ((m.getElements()&GraphMessage.DIRECTION)==GraphMessage.DIRECTION) //directed changed
+		else if ((m.getAction()&GraphMessage.DIRECTION)==GraphMessage.DIRECTION) //directed changed
 		{
 	    	if (graphpart.getVGraph().isDirected())
 	        	mVGDirCh.setText("ungerichtet");
 	        else
 	        	mVGDirCh.setText("gerichtet");        	
 		}
-		else if ((m.getElements()&GraphMessage.LOOPS)==GraphMessage.LOOPS) //Loops changed
+		else if ((m.getAction()&GraphMessage.LOOPS)==GraphMessage.LOOPS) //Loops changed
 		{
 	    	if (graphpart.getVGraph().isLoopAllowed())
 	        	mVGLoopCh.setText("entferne Schleifen");
 	        else
 	        	mVGLoopCh.setText("erlaube Schleifen");        	
 		}
-		else if ((m.getElements()&GraphMessage.MULTIPLE)==GraphMessage.MULTIPLE) //Multiple Edges Changed
+		else if ((m.getAction()&GraphMessage.MULTIPLE)==GraphMessage.MULTIPLE) //Multiple Edges Changed
 		{
 	    	if (graphpart.getVGraph().isMultipleAllowed())
 	        	mVGMultipleCh.setText("entferne Mehrfachkanten");

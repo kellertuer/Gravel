@@ -377,12 +377,6 @@ public class VGraphic extends Component implements 	Observer
 		Drag = null;
 		Click = null;
 	}
-	public boolean MouseIsDragged()
-	{
-		if (Drag!=null)
-			return Drag.dragged();
-		return false;
-	}
 	public void setZoomEnabled(boolean activity)
 	{
 		usezoom = activity;
@@ -439,7 +433,7 @@ public class VGraphic extends Component implements 	Observer
 				vp.getParent().validate();
 				repaint();	
 			}
-			else if ((m.getElements()&GraphMessage.SUBSET)==GraphMessage.SUBSET)
+			else if ((m.getAction()&GraphMessage.SUBSET)==GraphMessage.SUBSET)
 			{
 				repaint();
 				if (Click!=null)

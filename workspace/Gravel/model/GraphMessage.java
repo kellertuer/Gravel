@@ -98,7 +98,7 @@ public class GraphMessage {
 	 * Get the elements that where actually changed,
 	 * may not bet unique, because one action may have changed multiple types
 	 */
-	public int getElements()
+	public int getAction()
 	{
 		return type;
 	}
@@ -134,5 +134,9 @@ public class GraphMessage {
 	public String getMessage()
 	{
 		return message;
+	}
+	public String toString()
+	{
+		return "Action:"+type+" (#"+id+") Status:"+status+" Affected:"+affected+" Msg:"+message;
 	}
 }

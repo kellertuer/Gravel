@@ -83,14 +83,17 @@ public class OCMDragMouseHandler extends DragMouseHandler
 				if (!multiple)
 				{
 					int i = vg.getNextEdgeIndex();
+					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.START_BLOCK|GraphMessage.UPDATED,GraphMessage.EDGE|GraphMessage.NODE));
 					vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),StartNode.index,DragNode.index,gp.getIntValue("edge.value"),"\u22C6");
 				}
 				else
 				{
+					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.START_BLOCK|GraphMessage.UPDATED));
 					vg.addEdgesfromSelectedNodes(DragNode);
 				}
 			}
-			vg.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.UPDATED));
+			else
+				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATED));
 		}
 	}
 
@@ -183,6 +186,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 				{	
 						vg.addEdgesfromSelectedNodes(EndNode);
 				}
+				vg.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.END_BLOCK));
 			}
 			StartNode = null;
 		}
