@@ -32,25 +32,38 @@ public class GraphHistoryManager implements Observer
 	}
 	private String getStatus(GraphMessage m)
 	{
-		if (m.getElementID() > 0)
+		int id = m.getElementID();
+		String action = "";
+		if ((m.getChangeStatus() & GraphMessage.ADDED) == GraphMessage.ADDED)
+			action = "hinzugefügt";
+		if ((m.getChangeStatus() & GraphMessage.UPDATED) == GraphMessage.UPDATED)
+			action = "verändert";
+		if ((m.getChangeStatus() & GraphMessage.REMOVED) == GraphMessage.REMOVED)
+			action = "entfernt";
+		if (id > 0)
 		{
 			String type = "unbekannt";
 			if (m.getAction()==GraphMessage.NODE) //Unique because of ID:
+			{
 				type="Knoten";
+				if (trackedGraph.getNode(id)==null)
+						type += " (failed)";
+			}
 			else if (m.getAction()==GraphMessage.EDGE) //Unique because of ID:
+			{
 				type="Kante";
+				if (trackedGraph.getEdge(id)==null)
+						type += " (failed)";
+			}
 			else if (m.getAction()==GraphMessage.SUBSET)
+			{
 				type="Untergraph";
-			String action = "";
-			if (m.getChangeStatus() == GraphMessage.ADDED)
-				action = "hinzugefügt";
-			if (m.getChangeStatus() == GraphMessage.UPDATED)
-				action = "verändert";
-			if (m.getChangeStatus() == GraphMessage.REMOVED)
-				action = "entfernt";
+				if (trackedGraph.getSubSet(id)==null)
+					type += " (failed)";
+			}
 			return "Einzelaktion: "+type+" (ID #"+m.getElementID()+") "+action+".";
 		}
-		if ((m.getChangeStatus()&GraphMessage.START_BLOCK)==GraphMessage.START_BLOCK)
+		if ((m.getChangeStatus()&GraphMessage.BLOCK_START)==GraphMessage.BLOCK_START)
 		{		
 			String type="";
 			if ((m.getAction()&GraphMessage.NODE)==GraphMessage.NODE) //nodes
@@ -59,7 +72,8 @@ public class GraphHistoryManager implements Observer
 				type="Kanten";
 			else if ((m.getAction()&GraphMessage.SUBSET)==GraphMessage.SUBSET) //edges
 				type="Untergraphen";			
-			return "Blockaktion auf "+type;
+			return "Blockaktion auf "+type +"("+action+")";
+			
 		}
 		return "--unknown ("+m.toString()+") ---";
 	}
@@ -68,24 +82,31 @@ public class GraphHistoryManager implements Observer
 		GraphMessage m = (GraphMessage) arg;
 		if (m==null)
 			return;
-		if (m.getAction()!=GraphMessage.SELECTION)
+		if (m.getAction()!=GraphMessage.SELECTION) //nicht nur selektion
 		{
-			if ((m.getChangeStatus()&GraphMessage.END_BLOCK)==GraphMessage.END_BLOCK) //Block endet with this Message
+			if ((m.getChangeStatus()&GraphMessage.BLOCK_END)==GraphMessage.BLOCK_END) //Block endet with this Message
 			{
 				if (blockdepth > 0)
+				{
 					blockdepth--;
+					//System.err.println("Block ended #"+(blockdepth+1)+".");
+				}
 				if (blockdepth==0)
 				{
 					active = true;
-					if (Blockstart!=null)
-						System.err.println("Block was: "+getStatus(Blockstart));
+					if (((m.getChangeStatus() & GraphMessage.BLOCK_ABORT) != GraphMessage.BLOCK_ABORT) && (Blockstart!=null))
+						System.err.println(getStatus(Blockstart)+" (Blockaktion)");
+					else if(Blockstart!=null)
+						System.err.println("Aborted Block");
 					Blockstart=null;
+					
 				}
 				return;
 			}
-			if ((m.getChangeStatus()&GraphMessage.START_BLOCK)==GraphMessage.START_BLOCK)
+			if ((m.getChangeStatus()&GraphMessage.BLOCK_START)==GraphMessage.BLOCK_START)
 			{
 					blockdepth++;
+				//	System.err.println("Block startet #"+(blockdepth)+".");	
 				if (blockdepth==1)
 				{
 					active = false;
@@ -94,8 +115,9 @@ public class GraphHistoryManager implements Observer
 				return;
 			}			
 			if (!active)
-				return;		
-			System.err.println(getStatus(m));			
+				return;
+			if (m.getElementID() > 0)
+				System.err.println(getStatus(m));			
 		}
 	}
 	

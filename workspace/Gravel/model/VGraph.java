@@ -785,7 +785,7 @@ public class VGraph extends Observable {
 	 * 				the source of all new edges
 	 */
 	public void addEdgestoSelectedNodes(VNode Start) {
-		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDED|GraphMessage.START_BLOCK));
+		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDED|GraphMessage.BLOCK_START));
 		Iterator<VNode> iter = vNodes.iterator();
 		while (iter.hasNext()) 
 		{
@@ -801,7 +801,7 @@ public class VGraph extends Observable {
 						setEdgeName(i,GeneralPreferences.getInstance().getEdgeName(i, Start.index, temp.index));
 				}
 		}
-		this.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.END_BLOCK));
+		this.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END));
 	}
 	/**
 	 * add edges from evey selected node to a given node
@@ -810,7 +810,7 @@ public class VGraph extends Observable {
 	 * 				the target of all new edges
 	 */
 	public void addEdgesfromSelectedNodes(VNode Ende) {
-		this.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDED|GraphMessage.START_BLOCK));
+		this.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDED|GraphMessage.BLOCK_START));
 		Iterator<VNode> iter = vNodes.iterator();
 		while (iter.hasNext()) 
 		{
@@ -826,7 +826,7 @@ public class VGraph extends Observable {
 						setEdgeName(i,GeneralPreferences.getInstance().getEdgeName(i, temp.index, Ende.index));
 				}
 		}
-		this.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.END_BLOCK));
+		this.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END));
 	}
 	/**
 	 * get the number of nodes

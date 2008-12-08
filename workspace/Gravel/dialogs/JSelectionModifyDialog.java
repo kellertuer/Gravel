@@ -960,8 +960,10 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	 * Modify Selected Ndes and set all selected Values (checked Values) in each node
 	 *
 	 */
-	private void modifyNodes()
-	{ //Set all nodes to the selected values, if they are selected
+	private boolean modifyNodes()
+	{ 
+		boolean changed = false;
+		//Set all nodes to the selected values, if they are selected
 		Iterator<VNode> nodeiter = vg.getNodeIterator();
 		while (nodeiter.hasNext())
 		{
@@ -970,21 +972,29 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			{
 				//Node Name
 				if (bChNodeName.isSelected())
+				{
 					vg.setNodeName(actual.index, GeneralPreferences.replace(sNodeName.getText(), "$ID",""+actual.index));
+					changed = true;
+				}
 				//Node Size
 				if (bChNodeSize.isSelected())
+				{
 					actual.setSize(iNodeSize.getValue());
+					changed = true;
+				}
 				actual = cNodeName.modifyNode(actual);
+				changed = true;
 			} //end if selected
 		} //end while
-		
+		return changed;
 	}
 	/**
 	 * Modify selected Edges - set all checked Values in each selected Edge
 	 *
 	 */
-	private void modifyEdges()
+	private boolean modifyEdges()
 	{
+		boolean changed = false;
 		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
 		while (edgeiter.hasNext())
 		{
@@ -999,22 +1009,34 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 					t = GeneralPreferences.replace(t,"$SID",vg.getEdgeProperties(actual.index).get(MGraph.EDGESTARTINDEX)+"");
 					t = GeneralPreferences.replace(t,"$EID",vg.getEdgeProperties(actual.index).get(MGraph.EDGEENDINDEX)+"");
 					vg.setEdgeName(actual.index, t);
+					changed=true;
 				}
 				if (bChEdgeValue.isSelected())
+				{
 					vg.getMathGraph().setEdgeValue(actual.index, iEdgeValue.getValue());
+					changed=true;
+				}
 				if (bChEdgeWidth.isSelected())
+				{
 					actual.setWidth(iEdgeWidth.getValue());
-				
+					changed=true;
+				}
 				actual = cText.modifyEdge(actual);
 				actual = cLine.modifyEdge(actual);
 				
 				if (vg.isDirected())
+				{
 					actual = cArrow.modifyEdge(actual);
-
+					changed=true;
+				}
 				if (cLoop!=null) //Loops exist
+				{
 					actual = cLoop.modifyEdge(actual); //Modify Loops
+					changed=true;
+				}
 			} // fi selected
 		} //end while (Edge Iteration
+		return changed;
 	} //end modify Edges
 	
 	//
@@ -1024,11 +1046,13 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	//
 	/**
 	 * modify the selected Edges and Nodes in the SubSets they belong to
+	 * 
+	 * @return true if something was changed, else false
 	 */
-	private void modifySubSets()
+	private boolean modifySubSets()
 	{
 		if (!bChSubSets.isSelected())
-			return; //Don't do it if the user diesn't want to
+			return false; //Don't do it if the user diesn't want to
 		Iterator<VNode> nodeiter = vg.getNodeIterator();
 		while (nodeiter.hasNext())
 		{
@@ -1072,7 +1096,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				}
 			}
 		}
-
+		return true;
 	}
 	/**
 	 * Check the Inputfields of the Position Tab. If Method is Chosen its fields must be filles
@@ -1225,17 +1249,26 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				arrangeCircle();
 			}
 		}
-		GraphMessage startblock = new GraphMessage(0,GraphMessage.START_BLOCK);
+		GraphMessage startblock = new GraphMessage(0,GraphMessage.BLOCK_START|GraphMessage.UPDATED);
 		startblock.setMessagey("Selektion verändert");
 		vg.pushNotify(startblock);
+		int changed = 0;
 		if (show_nodeprop)
-			modifyNodes();
+		{
+			if (modifyNodes())
+				changed |= GraphMessage.NODE;
+		}
 		if (show_edgeprop)
-			modifyEdges();
+		{
+			if (modifyEdges())
+				changed |= GraphMessage.EDGE;
+		}
 		if (show_subsets)
-			modifySubSets();
-		vg.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.UPDATED));
-		vg.pushNotify(new GraphMessage(0,GraphMessage.END_BLOCK));
+		{
+			if (modifySubSets())
+				changed |= GraphMessage.SUBSET;
+		}
+		vg.pushNotify(new GraphMessage(changed,GraphMessage.BLOCK_END));
 		return true;
 	}
 	public void actionPerformed(ActionEvent event) {

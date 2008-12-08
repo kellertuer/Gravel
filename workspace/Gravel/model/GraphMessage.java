@@ -34,14 +34,15 @@ public class GraphMessage {
 	public static int ALL = 0xffff;
 
 	//Status - Actions done
-	public static int UPDATED = 0;
-	public static int ADDED = 1;
-	public static int REMOVED = 2;
-	public static int TRANSLATED = 4;
-	public static int REPLACED = 8;
+	public static int UPDATED = 1;
+	public static int ADDED = 2;
+	public static int REMOVED = 4;
+	public static int TRANSLATED = 8;
+	public static int REPLACED = 16;
 	//Special Stati for Block Updates
-	public static int START_BLOCK = 512;
-	public static int END_BLOCK = 1024;
+	public static int BLOCK_START = 512;
+	public static int BLOCK_END = 1024;
+	public static int BLOCK_ABORT = 2048;
 	
 	private int id, status, type, affected;
 	private String message="";

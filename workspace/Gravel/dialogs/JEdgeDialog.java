@@ -29,6 +29,7 @@ import javax.swing.JOptionPane;
 
 import dialogs.components.*;
 
+import model.GraphMessage;
 import model.MGraph;
 import model.VEdge;
 import model.VEdgeLinestyle;
@@ -753,6 +754,8 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			}
 		
 			//Alles in Ordnung, aendern also loeschen
+			//Als Block
+			graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,oldindex,GraphMessage.UPDATED|GraphMessage.BLOCK_START,GraphMessage.EDGE));
 			graphref.removeEdge(oldindex);
 		}
 		//hinzufuegen
@@ -770,11 +773,13 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 				temp++; //Anzahl Knoten zaehlen
 			}
 		}
+		if (chEdge!=null)//Change edge, end block
+			graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,oldindex,GraphMessage.BLOCK_END,GraphMessage.EDGE));
 		this.dispose();
 		//Text bauen
 		VEdge e = graphref.getEdge(iEdgeIndex.getValue());
 		e = cText.modifyEdge(e);
-		e = cLine.modifyEdge(e);
+		e = cLine.modifyEdge(e);			
 	}
 	/**
 	 * Verify the EdgeType and its Parameter Fields

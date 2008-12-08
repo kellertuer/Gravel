@@ -217,6 +217,14 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 	public void mouseClicked(MouseEvent e)
 	{
 		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //rausrechnen
+		if ((e.getClickCount()==2)&&(e.getModifiers() == MouseEvent.BUTTON1_MASK))
+		{ //Double Click on Node
+			VNode dcn = vg.getNodeinRange(p);
+			if (dcn!=null) //Doubleclick really on Node
+			{
+				new JNodeDialog(dcn,vg);
+			}
+		}
 		if ((e.getModifiers() == MouseEvent.BUTTON3_MASK) || (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.CTRL_MASK)) // mit rechts oder strg links
 		{
 			VNode r = vg.getNodeinRange(p);
