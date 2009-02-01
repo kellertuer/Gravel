@@ -124,7 +124,7 @@ public class GraphMessage {
 	 * Specify a special Message String (for example at the Beginning of a Block
 	 * @param s
 	 */
-	public void setMessagey(String s)
+	public void setMessage(String s)
 	{
 		message = s;
 	}

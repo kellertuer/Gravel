@@ -36,10 +36,13 @@ public class GraphHistoryManager implements Observer
 		String action = "";
 		if ((m.getChangeStatus() & GraphMessage.ADDED) == GraphMessage.ADDED)
 			action = "hinzugefügt";
-		if ((m.getChangeStatus() & GraphMessage.UPDATED) == GraphMessage.UPDATED)
+		else if ((m.getChangeStatus() & GraphMessage.UPDATED) == GraphMessage.UPDATED)
 			action = "verändert";
-		if ((m.getChangeStatus() & GraphMessage.REMOVED) == GraphMessage.REMOVED)
+		else if ((m.getChangeStatus() & GraphMessage.REMOVED) == GraphMessage.REMOVED)
 			action = "entfernt";
+		else 
+			action = "Action #"+m.getChangeStatus();
+
 		if (id > 0)
 		{
 			String type = "unbekannt";
@@ -63,17 +66,24 @@ public class GraphHistoryManager implements Observer
 			}
 			return "Einzelaktion: "+type+" (ID #"+m.getElementID()+") "+action+".";
 		}
+		else if (((m.getAction() & (GraphMessage.NODE|GraphMessage.EDGE)) > 0) &&((m.getAction() & GraphMessage.SELECTION)==GraphMessage.SELECTION))
+		{
+			return "selektierte Knoten/Kanten "+action+".";
+		}
 		if ((m.getChangeStatus()&GraphMessage.BLOCK_START)==GraphMessage.BLOCK_START)
 		{		
 			String type="";
-			if ((m.getAction()&GraphMessage.NODE)==GraphMessage.NODE) //nodes
+			if ((m.getAction()&GraphMessage.NODE)==GraphMessage.NODE)
 				type="Knoten";
-			else if ((m.getAction()&GraphMessage.EDGE)==GraphMessage.EDGE) //edges
+			else if ((m.getAction()&GraphMessage.EDGE)==GraphMessage.EDGE)
 				type="Kanten";
-			else if ((m.getAction()&GraphMessage.SUBSET)==GraphMessage.SUBSET) //edges
-				type="Untergraphen";			
-			return "Blockaktion auf "+type +"("+action+")";
-			
+			else if ((m.getAction()&GraphMessage.SUBSET)==GraphMessage.SUBSET) 
+				type="Untergraphen";
+			else if ((m.getAction()&GraphMessage.SELECTION)==GraphMessage.SELECTION) 
+				type="Untergraphen";
+			else
+				type=" #"+(m.getAction()&127);
+			return "Blockaktion auf "+type +"("+action+")";			
 		}
 		return "--unknown ("+m.toString()+") ---";
 	}
@@ -88,9 +98,10 @@ public class GraphHistoryManager implements Observer
 			{
 				if (blockdepth > 0)
 				{
+//					System.err.println("Block ended #"+(blockdepth)+".");	
 					blockdepth--;
-					//System.err.println("Block ended #"+(blockdepth+1)+".");
 				}
+				//If We left Block #1 or never were in a Bock set active and give info about block
 				if (blockdepth==0)
 				{
 					active = true;
@@ -106,7 +117,7 @@ public class GraphHistoryManager implements Observer
 			if ((m.getChangeStatus()&GraphMessage.BLOCK_START)==GraphMessage.BLOCK_START)
 			{
 					blockdepth++;
-				//	System.err.println("Block startet #"+(blockdepth)+".");	
+//					System.err.println("Block startet #"+(blockdepth)+".");	
 				if (blockdepth==1)
 				{
 					active = false;
@@ -116,7 +127,7 @@ public class GraphHistoryManager implements Observer
 			}			
 			if (!active)
 				return;
-			if (m.getElementID() > 0)
+			if (m.getElementID() !=0) //Temporary Node not mentioning
 				System.err.println(getStatus(m));			
 		}
 	}

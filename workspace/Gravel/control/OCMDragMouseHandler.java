@@ -129,12 +129,13 @@ public class OCMDragMouseHandler extends DragMouseHandler
 			}
 			else
 			{
-				if (!vg.selectedNodeExists()) //Es m�ssen welche selektiert sein
+				if (!vg.selectedNodeExists()) //Es müssen welche selektiert sein
 					return;
 				if (vg.getNodeinRange(p)==null) //Es muss auf einem Knoten sein, der...
 					return;
 				if (!((vg.getNodeinRange(p).getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)) //selektiert ist
 					return;
+				//Temp Node index #0 erstellen in weiß
 				DragNode = new VNode(0,p.x,p.y,1,0,0,0,false);
 				DragNode.addColor(Color.white);
 				vg.addNode(DragNode,"-");
@@ -166,25 +167,28 @@ public class OCMDragMouseHandler extends DragMouseHandler
 			if (EndNode!=null)
 			{
 				if (!multiple)
-				{
+				{ //Only One Edge created
 					int i = vg.getNextEdgeIndex();
 					if ((StartNode.index==EndNode.index)&&(vg.isLoopAllowed()))
 					{
 						VLoopEdge t = new VLoopEdge(i,gp.getIntValue("edge.width"),gp.getIntValue("edge.looplength"),gp.getIntValue("edge.loopdirection"),(double)gp.getIntValue("edge.loopproportion")/100.0d,gp.getBoolValue("edge.loopclockwise"));
 						vg.addEdge(t,StartNode.index,EndNode.index,gp.getIntValue("edge.value"),gp.getEdgeName(i,StartNode.index,EndNode.index));							
+						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDED,GraphMessage.EDGE|GraphMessage.NODE));
 					}
 					else if (StartNode.index!=EndNode.index)
-						vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),
+					{	vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),
 									StartNode.index,
 									EndNode.index,
 									gp.getIntValue("edge.value"),
 									gp.getEdgeName(i,StartNode.index,EndNode.index));
+						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDED,GraphMessage.EDGE|GraphMessage.NODE));
+					}
 				}
 				else if (DragNode!=null)
 				{	
 						vg.addEdgesfromSelectedNodes(EndNode);
+						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END|GraphMessage.ADDED));
 				}
-				vg.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.BLOCK_END));
 			}
 			else if ((DragNode!=null)&&(!firstdrag)) //We had a drag
 			{

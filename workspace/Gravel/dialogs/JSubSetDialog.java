@@ -359,7 +359,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 					JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Untergraphen Nicht m"+main.CONST.html_oe+"glich.<br><br>Die Farbe ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				startblock.setMessagey("Untergraph #"+SetIndex+"erstellt");
+				startblock.setMessage("Untergraph #"+SetIndex+"erstellt");
 				graphref.pushNotify(startblock);
 			}
 			else //2. Untergraphenaenderungsdialog
@@ -378,7 +378,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 					return;
 				}
 				//Sonst läßt sich das alles ändern, also entfernen
-				startblock.setMessagey("Untergraph #"+SetIndex+" verändert");
+				startblock.setMessage("Untergraph #"+SetIndex+" verändert");
 				graphref.pushNotify(startblock);
 				graphref.removeSubSet(oldindex);
 			}

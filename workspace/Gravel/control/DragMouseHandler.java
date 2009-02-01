@@ -83,7 +83,9 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 	}
 	/**
 	 * Update the selection of nodes and edges in the rectangle the user just dragges 
-	 * on the background to the new status given and set all non selected to nonsoft
+	 * on the background to the new status. This status can be specified, so that the rectanlge might be used for different modi
+	 *
+	 * Everithing in the rectangle gets status activated, everything else deactivated
 	 *
 	 * @param the status the selection is set to resp. the non selected part is removed from
 	 */
@@ -174,6 +176,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		boolean alt = ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK); // alt ?
 		boolean shift = ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK); //shift ?
 		boolean cpnonactive = ((vg.getControlPointinRange(p,gp.getIntValue("vgraphic.cpsize"))==null)||(!gp.getBoolValue("vgraphic.cpshow")));
+		
 		if ((!alt)&&(!shift))
 		{// insgesamt auf dem Hintergrund ohne shift und ohne alt
 			if ((inrangeN==null)&&(vg.getEdgeinRange(p,2.0d)==null)&&(cpnonactive))
@@ -213,8 +216,10 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		}
 	}
 	/**
-	 * inherited from MouseDRagHanlder
+	 * inherited from MouseDragHandler
 	 * handles the general work of while dragging the mouse such as mooving the selected elements
+	 * 
+	 * Handles all ALT-pressed-Stuff because thats equal for both modes
 	 */
 	public void mouseDragged(MouseEvent e) 
 	{
@@ -245,7 +250,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 					distance = 0;
 				movingNode.setNameDistance(distance); //Y Richtung setzt Distance
 				movingNode.setNameRotation(rotation); //X Setzt Rotation
-				if (firstdrag)
+				if (firstdrag) //Begin drag with a Block-Notification
 					vg.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.BLOCK_START|GraphMessage.UPDATED));
 				else		
 					vg.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.UPDATED));
@@ -258,22 +263,21 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 				else if (arrpos<0.0f)
 					arrpos = 0.0f;
 				movingEdge.setArrowPos(arrpos);
-				if (firstdrag)
+				if (firstdrag) //Begin Drag with a Block Start-Notification
 					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_START|GraphMessage.UPDATED));
 				else		
 					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATED));
 			}
 			else if (((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK)&&(multiplemoving))
-			{ //Moving multiple elements
+			{ //Shift + Alt + Multiple Moving multiple elements
 				if (multipleisNode)
 					moveSelNodes(x,y);
 				else
 					moveSelEdges(x,y);
-				if (firstdrag)
+				if (firstdrag) //Begin drag with a Block Start Notification
 					vg.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.BLOCK_START|GraphMessage.UPDATED));
 				else		
-					vg.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATED));
-				
+					vg.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATED));				
 			}
 		} //End handling ALT
 		//Handling selection Rectangle
@@ -327,7 +331,6 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 				temp.setNameRotation(rotation); //X Setzt Rotation
 			}
 		}
-		vg.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.UPDATED));
 	}
 	/**
 	 * moving selected Edges. The start and end point might not be moved, but every controlpoint is moved
@@ -352,7 +355,6 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 				temp.setArrowPos(arrpos);
 			}
 		}
-		vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATED));
 	}
 	/**
 	 * And any motion of nodes if movemnt was activ
@@ -393,12 +395,14 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 	private void reset()
 	{
 		//Only if a Block was started: End it...
-		if (movingNode!=null)
+		if (movingNode!=null) //Single Node Handled
 			vg.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.BLOCK_END));
-		else if (movingEdge!=null)
+		else if (movingEdge!=null) //Single Edge Handled
 			vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END));
-		else if (multiplemoving&&(!firstdrag))
+		else if (multiplemoving&&(!firstdrag)) //Multiple (really!) Handled
 			vg.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.BLOCK_END));
+		if (selrect!=null) //We had an rectangle, Houston, We had a rectangle
+			vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.BLOCK_END));
 		movingNode=null;
 		movingEdge=null;
 		altwaspressed=false;

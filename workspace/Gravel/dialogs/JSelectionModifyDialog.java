@@ -1249,25 +1249,24 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				arrangeCircle();
 			}
 		}
-		GraphMessage startblock = new GraphMessage(0,GraphMessage.BLOCK_START|GraphMessage.UPDATED);
-		startblock.setMessagey("Selektion verändert");
-		vg.pushNotify(startblock);
 		int changed = 0;
 		if (show_nodeprop)
-		{
-			if (modifyNodes())
 				changed |= GraphMessage.NODE;
-		}
 		if (show_edgeprop)
-		{
-			if (modifyEdges())
 				changed |= GraphMessage.EDGE;
-		}
 		if (show_subsets)
-		{
-			if (modifySubSets())
 				changed |= GraphMessage.SUBSET;
-		}
+		System.err.println("CH"+changed);
+		GraphMessage startblock = new GraphMessage(changed,GraphMessage.BLOCK_START|GraphMessage.UPDATED);
+		startblock.setMessage("Selektion verändert");
+		vg.pushNotify(startblock);
+		if (show_nodeprop)
+			modifyNodes();
+		if (show_edgeprop)
+			modifyEdges();
+		if (show_subsets)
+			modifySubSets();
+		
 		vg.pushNotify(new GraphMessage(changed,GraphMessage.BLOCK_END));
 		return true;
 	}

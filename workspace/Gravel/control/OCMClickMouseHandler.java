@@ -28,15 +28,7 @@ public class OCMClickMouseHandler extends ClickMouseHandler {
 	/*
 	 * Mouse Listener fuer Tastenaktionen
 	 */
-	/**
-	 * no mode special actions in the case the mouse button is pressed
-	 */
 	public void mousePressed(MouseEvent e) {}
-
-	/**
-	 * if you click on the background in this mode, a node is created
-	 * 
-	 */
 	public void mouseClicked(MouseEvent e) 
 	{
 		super.mouseClicked(e);
@@ -51,15 +43,8 @@ public class OCMClickMouseHandler extends ClickMouseHandler {
 				vg.deselect();
 			}	
 		}
-		if (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.SHIFT_MASK) // mit SHIFTlinks angeklickt, Selektion erweitern
-		{} //superclass handles them 
-		else if ((e.getModifiers() == MouseEvent.BUTTON3_MASK) || (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.CTRL_MASK)) // mit rechts oder strg links
-		{} //moved this part to super()
-	}
-	
+	}	
 	public void mouseEntered(MouseEvent e) {}
-
 	public void mouseExited(MouseEvent e) {}
-
 	public void mouseReleased(MouseEvent e) {}
 }

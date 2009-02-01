@@ -104,17 +104,16 @@ public class StandardDragMouseHandler extends DragMouseHandler
 		super.mouseDragged(e);
 		if ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)
 			return; //No ALT Handling here
-		//Falls sich die Maus von Pressed bis Released bewegt hat...transalte alle selected Nodes
-		//getX und getY heben dabei die Scrollposition auf die sonst mit MouseTempPos auch abgezogen wird.		
+		//Get Movement since begin of Drag
 		Point p = new Point(e.getPoint().x-MouseOffSet.x, e.getPoint().y-MouseOffSet.y);
-		//Bewegung des aktuellen objektes im Graphen (ohne Zoom
+		//Actual Movement in the graph (without Zoom)
 		int Gtransx = Math.round(p.x/((float)gp.getIntValue("vgraphic.zoom")/100));
 		int Gtransy = Math.round(p.y/((float)gp.getIntValue("vgraphic.zoom")/100));
 		//Position im Graphen (ohne Zoom)
 		Point GPos = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100)));
 		//Das ist die Bewegung p
 		if ((((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))&&(movingNode!=null)) //shift n drag == Selection bewegen
-		{
+		{ //Move all Selected Nodes
 			Iterator<VNode> nodeiter = vg.getNodeIterator();
 			while (nodeiter.hasNext()) // drawNodes
 			{
@@ -138,11 +137,11 @@ public class StandardDragMouseHandler extends DragMouseHandler
 					translateAdjacentEdges(temp.index, Gtransx,Gtransy);
 				}
 			}
-			if (firstdrag)
-				vg.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATED|GraphMessage.BLOCK_START)); //Kanten aktualisiert
+			if (firstdrag) //First Drag: Start a Block for the Movement else just update
+				vg.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATED|GraphMessage.BLOCK_START));
 			else
 				vg.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATED));
-		}
+		} //End Shift
 		else if (movingNode!=null) //ohne Shift ohne alt - gibt es einen Knoten r auf dem Mausposition, der nicht selektiert ist ?
 		{
 			Point newpos = movingNode.getPosition();
@@ -159,8 +158,8 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			}
 			translateAdjacentEdges(movingNode.index,Gtransx,Gtransy);	
 			movingNode.setPosition(GPos);
-			if (firstdrag)
-				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.index,GraphMessage.UPDATED|GraphMessage.BLOCK_START,GraphMessage.NODE|GraphMessage.EDGE)); //Kanten aktualisiert
+			if (firstdrag) //Start Block for Node Movement else just update graphic
+				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.index,GraphMessage.UPDATED|GraphMessage.BLOCK_START,GraphMessage.NODE|GraphMessage.EDGE));
 			else
 				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.index,GraphMessage.UPDATED,GraphMessage.NODE|GraphMessage.EDGE)); //Kanten aktualisiert
 		}
@@ -182,7 +181,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			}
 			points.set(movingControlPointIndex, GPos);
 			movingControlPointEdge.setControlPoints(points);
-			if (firstdrag)
+			if (firstdrag) //On First Drag Movement start a Block for CP-Movement else just update it
 				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,movingControlPointEdge.index,GraphMessage.UPDATED|GraphMessage.BLOCK_START,GraphMessage.EDGE)); //Kanten aktualisiert
 			else
 				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,movingControlPointEdge.index,GraphMessage.UPDATED,GraphMessage.EDGE)); //Kanten aktualisiert
@@ -247,9 +246,8 @@ public class StandardDragMouseHandler extends DragMouseHandler
 		}
 		if (!((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))
 		{ //No Shift - Snap the moving node (if existent) to grid
-			if ((movingNode!=null)&&gridorientated) //nur dann zum grid snappen
+			if ((movingNode!=null)&&gridorientated)
 			{ //nur ein Knoten wurde bewegt, snap to grid	
-				
 				int xdistanceupper = movingNode.getPosition().x%gridx;
 				int xdistancelower = gridx-xdistanceupper;
 				int ydistanceupper = movingNode.getPosition().y%gridy;
@@ -265,17 +263,17 @@ public class StandardDragMouseHandler extends DragMouseHandler
 					newpos.y =  (new Double(Math.floor((double)movingNode.getPosition().y/(double)gridy)).intValue())*gridy;
 				movingNode.setPosition(newpos);	
 			}
-			if (movingNode!=null)
-				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.index,GraphMessage.UPDATED|GraphMessage.BLOCK_END,GraphMessage.NODE|GraphMessage.EDGE)); //Kanten aktualisiert
-			else if (movingControlPointEdge!=null)
+			if (movingNode!=null) //End Nove Movement-Block
+				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.index,GraphMessage.UPDATED|GraphMessage.BLOCK_END,GraphMessage.NODE|GraphMessage.EDGE));
+			else if (movingControlPointEdge!=null) //End Edge-CP Movement-Block
 				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,movingControlPointEdge.index,GraphMessage.UPDATED|GraphMessage.BLOCK_END,GraphMessage.EDGE)); //Kanten aktualisiert
-			else
-				vg.pushNotify(new GraphMessage(GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.BLOCK_END));
 			movingNode=null;
 			movingControlPointEdge=null;
 			movingControlPointIndex = -1;
-			firstdrag = true;
 		}
-	}
+		else if (!firstdrag) //With Shift and a real drag
+			vg.pushNotify(new GraphMessage(GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.BLOCK_END));
 
+		firstdrag = true;
+	}
 }

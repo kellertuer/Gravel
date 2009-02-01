@@ -113,7 +113,7 @@ public class VGraph extends Observable {
 		}
 		setChanged();
 		notifyObservers(
-			new GraphMessage(GraphMessage.SELECTION, //Changed
+			new GraphMessage(GraphMessage.SELECTION|GraphMessage.NODE|GraphMessage.EDGE, //Changed
 							GraphMessage.REMOVED, //Status 
 							GraphMessage.NODE|GraphMessage.EDGE|GraphMessage.SELECTION) //Affected		
 		);		
