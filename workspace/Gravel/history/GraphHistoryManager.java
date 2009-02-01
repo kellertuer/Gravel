@@ -87,6 +87,7 @@ public class GraphHistoryManager implements Observer
 		}
 		return "--unknown ("+m.toString()+") ---";
 	}
+	
 	public void update(Observable o, Object arg) 
 	{
 		GraphMessage m = (GraphMessage) arg;
@@ -98,7 +99,6 @@ public class GraphHistoryManager implements Observer
 			{
 				if (blockdepth > 0)
 				{
-//					System.err.println("Block ended #"+(blockdepth)+".");	
 					blockdepth--;
 				}
 				//If We left Block #1 or never were in a Bock set active and give info about block
@@ -106,7 +106,12 @@ public class GraphHistoryManager implements Observer
 				{
 					active = true;
 					if (((m.getChangeStatus() & GraphMessage.BLOCK_ABORT) != GraphMessage.BLOCK_ABORT) && (Blockstart!=null))
+					{
 						System.err.println(getStatus(Blockstart)+" (Blockaktion)");
+						/*
+						 * Handle Block Action here 
+						 */
+					}
 					else if(Blockstart!=null)
 						System.err.println("Aborted Block");
 					Blockstart=null;
@@ -114,10 +119,9 @@ public class GraphHistoryManager implements Observer
 				}
 				return;
 			}
-			if ((m.getChangeStatus()&GraphMessage.BLOCK_START)==GraphMessage.BLOCK_START)
+			else if ((m.getChangeStatus()&GraphMessage.BLOCK_START)==GraphMessage.BLOCK_START)
 			{
 					blockdepth++;
-//					System.err.println("Block startet #"+(blockdepth)+".");	
 				if (blockdepth==1)
 				{
 					active = false;
@@ -127,8 +131,13 @@ public class GraphHistoryManager implements Observer
 			}			
 			if (!active)
 				return;
-			if (m.getElementID() !=0) //Temporary Node not mentioning
+			if (m.getElementID() != 0) //Temporary Node not mentioning
+			{
 				System.err.println(getStatus(m));			
+				/*
+				 * Handle single actions here
+				 */
+			}
 		}
 	}
 	

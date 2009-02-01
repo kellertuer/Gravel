@@ -109,7 +109,7 @@ public class VNode extends VItem {
 				int a=colour.getAlpha()*setCount - newc.getAlpha();
 				int g=colour.getGreen()*setCount - newc.getGreen();
 				int r=colour.getRed()*setCount - newc.getRed();
-				//Durch Rundungsfehler k�nnen dabei negative werte entstehen, diese also verhindern
+				//Durch Rundungsfehler können dabei negative werte entstehen, diese also verhindern
 				if (b<0) b=0;
 				if (a<0) a=0;
 				if (r<0) r=0;

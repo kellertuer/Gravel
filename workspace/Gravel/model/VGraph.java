@@ -311,6 +311,7 @@ public class VGraph extends Observable {
 		{
 			VNode v = n2.next();
 			VNode nodeclone = new VNode(v.index,v.getPosition().x,v.getPosition().y,v.getSize(),v.getNameDistance(),v.getNameRotation(), v.getNameSize(),v.isNameVisible());
+			nodeclone.setSelectedStatus(v.getSelectedStatus());
 			clone.addNode(nodeclone, mG.getNodeName(v.index));
 			//In alle Sets einfuegen
 			n1 = vSubSets.iterator();
@@ -326,6 +327,7 @@ public class VGraph extends Observable {
 		while (n3.hasNext())
 		{
 			VEdge cloneEdge = n3.next().clone();
+			cloneEdge.setSelectedStatus(this.getEdge(cloneEdge.index).getSelectedStatus());
 			Vector<Integer> values = mG.getEdgeProperties(cloneEdge.index);
 			clone.addEdge(cloneEdge,values.elementAt(MGraph.EDGESTARTINDEX),values.elementAt(MGraph.EDGEENDINDEX),values.elementAt(MGraph.EDGEVALUE));
 			//Name klonen
