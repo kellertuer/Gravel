@@ -1,6 +1,5 @@
 package view;
 
-import history.GraphHistoryManager;
 import io.GeneralPreferences;
 
 import java.awt.*;

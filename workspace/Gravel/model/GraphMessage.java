@@ -23,26 +23,26 @@ package model;
 public class GraphMessage {
 	
 	//Type of change
-	public static int NODE = 1;
-	public static int EDGE = 2;
-	public static int SUBSET = 4;
-	public static int ALL_ELEMENTS=7;
-	public static int SELECTION = 8;
-	public static int DIRECTION = 16;
-	public static int LOOPS = 32;
-	public static int MULTIPLE = 64;
-	public static int ALL = 0xffff;
+	public static final int NODE = 1;
+	public static final int EDGE = 2;
+	public static final int SUBSET = 4;
+	public static final int ALL_ELEMENTS=7;
+	public static final int SELECTION = 8;
+	public static final int DIRECTION = 16;
+	public static final int LOOPS = 32;
+	public static final int MULTIPLE = 64;
+	public static final int ALL = 0xffff;
 
 	//Status - Actions done
-	public static int UPDATED = 1;
-	public static int ADDED = 2;
-	public static int REMOVED = 4;
-	public static int TRANSLATED = 8;
-	public static int REPLACED = 16;
+	public static final int UPDATED = 1;
+	public static final int ADDED = 2;
+	public static final int REMOVED = 4;
+	public static final int TRANSLATED = 8;
+	public static final int REPLACED = 16;
 	//Special Stati for Block Updates
-	public static int BLOCK_START = 512;
-	public static int BLOCK_END = 1024;
-	public static int BLOCK_ABORT = 2048;
+	public static final int BLOCK_START = 512;
+	public static final int BLOCK_END = 1024;
+	public static final int BLOCK_ABORT = 2048;
 	
 	private int id, status, type, affected;
 	private String message="";
