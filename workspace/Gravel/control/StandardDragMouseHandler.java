@@ -138,9 +138,9 @@ public class StandardDragMouseHandler extends DragMouseHandler
 				}
 			}
 			if (firstdrag) //First Drag: Start a Block for the Movement else just update
-				vg.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATED|GraphMessage.BLOCK_START));
+				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.UPDATED|GraphMessage.BLOCK_START));
 			else
-				vg.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATED));
+				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.UPDATED));
 		} //End Shift
 		else if (movingNode!=null) //ohne Shift ohne alt - gibt es einen Knoten r auf dem Mausposition, der nicht selektiert ist ?
 		{
@@ -272,7 +272,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			movingControlPointIndex = -1;
 		}
 		else if (!firstdrag) //With Shift and a real drag
-			vg.pushNotify(new GraphMessage(GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.BLOCK_END));
+			vg.pushNotify(new GraphMessage(GraphMessage.NODE|GraphMessage.EDGE|GraphMessage.SELECTION,GraphMessage.BLOCK_END));
 
 		firstdrag = true;
 	}

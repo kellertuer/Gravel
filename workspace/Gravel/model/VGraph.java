@@ -309,17 +309,15 @@ public class VGraph extends Observable {
 		Iterator<VNode> n2 = vNodes.iterator();
 		while (n2.hasNext())
 		{
-			VNode v = n2.next();
-			VNode nodeclone = new VNode(v.index,v.getPosition().x,v.getPosition().y,v.getSize(),v.getNameDistance(),v.getNameRotation(), v.getNameSize(),v.isNameVisible());
-			nodeclone.setSelectedStatus(v.getSelectedStatus());
-			clone.addNode(nodeclone, mG.getNodeName(v.index));
+			VNode nodeclone = n2.next().clone();
+			clone.addNode(nodeclone, mG.getNodeName(nodeclone.index));
 			//In alle Sets einfuegen
 			n1 = vSubSets.iterator();
 			while (n1.hasNext())
 			{
 				VSubSet actualSet = n1.next();
-				if (this.SubSetcontainsNode(v.index,actualSet.index))
-					clone.addNodetoSubSet(v.index,actualSet.index); //In jedes Set setzen wo er war
+				if (this.SubSetcontainsNode(nodeclone.index,actualSet.index))
+					clone.addNodetoSubSet(nodeclone.index,actualSet.index); //In jedes Set setzen wo er war
 			}
 		}
 		//Analog Kanten
@@ -1293,10 +1291,10 @@ public class VGraph extends Observable {
 	 * 				Color of the new Set (that is given to the nodes or edges in this set or the sets boundary)
 	 */
 	public void addSubSet(int SetIndex, String SetName, Color SetColor) {
-		if (mG.existsSubSet(SetIndex))
+		if (getSubSet(SetIndex)!=null)
 			return;
 		mG.addSubSet(SetIndex, SetName);
-		vSubSets.add(new VSubSet(SetIndex, SetColor, this));
+		vSubSets.add(new VSubSet(SetIndex, SetColor));
 		setChanged();
 		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.ADDED,GraphMessage.SUBSET));	
 	}
@@ -1310,7 +1308,7 @@ public class VGraph extends Observable {
 	 */
 	public void removeSubSet(int SetIndex) {
 		VSubSet toDel = null;
-		if (!mG.existsSubSet(SetIndex))
+		if (getSubSet(SetIndex)==null)
 			return;
 		Iterator<VNode> iterNode = vNodes.iterator();
 		while (iterNode.hasNext()) {
@@ -1354,7 +1352,7 @@ public class VGraph extends Observable {
 	 * @see MGraph.addNodetoSet(nodeindex,setindex)
 	 */
 	public void addNodetoSubSet(int nodeindex, int SetIndex) {
-		if ((mG.existsNode(nodeindex)) && (mG.existsSubSet(SetIndex))
+		if ((mG.existsNode(nodeindex)) && (mG.getSubSet(SetIndex)!=null)
 				&& (!mG.SubSetcontainsNode(nodeindex, SetIndex))) {
 			// Mathematisch hinzufuegen
 			mG.addNodetoSubSet(nodeindex, SetIndex);
@@ -1430,7 +1428,7 @@ public class VGraph extends Observable {
 	 */
 	public void addEdgetoSubSet(int edgeindex, int SetIndex) {
 		if ((mG.getEdgeProperties(edgeindex) != null)
-				&& (mG.existsSubSet(SetIndex))
+				&& (mG.getSubSet(SetIndex)!=null)
 				&& (!mG.SubSetcontainsEdge(edgeindex, SetIndex))) {
 			// Mathematisch hinzufuegen
 			mG.addEdgetoSubSet(edgeindex, SetIndex);
@@ -1523,6 +1521,47 @@ public class VGraph extends Observable {
 		}
 		return null;
 	}
+	/**
+	 * Set the Color of a Subset to a new color. Returns true, if the color was changed, else false.
+	 * The color is not changed, if another Subset already got that color
+	 * @param newcolour
+	 */
+	public boolean setSubSetColor(int SetIndex, Color newcolour)
+	{
+		VSubSet actual=null;
+		Iterator<VSubSet> subsetiter = vSubSets.iterator();
+		while (subsetiter.hasNext())
+		{
+			VSubSet s = subsetiter.next();
+			if (s.getIndex()==SetIndex)
+				actual = s;
+			else if (s.getColor().equals(newcolour))
+				return false;
+		}
+		if (actual==null)
+			return false;
+		Iterator<VNode> nodeiter = vNodes.iterator();
+		while (nodeiter.hasNext())
+		{
+			VNode n = nodeiter.next();
+			if (SubSetcontainsNode(n.index,SetIndex))
+			{
+				n.removeColor(actual.getColor()); n.addColor(newcolour);
+			}
+		}
+		Iterator<VEdge> edgeiter = vEdges.iterator();
+		while (edgeiter.hasNext())
+		{
+			VEdge n = edgeiter.next();
+			if (SubSetcontainsEdge(n.index,SetIndex))
+			{
+				n.removeColor(actual.getColor()); n.addColor(newcolour);
+			}
+		}
+		actual.setColor(newcolour);
+		return true;
+	}
+
 	/**
 	 * get the name of the set with index i
 	 * @param i

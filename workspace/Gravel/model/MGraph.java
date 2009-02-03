@@ -829,7 +829,7 @@ public class MGraph extends Observable
 	 */
 	public void addSubSet(int index, String name)
 	{
-		if (!existsSubSet(index))
+		if (getSubSet(index)==null)
 		{
 			mSubSets.add(new MSubSet(index,name));
 			setChanged();
@@ -866,11 +866,11 @@ public class MGraph extends Observable
 		return false;
 	}
 	/**
-	 * Indicator for the existence of a subset
-	 * @param index subset given by id
-	 * @return true if it exists else false
+	 * Get the Subset specified by the index. If ist does not exists, the Method returns null
+	 * @param index Inddex of the Subset
+	 * @return the subset with the index, if exists, else null
 	 */
-	public boolean existsSubSet(int index)
+	public MSubSet getSubSet(int index)
 	{
 		Iterator<MSubSet> iter = mSubSets.iterator();
 		while (iter.hasNext())
@@ -878,10 +878,10 @@ public class MGraph extends Observable
 			MSubSet actual = iter.next();
 			if (actual.getIndex()==index)
 			{
-				return true;
+				return actual;
 			}
 		}
-		return false;
+		return null;
 	}
 	/**
 	 * Get a free subset index

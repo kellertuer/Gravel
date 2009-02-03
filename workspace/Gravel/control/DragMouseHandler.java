@@ -275,9 +275,9 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 				else
 					moveSelEdges(x,y);
 				if (firstdrag) //Begin drag with a Block Start Notification
-					vg.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.BLOCK_START|GraphMessage.UPDATED));
+					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.BLOCK_START|GraphMessage.UPDATED));
 				else		
-					vg.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATED));				
+					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATED));				
 			}
 		} //End handling ALT
 		//Handling selection Rectangle

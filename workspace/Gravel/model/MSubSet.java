@@ -26,6 +26,18 @@ public class MSubSet
 		setnodes = new BitSet();
 		setedges = new BitSet();
 	}
+	
+	public MSubSet clone()
+	{
+		MSubSet c = new MSubSet(index, SetName);
+		for (int i=0; i < setnodes.size(); i++)
+			if (setnodes.get(i))
+				c.addNode(i);
+		for (int i=0; i < setedges.size(); i++)
+			if (setedges.get(i))
+				c.addEdge(i);
+		return c;
+	}
 	/**
 	 * Indicates whether Node with index i belongs to this subset
 	 * @param i index of a node

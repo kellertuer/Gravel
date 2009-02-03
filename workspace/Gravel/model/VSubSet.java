@@ -1,7 +1,6 @@
 package model;
 
 import java.awt.Color;
-import java.util.Iterator;
 
 /**
  * A Visual SubSet contains the index for identification and the color 
@@ -12,8 +11,6 @@ public class VSubSet {
 	private Color colour;
 	//INdex
 	int index;
-	//Referenz zum vGraphen
-	VGraph vGraph;
 	/**
 	 * Init the Subset
 	 * 
@@ -21,39 +18,26 @@ public class VSubSet {
 	 * @param c color
 	 * @param v corresponding VGRaph that is needed for color changes
 	 */
-	VSubSet(int i, Color c,VGraph v)
+	public VSubSet(int i, Color c)
 	{
 		index = i;
 		colour = c;
-		vGraph =v;
 	}
 	/**
-	 * Update the color of this subset
-	 * removes the color from all nodes and edges it belongs to and adds the new
-	 * @param newcolour
+	 * Set the Color to a new value
+	 * protected because only a graph should to this (!)
+	 * @param n
 	 */
-	public void setColor(Color newcolour)
+	protected void setColor(Color n)
 	{
-		colour = newcolour;
-		Iterator<VNode> nodeiter = vGraph.getNodeIterator();
-		while (nodeiter.hasNext())
-		{
-			VNode n = nodeiter.next();
-			if (vGraph.SubSetcontainsNode(n.index,index))
-			{
-				n.removeColor(colour); n.addColor(newcolour);
-			}
-		}
-		Iterator<VEdge> edgeiter = vGraph.getEdgeIterator();
-		while (edgeiter.hasNext())
-		{
-			VEdge n = edgeiter.next();
-			if (vGraph.SubSetcontainsEdge(n.index,index))
-			{
-				n.removeColor(colour); n.addColor(newcolour);
-			}
-		}
-		colour = newcolour;
+		colour = n;
+	}
+	/**
+	 * Clone the actual VSubset, that is return a copy
+	 */
+	public VSubSet clone()
+	{
+		return new VSubSet(index,colour);
 	}
 	/**
 	 * Get actual Color of the Subset

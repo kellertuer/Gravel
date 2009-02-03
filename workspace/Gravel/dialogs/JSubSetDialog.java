@@ -342,7 +342,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 						colorgone = true;
 			}
 			int SetIndex = iSubSetIndex.getValue();
-			GraphMessage startblock = new GraphMessage(0,GraphMessage.BLOCK_START);
+			GraphMessage startblock = new GraphMessage(GraphMessage.SUBSET, SetIndex, GraphMessage.ADDED|GraphMessage.BLOCK_START, GraphMessage.NODE|GraphMessage.EDGE);
 			//TESTS
 			//1. Falls der Graph neu ist
 			if (chSubSet==null) //neuer Untergraph, index testen
@@ -410,7 +410,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 				}	
 				
 			}
-			graphref.pushNotify(new GraphMessage(0,GraphMessage.BLOCK_END));
+			graphref.pushNotify(new GraphMessage(GraphMessage.SUBSET, SetIndex,GraphMessage.BLOCK_END, GraphMessage.NODE|GraphMessage.EDGE));
 			this.dispose();
 		}
 	}

@@ -1,6 +1,5 @@
 package view;
 
-import history.GraphHistoryManager;
 import io.GeneralPreferences;
 import io.GravelMLReader;
 
@@ -113,8 +112,6 @@ public class Gui implements WindowListener
         MenuBar = new MainMenu(graphpart);
         //Set the menu bar and add the label to the content pane.
     	frame.setJMenuBar(MenuBar);
-    	//TODO : FOR DEBUG
-        GraphHistoryManager g = new GraphHistoryManager(graphpart);
         if (System.getProperty("os.name").toLowerCase().indexOf("mac")!=-1)
         {
         	//The normal way would be just to set the frame Menubar to NULL
@@ -221,6 +218,7 @@ public class Gui implements WindowListener
     public void setVGraph(VGraph vg)
 	{
 		MainGraph.replace(vg);
+		graphpart.getGraphHistoryManager().ResetToNewGraph(vg);
 	}
     public TreeMap<String, String> getStatRows()
     {

@@ -1,5 +1,6 @@
 package view;
 
+import history.GraphHistoryManager;
 import io.GeneralPreferences;
 
 import java.awt.*;
@@ -47,6 +48,7 @@ public class VGraphic extends Component implements 	Observer
 	
 	// VGraph : Die Daten des Graphen
 	private VGraph vG;
+	private GraphHistoryManager vGh;
 	
 	private JViewport vp;
 	
@@ -96,6 +98,7 @@ public class VGraphic extends Component implements 	Observer
 		
 		vG = Graph;
 		vG.addObserver(this); //Die Graphikumgebung als Observer der Datenstruktur eintragen
+		vGh = new GraphHistoryManager(vG);
 		Controls = new HashMap<String,Observable>();
 	}
 	
@@ -308,9 +311,18 @@ public class VGraphic extends Component implements 	Observer
 		}		
 	}
 	
+	/**
+	 * Returns the actual VGraph that is handled in the this GUI
+	 * 
+	 * @return
+	 */
 	public VGraph getVGraph()
 	{
 		return vG;
+	}
+	public GraphHistoryManager getGraphHistoryManager()
+	{
+		return vGh;
 	}
 
 	public void setViewPort(JViewport p)

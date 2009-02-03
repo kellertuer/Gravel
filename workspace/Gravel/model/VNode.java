@@ -35,8 +35,8 @@ public class VNode extends VItem {
 		private int name_distance, name_rotation, name_size;
 		private boolean name_visible=false;
 		
-		private Color colour; //Farbe des Knotens
-		private int setCount; //Anzahl Mengen in denen der Knoten beteiligt ist, f�r Color 
+		protected Color colour; //Farbe des Knotens
+		protected int setCount; //Anzahl Mengen in denen der Knoten beteiligt ist, f�r Color 
 		/**
 		 * 
 		 * @param i
@@ -72,6 +72,12 @@ public class VNode extends VItem {
 			name_rotation = nr;
 			name_size = ns;
 			name_visible = nv;
+		}
+		public VNode clone()
+		{
+			VNode nodeclone = new VNode(index,getPosition().x,getPosition().y,getSize(),getNameDistance(),getNameRotation(), getNameSize(),isNameVisible());
+			nodeclone.setSelectedStatus(getSelectedStatus());
+			return nodeclone;
 		}
 		/**
 		 * Actual Color the actual Color of the node

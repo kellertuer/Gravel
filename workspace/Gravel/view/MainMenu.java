@@ -1,6 +1,7 @@
   package view;
 
 import help.view.HelpPanel;
+import history.GraphHistoryManager;
 import io.GeneralPreferences;
 
 import java.awt.Dimension;
@@ -42,14 +43,18 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 	JRadioButtonMenuItem mVModusNormal,mVModusOCM, mVZoom1,mVZoom2,mVZoom3;
 	JMenuItem mVGrid, mVGDirCh, mVGLoopCh, mVGMultipleCh;
 	JMenuItem mEdDelSelection,mEdModifySelection, mEdArrangeSelection;
+	JMenuItem mEdUndo, mEdRedo;
 	JMenuItem mAVTest,mAVLTD, mAVMAS;
 	JMenuItem mHIndex,mHAbout;
 	JFileDialogs fileDialogs;
 	VGraphic graphpart;
+	GraphHistoryManager GraphHistory;
+	
 	boolean isMac;
 	public MainMenu(VGraphic vgraphic)
 	{
         this.graphpart = vgraphic;
+        GraphHistory = graphpart.getGraphHistoryManager();
         isMac = (System.getProperty("os.name").toLowerCase().indexOf("mac")!=-1);
         createMenuBar();
 		fileDialogs = new JFileDialogs(vgraphic, GeneralPreferences.getInstance().getBoolValue("graph.loadfileonstart"));
@@ -134,7 +139,22 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         if (!isMac) mEdit.setMnemonic(KeyEvent.VK_E);
         add(mEdit);
 
-    	mEdDelSelection = new JMenuItem("Selektion löschen");
+        mEdUndo = new JMenuItem("Wiederrufen");
+       	mEdUndo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,MenuAccModifier));
+        if (!isMac)
+        	mEdUndo.setMnemonic(KeyEvent.VK_U);
+        mEdUndo.addActionListener(this);
+        mEdUndo.setEnabled(GraphHistory.CanUndo());
+        
+        mEdRedo = new JMenuItem("Wiederholen");
+       	mEdRedo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, (java.awt.event.InputEvent.SHIFT_MASK | MenuAccModifier)));
+        if (!isMac)
+        	mEdRedo.setMnemonic(KeyEvent.VK_R);
+        mEdRedo.addActionListener(this);
+        mEdRedo.setEnabled(GraphHistory.CanRedo());
+
+        //Delete Selection
+        mEdDelSelection = new JMenuItem("Selektion löschen");
     	if (isMac)
     		mEdDelSelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, MenuAccModifier));    		
     	else
@@ -161,6 +181,9 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 
     	
     	if (!isMac) mEdit.setMnemonic(KeyEvent.VK_E);
+    	mEdit.add(mEdUndo);
+    	mEdit.add(mEdRedo);
+    	
     	mEdit.add(mEdDelSelection);        
         mEdit.add(mEdModifySelection);
         mEdit.add(mEdArrangeSelection);
@@ -420,6 +443,18 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     		{  
     			Gui.getInstance().showAbout();
     		}
+    		else if (item == mEdUndo)
+    		{
+    			GraphHistory.Undo();
+    			mEdRedo.setEnabled(GraphHistory.CanRedo());
+    			mEdUndo.setEnabled(GraphHistory.CanUndo());
+    		}
+    		else if (item == mEdRedo)
+    		{
+    			GraphHistory.Redo();
+       			mEdRedo.setEnabled(GraphHistory.CanRedo());
+       			mEdUndo.setEnabled(GraphHistory.CanUndo());
+       		}
     		else if (item == mEdDelSelection)
     		{
     			graphpart.getVGraph().removeSelection();
@@ -494,6 +529,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 	        else
 	        	mVGMultipleCh.setText("erlaube Mehrfachkanten");        	
 		}
-		
+		mEdUndo.setEnabled(GraphHistory.CanUndo());
+		mEdRedo.setEnabled(GraphHistory.CanRedo());
 	}
 }

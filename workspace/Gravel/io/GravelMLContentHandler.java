@@ -294,7 +294,7 @@ public class GravelMLContentHandler implements ContentHandler
 			if (sb>255) sb%=256;
 			if ((sr!=0)||(sg!=0)||(sb!=0))
 			{
-				vG.getSubSet(id).setColor(new Color(sr,sg,sb));
+				vG.setSubSetColor(id,new Color(sr,sg,sb));
 			}
 		}
 		data_key="";

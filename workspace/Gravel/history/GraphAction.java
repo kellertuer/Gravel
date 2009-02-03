@@ -1,5 +1,7 @@
 package history;
 
+import java.util.Iterator;
+
 import model.*;
 /**
  * GraphAction represents one single action that can be performed to manipulate a VGraph.
@@ -31,6 +33,7 @@ public class GraphAction {
 	private static final int SUBSET = 4;
 	
 	private Object ActionObject;
+	private MSubSet mathsubset;
 	private int Objecttype;
 	private int Action,StartNode=0, EndNode=0, Value=0;
 	private String name;
@@ -43,7 +46,9 @@ public class GraphAction {
 	 */
 	public GraphAction(VGraph o, int action) throws GraphActionException
 	{
-		ActionObject=o;
+		if (o==null)
+			throw new GraphActionException("Could not Create Action: Graph must not be null.");
+		ActionObject=o.clone();
 		Action=action;
 		if ((action&(CREATE|DELETE))>0) //Create or delete is active
 		{
@@ -62,6 +67,8 @@ public class GraphAction {
 	 */
 	public GraphAction(VNode o, int action, String s) throws GraphActionException
 	{
+		if (o==null)
+			throw new GraphActionException("Could not Create Action: Node must not be null.");
 		ActionObject = o;
 		Action=action;
 		name=s;
@@ -75,9 +82,12 @@ public class GraphAction {
 	 * @param c Color.
 	 * @throws GraphActionException
 	 */
-	public GraphAction(VSubSet o, int action, String s) throws GraphActionException
+	public GraphAction(VSubSet o, int action, MSubSet m, String s) throws GraphActionException
 	{
-		ActionObject = o;
+		if ((o==null)||(m==null))
+			throw new GraphActionException("Could not Create Action: SubSet must not be null.");
+		ActionObject = new VSubSet(o.getIndex(),o.getColor());
+		mathsubset = m.clone();
 		Action=action;
 		name=s;
 		Objecttype=SUBSET;
@@ -94,7 +104,9 @@ public class GraphAction {
 	 */
 	public GraphAction(VEdge o, int action, int s, int e, int v, String name) throws GraphActionException
 	{
-		ActionObject=o;
+		if (o==null)
+			throw new GraphActionException("Could not Create Action: Edge must not be null.");
+		ActionObject=o.clone();
 		Action=action;
 		this.name=name;
 		StartNode=s;
@@ -103,8 +115,9 @@ public class GraphAction {
 		Objecttype=EDGE;
 	}
 	/**
-	 * Replace this object in or with a Graph, and save the replaced object in this one, 
-	 * so twice do or undo is the same graph again
+	 * Replace this object in or with a Graph.
+	 * 
+	 * The replaced element is stored in the action part, so that another replace restores the first situation.
 	 * 
 	 */
 	private VGraph doReplace(VGraph graph) throws GraphActionException
@@ -112,9 +125,10 @@ public class GraphAction {
 		VGraph ret;
 		switch(Objecttype)
 		{
-			case GRAPH: 
+			case GRAPH: //Replace 
 				ret=(VGraph)ActionObject;
-				ActionObject=graph;
+				((VGraph)ActionObject).replace(graph);
+				graph.replace(ret);
 			break;
 			case NODE:
 				VNode n = (VNode)ActionObject;
@@ -179,6 +193,21 @@ public class GraphAction {
 				if ((graph.getSubSet(vs.getIndex())!=null)) //subset exists or one of its Nodes does not
 					throw new GraphActionException("Can't create subset, it already exists or one of its Nodes does not.");
 				graph.addSubSet(vs.getIndex(), name, vs.getColor());
+				//Add Nodes and Edges again
+				Iterator<VNode> nit = graph.getNodeIterator();
+				while (nit.hasNext())
+				{
+					int nindex = nit.next().index;
+					if (mathsubset.containsNode(nindex))
+						graph.addNodetoSubSet(nindex,vs.getIndex());
+				}
+				Iterator<VEdge> eit = graph.getEdgeIterator();
+				while (eit.hasNext())
+				{
+					int eindex = eit.next().index;
+					if (mathsubset.containsEdge(eindex))
+						graph.addEdgetoSubSet(eindex,vs.getIndex());
+				}
 				break;
 		}
 		return graph;
@@ -201,7 +230,7 @@ public class GraphAction {
 				break;
 			case SUBSET:
 				VSubSet vs = (VSubSet)ActionObject;
-				if (graph.getSubSet(vs.getIndex())!=null) //subset does not exists
+				if (graph.getSubSet(vs.getIndex())==null) //subset does not exists
 					throw new GraphActionException("Can't delete subset, none there.");
 				graph.removeSubSet(vs.getIndex());
 				break;
@@ -258,12 +287,12 @@ public class GraphAction {
 			throw new GraphActionException("No Object available for the Action");
 		switch(Action) 
 		{
-			case REPLACE: 
+			case REPLACE:  //Undo a replace is repace itself
 				return doReplace(graph);
-			case CREATE:
-				return doCreate(graph);
-			case DELETE:
+			case CREATE: //Undo a Create is a delete
 				return doDelete(graph);
+			case DELETE: //Undo Delete is Create
+				return doCreate(graph);
 		}
 		throw new GraphActionException("No Action given.");
 
@@ -272,5 +301,10 @@ public class GraphAction {
 	public VGraph UnDoActionOnClone(VGraph g) throws GraphActionException
 	{
 		return UnDoAction(g.clone());
+	}
+	
+	public int getActionType()
+	{
+		return Action;
 	}
 }

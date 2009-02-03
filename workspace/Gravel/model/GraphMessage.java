@@ -22,7 +22,7 @@ package model;
  */
 public class GraphMessage {
 	
-	//Type of change
+	//Type of change (and affection)
 	public static final int NODE = 1;
 	public static final int EDGE = 2;
 	public static final int SUBSET = 4;

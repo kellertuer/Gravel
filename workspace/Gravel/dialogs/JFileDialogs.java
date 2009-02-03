@@ -466,6 +466,7 @@ public class JFileDialogs implements Observer
 		vGc.getVGraph().replace(vg);
 		vGc.getVGraph().getMathGraph().deleteObserver(this);
 		vGc.getVGraph().addObserver(this);
+		vGc.getGraphHistoryManager().ResetToNewGraph(vg);
 		Gui.getInstance().getParentWindow().setTitle(Gui.WindowName);
 	}	
 	
