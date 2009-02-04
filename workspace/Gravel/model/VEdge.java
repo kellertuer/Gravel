@@ -182,7 +182,7 @@ public abstract class VEdge extends VItem {
 	 * Clone the edge, create a new Edge with the same values and return it
 	 */
 	public abstract VEdge clone();
-	/**
+		/**
 	 * returns the path that is suitable for drawing includes the line style
 	 * 
 	 * @param Start Start Node Coordinates
@@ -194,8 +194,19 @@ public abstract class VEdge extends VItem {
 	{
 		return Linestyle.modifyPath(getPath(Start,End,zoom), width, zoom);
 	}
-	protected VEdge copyArrowProperties(VEdge target)
+	/**
+	 * Apply the Properties of this Edge to another (possibly clone) the given parameter edge is modified
+	 * @param target The Edge the Properties should be Applied to
+	 * @return the modified target
+	 */
+	protected VEdge copyCommonProperties(VEdge target)
 	{
+		target.setTextProperties(this.getTextProperties().clone());
+		
+		target.setLinestyle(this.getLinestyle().clone());
+		
+		target.setSelectedStatus(this.getSelectedStatus());
+		
 		target.setArrowAngle(getArrowAngle());
 		target.setArrowPart(getArrowPart());
 		target.setArrowPos(getArrowPos());

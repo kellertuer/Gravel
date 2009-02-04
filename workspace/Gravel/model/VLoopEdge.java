@@ -30,9 +30,7 @@ public class VLoopEdge extends VEdge {
 	public VEdge clone() 
 	{
 		VEdge cloneedge = new VLoopEdge(index,width,length, direction, proportion, clockwise);
-		cloneedge.setTextProperties(this.getTextProperties().clone());
-		cloneedge.setLinestyle(this.getLinestyle().clone());
-		return copyArrowProperties(cloneedge);
+		return copyCommonProperties(cloneedge);
 	}
 
 	public Point getMax() {

@@ -118,7 +118,6 @@ public class JFileDialogs implements Observer
 			if ((s!=null)&&(getExtension(fold)==null)) //nur etwa test angegeben
 			{
 				f = new File (fold.getParent()+"/"+fold.getName()+s);
-				System.err.println("Changed to "+f.getParent()+"/"+f.getName());
 			}
 			else
 				f = fold;

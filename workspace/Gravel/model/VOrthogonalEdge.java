@@ -70,9 +70,7 @@ public class VOrthogonalEdge extends VEdge {
 	public VEdge clone()
 	{
 		VEdge cloneedge = new VOrthogonalEdge(index,width,verticalfirst);
-		cloneedge.setTextProperties(this.getTextProperties().clone());
-		cloneedge.setLinestyle(this.getLinestyle().clone());
-		return copyArrowProperties(cloneedge);
+		return copyCommonProperties(cloneedge);
 	}
 	public boolean PathEquals(VEdge v)
 	{

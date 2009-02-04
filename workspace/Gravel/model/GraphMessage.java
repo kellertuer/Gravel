@@ -34,11 +34,11 @@ public class GraphMessage {
 	public static final int ALL = 0xffff;
 
 	//Status - Actions done
-	public static final int UPDATED = 1;
-	public static final int ADDED = 2;
-	public static final int REMOVED = 4;
-	public static final int TRANSLATED = 8;
-	public static final int REPLACED = 16;
+	public static final int UPDATE = 1;
+	public static final int ADDITION = 2;
+	public static final int REMOVAL = 4;
+	public static final int TRANSLATION = 8;
+	public static final int REPLACEMENT = 16;
 	//Special Stati for Block Updates
 	public static final int BLOCK_START = 512;
 	public static final int BLOCK_END = 1024;

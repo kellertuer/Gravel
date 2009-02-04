@@ -122,7 +122,7 @@ public class RandomVisualize implements VAlgorithmIF {
 						ErgebnisGraph.addEdge(new VStraightLineEdge(e.index,width),e.StartIndex,e.EndIndex,e.Value);
 					}		
 				}
-				ErgebnisGraph.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATED));
+				ErgebnisGraph.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATE));
 			}
 			else
 				return;

@@ -22,15 +22,15 @@ import model.*;
 public class GraphAction {
 
 	//Acion that happened to the Graph
-	public static final int REPLACE = 1;
-	public static final int CREATE = 2;
-	public static final int DELETE = 4;
+	public static final int UPDATE = 1;
+	public static final int ADDITION = 2;
+	public static final int REMOVAL = 4;
 	
 	//Encoding of the internal object used
-	private static final int GRAPH = 0;
 	private static final int NODE = 1;
 	private static final int EDGE = 2;
 	private static final int SUBSET = 4;
+	private static final int GRAPH = 128;
 	
 	private Object ActionObject;
 	private MSubSet mathsubset;
@@ -50,7 +50,7 @@ public class GraphAction {
 			throw new GraphActionException("Could not Create Action: Graph must not be null.");
 		ActionObject=o.clone();
 		Action=action;
-		if ((action&(CREATE|DELETE))>0) //Create or delete is active
+		if ((action&(ADDITION|REMOVAL))>0) //Create or delete is active
 		{
 			ActionObject=null;
 			Action=0;
@@ -62,16 +62,18 @@ public class GraphAction {
 	 * Create New Action inducted by a Node
 	 * @param o the node
 	 * @param action the action
-	 * @param s node name
+	 * @param environment Graph containing the Subsets the node belongs to and (at least) andjacent edges and their second nodes
 	 * @throws GraphActionException
 	 */
-	public GraphAction(VNode o, int action, String s) throws GraphActionException
+	public GraphAction(VNode o, int action, VGraph environment) throws GraphActionException
 	{
-		if (o==null)
-			throw new GraphActionException("Could not Create Action: Node must not be null.");
+		if ((o==null)||(environment==null))
+			throw new GraphActionException("Could not Create Action: Node and environment must not be null.");
+		if (environment.getNode(o.index)==null)
+			throw new GraphActionException("Could not Create Action: Environment must contains at least the node itself.");			
 		ActionObject = o;
 		Action=action;
-		name=s;
+		name=environment.getNodeName(o.index);
 		Objecttype=NODE;
 	}
 	/**
@@ -96,22 +98,21 @@ public class GraphAction {
 	 * Create an Action for Manipulation of an Edge
 	 * @param o The Visual Information of the Edge
 	 * @param action Action Happening to it
-	 * @param s StartNode Index
-	 * @param e Endnnode-Index
-	 * @param v Value of the edge
-	 * @param name name of the edge
+	 * @param environment VGraph containins at least the Start- and Endnode and the Subsets the Edge belongs to
 	 * @throws GraphActionException
 	 */
-	public GraphAction(VEdge o, int action, int s, int e, int v, String name) throws GraphActionException
+	public GraphAction(VEdge o, int action, VGraph environment) throws GraphActionException
 	{
-		if (o==null)
-			throw new GraphActionException("Could not Create Action: Edge must not be null.");
+		if ((o==null)||(environment==null))
+			throw new GraphActionException("Could not Create Action: Edge and Environment must not be null.");
+		if (environment.getEdge(o.index)==null)
+			throw new GraphActionException("Could not Create Action: Environment must contain edge");
 		ActionObject=o.clone();
 		Action=action;
-		this.name=name;
-		StartNode=s;
-		EndNode=e;
-		Value=v;
+		name=environment.getEdgeName(o.index);
+		StartNode=environment.getEdgeProperties(o.index).get(MGraph.EDGESTARTINDEX);
+		EndNode=environment.getEdgeProperties(o.index).get(MGraph.EDGEENDINDEX);
+		Value=environment.getEdgeProperties(o.index).get(MGraph.EDGEVALUE);
 		Objecttype=EDGE;
 	}
 	/**
@@ -126,9 +127,12 @@ public class GraphAction {
 		switch(Objecttype)
 		{
 			case GRAPH: //Replace 
-				ret=(VGraph)ActionObject;
+				ret = new VGraph(((VGraph)ActionObject).isDirected(), ((VGraph)ActionObject).isLoopAllowed(), ((VGraph)ActionObject).isMultipleAllowed());
+				System.err.print("\nReplacing Graph. Status: ret("+ret.NodeCount()+","+ret.EdgeCount()+") Action("+((VGraph)ActionObject).NodeCount()+","+((VGraph)ActionObject).EdgeCount()+") graph("+graph.NodeCount()+","+graph.EdgeCount()+")");
+				ret.replace((VGraph)ActionObject);
 				((VGraph)ActionObject).replace(graph);
-				graph.replace(ret);
+				graph.replace(ret);				
+				System.err.println("\nAfter that: Status: ret("+ret.NodeCount()+","+ret.EdgeCount()+") Action("+((VGraph)ActionObject).NodeCount()+","+((VGraph)ActionObject).EdgeCount()+") graph("+graph.NodeCount()+","+graph.EdgeCount()+")");
 			break;
 			case NODE:
 				VNode n = (VNode)ActionObject;
@@ -149,7 +153,7 @@ public class GraphAction {
 				Value = graph.getEdgeProperties(e.index).get(MGraph.EDGEVALUE);
 				name = graph.getEdgeName(e.index);
 				
-				graph.pushNotify(new GraphMessage(GraphMessage.EDGE,e.index,GraphMessage.UPDATED|GraphMessage.BLOCK_START,GraphMessage.EDGE));
+				graph.pushNotify(new GraphMessage(GraphMessage.EDGE,e.index,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
 				graph.removeEdge(e.index);
 				graph.addEdge(e, StartNode, EndNode, Value, name);
 				graph.pushNotify(new GraphMessage(GraphMessage.EDGE,e.index,GraphMessage.BLOCK_END,GraphMessage.EDGE));
@@ -161,7 +165,7 @@ public class GraphAction {
 					throw new GraphActionException("Can't replace subset, none there.");
 				ActionObject = graph.getSubSetName(vs.getIndex());
 				name = graph.getSubSetName(vs.getIndex());
-				graph.pushNotify(new GraphMessage(GraphMessage.SUBSET,vs.getIndex(),GraphMessage.UPDATED|GraphMessage.BLOCK_START,GraphMessage.ALL_ELEMENTS));
+				graph.pushNotify(new GraphMessage(GraphMessage.SUBSET,vs.getIndex(),GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.ALL_ELEMENTS));
 				graph.removeSubSet(vs.getIndex());
 				graph.addSubSet(vs.getIndex(), name, vs.getColor());
 				graph.pushNotify(new GraphMessage(GraphMessage.SUBSET,vs.getIndex(),GraphMessage.BLOCK_END,GraphMessage.ALL_ELEMENTS));
@@ -219,13 +223,13 @@ public class GraphAction {
 			case NODE:
 				VNode n = (VNode)ActionObject;
 				if (graph.getNode(n.index)==null) //node does not exists
-					throw new GraphActionException("Can't dekete node, none there.");
+					throw new GraphActionException("Can't delete node, none there.");
 				graph.removeNode(n.index);
 				break;
 			case EDGE:
 				VEdge e = (VEdge)ActionObject;
 				if (graph.getEdge(e.index)==null) //edge does not exists
-					throw new GraphActionException("Can't dekete edge, none there.");
+					throw new GraphActionException("Can't delete edge, none there.");
 				graph.removeEdge(e.index);
 				break;
 			case SUBSET:
@@ -233,11 +237,11 @@ public class GraphAction {
 				if (graph.getSubSet(vs.getIndex())==null) //subset does not exists
 					throw new GraphActionException("Can't delete subset, none there.");
 				graph.removeSubSet(vs.getIndex());
+				System.err.println(graph.SubSetCount());
 				break;
 			}
 		return graph;
 	}
-
 	/**
 	 * Apply this Action to a Graph. The graph given as argument is manipulated directly, though returned, too.
 	 * @param graph the graph to be manipulated
@@ -251,11 +255,11 @@ public class GraphAction {
 			throw new GraphActionException("No Object available for the Action");
 		switch(Action) 
 		{
-			case REPLACE: 
+			case UPDATE: 
 				return doReplace(graph);
-			case CREATE:
+			case ADDITION:
 				return doCreate(graph);
-			case DELETE:
+			case REMOVAL:
 				return doDelete(graph);
 		}
 		throw new GraphActionException("No Action given.");
@@ -287,17 +291,23 @@ public class GraphAction {
 			throw new GraphActionException("No Object available for the Action");
 		switch(Action) 
 		{
-			case REPLACE:  //Undo a replace is repace itself
+			case UPDATE:  //Undo a replace is repace itself
 				return doReplace(graph);
-			case CREATE: //Undo a Create is a delete
+			case ADDITION: //Undo a Create is a delete
 				return doDelete(graph);
-			case DELETE: //Undo Delete is Create
+			case REMOVAL: //Undo Delete is Create
 				return doCreate(graph);
 		}
 		throw new GraphActionException("No Action given.");
 
 	}
-	
+	/**
+	 * Undo The Action on the copy of the given graph
+	 * does the same as UndoAction, but on a clone, so the parameter Graph given is unchanged
+	 * @param g
+	 * @return
+	 * @throws GraphActionException
+	 */
 	public VGraph UnDoActionOnClone(VGraph g) throws GraphActionException
 	{
 		return UnDoAction(g.clone());

@@ -1257,7 +1257,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		if (show_subsets)
 				changed |= GraphMessage.SUBSET;
 
-		GraphMessage startblock = new GraphMessage(changed,GraphMessage.BLOCK_START|GraphMessage.UPDATED);
+		GraphMessage startblock = new GraphMessage(changed,GraphMessage.BLOCK_START|GraphMessage.UPDATE);
 		startblock.setMessage("Selektion verändert");
 		vg.pushNotify(startblock);
 		if (show_nodeprop)

@@ -497,7 +497,7 @@ public class VGraphic extends Component implements 	Observer
 			}
 			selColor = new Color(gp.getIntValue("vgraphic.selcolr"),gp.getIntValue("vgraphic.selcolg"),gp.getIntValue("vgraphic.selcolb"));
 			selWidth = gp.getIntValue("vgraphic.selwidth");
-			vG.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATED)); //Zoom and Selection stuff belong to the mark actions on a graph - they don't change the state to "not saved yet"
+			vG.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE)); //Zoom and Selection stuff belong to the mark actions on a graph - they don't change the state to "not saved yet"
 			repaint();
 		}
 	}

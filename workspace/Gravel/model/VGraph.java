@@ -40,8 +40,6 @@ public class VGraph extends Observable {
 
 	private TreeSet<VNode> vNodes;
 	private TreeSet<VEdge> vEdges;
-	// Zuordnung SubSet-Indizes => Color, mehr benötigt man da nicht, rest ist
-	// in MGraph
 	private HashSet<VSubSet> vSubSets;
 	private Lock EdgeLock, NodeLock;
 	private MGraph mG;
@@ -79,7 +77,7 @@ public class VGraph extends Observable {
 			n2.next().deselect();
 		}
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATED));
+		notifyObservers(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE));
 	}
 	/**
 	 * deletes all selected Nodes and Edges. That means, that also all incident Edges of selected Nodes are deleted
@@ -114,7 +112,7 @@ public class VGraph extends Observable {
 		setChanged();
 		notifyObservers(
 			new GraphMessage(GraphMessage.SELECTION|GraphMessage.NODE|GraphMessage.EDGE, //Changed
-							GraphMessage.REMOVED, //Status 
+							GraphMessage.REMOVAL, //Status 
 							GraphMessage.NODE|GraphMessage.EDGE|GraphMessage.SELECTION) //Affected		
 		);		
 	}
@@ -230,7 +228,7 @@ public class VGraph extends Observable {
 		setChanged();
 		notifyObservers(
 				new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION, //Type
-								GraphMessage.UPDATED) //Status 
+								GraphMessage.UPDATE) //Status 
 			);
 		return removed;
 	}
@@ -255,7 +253,7 @@ public class VGraph extends Observable {
 		setChanged();
 		notifyObservers(
 				new GraphMessage(GraphMessage.NODE|GraphMessage.EDGE, //Type
-								GraphMessage.TRANSLATED, //Status 
+								GraphMessage.TRANSLATION, //Status 
 								GraphMessage.NODE|GraphMessage.EDGE|GraphMessage.SELECTION|GraphMessage.SUBSET) //Affected		
 			);
 	}
@@ -281,13 +279,13 @@ public class VGraph extends Observable {
 		mG = anotherone.mG;
 		mG.pushNotify(
 						new GraphMessage(GraphMessage.ALL_ELEMENTS, //Type
-										GraphMessage.UPDATED, //Status 
+										GraphMessage.UPDATE, //Status 
 										GraphMessage.ALL_ELEMENTS) //Affected		
 		);
 		setChanged();
 		notifyObservers(
 				new GraphMessage(GraphMessage.ALL_ELEMENTS, //Type
-						GraphMessage.UPDATED, //Status 
+						GraphMessage.UPDATE, //Status 
 						GraphMessage.ALL_ELEMENTS) //Affected		
 		);
 	}
@@ -325,7 +323,6 @@ public class VGraph extends Observable {
 		while (n3.hasNext())
 		{
 			VEdge cloneEdge = n3.next().clone();
-			cloneEdge.setSelectedStatus(this.getEdge(cloneEdge.index).getSelectedStatus());
 			Vector<Integer> values = mG.getEdgeProperties(cloneEdge.index);
 			clone.addEdge(cloneEdge,values.elementAt(MGraph.EDGESTARTINDEX),values.elementAt(MGraph.EDGEENDINDEX),values.elementAt(MGraph.EDGEVALUE));
 			//Name klonen
@@ -490,7 +487,7 @@ public class VGraph extends Observable {
 			}
 			setChanged();
 			//Loops done, update Edges
-			notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATED,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE,GraphMessage.EDGE));	
 		}
 		return removed;
 	}
@@ -557,7 +554,7 @@ public class VGraph extends Observable {
 			}
 			setChanged();
 			//Allowance Updated, affected the edges
-			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATED,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE,GraphMessage.EDGE));	
 		}
 		return removed;
 
@@ -600,7 +597,7 @@ public class VGraph extends Observable {
 			mG.addNode(node.index, name);
 			setChanged();
 			//Graph changed with an add, only nodes affected
-			notifyObservers(new GraphMessage(GraphMessage.NODE,node.index,GraphMessage.ADDED,GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphMessage.NODE,node.index,GraphMessage.ADDITION,GraphMessage.NODE));	
 		}
 	}
 	/**
@@ -636,7 +633,7 @@ public class VGraph extends Observable {
 	public void setNodeName(int i, String newname) {
 		mG.setNodeName(i, newname);
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.UPDATED,GraphMessage.NODE));	
+		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.UPDATE,GraphMessage.NODE));	
 	}
 	/**
 	 * removes a node and all incident edges
@@ -649,7 +646,7 @@ public class VGraph extends Observable {
 	{
 		removeNode_(i);
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.REMOVED,GraphMessage.ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
 	}
 	/**
 	 * removes a Node from the Graph without notifying the Observers
@@ -757,7 +754,7 @@ public class VGraph extends Observable {
 		temp.setNameVisible(v.isNameVisible());
 		temp.index = v.index;
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,v.index,GraphMessage.UPDATED,GraphMessage.NODE));	
+		notifyObservers(new GraphMessage(GraphMessage.NODE,v.index,GraphMessage.UPDATE,GraphMessage.NODE));	
 	}
 	/**
 	 * get a list of the node names in a vector, where each node name is stored at it's index
@@ -785,7 +782,7 @@ public class VGraph extends Observable {
 	 * 				the source of all new edges
 	 */
 	public void addEdgestoSelectedNodes(VNode Start) {
-		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDED|GraphMessage.BLOCK_START));
+		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDITION|GraphMessage.BLOCK_START));
 		Iterator<VNode> iter = vNodes.iterator();
 		while (iter.hasNext()) 
 		{
@@ -810,7 +807,7 @@ public class VGraph extends Observable {
 	 * 				the target of all new edges
 	 */
 	public void addEdgesfromSelectedNodes(VNode Ende) {
-		this.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDED|GraphMessage.BLOCK_START));
+		this.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDITION|GraphMessage.BLOCK_START));
 		Iterator<VNode> iter = vNodes.iterator();
 		while (iter.hasNext()) 
 		{
@@ -958,7 +955,7 @@ public class VGraph extends Observable {
 			} 
 			finally {EdgeLock.unlock();}
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.EDGE,edge.index,GraphMessage.ADDED,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphMessage.EDGE,edge.index,GraphMessage.ADDITION,GraphMessage.EDGE));	
 		}
 	}
 	/**
@@ -1044,7 +1041,7 @@ public class VGraph extends Observable {
 		if (removeEdge_(i))
 		{
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.REMOVED,GraphMessage.EDGE|GraphMessage.SUBSET|GraphMessage.SELECTION));	
+			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.REMOVAL,GraphMessage.EDGE|GraphMessage.SUBSET|GraphMessage.SELECTION));	
 			return true;
 		}
 		return false;
@@ -1211,7 +1208,7 @@ public class VGraph extends Observable {
 	public void setEdgeName(int i, String newname) {
 		mG.setEdgeName(i, newname);
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.UPDATED,GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.UPDATE,GraphMessage.EDGE));	
 	}
 	/**
 	 * get the Number of edges contained in this graph
@@ -1296,7 +1293,7 @@ public class VGraph extends Observable {
 		mG.addSubSet(SetIndex, SetName);
 		vSubSets.add(new VSubSet(SetIndex, SetColor));
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.ADDED,GraphMessage.SUBSET));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.ADDITION,GraphMessage.SUBSET));	
 	}
 	/**
 	 * remove a set from the VGraph and remove the Sets color from each node or edge contained in the set
@@ -1331,7 +1328,7 @@ public class VGraph extends Observable {
 		vSubSets.remove(toDel);
 		mG.removeSubSet(toDel.getIndex());
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.REMOVED,GraphMessage.ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
 	}
 	/**
 	 * get the smallest subset index beyond all used subset indices
@@ -1368,7 +1365,7 @@ public class VGraph extends Observable {
 		}
 		setChanged();
 		// Knoten wurden verändert und Sets
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATED,GraphMessage.SUBSET|GraphMessage.NODE));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.NODE));	
 	}
 	/**
 	 * remove a node from a set
@@ -1382,7 +1379,7 @@ public class VGraph extends Observable {
 	public void removeNodefromSubSet(int nodeindex, int SetIndex) {
 		removeNodefromSubSet_(nodeindex,SetIndex);		
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATED,GraphMessage.SUBSET|GraphMessage.NODE));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.NODE));	
 	}
 	/**
 	 * remove Node from Sub set without informing the observsers
@@ -1442,7 +1439,7 @@ public class VGraph extends Observable {
 			}
 		}
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATED,GraphMessage.SUBSET|GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.EDGE));	
 	}
 	/**
 	 * remove an edge from a set
@@ -1454,7 +1451,7 @@ public class VGraph extends Observable {
 	public void removeEdgefromSubSet(int edgeindex, int SetIndex) {
 		removeEdgefromSubSet_(edgeindex,SetIndex);
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATED,GraphMessage.SUBSET|GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.EDGE));	
 	}
 	/**
 	 * remove an edge from a set without informing the observers 

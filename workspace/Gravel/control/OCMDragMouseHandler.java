@@ -83,17 +83,17 @@ public class OCMDragMouseHandler extends DragMouseHandler
 				if (!multiple)
 				{
 					int i = vg.getNextEdgeIndex();
-					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_START|GraphMessage.ADDED,GraphMessage.EDGE|GraphMessage.NODE));
+					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_START|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
 					vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),StartNode.index,DragNode.index,gp.getIntValue("edge.value"),"\u22C6");
 				}
 				else
 				{
-					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_START|GraphMessage.ADDED));
+					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_START|GraphMessage.ADDITION));
 					vg.addEdgesfromSelectedNodes(DragNode);
 				}
 			}
 			else
-				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATED));
+				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATE));
 		}
 	}
 
@@ -173,7 +173,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 					{
 						VLoopEdge t = new VLoopEdge(i,gp.getIntValue("edge.width"),gp.getIntValue("edge.looplength"),gp.getIntValue("edge.loopdirection"),(double)gp.getIntValue("edge.loopproportion")/100.0d,gp.getBoolValue("edge.loopclockwise"));
 						vg.addEdge(t,StartNode.index,EndNode.index,gp.getIntValue("edge.value"),gp.getEdgeName(i,StartNode.index,EndNode.index));							
-						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDED,GraphMessage.EDGE|GraphMessage.NODE));
+						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
 					}
 					else if (StartNode.index!=EndNode.index)
 					{	vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),
@@ -181,13 +181,13 @@ public class OCMDragMouseHandler extends DragMouseHandler
 									EndNode.index,
 									gp.getIntValue("edge.value"),
 									gp.getEdgeName(i,StartNode.index,EndNode.index));
-						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDED,GraphMessage.EDGE|GraphMessage.NODE));
+						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
 					}
 				}
 				else if (DragNode!=null)
 				{	
 						vg.addEdgesfromSelectedNodes(EndNode);
-						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END|GraphMessage.ADDED));
+						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END|GraphMessage.ADDITION));
 				}
 			}
 			else if ((DragNode!=null)&&(!firstdrag)) //We had a drag

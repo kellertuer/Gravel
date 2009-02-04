@@ -175,7 +175,7 @@ public class MGraph extends Observable
 		setChanged();
 		notifyObservers(
 				new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION, //Type
-								GraphMessage.UPDATED) //Status 
+								GraphMessage.UPDATE) //Status 
 			);
 
 		return removed;
@@ -222,7 +222,7 @@ public class MGraph extends Observable
 		}	
 		this.allowloops = a;
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATED,GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE,GraphMessage.EDGE));	
 		return removed;
 	}
 	/**
@@ -281,7 +281,7 @@ public class MGraph extends Observable
 		}
 		this.allowmultiple = a;
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATED,GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE,GraphMessage.EDGE));	
 		return removed;
 	}
 
@@ -302,7 +302,7 @@ public class MGraph extends Observable
 			mNodes.add(new MNode(i,n));
 			setChanged();
 			notifyObservers("N"+i);
-			notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.ADDED,GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.ADDITION,GraphMessage.NODE));	
 		} 
 		finally
 		{
@@ -366,7 +366,7 @@ public class MGraph extends Observable
 		}
 		finally {EdgeLock.unlock();}
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.REMOVED,GraphMessage.ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
 		return ergebnis;
 	}
 	/**
@@ -457,7 +457,7 @@ public class MGraph extends Observable
 		if (index!=0) //found the node, notify observers
 		{
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.NODE,index,GraphMessage.UPDATED,GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphMessage.NODE,index,GraphMessage.UPDATE,GraphMessage.NODE));	
 		}
 	}
 	/**
@@ -522,7 +522,7 @@ public class MGraph extends Observable
 			}
 		} finally {NodeLock.unlock();}
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,newindex,GraphMessage.UPDATED,GraphMessage.NODE));	
+		notifyObservers(new GraphMessage(GraphMessage.NODE,newindex,GraphMessage.UPDATE,GraphMessage.NODE));	
 	}
 	
 	//
@@ -564,7 +564,7 @@ public class MGraph extends Observable
 		{
 			mEdges.add(new MEdge(i,s,e,v));
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.ADDED,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.ADDITION,GraphMessage.EDGE));	
 		} 
 		finally
 		{
@@ -604,7 +604,7 @@ public class MGraph extends Observable
 		{
 			mEdges.remove(toDel);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.REMOVED,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.REMOVAL,GraphMessage.EDGE));	
 		}
 	}
 	/**
@@ -689,7 +689,7 @@ public class MGraph extends Observable
 			if (change)
 			{
 				setChanged();
-				notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.UPDATED,GraphMessage.EDGE));	
+				notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.UPDATE,GraphMessage.EDGE));	
 			}
 	}
 	/**
@@ -782,7 +782,7 @@ public class MGraph extends Observable
 		if (change)
 		{
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.UPDATED,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.UPDATE,GraphMessage.EDGE));	
 		}
 	}
 	/**
@@ -833,7 +833,7 @@ public class MGraph extends Observable
 		{
 			mSubSets.add(new MSubSet(index,name));
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,index,GraphMessage.ADDED,GraphMessage.SUBSET));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,index,GraphMessage.ADDITION,GraphMessage.SUBSET));	
 
 		}
 		//TODO if Subsetindex already in use -> Exception ?
@@ -859,7 +859,7 @@ public class MGraph extends Observable
 		{
 			mSubSets.remove(toDelete);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,index,GraphMessage.REMOVED,GraphMessage.ALL_ELEMENTS));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,index,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
 			notifyObservers("S"+index);
 			return true;
 		}
@@ -939,7 +939,7 @@ public class MGraph extends Observable
 		if (change)
 		{
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,index,GraphMessage.UPDATED,GraphMessage.SUBSET));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,index,GraphMessage.UPDATE,GraphMessage.SUBSET));	
 		}
 	}
 	/**
@@ -967,7 +967,7 @@ public class MGraph extends Observable
 		if (change)
 		{
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATED,GraphMessage.SUBSET|GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.NODE));	
 		}
 	}
 	/**
@@ -993,7 +993,7 @@ public class MGraph extends Observable
 		if (change)
 		{
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATED,GraphMessage.SUBSET|GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.NODE));	
 		}
 		return change;
 	}
@@ -1037,7 +1037,7 @@ public class MGraph extends Observable
 			}
 		}
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATED,GraphMessage.SUBSET|GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.EDGE));	
 	}
 	/**
 	 * Removes an edge from a subset, if both exist. If a change is done (edge is also contained in the subset). 
@@ -1066,7 +1066,7 @@ public class MGraph extends Observable
 		if (change)
 		{
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATED,GraphMessage.SUBSET|GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.EDGE));	
 		}
 		return change;
 	}

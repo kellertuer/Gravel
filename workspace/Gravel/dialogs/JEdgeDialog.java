@@ -755,7 +755,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		
 			//Alles in Ordnung, aendern also loeschen
 			//Als Block
-			graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,oldindex,GraphMessage.UPDATED|GraphMessage.BLOCK_START,GraphMessage.EDGE));
+			graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,oldindex,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
 			graphref.removeEdge(oldindex);
 		}
 		//hinzufuegen

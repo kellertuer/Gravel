@@ -89,9 +89,7 @@ public class VSegmentedEdge extends VEdge
 	{
 		Vector<Point> p = (Vector<Point>) points.clone();
 		VEdge cloneedge =  new VSegmentedEdge(index,width,p);
-		cloneedge.setTextProperties(this.getTextProperties().clone());
-		cloneedge.setLinestyle(this.getLinestyle().clone());
-		return copyArrowProperties(cloneedge);
+		return copyCommonProperties(cloneedge);
 	}
 	public boolean PathEquals(VEdge v)
 	{

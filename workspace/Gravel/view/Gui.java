@@ -218,7 +218,7 @@ public class Gui implements WindowListener
     public void setVGraph(VGraph vg)
 	{
 		MainGraph.replace(vg);
-		graphpart.getGraphHistoryManager().ResetToNewGraph(vg);
+		graphpart.getGraphHistoryManager().Reset();
 	}
     public TreeMap<String, String> getStatRows()
     {

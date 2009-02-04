@@ -121,7 +121,7 @@ public class MagnetismAndSprings implements VAlgorithmIF
 			int y = v.getPosition().y + Math.round((new Double(force_y*movepart)).floatValue());
 			movement += Math.abs(Math.round((new Double(force_x*movepart)).floatValue())) + Math.abs(Math.round((new Double(force_y*movepart)).floatValue()));
 			v.setPosition(new Point(x,y));
-			vg.pushNotify(new GraphMessage(GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.UPDATED));
+			vg.pushNotify(new GraphMessage(GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.UPDATE));
 		} //End while
 		//All Nodes moved by a part of its force
 		if (movement==0)

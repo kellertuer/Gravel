@@ -262,7 +262,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 					r.setSelectedStatus(VItem.SELECTED);
 				else
 					r.deselect();
-				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATED));
+				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE));
 			} else {
 				VEdge s = vg.getEdgeinRange(p,2.0);
 				if (s != null) 
@@ -271,7 +271,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 						s.setSelectedStatus(VItem.SELECTED);
 					else
 						s.deselect();
-					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATED));
+					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE));
 				}
 			}
 		}

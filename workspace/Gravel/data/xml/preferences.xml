@@ -34,7 +34,7 @@
 		<value name="text_size" type="Integer">12</value>
 		<value name="text_visible" type="Boolean">false</value>
 		<value name="value" type="Integer">1</value>
-		<value name="width" type="Integer">1</value>
+		<value name="width" type="Integer">2</value>
 	</group>
 	<group name="graph">
 		<value name="allowloops" type="Boolean">true</value>
@@ -57,7 +57,7 @@
 		<value name="name_rotation" type="Integer">270</value>
 		<value name="name_size" type="Integer">12</value>
 		<value name="name_visible" type="Boolean">false</value>
-		<value name="size" type="Integer">8</value>
+		<value name="size" type="Integer">15</value>
 	</group>
 	<group name="pref">
 		<value name="saveonexit" type="Boolean">true</value>
