@@ -324,7 +324,7 @@ public class VGraphic extends Component implements 	Observer
 	{
 		return vGh;
 	}
-
+	
 	public void setViewPort(JViewport p)
 	{
 		vp = p;

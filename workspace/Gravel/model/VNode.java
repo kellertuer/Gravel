@@ -73,6 +73,11 @@ public class VNode extends VItem {
 			name_size = ns;
 			name_visible = nv;
 		}
+		/**
+		 * Returns a Copy of the Node without its Color
+		 * 
+		 * @return Copy
+		 */
 		public VNode clone()
 		{
 			VNode nodeclone = new VNode(index,getPosition().x,getPosition().y,getSize(),getNameDistance(),getNameRotation(), getNameSize(),isNameVisible());

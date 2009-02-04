@@ -45,10 +45,11 @@ public class GraphHistoryManager implements Observer
 		lastGraph.replace(trackedGraph.clone());
 		Blockstart=null;
 		blockdepth=0;
-		UndoStack.clear();
-		RedoStack.clear();
+		UndoStack = new LinkedList<GraphAction>();
+		RedoStack = new LinkedList<GraphAction>();
 		stacksize=10;		
 		trackedGraph.addObserver(this);
+		active=true;
 	}
 	/**
 	 * Change the Graph, for which a History is kept.
@@ -61,64 +62,7 @@ public class GraphHistoryManager implements Observer
 		Reset();
 	}
 	
-	private String getStatus(GraphMessage m)
-	{
-		int id = m.getElementID();
-		String action = "";
-		if ((m.getChangeStatus() & GraphMessage.ADDITION) == GraphMessage.ADDITION)
-			action = "hinzugefügt";
-		else if ((m.getChangeStatus() & GraphMessage.UPDATE) == GraphMessage.UPDATE)
-			action = "verändert";
-		else if ((m.getChangeStatus() & GraphMessage.REMOVAL) == GraphMessage.REMOVAL)
-			action = "entfernt";
-		else 
-			action = "Action #"+m.getChangeStatus();
-
-		if (id > 0)
-		{
-			String type = "unbekannt";
-			if (m.getAction()==GraphMessage.NODE) //Unique because of ID:
-			{
-				type="Knoten";
-				if (trackedGraph.getNode(id)==null)
-						type += " (failed)";
-			}
-			else if (m.getAction()==GraphMessage.EDGE) //Unique because of ID:
-			{
-				type="Kante";
-				if (trackedGraph.getEdge(id)==null)
-						type += " (failed)";
-			}
-			else if (m.getAction()==GraphMessage.SUBSET)
-			{
-				type="Untergraph";
-				if (trackedGraph.getSubSet(id)==null)
-					type += " (failed)";
-			}
-			return "Einzelaktion: "+type+" (ID #"+m.getElementID()+") "+action+".";
-		}
-		else if (((m.getAction() & (GraphMessage.NODE|GraphMessage.EDGE)) > 0) &&((m.getAction() & GraphMessage.SELECTION)==GraphMessage.SELECTION))
-		{
-			return "selektierte Knoten/Kanten "+action+".";
-		}
-		if ((m.getChangeStatus()&GraphMessage.BLOCK_START)==GraphMessage.BLOCK_START)
-		{		
-			String type="";
-			if ((m.getAction()&GraphMessage.NODE)==GraphMessage.NODE)
-				type="Knoten";
-			else if ((m.getAction()&GraphMessage.EDGE)==GraphMessage.EDGE)
-				type="Kanten";
-			else if ((m.getAction()&GraphMessage.SUBSET)==GraphMessage.SUBSET) 
-				type="Untergraphen";
-			else if ((m.getAction()&GraphMessage.SELECTION)==GraphMessage.SELECTION) 
-				type="Selektion";
-			else
-				type=" #"+(m.getAction()&127);
-			return "Blockaktion auf "+type +"("+action+")";			
-		}
-		return "--unknown ("+m.toString()+") ---";
-	}
-	/**
+   /**
 	 * Create an Action based on the message, that came from the Graph,
 	 * return that Action and update LastGraph
 	 * @param m the created Action
@@ -169,7 +113,7 @@ public class GraphHistoryManager implements Observer
 			}
 			catch (GraphActionException e2)
 			{
-				act=null; System.err.println("DEBUG: Edge.added.GraphAction Creation Failed:"+e2.getMessage());
+				act=null; System.err.println("DEBUG: ¢added.GraphAction Creation Failed:"+e2.getMessage());
 			}
 		}
 		else if (m.getAction()==GraphMessage.SUBSET)
@@ -195,11 +139,12 @@ public class GraphHistoryManager implements Observer
 		if ((m.getChangeStatus()&GraphMessage.BLOCK_ABORT)==GraphMessage.BLOCK_ABORT)
 			return; //Don't handle Block-Abort-Stuff
 		GraphAction act = null;
-		if (m.getElementID() > 0) //Message for single stuff
+		//TODO: More Single Stuff here
+		if ((m.getElementID() > 0) && (m.getAction()==GraphMessage.NODE)) //Message for single stuff
 		{
 			act = handleSingleAction(m);
 		}
-		else //multiple modifications, up to know just a replace
+		else //multiple modifications, up to know just a replace */
 		{
 			//Last status in action - Do i have to clone that?
 			try {	act = new GraphAction(lastGraph, GraphAction.UPDATE); }
@@ -219,7 +164,7 @@ public class GraphHistoryManager implements Observer
 			UndoStack.add(act);
 		}
 		else
-			System.err.println("Status:"+getStatus(m)+", I was not able to create Action.");
+			System.err.println("Status:"+m.toString()+", I was not able to create Action.");
 	}
 	
 	public boolean CanUndo()
@@ -249,7 +194,6 @@ public class GraphHistoryManager implements Observer
 			RedoStack.remove();
 		RedoStack.add(LastAction);
 		trackedGraph.addObserver(this); //Activate Tracking again
-		trackedGraph.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.UPDATE));
 	}
 	
 	public boolean CanRedo()
@@ -263,8 +207,8 @@ public class GraphHistoryManager implements Observer
 		trackedGraph.deleteObserver(this); //Deaktivate Tracking
 		GraphAction LastAction = RedoStack.removeLast();
 		try{
-		LastAction.doAction(trackedGraph);
-		LastAction.doAction(lastGraph);
+			LastAction.doAction(trackedGraph);
+			lastGraph = trackedGraph.clone();
 		}
 		catch (GraphActionException e)
 		{
@@ -280,7 +224,7 @@ public class GraphHistoryManager implements Observer
 		GraphMessage m = (GraphMessage) arg;
 		if (m==null)
 			return;
-		if (m.getAction()==GraphMessage.SELECTION) //Nur selektion
+		if (m.getAction()==GraphMessage.SELECTION) //Nur selektion -> Update in Copyx
 		{
 			if (active) //not every update but on ends of blocks
 			{
@@ -288,13 +232,17 @@ public class GraphHistoryManager implements Observer
 				while (ni.hasNext())
 				{
 					VNode n = ni.next();
-					lastGraph.getNode(n.index).setSelectedStatus(n.getSelectedStatus());
+					VNode n2 = lastGraph.getNode(n.index);
+					if (n2!=null)
+						n2.setSelectedStatus(n.getSelectedStatus());
 				}
 				Iterator<VEdge> ei = trackedGraph.getEdgeIterator();
 				while (ei.hasNext())
 				{
 					VEdge e = ei.next();
-					lastGraph.getEdge(e.index).setSelectedStatus(e.getSelectedStatus());
+					VEdge e2 = lastGraph.getEdge(e.index);
+					if (e2!=null)
+						e2.setSelectedStatus(e.getSelectedStatus());
 				}
 			}
 		}
@@ -342,7 +290,6 @@ public class GraphHistoryManager implements Observer
 				return;
 			if (m.getElementID() != 0) //Temporary Node not mentioning
 			{
-				//System.err.println(getStatus(m));			
 				addAction(m);
 			}
 		}
