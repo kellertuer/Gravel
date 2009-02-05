@@ -140,8 +140,9 @@ public class GraphAction {
 				if (graph.getNode(n.index)==null) //node does not exists
 					throw new GraphActionException("Can't replace node, none there.");
 				ActionObject = graph.getNode(n.index).clone(); //save old node
+				String tempname = name;
 				name = graph.getNodeName(n.index); //save old name
-				graph.updateNode(n.index, name, n); //change node in graph
+				graph.updateNode(n.index, tempname, n); //change node in graph
 				ret = graph; //return graph
 			break;
 			case EDGE:
@@ -149,15 +150,20 @@ public class GraphAction {
 				if (graph.getEdge(e.index)==null) //edge does not exists
 					throw new GraphActionException("Can't replace edge, none there.");
 				ActionObject = graph.getEdge(e.index);
+				int temps = StartNode;
 				StartNode = graph.getEdgeProperties(e.index).get(MGraph.EDGESTARTINDEX);
+				int tempe = EndNode;
 				EndNode = graph.getEdgeProperties(e.index).get(MGraph.EDGEENDINDEX);
+				int tempv = Value;
 				Value = graph.getEdgeProperties(e.index).get(MGraph.EDGEVALUE);
+				String tempn = name;
 				name = graph.getEdgeName(e.index);
 				
 				graph.pushNotify(new GraphMessage(GraphMessage.EDGE,e.index,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
 				graph.removeEdge(e.index);
-				graph.addEdge(e, StartNode, EndNode, Value, name);
+				graph.addEdge(e, temps, tempe, tempv, tempn);
 				graph.pushNotify(new GraphMessage(GraphMessage.EDGE,e.index,GraphMessage.BLOCK_END,GraphMessage.EDGE));
+				
 				ret = graph;
 			break;
 			case SUBSET:
@@ -191,7 +197,12 @@ public class GraphAction {
 		}
 		return ret;
 	}
-
+	/**
+	 * Perform a Create - after that the message is directly without manipulation its own undo
+	 * @param graph
+	 * @return
+	 * @throws GraphActionException
+	 */
 	private VGraph doCreate(VGraph graph) throws GraphActionException
 	{
 		switch(Objecttype)
@@ -259,6 +270,13 @@ public class GraphAction {
 		}
 		return graph;
 	}
+	/**
+	 * Perform a Delete
+	 * The Action itself is not manipulated, because it is its own undo
+	 * @param graph
+	 * @return
+	 * @throws GraphActionException
+	 */
 	private VGraph doDelete(VGraph graph) throws GraphActionException
 	{
 		switch(Objecttype)
@@ -283,13 +301,15 @@ public class GraphAction {
 				break;
 			}
 		return graph;
-	}
+	}	
+
 	/**
 	 * Apply this Action to a Graph. The graph given as argument is manipulated directly, though returned, too.
+	 * The action itself is transofrmed to be its own undo-Message
 	 * @param graph the graph to be manipulated
 	 * @return the manipulated graph
 	 */
-	public VGraph doAction(VGraph graph) throws GraphActionException
+	public VGraph redoAction(VGraph graph) throws GraphActionException
 	{
 		if (Action==0)
 			throw new GraphActionException("No Action given");
@@ -312,9 +332,9 @@ public class GraphAction {
 	 * @param g A Graph
 	 * @return The Manipulated Clone
 	 */
-	public VGraph doActionOnClone(VGraph g) throws GraphActionException
+	public VGraph redoActionOnClone(VGraph g) throws GraphActionException
 	{
-		return doAction(g.clone());
+		return redoAction(g.clone());
 	}
 	/**
 	 * Undo The Action on a given Graph:

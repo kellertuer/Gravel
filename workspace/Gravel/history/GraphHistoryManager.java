@@ -97,7 +97,6 @@ public class GraphHistoryManager implements Observer
 			try { 
 				//TODO: Optimize temp.clone();
 				act = new GraphAction(tempG.getNode(m.getElementID()),action,tempG.clone()); 
-				act.doAction(lastGraph);			
 			}
 			catch (GraphActionException e)
 			{
@@ -109,7 +108,6 @@ public class GraphHistoryManager implements Observer
 			try { 
 				//TODO: Optimize Environment Graph
 				act = new GraphAction(tempG.getEdge(m.getElementID()),action,tempG.clone());
-				act.doAction(lastGraph);
 			}
 			catch (GraphActionException e2)
 			{
@@ -120,7 +118,6 @@ public class GraphHistoryManager implements Observer
 		{
 			try { 
 				act = new GraphAction(tempG.getSubSet(m.getElementID()),action, tempG.getMathGraph().getSubSet(m.getElementID()),tempG.getSubSetName(m.getElementID()));
-				act.doAction(lastGraph);
 			}
 			catch (GraphActionException e2)
 			{
@@ -152,8 +149,8 @@ public class GraphHistoryManager implements Observer
 			{
 				act=null; System.err.println("DEBUG: Edge.added.GraphAction Creation Failed:"+e.getMessage());				
 			}
-			lastGraph = trackedGraph.clone(); //Actual status as last status.clone
 		}
+		lastGraph = trackedGraph.clone(); //Actual status as last status.clone
 		if (act!=null)
 		{ //Try to add to Stack, if its full discard oldest action
 			//Because its a new action, delete Redo, if its filled
@@ -207,7 +204,7 @@ public class GraphHistoryManager implements Observer
 		trackedGraph.deleteObserver(this); //Deaktivate Tracking
 		GraphAction LastAction = RedoStack.removeLast();
 		try{
-			LastAction.doAction(trackedGraph);
+			LastAction.redoAction(trackedGraph);
 			lastGraph = trackedGraph.clone();
 		}
 		catch (GraphActionException e)
