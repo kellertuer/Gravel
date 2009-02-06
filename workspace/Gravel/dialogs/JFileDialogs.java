@@ -462,9 +462,12 @@ public class JFileDialogs implements Observer
 		VGraph vg = new VGraph(GeneralPreferences.getInstance().getBoolValue("graph.directed"),GeneralPreferences.getInstance().getBoolValue("graph.allowloops"),GeneralPreferences.getInstance().getBoolValue("graph.allowmultiple"));
 		
 		GeneralPreferences.getInstance().setStringValue("graph.lastfile","$NONE");
+		//Deactivate HistoryStuff
+		vGc.getVGraph().deleteObserver(vGc.getGraphHistoryManager());
 		vGc.getVGraph().replace(vg);
 		vGc.getVGraph().getMathGraph().deleteObserver(this);
 		vGc.getVGraph().addObserver(this);
+		//Reset (and with that reactivate History
 		vGc.getGraphHistoryManager().ResetToNewGraph(vg);
 		Gui.getInstance().getParentWindow().setTitle(Gui.WindowName);
 	}	

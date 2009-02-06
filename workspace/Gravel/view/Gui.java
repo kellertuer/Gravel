@@ -211,14 +211,22 @@ public class Gui implements WindowListener
 			frame.dispose();
     }
     //External getting referrence of the Graph for manipulating ist
+    /**
+     * Get actual VGraph for Manipulation
+     * 
+     * @return the VGraph from the editor
+     */
     public VGraph getVGraph()
 	{
 		return MainGraph;
 	}
+    /**
+     * Change the VGraph to a new one, also resets History
+     * @param vg
+     */
     public void setVGraph(VGraph vg)
 	{
 		MainGraph.replace(vg);
-		graphpart.getGraphHistoryManager().Reset();
 	}
     public TreeMap<String, String> getStatRows()
     {

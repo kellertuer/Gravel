@@ -39,29 +39,18 @@ public class GraphHistoryManager implements Observer
 		RedoStack = new LinkedList<GraphAction>();
 		stacksize=10;
 	}
-	public void Reset()
+	public void ResetToNewGraph(VGraph vg)
 	{
-		trackedGraph.deleteObserver(this);
-		lastGraph.replace(trackedGraph.clone());
+		trackedGraph.deleteObserver(this); //Clean end old tracking
+		trackedGraph = vg;
+		lastGraph = trackedGraph.clone();
+		trackedGraph.addObserver(this);
 		Blockstart=null;
 		blockdepth=0;
 		UndoStack = new LinkedList<GraphAction>();
 		RedoStack = new LinkedList<GraphAction>();
-		stacksize=10;		
-		trackedGraph.addObserver(this);
 		active=true;
 	}
-	/**
-	 * Change the Graph, for which a History is kept.
-	 * @param vg
-	 */	
-	public void ResetToNewGraph(VGraph vg)
-	{
-		trackedGraph.deleteObserver(this);
-		trackedGraph = vg;
-		Reset();
-	}
-	
    /**
 	 * Create an Action based on the message, that came from the Graph,
 	 * return that Action and update LastGraph
@@ -137,7 +126,7 @@ public class GraphHistoryManager implements Observer
 			return; //Don't handle Block-Abort-Stuff
 		GraphAction act = null;
 		//TODO: More Single Stuff here
-		if ((m.getElementID() > 0) && (m.getAction()==GraphMessage.NODE)) //Message for single stuff
+		if ((m.getElementID() > 0) && (m.getAction()!=GraphMessage.SUBSET)) //Message for single stuff
 		{
 			act = handleSingleAction(m);
 		}
@@ -162,16 +151,22 @@ public class GraphHistoryManager implements Observer
 		}
 		else
 			System.err.println("Status:"+m.toString()+", I was not able to create Action.");
+		//Debug - after each handled Action Stacks Ouptut
+		System.err.println("SL:"+this.stacksize+" | U:"+UndoStack.size()+" | R:"+RedoStack.size()+" Last Action"+act);
 	}
 	
+	/**
+	 * Indicates, whether an undo is possible or not
+	 * 
+	 * @return true, if an undo is possible on the tracked Graph, else false
+	 */
 	public boolean CanUndo()
 	{
 		return !UndoStack.isEmpty();
 	}
 	/**
 	 * Undo the Last Action, that happened to the Graph.
-	 * This is only performed if CanUndo() is true, 
-	 *
+	 * This is only performed if CanUndo() is true, if it isn't nothiing happens
 	 */
 	public void Undo()
 	{
@@ -192,11 +187,19 @@ public class GraphHistoryManager implements Observer
 		RedoStack.add(LastAction);
 		trackedGraph.addObserver(this); //Activate Tracking again
 	}
-	
+	/**
+	 * Indicate whether an Redo is possible
+	 * 
+	 * @return true, if an Redo is possible, else false
+	 */
 	public boolean CanRedo()
 	{
 		return !RedoStack.isEmpty();
 	}
+	/**
+	 * Redo the Last Action, that was undone.
+	 * This is only performed if CanRedo() is true, if it isn't nothing happens 
+	 */	
 	public void Redo()
 	{
 		if (!CanRedo())
@@ -216,6 +219,7 @@ public class GraphHistoryManager implements Observer
 		UndoStack.add(LastAction);
 		trackedGraph.addObserver(this); //Activate Tracking again
 	}
+	
 	public void update(Observable o, Object arg) 
 	{
 		GraphMessage m = (GraphMessage) arg;
@@ -245,11 +249,6 @@ public class GraphHistoryManager implements Observer
 		}
 		else
 		{
-			//TODO: Remove DEBUG
-			if ((m.getElementID()!=0)&&(active))
-			{
-				System.err.println("SL:"+this.stacksize+" | U:"+UndoStack.size()+" | R:"+RedoStack.size());
-			}
 			if ((m.getChangeStatus()&GraphMessage.BLOCK_END)==GraphMessage.BLOCK_END) //Block endet with this Message
 			{
 				if (blockdepth > 0)

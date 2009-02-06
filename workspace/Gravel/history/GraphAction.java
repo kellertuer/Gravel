@@ -116,7 +116,30 @@ public class GraphAction {
 		StartNode=environment.getEdgeProperties(o.index).get(MGraph.EDGESTARTINDEX);
 		EndNode=environment.getEdgeProperties(o.index).get(MGraph.EDGEENDINDEX);
 		Value=environment.getEdgeProperties(o.index).get(MGraph.EDGEVALUE);
+		env = environment;
 		Objecttype=EDGE;
+	}
+	/**
+	 * Recreate the Subsets the edge belonged to, depending on the actual environment
+	 * 
+	 * @param e Edge 
+	 * @param g Graph the edge should be recreated in and the colors should be restored in
+	 * @param old graph the color comes from
+	 */
+	private void recreateEdgeColor(VEdge e, VGraph g, VGraph old) throws GraphActionException
+	{
+		Iterator<VSubSet> si =  old.getSubSetIterator();
+		while (si.hasNext())
+		{
+			VSubSet s = si.next();
+			if (old.SubSetcontainsEdge(e.index, s.getIndex()))
+			{
+				if (g.getSubSet(s.getIndex())==null)
+					throw new GraphActionException("Can't replace edge, replacements belongs to Subsets, that don't exists in given parameter graph");
+				g.addEdgetoSubSet(e.index, s.getIndex());
+			}
+		}
+
 	}
 	/**
 	 * Replace this object in or with a Graph.
@@ -142,14 +165,14 @@ public class GraphAction {
 				ActionObject = graph.getNode(n.index).clone(); //save old node
 				String tempname = name;
 				name = graph.getNodeName(n.index); //save old name
-				graph.updateNode(n.index, tempname, n); //change node in graph
+				//TODO graph.updateNode(n.index, tempname, n); //change node in graph
 				ret = graph; //return graph
 			break;
 			case EDGE:
 				VEdge e = (VEdge)ActionObject;
 				if (graph.getEdge(e.index)==null) //edge does not exists
 					throw new GraphActionException("Can't replace edge, none there.");
-				ActionObject = graph.getEdge(e.index);
+				ActionObject = graph.getEdge(e.index).clone(); //save old edge
 				int temps = StartNode;
 				StartNode = graph.getEdgeProperties(e.index).get(MGraph.EDGESTARTINDEX);
 				int tempe = EndNode;
@@ -158,12 +181,18 @@ public class GraphAction {
 				Value = graph.getEdgeProperties(e.index).get(MGraph.EDGEVALUE);
 				String tempn = name;
 				name = graph.getEdgeName(e.index);
-				
+				//I would just need the subsets, eventually optimize here
+				VGraph colortemp = graph.clone();
 				graph.pushNotify(new GraphMessage(GraphMessage.EDGE,e.index,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
+				//delete old (now in action saved) edge, add new and recreate Color
 				graph.removeEdge(e.index);
 				graph.addEdge(e, temps, tempe, tempv, tempn);
+				recreateEdgeColor(e,graph,env); //
+				//Same with old on env
+				env.removeEdge(e.index);
+				env.addEdge((VEdge)ActionObject, StartNode, EndNode, Value, name);
+				recreateEdgeColor((VEdge)ActionObject,env,colortemp);
 				graph.pushNotify(new GraphMessage(GraphMessage.EDGE,e.index,GraphMessage.BLOCK_END,GraphMessage.EDGE));
-				
 				ret = graph;
 			break;
 			case SUBSET:
@@ -220,7 +249,7 @@ public class GraphAction {
 					if (env.SubSetcontainsNode(n.index, s.getIndex()))
 						graph.addNodetoSubSet(n.index, s.getIndex());
 				}
-				//Recreate adjacent edges and theis subsets
+				//Recreate adjacent edges and their subsets
 				Iterator<VEdge> ei = env.getEdgeIterator();
 				while (ei.hasNext())
 				{
@@ -230,13 +259,7 @@ public class GraphAction {
 						graph.addEdge(e, env.getEdgeProperties(e.index).get(MGraph.EDGESTARTINDEX),
 								env.getEdgeProperties(e.index).get(MGraph.EDGEENDINDEX),
 								env.getEdgeProperties(e.index).get(MGraph.EDGEVALUE), env.getEdgeName(e.index));
-						si = env.getSubSetIterator();
-						while (si.hasNext())
-						{
-							VSubSet s = si.next();
-							if (env.SubSetcontainsEdge(e.index, s.getIndex()))
-								graph.addEdgetoSubSet(e.index, s.getIndex());
-						}	
+						recreateEdgeColor(e,graph,env);
 					}
 				}
 				break;
@@ -245,6 +268,7 @@ public class GraphAction {
 				if ((graph.getEdge(e.index)!=null)||(graph.getNode(StartNode)==null)||(graph.getNode(EndNode)==null)) //edge exists or one of its Nodes does not
 					throw new GraphActionException("Can't create edge, it already exists or one of its Nodes does not.");
 				graph.addEdge(e, StartNode, EndNode, Value, name);
+				recreateEdgeColor(e,graph,env);				
 				break;
 			case SUBSET:
 				VSubSet vs = (VSubSet)ActionObject;
@@ -302,7 +326,6 @@ public class GraphAction {
 			}
 		return graph;
 	}	
-
 	/**
 	 * Apply this Action to a Graph. The graph given as argument is manipulated directly, though returned, too.
 	 * The action itself is transofrmed to be its own undo-Message
@@ -375,6 +398,10 @@ public class GraphAction {
 		return UnDoAction(g.clone());
 	}
 	
+	/**
+	 * Return Type of Action.
+	 * @return
+	 */
 	public int getActionType()
 	{
 		return Action;

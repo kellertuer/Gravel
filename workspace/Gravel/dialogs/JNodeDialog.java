@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -30,8 +31,11 @@ import dialogs.components.CNodeNameParameters;
 
 import view.Gui;
 
+import model.MGraph;
+import model.VEdge;
 import model.VGraph;
 import model.VNode;
+import model.VSubSet;
 
 /** JNodeDialog
  *  Dialog for creation and variation of nodes
@@ -320,9 +324,9 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 		{
 			if ((iNodeIndex.getValue()==-1)||(sname.getText().equals(""))||(ixPos.getValue()==-1)||(iyPos.getValue()==-1)||(iSize.getValue()==-1))
 			{
-				if (chNode==null)
+				if (chNode==null) //Creation
 					JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Knotens nicht m"+main.CONST.html_oe+"glich.<br><br>Einige Felder wurden nicht ausgef"+main.CONST.html_ue+"llt.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
-				else
+				else //Modification
 					JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderungen am Knoten nicht m"+main.CONST.html_oe+"glich.<br><br>Einige Felder wurden nicht ausgef"+main.CONST.html_ue+"llt.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					
 				return;
 			
@@ -370,13 +374,10 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 						JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Knotens nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index muss echt gr"+main.CONST.html_oe+""+main.CONST.html_sz+"er 0 sein.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 						return;					
 					}
+					graphref.changeNodeIndex(oldindex, iNodeIndex.getValue());
 				}
-				VNode newnode = new VNode(iNodeIndex.getValue(),ixPos.getValue(), iyPos.getValue(), iSize.getValue(),0,0,0,false);
-				newnode = cNodeName.modifyNode(newnode);
-				graphref.updateNode(oldindex,sname.getText(), newnode);
 			}
 			//Gruppen noch wieder einbauen
-//			Gruppen einbauen
 			int temp = 0;
 			for (int i=0; i<subsetlist.size(); i++)
 			{

@@ -332,7 +332,7 @@ public class VGraph extends Observable {
 			while (n1.hasNext())
 			{
 				VSubSet actualSet = n1.next();
-				if (this.SubSetcontainsEdge(cloneEdge.index,actualSet.index))
+				if (SubSetcontainsEdge(cloneEdge.index,actualSet.index))
 					clone.addEdgetoSubSet(cloneEdge.index,actualSet.getIndex()); //Jedes Set kopieren
 			}
 		}
@@ -635,6 +635,18 @@ public class VGraph extends Observable {
 		setChanged();
 		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.UPDATE,GraphMessage.NODE));	
 	}
+	
+	public void changeNodeIndex(int oldi, int newi)
+	{
+		if (oldi==newi)
+			return;
+		if ((getNode(oldi)==null)||(getNode(newi)!=null)) //old not or new already in use
+			return;
+		mG.changeNodeIndex(oldi, newi);
+		getNode(oldi).index=newi;
+		setChanged();
+		notifyObservers(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.REPLACEMENT));	
+	}
 	/**
 	 * removes a node and all incident edges
 	 * if no node with the given index exists, nothing happens
@@ -719,42 +731,6 @@ public class VGraph extends Observable {
 				return true;
 		}
 		return false;
-	}
-	/**
-	 * update the node with an old given index to a new VNode and a new index
-	 * all incident edges are updated also
-	 * <br>
-	 * @param oldindex
-	 * @param newname
-	 * @param v
-	 */
-	public void updateNode(int oldindex, String newname, VNode v) {
-		if ((getNode(v.index) != null) && (oldindex != v.index)) // falls der neue Index schon vergeben ist
-			return;
-		if (oldindex!=v.index)
-		{ // Zunächst von allen SubSets aktualisieren (remove old set new)
-			Iterator<VSubSet> s = vSubSets.iterator();
-			while (s.hasNext())
-				removeNodefromSubSet_(oldindex, s.next().getIndex());
-			mG.updateNodeIndex(oldindex, v.index);
-			// und danach zu den Gruppen neu hinzufuegen
-			s = vSubSets.iterator();
-			while (s.hasNext())
-				addNodetoSubSet(v.index, s.next().getIndex());
-		}
-		// Knotenname setzen
-		mG.setNodeName(v.index, newname);
-		// alle anderen Informationen so setzen
-		VNode temp = getNode(oldindex);
-		temp.setSize(v.getSize());
-		temp.setPosition(v.getPosition());
-		temp.setNameDistance(v.getNameDistance());
-		temp.setNameRotation(v.getNameRotation());
-		temp.setNameSize(v.getNameSize());
-		temp.setNameVisible(v.isNameVisible());
-		temp.index = v.index;
-		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,v.index,GraphMessage.UPDATE,GraphMessage.NODE));	
 	}
 	/**
 	 * get a list of the node names in a vector, where each node name is stored at it's index

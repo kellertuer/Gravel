@@ -755,7 +755,10 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		
 			//Alles in Ordnung, aendern also loeschen
 			//Als Block
-			graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,oldindex,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
+			if (oldindex==iEdgeIndex.getValue()) //Index not changed -> Just an EdgeReplace
+				graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,oldindex,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
+			else
+				graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
 			graphref.removeEdge(oldindex);
 		}
 		//hinzufuegen
@@ -774,7 +777,12 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			}
 		}
 		if (chEdge!=null)//Change edge, end block
-			graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,oldindex,GraphMessage.BLOCK_END,GraphMessage.EDGE));
+		{
+			if (oldindex==iEdgeIndex.getValue()) //Index not changed -> Just an EdgeReplace
+				graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,oldindex,GraphMessage.BLOCK_END,GraphMessage.EDGE));
+			else
+				graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END,GraphMessage.EDGE));
+		}
 		this.dispose();
 		//Text bauen
 		VEdge e = graphref.getEdge(iEdgeIndex.getValue());

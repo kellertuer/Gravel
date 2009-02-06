@@ -309,6 +309,56 @@ public class MGraph extends Observable
 			NodeLock.unlock();
 		}
 	}
+	public void changeNodeIndex(int oldi, int newi)
+	{
+		if (oldi==newi)
+			return;
+		MNode oldn = null, newn=null;
+		NodeLock.lock(); //Knoten finden
+		try
+		{
+			Iterator<MNode> n = mNodes.iterator();
+			while (n.hasNext())
+			{
+				MNode t = n.next();
+				if (t.index==oldi)
+					oldn = t;
+				else if (t.index==newi)
+					newn = t;
+			}
+		} finally {NodeLock.unlock();}
+		if ((oldn==null)||(newn!=null))
+			return; //can't change
+		//Change adjacent edges
+		EdgeLock.lock();
+		try //Find adjacent adjes and update index
+		{		Iterator<MEdge> ei = mEdges.iterator();
+				while (ei.hasNext())
+				{
+					MEdge e = ei.next();
+					if (e.EndIndex==oldi)
+						e.EndIndex=newi;
+					if (e.StartIndex==oldi)
+						e.StartIndex=newi;
+				}
+		}
+		finally {EdgeLock.unlock();}
+		//Update Subsets
+		Iterator<MSubSet> iter = mSubSets.iterator();
+		while (iter.hasNext())
+		{
+			MSubSet actual = iter.next();
+			if (actual.containsNode(oldi))
+			{
+				actual.removeNode(oldi);
+				actual.addNode(newi);
+			}
+		}
+		//And Change the oldnode aswell
+		oldn.index=newi;
+		setChanged();
+		notifyObservers(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.REPLACEMENT));	
+	}
 	/**
 	 * remove a node from the graph. thereby the adjacent edges are removed too. The indices of the deleted edges
 	 * are set in the return value
@@ -412,27 +462,6 @@ public class MGraph extends Observable
 		return null;
 	}
 	/**
-	 * returns the MNode with index i
-	 * @param i node index
-	 * @return MNode with index i if it exits else null
-	 * @deprecated use getNodeName instead
-	 */
-	public MNode getNode(int i)
-	{
-		NodeLock.lock();
-		try
-		{
-			Iterator<MNode> n = mNodes.iterator();
-			while (n.hasNext())
-			{
-				MNode t = n.next();
-				if (t.index==i)
-					return t;
-			}
-		} finally {NodeLock.unlock();}
-		return null;
-	}
-	/**
 	 * Set the node name of a node. If the node does not exist, nothing happens
 	 * @param i the node with index i
 	 * @param name to the new name
@@ -487,44 +516,6 @@ public class MGraph extends Observable
 	{
 		return mNodes.size();
 	}	
-	/**
-	 * Update a node index to another value. If the new Index is already used, nothing happens
-	 * @param oldindex old node index
-	 * @param newindex new index the node should get
-	 */
-	public void updateNodeIndex(int oldindex, int newindex)
-	{
-		if (existsNode(newindex))
-			return; //TODO Throw an Expection if node index is already in use ?
-		EdgeLock.lock();
-		try{
-				Iterator<MEdge> n = mEdges.iterator();
-				while (n.hasNext())
-				{
-					MEdge e = n.next();
-					if (( e.StartIndex==oldindex))
-						e.StartIndex = newindex;
-					if (( e.EndIndex==oldindex))
-						e.EndIndex = newindex;
-				}
-		} finally {EdgeLock.unlock();}
-		NodeLock.lock();
-		try
-		{
-			Iterator<MNode> n = mNodes.iterator();
-			while (n.hasNext())
-			{
-				MNode t = n.next();
-				if (t.index==oldindex)
-				{
-					t.index = newindex;
-				}
-			}
-		} finally {NodeLock.unlock();}
-		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,newindex,GraphMessage.UPDATE,GraphMessage.NODE));	
-	}
-	
 	//
 	//Knoteniteration
 	//

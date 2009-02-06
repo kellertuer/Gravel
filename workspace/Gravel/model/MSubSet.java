@@ -24,7 +24,9 @@ public class MSubSet
 		SetName = n;
 		index = i;
 		setnodes = new BitSet();
+		setnodes.clear();
 		setedges = new BitSet();
+		setedges.clear();
 	}
 	
 	public MSubSet clone()
