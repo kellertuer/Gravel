@@ -112,7 +112,6 @@ public class VEdgeLinestyle {
     			while (pathlength > sumdistance) //alle weiteren Punkte auf diesem Wegstück
     			{
     				double restToPoint = sumdistance + seglength - pathlength; //restlength of on this seg
-    				//System.err.println("("+dash+","+dot+","+gap+","+gap2+") "+restToPoint);
         				//double restFromPointToEnd = pathlength - restToPoint;
     				//From last only a part to x thats left from distance also Punktberechnung
     				p1 = new Point2D.Float((new Double(lastx + (x-lastx)*restToPoint/seglength)).floatValue(),(new Double(lasty + (y-lasty)*restToPoint/seglength)).floatValue());

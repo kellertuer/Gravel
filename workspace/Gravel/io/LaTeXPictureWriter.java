@@ -283,7 +283,6 @@ public class LaTeXPictureWriter implements TeXWriter {
 		   {
 			   if (distancefromline==0.0d)
 			   {
-				   //System.err.println("possible circle #"+(++ccount)+" at ("+x+","+y+") on edge #"+actual.index);
 				   //Circle with diameter linewidth
 				   s += drawCircle(x-offset.x,max.y-y,actual.getWidth());
 			   }

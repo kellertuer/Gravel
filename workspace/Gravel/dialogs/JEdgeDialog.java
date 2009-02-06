@@ -935,8 +935,6 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 					tabs.setTitleAt(2,"Kantentyp");
 				}
 			}
-			else
-				System.err.println("Actual TabCount is : "+tabs.getTabCount());
 		}
 		else if (event.getSource()==bCancel)
 		{

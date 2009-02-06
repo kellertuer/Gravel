@@ -210,7 +210,6 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	{
 		if (e.getSource()==Properties)
 		{
-			//System.err.println("Eigenschaften ausgewählt");
 			switch (ParentType) //Wo war das zuletzt
 			{
 				case USENODES : {new JNodeDialog(vG.getNode(StringPos2Index(ParentType,selectedPosition)),vG); break;}

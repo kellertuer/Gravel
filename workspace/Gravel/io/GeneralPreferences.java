@@ -187,7 +187,6 @@ public class GeneralPreferences extends Observable
 		{
 			return IntValues.get(key);
 		}
-		System.err.println("Key not found "+key);
 			return -1;
 	}
 	/**
@@ -222,7 +221,6 @@ public class GeneralPreferences extends Observable
 		{
 			return BoolValues.get(key);
 		}
-		System.err.println("Key not found "+key);
 			return false;
 	}
 	/**
@@ -257,7 +255,6 @@ public class GeneralPreferences extends Observable
 		{
 			return StringValues.get(key);
 		}
-		System.err.println("Key not found "+key);
 			return "";
 	}
 	/**
@@ -496,7 +493,7 @@ public class GeneralPreferences extends Observable
 			}
 			catch (Exception e)
 			{
-				System.err.println("Creating : "+e.getMessage());
+				System.err.println("DEBUG : Error Creating File : "+e.getMessage());
 			}
 		
 		try {        

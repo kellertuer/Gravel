@@ -98,7 +98,6 @@ public class GravelMLContentHandler implements ContentHandler
 			if (gp.getIntValue("edge.arrpos")==-1) //not found
 			{
 				gp.setIntValue("edge.arrpos",100);
-				System.err.println("Found an older Version, set arrpos to 100%");
 			}
 		}
 		if (Status==PARSE_EDGES)
@@ -121,7 +120,7 @@ public class GravelMLContentHandler implements ContentHandler
 			if ((position.equals("graphml.graph.subset"))||(position.equals("graphml.graph"))||(position.equals("graphml.graph.node"))||(position.equals("graphml.graph.edge")))
 				EndElementData();
 			else
-				System.err.println("Non-toplevel Data <data key='"+data_key+"'>"+CDATA+"</data> at"+position);
+				System.err.println("DEBUG : Non-toplevel Data <data key='"+data_key+"'>"+CDATA+"</data> at"+position);
 		}
 		else if (Status==PARSE_NODES)
 		{
@@ -172,7 +171,7 @@ public class GravelMLContentHandler implements ContentHandler
 			position += "."+localName;
 		if (localName.equals("hyperegde"))
 		{
-			System.err.println("Not yet implemented");
+			System.err.println("DEBUG : HyperEdge Not yet implemented");
 		}
 		else if (Status==PARSE_NODES)
 		{
@@ -338,7 +337,7 @@ public class GravelMLContentHandler implements ContentHandler
 					id = vG.getNextNodeIndex();
 				else
 					id = mG.getNextNodeIndex();
-				System.err.println("Malformed ID - generating own ("+id+")");
+				System.err.println("DEBUG : Malformed ID - generating own ("+id+")");
 			}				
 			idString = atts.getValue("id");
 		}
@@ -367,8 +366,6 @@ public class GravelMLContentHandler implements ContentHandler
 						fval *= 100.0f;
 					gp.setIntValue(gpKey,Math.round(fval));
 				}
-				else	
-					System.err.println("Default Value found that is neither string nor int nor bool nor float (which is rounded to int), ignored");
 				def="";
 				gpKey="";
 			}
@@ -396,7 +393,7 @@ public class GravelMLContentHandler implements ContentHandler
 				}
 				if (vG.getNode(id)!=null)
 				{
-					System.err.println("Node Index already given another node.");
+					System.err.println("DEBUG : Error Parsing File : Node Index already given another node.");
 					isValid=false;
 					return;
 				}
@@ -413,7 +410,7 @@ public class GravelMLContentHandler implements ContentHandler
 			{
 				if (mG.existsNode(id))
 				{
-					System.err.println("Node Index already given another node.");
+					System.err.println("DEBUG : Error Parsing Node : Node Index already given another node.");
 					isValid=false;
 					return;
 				}
@@ -448,7 +445,6 @@ public class GravelMLContentHandler implements ContentHandler
 					id = vG.getNextEdgeIndex();
 				else
 					id = mG.getNextEdgeIndex();
-				System.err.println("Malformed ID - generating own ("+id+")");
 			}				
 			idString = atts.getValue("id");
 			edgepath = new Vector<Point>();
@@ -548,7 +544,7 @@ public class GravelMLContentHandler implements ContentHandler
 			if (vG.similarPathEdgeIndex(toAdd, start, ende) > 0) //old : vG.getEdgeIndices(start, ende)!=-1) 
 			{
 				isValid= false; 
-				System.err.println("An (similar) Edge already existst between the two Nodes"); 
+				System.err.println("DEBUG : Error Parsing File : An (similar) Edge already existst between the two Nodes"); 
 				return;
 			}
 			vG.addEdge(toAdd,start,ende,ev,en);
@@ -572,7 +568,7 @@ public class GravelMLContentHandler implements ContentHandler
 					id = vG.getNextSubSetIndex();
 				else
 					id = mG.getNextSetIndex();
-				System.err.println("Malformed ID - generating own ("+id+")");
+				System.err.println("DEBUG : Malformed ID - generating own ("+id+")");
 			}				
 			idString = atts.getValue("id");
 			//Sonderfall, hier mal zuerst erstellen, da kein andres SubSet schwarz ist...dies hier schwarz machen, bis eine Farbe eintrudelt
@@ -641,7 +637,7 @@ public class GravelMLContentHandler implements ContentHandler
 			{
 				if (vG.getSubSet(id).getColor()==Color.BLACK)
 				{
-					System.err.println("The SubSet has no Color!");
+					System.err.println("DEBUG : Error Parsing File : The SubSet has no Color!");
 					vG.removeSubSet(id);
 					isValid=false;
 					return;

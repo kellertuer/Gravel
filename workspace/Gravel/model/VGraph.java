@@ -203,14 +203,14 @@ public class VGraph extends Observable {
 							{
 								if ((((VOrthogonalEdge)act).getVerticalFirst()!=((VOrthogonalEdge)t).getVerticalFirst())&&(!removed.get(act.index)))
 								{
-									System.err.println("removing Edge #"+t.index+" because ORTH and it is similar to #"+act.index);
+									//System.err.println("removing Edge #"+t.index+" because ORTH and it is similar to #"+act.index);
 									toDelete.add(t);
 									removed.set(t.index);
 								}
 							}
 							else if ((t.PathEquals(act)&&(!removed.get(act.index)))&&(t.index!=act.index)) //same path
 							{
-								System.err.println("removing Edge #"+t.index+" because it is similar to #"+act.index);
+								//System.err.println("removing Edge #"+t.index+" because it is similar to #"+act.index);
 								toDelete.add(t);
 								removed.set(t.index);
 							}
@@ -669,7 +669,7 @@ public class VGraph extends Observable {
 	private void removeNode_(int i) {
 		if (getNode(i)==null)
 		{
-			System.err.println("not removing node "+i+" - not in Graph");
+			//System.err.println("not removing node "+i+" - not in Graph");
 			return;
 		}
 		
@@ -1125,7 +1125,6 @@ public class VGraph extends Observable {
 	 * @return the first edge in range, if there is one, else null
 	 */
 	public VEdge getEdgeinRange(Point m, double variation) {
-		//System.err.println("("+m.x+","+m.y+") Variation is "+variation+" zoom "+(float)GeneralPreferences.getInstance().getIntValue("vgraphic.zoom")/100);
 		variation *=(float)GeneralPreferences.getInstance().getIntValue("vgraphic.zoom")/100; //jop is gut
 		Iterator<VEdge> n = vEdges.iterator();
 		while (n.hasNext()) {

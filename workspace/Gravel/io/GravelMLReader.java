@@ -94,9 +94,6 @@ public class GravelMLReader
 				position = localName;
 			else
 				position += "."+localName;
-			
-			//System.err.println("Betrete "+position+" #ID "+atts.getValue("id"));
-			
 			if (localName.equals("key")) //Attribute herausholen
 			{
 				id = atts.getValue("id"); //Reset id
@@ -160,7 +157,6 @@ public class GravelMLReader
 			input.setSystemId(f.getAbsolutePath());
 			parser.setContentHandler(checker);
 			parser.parse(input);
-			//	System.err.println(parser.toString());
 		}
 		catch (Exception e2)
 		{

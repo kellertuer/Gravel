@@ -254,7 +254,6 @@ public abstract class VEdge extends VItem {
 		   {
 			   p1done = true;
 			   p1distance = p1distance +seglength - length; //restlength of p1 on this seg
-			   //System.err.print("to "+seglength);
 			   //From last only a part to x thats left from distance
 			   p1 = new Point2D.Double(lastx + (x-lastx)*p1distance/seglength,lasty + (y-lasty)*p1distance/seglength);
 		   }
@@ -321,7 +320,6 @@ public abstract class VEdge extends VItem {
 		    {} //we need from the first moveto the coords as lastxlasty
 		    else if (type==PathIterator.SEG_LINETO)	
 		    {
-		    	//System.err.println("From ("+lastx+","+lasty+") to ("+x+","+y+") length")
 		    	ret += (new Point2D.Double(lastx,lasty)).distance(x,y);
 		    }
 		   lastx = x; lasty = y;
@@ -363,7 +361,6 @@ public abstract class VEdge extends VItem {
 		   if (length>pointdistance) //the newest point is farther away than the point should be
 		   {
 			   pointdistance = pointdistance +seglength - length; //restlength of p1 on this seg
-			   //System.err.print("to "+seglength);
 			   //From last only a part to x thats left from distance
 			   return new Point((new Long(Math.round(lastx + (x-lastx)*pointdistance/seglength))).intValue(),(new Long(Math.round(lasty + (y-lasty)*pointdistance/seglength))).intValue());
 		   }
@@ -413,7 +410,6 @@ public abstract class VEdge extends VItem {
 				   return new Point2D.Double(0.0,0.0); //no direction given!
 			   }
 			   pointdistance = pointdistance +seglength - length; //restlength of p1 on this seg
-			   //System.err.print("to "+seglength);
 			   //From last only a part to x thats left from distance
 			   Point2D.Double thispoint = new Point2D.Double((lastx + (x-lastx)*pointdistance/seglength),(lasty + (y-lasty)*pointdistance/seglength));
 			   //The direction is now the direction from the last to this point

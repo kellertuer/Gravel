@@ -32,7 +32,6 @@ public class MagnetismAndSprings implements VAlgorithmIF
 		{
 			if (edgeiterator.next().getType()!=VEdge.STRAIGHTLINE)
 			{
-				//System.err.println("wah!");
 				return false;
 			}
 		}

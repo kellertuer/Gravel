@@ -68,7 +68,6 @@ public class RandomVisualize implements VAlgorithmIF {
 			randNodes = ((Boolean)m.get("RandomizeEdges")).booleanValue();
 		maxX = ((Integer) m.get("MaxX")).intValue();
 		maxY = ((Integer) m.get("MaxY")).intValue();
-		//System.err.println(maxX+","+maxY);
 		if ((maxX<=0)&&(maxY<=0))
 			return "Einer der Max-Werte ist zu klein";
 		return "";
@@ -91,7 +90,6 @@ public class RandomVisualize implements VAlgorithmIF {
 				MNode actualNode = nodeiter.next();
 				int posx = generator.nextInt(maxX);
 				int posy = generator.nextInt(maxY);
-				//System.err.println("Placing Node : "+actualNode.index+ " on ("+posx+","+posy+")");
 				//Place the node
 				int size;
 				if (randNodes)

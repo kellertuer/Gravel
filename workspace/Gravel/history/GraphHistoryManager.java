@@ -133,10 +133,6 @@ public class GraphHistoryManager implements Observer
 				UndoStack.remove();
 			UndoStack.add(act);
 		}
-		else
-			System.err.println("Status:"+m.toString()+", I was not able to create Action.");
-		//Debug - after each handled Action Stacks Ouptut
-		System.err.println("SL:"+this.stacksize+" | U:"+UndoStack.size()+" | R:"+RedoStack.size()+" Last Action"+act);
 	}
 	
 	/**
@@ -164,7 +160,7 @@ public class GraphHistoryManager implements Observer
 		}
 		catch (GraphActionException e)
 		{
-			System.err.println("Argh"+e.getMessage());
+			System.err.println("DEBUG: An Error Occured while Undoing an Action "+e.getMessage());
 		}
 		if (RedoStack.size()>=stacksize)
 			RedoStack.remove();
@@ -196,7 +192,7 @@ public class GraphHistoryManager implements Observer
 		}
 		catch (GraphActionException e)
 		{
-			System.err.println("Argh"+e.getMessage());
+			System.err.println("An error occured when Redoing an Action: "+e.getMessage());
 		}
 		if (UndoStack.size()>=stacksize)
 			UndoStack.remove();

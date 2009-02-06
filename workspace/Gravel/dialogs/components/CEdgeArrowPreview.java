@@ -148,7 +148,6 @@ public class CEdgeArrowPreview extends Container implements Observer{
 												v.get(CEdgeTextParameters.BTEXTVISIBLE)==1,
 												v.get(CEdgeTextParameters.BSHOWTEXTVALUE)==1);
 					ArrowEdge.setTextProperties(m);
-				//	System.err.println("??"+v.get(CEdgeTextParameters.BTEXTVISIBLE)+"/"+ArrowEdge.getTextProperties().isVisible());
 					ArrowG.repaint();
 				}
 				if (v.firstElement()==CEdgeLineParameters.CEDGELINEPARAMETERS)

@@ -210,7 +210,6 @@ public class Statistics extends JPanel implements Observer, ActionListener
 	
 	public double interprete(String s)
 	{	
-	//	System.err.print("Interprete s:"+s);
 		for (int i=0; i<GraphStatisticAtoms.ATOMS.length; i++)
 		{
 			s = replace(s,GraphStatisticAtoms.ATOMS[i], vgs.getValuebyName(GraphStatisticAtoms.ATOMS[i]).toString());

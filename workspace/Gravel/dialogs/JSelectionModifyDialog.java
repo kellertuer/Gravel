@@ -946,7 +946,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				double posy = (new Integer(mr)).doubleValue()*Math.sin(2*Math.PI*actualdeg/360d);
 						
 				Point newpos = new Point(mx+Math.round((new Double(posx)).floatValue()),my+Math.round((new Double(posy)).floatValue()));
-			//	System.err.println("Now placing node #"+temp.index+"("+vg.getNodeName(temp.index)+") at "+actualdeg+" Degree - Position on Circle ("+posx+","+posy+") and in RL ("+newpos.x+","+newpos.y+")");
+
 				int diffx = temp.getPosition().x - newpos.x;
 				int diffy = temp.getPosition().y - newpos.y;
 				temp.setPosition(newpos);	

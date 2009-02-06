@@ -93,7 +93,7 @@ public class Gui implements WindowListener
 			}
 			else
 			{
-				System.err.println("MGraph geladen, TODO Wizard hier einbauen.");
+				System.err.println(" DEBUG MGraph geladen, TODO Wizard hier einbauen.");
 				//TODO: Wizard 
 				JOptionPane.showMessageDialog(frame, "<html><p>Der letzte gespeicherte Graph ist ein mathematischer Graph. Diese können zwar geladen, danach jedoch nicht weiter verarbeitet werden.<br>Gravel startet mit einem neuen Graphen.</p></html>","Hinweis",JOptionPane.INFORMATION_MESSAGE);				
 				MainGraph = new VGraph(gp.getBoolValue("graph.directed"),gp.getBoolValue("graph.allowloops"),gp.getBoolValue("graph.allowmultiple"));

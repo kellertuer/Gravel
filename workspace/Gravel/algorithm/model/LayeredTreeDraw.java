@@ -160,7 +160,6 @@ public class LayeredTreeDraw implements VAlgorithmIF
 		mG = (MGraph) m.get("MGraph");
 		ta.setGraph(mG);
 		ErgebnisGraph = new VGraph(mG.isDirected(),false,false);
-		//System.err.println(maxX+","+maxY);
 		if ((gridX<=0)&&(gridY<=0))
 			return "Einer der Max-Werte ist zu klein";
 		if (!GraphOkay())

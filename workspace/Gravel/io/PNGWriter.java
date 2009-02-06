@@ -59,13 +59,11 @@ public class PNGWriter
 		}
 		vGc.setSize(dim);
 		vGc.paint(g);
-		//System.err.println("Taking Subimage 0,0 : "+Math.round((float)min.x*z2)+","+Math.round((float)min.y*z2)+"Dim:"+x+","+y);
 		img = img.getSubimage((new Double(Math.ceil((double)min.x*(double)z2))).intValue(),(new Double(Math.ceil((double)min.y*(double)z2))).intValue(),x,y);
 		try {
 			ImageIO.write(img, type, f);
 		} catch (IOException e) {
-			System.err.println("Saving failed...");
-			e.printStackTrace();
+			System.err.println("DEBUG : PNG Writing failed : "+e.getMessage());
 		}
 		GeneralPreferences.getInstance().setIntValue("vgraphic.zoom",oldz);
 	}

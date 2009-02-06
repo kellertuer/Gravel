@@ -92,7 +92,6 @@ public class VGraphic extends Component implements 	Observer
 		gridorientated = gp.getBoolValue("grid.orientated");
 		
 		vEdgeStyle = new BasicStroke(5.0f, BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND);
-		//System.err.println("r "+gp.getIntValue("vgraphic.selcolr")+" g "+gp.getIntValue("vgraphic.selcolg")+" g "+gp.getIntValue("vgraphic.selcolb"));
 		selColor = new Color(gp.getIntValue("vgraphic.selcolr"),gp.getIntValue("vgraphic.selcolg"),gp.getIntValue("vgraphic.selcolb"));
 		selWidth = gp.getIntValue("vgraphic.selwidth");
 		
@@ -420,7 +419,6 @@ public class VGraphic extends Component implements 	Observer
 				int offset = gp.getIntValue("vgraphic.framedistance");
 				int x = Math.max(GraphSize.x+offset,vp.getViewRect().x+vp.getViewRect().width-offset);
 				int y = Math.max(GraphSize.y+offset,vp.getViewRect().y+vp.getViewRect().height-offset);
-				//System.err.println("Updating Size "+x+","+y);
 				setPreferredSize(new Dimension(x,y));
 				setSize(new Dimension(x,y));
 				//Nun soll mitgescrollt werden, falls ein Knoten oder eine Kante (CP) in Bewegung ist 

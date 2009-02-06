@@ -298,7 +298,7 @@ public class GravelMLWriter {
 			}
 			catch (Exception e)
 			{
-				System.err.println("Creating : "+e.getMessage());
+				System.err.println("DEBUG : Error on Writing File : "+e.getMessage());
 			}
 		
 		try {        
@@ -412,7 +412,7 @@ public class GravelMLWriter {
 			}
 			catch (Exception e)
 			{
-				System.err.println("Creating : "+e.getMessage());
+				System.err.println("DEBUG : Error on Creating File : "+e.getMessage());
 			}
 		
 		try {        

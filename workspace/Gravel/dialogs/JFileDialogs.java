@@ -225,7 +225,7 @@ public class JFileDialogs implements Observer
 	    		}
 	    		else
 	    		{
-	    			System.err.println("MGraph geladen, TODO Wizard hier einbauen.");
+	    			System.err.println("DEBUG : MGraph geladen, TODO Wizard hier einbauen.");
 					JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><p>Die Datei <br><i>"+f.getName()+"</i><br>enth"+main.CONST.html_ae+"lt einen mathematischen Graphen. Diese können bisher nicht weiter verarbeitet werden.</p></html>","Hinweis",JOptionPane.INFORMATION_MESSAGE);				
 	    			//TODO: Wizard 
 					//Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+" (math only)");					
@@ -447,8 +447,7 @@ public class JFileDialogs implements Observer
 				if (sel == JOptionPane.CANCEL_OPTION)
 					return false;
 				if(sel == JOptionPane.YES_OPTION)
-					if (!Save())
-						System.err.println("Internal Save error!");
+					Save();
         	}
         }
 		//No one aborted so return true

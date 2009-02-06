@@ -71,7 +71,6 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 	 */
 	public Double getValuebyName(String atomname)
 	{
-		//System.err.println("Geting : "+atomname+"  "+(atomvalues.get(atomname)!=null));
 		if (atomvalues.get(atomname)!=null)
 			return atomvalues.get(atomname);
 		else
@@ -89,7 +88,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		outvalenz = new TreeMap<Integer,Integer>();
 		bends = new TreeMap<Integer,Integer>();
 		kantenlaenge = new TreeMap<Integer,Double>();
-		int compareCount = new Double(vg.NodeCount()*vg.NodeCount()/2 - vg.NodeCount()/2).intValue();
+//		int compareCount = new Double(vg.NodeCount()*vg.NodeCount()/2 - vg.NodeCount()/2).intValue();
 		knotenabstand = new TreeMap<Integer,Double>();
 		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
 		while (edgeiter.hasNext())
@@ -191,8 +190,6 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 			while (rest.hasNext())
 			{
 				knotenabstand.put(i++,actual.getPosition().distance(rest.next().getPosition()));
-				if (i > compareCount)
-					System.err.println("Too many nodes to run (GraphStatisticAtoms.181.");
 			}
 		}
 		//Nun noch werte Setzen
