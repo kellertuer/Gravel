@@ -34,7 +34,7 @@
 		<value name="text_size" type="Integer">12</value>
 		<value name="text_visible" type="Boolean">false</value>
 		<value name="value" type="Integer">1</value>
-		<value name="width" type="Integer">2</value>
+		<value name="width" type="Integer">1</value>
 	</group>
 	<group name="graph">
 		<value name="allowloops" type="Boolean">true</value>
@@ -57,7 +57,7 @@
 		<value name="name_rotation" type="Integer">270</value>
 		<value name="name_size" type="Integer">12</value>
 		<value name="name_visible" type="Boolean">false</value>
-		<value name="size" type="Integer">15</value>
+		<value name="size" type="Integer">8</value>
 	</group>
 	<group name="pref">
 		<value name="saveonexit" type="Boolean">true</value>
@@ -69,7 +69,7 @@
 		<value name="name" type="String">Untergraph #$ID</value>
 	</group>
 	<group name="vgraphic">
-		<value name="cpshow" type="Boolean">true</value>
+		<value name="cpshow" type="Boolean">false</value>
 		<value name="cpsize" type="Integer">3</value>
 		<value name="directed" type="Boolean">true</value>
 		<value name="framedistance" type="Integer">10</value>

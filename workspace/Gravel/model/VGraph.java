@@ -695,6 +695,34 @@ public class VGraph extends Observable {
 		vNodes.remove(getNode(i));
 	}
 	/**
+	 * Replace the node with index given by parameter Node with the parameter, if such a node exists, else, do nothing
+	 * 
+	 * Its SubSetStuff is not changed
+	 * 
+	 * @param node - Node that is exchanged into the graph (if a node exists with same index)
+	 * @param name - name of the node
+	 */
+	public void replaceNode(VNode node, String name)
+	{
+		mG.replaceNode(new MNode(node.index, name));
+		NodeLock.lock(); //Knoten finden
+		try
+		{
+			Iterator<VNode> n = vNodes.iterator();				
+			while (n.hasNext())
+			{
+				VNode t = n.next();
+				if (t.index==node.index)
+				{
+					vNodes.remove(t);
+					vNodes.add(node);
+					break;
+				}
+			}
+		}
+		finally {NodeLock.unlock();}
+	}
+	/**
 	 *  get an unused node index
 	 *  
 	 * @return the smallest node index beyond all existent nodes
@@ -1005,6 +1033,39 @@ public class VGraph extends Observable {
 	{
 		return mG.getEdgeIndices(start, ende);
 	}
+	/**
+	 * Replace the edge with index given by parameter Edge with the parameter, 
+	 * if such an edge exists, else, do nothing
+	 * 
+	 * Its SubSetStuff is not changed
+	 * 
+	 * @param e VEdge to be replaced with its Edge with similar index in the graph
+	 * @param start - Startindex from e
+	 * @param ende - Endindex form e
+	 * @param value - Value of e
+	 * @param name - name of e 
+	 */
+	public void replaceEdge(VEdge e, int start, int ende, int value, String name)
+	{
+		mG.replaceEdge(new MEdge(e.index, start,ende,value,name));
+		EdgeLock.lock(); //Knoten finden
+		try
+		{
+			Iterator<VEdge> ei = vEdges.iterator();				
+			while (ei.hasNext())
+			{
+				VEdge t = ei.next();
+				if (t.index==e.index)
+				{
+					vEdges.remove(t);
+					vEdges.add(e);
+					break;
+				}
+			}
+		}
+		finally {EdgeLock.unlock();}
+	}
+
 	/**
 	 * remove the edge with index i
 	 * @param i

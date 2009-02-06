@@ -301,14 +301,44 @@ public class MGraph extends Observable
 		{
 			mNodes.add(new MNode(i,n));
 			setChanged();
-			notifyObservers("N"+i);
 			notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.ADDITION,GraphMessage.NODE));	
 		} 
-		finally
-		{
-			NodeLock.unlock();
-		}
+		finally {NodeLock.unlock();}
 	}
+	/**
+	 * Replace (if existent) the node in the graph with the index of the parameter node by the parameter
+	 * 
+	 * @param node new node for its index
+	 */
+	public void replaceNode(MNode node)
+	{
+		NodeLock.lock();
+		try 
+		{
+			Iterator<MNode> n = mNodes.iterator();
+			while (n.hasNext())
+			{
+				MNode t = n.next();
+				if (t.index==node.index)
+				{
+					mNodes.remove(t);
+					mNodes.add(node);
+					setChanged();
+					notifyObservers(new GraphMessage(GraphMessage.NODE,node.index,GraphMessage.UPDATE,GraphMessage.NODE));	
+					break;
+				}
+			}
+		} 
+		finally
+		{NodeLock.unlock();}		
+	}
+	/**
+	 * Change the index of a node. This method is neccessary, because all other functions rely on the fact, 
+	 * that the nodeindex is the reference for everything
+	 * 
+	 * @param oldi old index of the node
+	 * @param newi new index of the node
+	 */
 	public void changeNodeIndex(int oldi, int newi)
 	{
 		if (oldi==newi)
@@ -572,6 +602,25 @@ public class MGraph extends Observable
 	public boolean addEdge(int i,int s,int e)
 	{		
 		return addEdge(i,s,e,1);
+	}
+	public void replaceEdge(MEdge edge)
+	{
+		EdgeLock.lock();
+		try {
+			Iterator<MEdge> ei = mEdges.iterator();
+			while (ei.hasNext()) {
+				MEdge temp = ei.next();
+				if (temp.index == edge.index) // index vergeben
+				{
+					mEdges.remove(temp);
+					mEdges.add(edge);
+					setChanged();
+					notifyObservers(new GraphMessage(GraphMessage.EDGE,edge.index,GraphMessage.UPDATE,GraphMessage.EDGE));	
+					break;
+				}
+			}
+		}
+		finally {EdgeLock.unlock();}
 	}
 	/**
 	 * Remove an edge from the graph.

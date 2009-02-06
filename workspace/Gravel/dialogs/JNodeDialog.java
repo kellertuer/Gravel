@@ -14,7 +14,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -31,11 +30,9 @@ import dialogs.components.CNodeNameParameters;
 
 import view.Gui;
 
-import model.MGraph;
-import model.VEdge;
+import model.GraphMessage;
 import model.VGraph;
 import model.VNode;
-import model.VSubSet;
 
 /** JNodeDialog
  *  Dialog for creation and variation of nodes
@@ -354,6 +351,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 				}
 				else
 				{
+					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, iNodeIndex.getValue(), GraphMessage.ADDITION|GraphMessage.BLOCK_START, GraphMessage.NODE));
 					//Neuen Knoten einfuegen
 					VNode newnode = new VNode(iNodeIndex.getValue(),ixPos.getValue(), iyPos.getValue(), iSize.getValue(),0,0,0,false);
 					newnode = cNodeName.modifyNode(newnode);
@@ -374,10 +372,13 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 						JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Knotens nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index muss echt gr"+main.CONST.html_oe+""+main.CONST.html_sz+"er 0 sein.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 						return;					
 					}
+					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS));
 					graphref.changeNodeIndex(oldindex, iNodeIndex.getValue());
 				}
+				else
+					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, iNodeIndex.getValue(), GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.NODE));
 			}
-			//Gruppen noch wieder einbauen
+			//Gruppen noch wieder aktualisieren
 			int temp = 0;
 			for (int i=0; i<subsetlist.size(); i++)
 			{
@@ -394,6 +395,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 			{ //Noch am Raster ausrichten, falls das aktiv ist
 				graphref.getNode(iNodeIndex.getValue()).setPosition(gridsnap(iNodeIndex.getValue()));	
 			}
+			graphref.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.BLOCK_END));
 			this.dispose();
 		}
 		

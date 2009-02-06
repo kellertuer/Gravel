@@ -752,7 +752,6 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 					return;
 				}
 			}
-		
 			//Alles in Ordnung, aendern also loeschen
 			//Als Block
 			if (oldindex==iEdgeIndex.getValue()) //Index not changed -> Just an EdgeReplace
@@ -776,6 +775,10 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 				temp++; //Anzahl Knoten zaehlen
 			}
 		}
+		//Text bauen
+		VEdge e = graphref.getEdge(iEdgeIndex.getValue());
+		e = cText.modifyEdge(e);
+		e = cLine.modifyEdge(e);			
 		if (chEdge!=null)//Change edge, end block
 		{
 			if (oldindex==iEdgeIndex.getValue()) //Index not changed -> Just an EdgeReplace
@@ -784,10 +787,6 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 				graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END,GraphMessage.EDGE));
 		}
 		this.dispose();
-		//Text bauen
-		VEdge e = graphref.getEdge(iEdgeIndex.getValue());
-		e = cText.modifyEdge(e);
-		e = cLine.modifyEdge(e);			
 	}
 	/**
 	 * Verify the EdgeType and its Parameter Fields
