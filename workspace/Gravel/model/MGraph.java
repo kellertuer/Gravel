@@ -387,7 +387,7 @@ public class MGraph extends Observable
 		//And Change the oldnode aswell
 		oldn.index=newi;
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.REPLACEMENT));	
+		notifyObservers(new GraphMessage(GraphMessage.NODE, GraphMessage.REPLACEMENT, GraphMessage.ALL_ELEMENTS));	
 	}
 	/**
 	 * remove a node from the graph. thereby the adjacent edges are removed too. The indices of the deleted edges

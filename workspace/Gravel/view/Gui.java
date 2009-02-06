@@ -221,7 +221,7 @@ public class Gui implements WindowListener
 		return MainGraph;
 	}
     /**
-     * Change the VGraph to a new one, also resets History
+     * Change the VGraph to a new one, also resets History.
      * @param vg
      */
     public void setVGraph(VGraph vg)

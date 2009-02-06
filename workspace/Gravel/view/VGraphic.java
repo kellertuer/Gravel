@@ -320,6 +320,12 @@ public class VGraphic extends Component implements 	Observer
 	{
 		return vG;
 	}
+	/**
+	 * Get the GraphHIstoryManager that tracks, records and enables undo for the graph
+	 * Use this Method to do the Undo/Redo and sth like that
+	 * 
+	 * @return
+	 */
 	public GraphHistoryManager getGraphHistoryManager()
 	{
 		return vGh;

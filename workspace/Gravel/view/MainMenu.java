@@ -341,9 +341,9 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			JMenuItem item = (JMenuItem) e.getSource();
 			if (item == mFNew)
     			fileDialogs.NewGraph(); 
-			if (item == mFOpen)
+			else if (item == mFOpen)
     			mFSave.setEnabled(fileDialogs.Open()); //If Successfull set Save to true
-			if (item == mFSave)
+			else if (item == mFSave)
     			mFSave.setEnabled(fileDialogs.Save());
 			else if (item == mFSaveAs)
         		mFSave.setEnabled(fileDialogs.SaveAs());

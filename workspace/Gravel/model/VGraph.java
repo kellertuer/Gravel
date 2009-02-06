@@ -269,6 +269,7 @@ public class VGraph extends Observable {
 	 * replace the actual VGraph with another one.
 	 * <br>Use this Method to replace this VGraph with a new loaded one or a new visualised one.
 	 * <br>
+	 * <br>The pushNotify Should be used to indicate complete replacement to reset observers
 	 * @param anotherone the New VGraph
 	 */
 	public void replace(VGraph anotherone)
@@ -279,13 +280,13 @@ public class VGraph extends Observable {
 		mG = anotherone.mG;
 		mG.pushNotify(
 						new GraphMessage(GraphMessage.ALL_ELEMENTS, //Type
-										GraphMessage.UPDATE, //Status 
+										GraphMessage.REPLACEMENT, //Status 
 										GraphMessage.ALL_ELEMENTS) //Affected		
 		);
 		setChanged();
 		notifyObservers(
 				new GraphMessage(GraphMessage.ALL_ELEMENTS, //Type
-						GraphMessage.UPDATE, //Status 
+						GraphMessage.REPLACEMENT, //Status 
 						GraphMessage.ALL_ELEMENTS) //Affected		
 		);
 	}
@@ -645,7 +646,7 @@ public class VGraph extends Observable {
 		mG.changeNodeIndex(oldi, newi);
 		getNode(oldi).index=newi;
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.REPLACEMENT));	
+		notifyObservers(new GraphMessage(GraphMessage.NODE,GraphMessage.UPDATE, GraphMessage.ALL_ELEMENTS));	
 	}
 	/**
 	 * removes a node and all incident edges
@@ -716,6 +717,8 @@ public class VGraph extends Observable {
 				{
 					vNodes.remove(t);
 					vNodes.add(node);
+					setChanged();
+					notifyObservers(new GraphMessage(GraphMessage.NODE,node.index, GraphMessage.REPLACEMENT,GraphMessage.NODE));	
 					break;
 				}
 			}
@@ -1059,6 +1062,8 @@ public class VGraph extends Observable {
 				{
 					vEdges.remove(t);
 					vEdges.add(e);
+					setChanged();
+					notifyObservers(new GraphMessage(GraphMessage.EDGE,e.index, GraphMessage.REPLACEMENT,GraphMessage.EDGE));	
 					break;
 				}
 			}

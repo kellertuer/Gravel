@@ -463,12 +463,10 @@ public class JFileDialogs implements Observer
 		
 		GeneralPreferences.getInstance().setStringValue("graph.lastfile","$NONE");
 		//Deactivate HistoryStuff
-		vGc.getVGraph().deleteObserver(vGc.getGraphHistoryManager());
 		vGc.getVGraph().replace(vg);
 		vGc.getVGraph().getMathGraph().deleteObserver(this);
 		vGc.getVGraph().addObserver(this);
 		//Reset (and with that reactivate History
-		vGc.getGraphHistoryManager().ResetToNewGraph(vg);
 		Gui.getInstance().getParentWindow().setTitle(Gui.WindowName);
 	}	
 	

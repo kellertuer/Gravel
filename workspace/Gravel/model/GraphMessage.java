@@ -33,7 +33,7 @@ public class GraphMessage {
 	public static final int MULTIPLE = 64;
 	public static final int ALL = 0xffff;
 
-	//Status - Actions done
+	//Status - Change that Happened
 	public static final int UPDATE = 1;
 	public static final int ADDITION = 2;
 	public static final int REMOVAL = 4;

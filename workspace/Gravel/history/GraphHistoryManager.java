@@ -39,18 +39,6 @@ public class GraphHistoryManager implements Observer
 		RedoStack = new LinkedList<GraphAction>();
 		stacksize=10;
 	}
-	public void ResetToNewGraph(VGraph vg)
-	{
-		trackedGraph.deleteObserver(this); //Clean end old tracking
-		trackedGraph = vg;
-		lastGraph = trackedGraph.clone();
-		trackedGraph.addObserver(this);
-		Blockstart=null;
-		blockdepth=0;
-		UndoStack = new LinkedList<GraphAction>();
-		RedoStack = new LinkedList<GraphAction>();
-		active=true;
-	}
    /**
 	 * Create an Action based on the message, that came from the Graph,
 	 * return that Action and update LastGraph
@@ -70,7 +58,6 @@ public class GraphHistoryManager implements Observer
 				action = GraphAction.REMOVAL;
 				tempG = lastGraph; //Information of the deleted Node must be taken from last status
 				break;
-			case GraphMessage.REPLACEMENT:
 			case GraphMessage.UPDATE:
 			case GraphMessage.TRANSLATION:
 				action = GraphAction.UPDATE;
@@ -222,6 +209,17 @@ public class GraphHistoryManager implements Observer
 		GraphMessage m = (GraphMessage) arg;
 		if (m==null)
 			return;
+		//Complete Replacement of Graph Handling
+		if ((m.getAction()==GraphMessage.ALL_ELEMENTS)&&(m.getAffectedTypes()==GraphMessage.ALL_ELEMENTS)&&(m.getChangeStatus()==GraphMessage.REPLACEMENT))
+		{
+				lastGraph = trackedGraph.clone();
+				Blockstart=null;
+				blockdepth=0;
+				UndoStack = new LinkedList<GraphAction>();
+				RedoStack = new LinkedList<GraphAction>();
+				active=true;
+				return;
+		}
 		if (m.getAction()==GraphMessage.SELECTION) //Nur selektion -> Update in Copyx
 		{
 			if (active) //not every update but on ends of blocks
