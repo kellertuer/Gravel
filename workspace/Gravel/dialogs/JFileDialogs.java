@@ -370,11 +370,11 @@ public class JFileDialogs implements Observer
 	    			if (esvgd.IsAccepted())
 	    			{
 	    				PNGWriter iw = new PNGWriter(vGc); 
-	    				iw.PNGExport(f,esvgd.getSizeX(),esvgd.getSizeY());
+	    				iw.PNGExport(f,esvgd.getSizeX(),esvgd.getSizeY(),esvgd.isTransparent());
 	    				return true;
 	    			}
 	    		}
-	    		if (svg.accept(f))
+	    		else if (svg.accept(f))
 	    		{
 	    			ExportSVGDialog esvgd = new ExportSVGDialog(Gui.getInstance().getParentWindow(),
 	    					(vGc.getVGraph().getMaxPoint(vGc.getGraphics()).x-vGc.getVGraph().getMinPoint(vGc.getGraphics()).x),
@@ -416,7 +416,7 @@ public class JFileDialogs implements Observer
 	    			String s = "'."+getExtension(f)+"'";
 	    			if (getExtension(f)==null)
 	    				s="<i>leer</i>";
-	    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(),"<html>Das Format "+s+" wird nicht unterstützt.<br><br>Unterst"+main.CONST.html_ue+"tzte Formate:<br>-PNG (.png) <br>-LaTeX (.tex) ","Fehler",JOptionPane.ERROR_MESSAGE);
+	    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(),"<html>Das Format "+s+" wird nicht unterstützt.<br><br>Unterst"+main.CONST.html_ue+"tzte Formate:<br>-LaTeX (.tex)<br>-PNG (.png)<br>-SVG (.svg)","Fehler",JOptionPane.ERROR_MESSAGE);
 	    		}
 	       }	   
 		   return false;

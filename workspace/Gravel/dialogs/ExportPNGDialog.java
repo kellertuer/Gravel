@@ -34,7 +34,7 @@ public class ExportPNGDialog extends JDialog implements ActionListener, CaretLis
 {
 	private IntegerTextField iSizeX,iSizeY;
 	private JButton bOk, bCancel;
-	private JRadioButton selX,selY;
+	private JRadioButton selX,selY,rTrans,rWhite;
 	private boolean accepted = false;
 	private int origx,origy;
 	private static final long serialVersionUID = 1L;
@@ -93,10 +93,28 @@ public class ExportPNGDialog extends JDialog implements ActionListener, CaretLis
 		ButtonGroup b = new ButtonGroup();
 		b.add(selX); b.add(selY);
 	
+		c.gridy++;
+		c.gridx = 0;
+		
+		ButtonGroup BgChoice = new ButtonGroup();
+		rTrans = new JRadioButton("transparent");
+		rWhite = new JRadioButton("<html>wei"+main.CONST.html_sz+"</html>");
+		BgChoice.add(rTrans);
+		BgChoice.add(rWhite);
+		rWhite.setSelected(true);
+		content.add(new JLabel("Hintergrund"),c);
+		c.gridx++;
+		content.add(rWhite,c);
+		c.gridx++;
+		content.add(rTrans,c);
+
+		c.gridy++;
+		c.gridx = 0;
+
 		bCancel = new JButton("Abbrechen");
 		bCancel.addActionListener(this);
 		content.add(bCancel,c);	
-		
+
 		c.gridx = 2;
 		bOk = new JButton("Speichern");
 		bOk.setMnemonic(KeyEvent.VK_ENTER);
@@ -143,6 +161,11 @@ public class ExportPNGDialog extends JDialog implements ActionListener, CaretLis
 	public boolean IsAccepted()
 	{
 		return accepted;
+	}
+	
+	public boolean isTransparent()
+	{
+		return rTrans.isSelected();
 	}
 	/**
 	 * handling user input action on the (radio-) buttons
