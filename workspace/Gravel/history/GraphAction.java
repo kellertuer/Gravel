@@ -198,13 +198,13 @@ public class GraphAction {
 		VGraph ret;
 		switch(Objecttype)
 		{
-			case GRAPH: //Replace 
+			case GRAPH: //Replace whole graph and save the actual parameter als old object
 				ret = new VGraph(((VGraph)ActionObject).isDirected(), ((VGraph)ActionObject).isLoopAllowed(), ((VGraph)ActionObject).isMultipleAllowed());
 				ret.replace((VGraph)ActionObject);
 				((VGraph)ActionObject).replace(graph);
 				graph.replace(ret);				
 			break;
-			case NODE:
+			case NODE: //Replace Node and keep the given one in the graph as old one
 				VNode n = (VNode)ActionObject;
 				if (graph.getNode(n.index)==null) //node does not exists
 					throw new GraphActionException("Can't replace node, none there.");
@@ -216,7 +216,7 @@ public class GraphAction {
 				exchangeSubSetMembership(NODE,n.index,env,graph);
 				ret = graph; //return graph
 			break;
-			case EDGE:
+			case EDGE: //Replace Edge in graph and keep the replaced one as old one 
 				VEdge e = (VEdge)ActionObject;
 				if (graph.getEdge(e.index)==null) //edge does not exists
 					throw new GraphActionException("Can't replace edge, none there.");
@@ -238,24 +238,27 @@ public class GraphAction {
 				VSubSet newSubSet = (VSubSet)ActionObject;
 				if (graph.getSubSet(newSubSet.getIndex())==null) //edge does not exists
 					throw new GraphActionException("Can't replace subset, none there.");
-				ActionObject = graph.getSubSet(newSubSet.getIndex()); //Old one
-				String newname = name;
-				name = graph.getSubSetName(newSubSet.getIndex()); //Old Name
+				ActionObject = graph.getSubSet(newSubSet.getIndex()); //Save old one in action
+				String newname = name; //temp for actual name
+				name = graph.getSubSetName(newSubSet.getIndex()); //Save Old Name
+				MSubSet tempm = mathsubset.clone();
+				mathsubset = graph.getMathGraph().getSubSet(newSubSet.getIndex());
 				graph.removeSubSet(newSubSet.getIndex()); //Remove old SubSet.
 				graph.addSubSet(newSubSet.getIndex(), newname, newSubSet.getColor());
 				graph.pushNotify(new GraphMessage(GraphMessage.SUBSET,newSubSet.getIndex(),GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.ALL_ELEMENTS));
+				//Reintroduce all Nodes/Edges
 				Iterator<VNode> ni = graph.getNodeIterator();
 				while (ni.hasNext())
 				{
 					VNode n2 = ni.next();
-					if (mathsubset.containsNode(n2.index))
+					if (tempm.containsNode(n2.index))
 						graph.addNodetoSubSet(n2.index, newSubSet.getIndex());
 				}
 				Iterator<VEdge> ei = graph.getEdgeIterator();
 				while (ei.hasNext())
 				{
 					VEdge e2 = ei.next();
-					if (mathsubset.containsEdge(e2.index))
+					if (tempm.containsEdge(e2.index))
 						graph.addEdgetoSubSet(e2.index, newSubSet.getIndex());
 				}
 				graph.pushNotify(new GraphMessage(GraphMessage.SUBSET,newSubSet.getIndex(),GraphMessage.BLOCK_END,GraphMessage.ALL_ELEMENTS));

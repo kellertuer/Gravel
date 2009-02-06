@@ -61,9 +61,8 @@ public class GraphHistoryManager implements Observer
 	{
 		int action = 0;
 		VGraph tempG; //which Graph provides information for the action?
-		switch(m.getChangeStatus()&0x1F) //Action must be spcific, no multiple, so switch not if and masks
-		{								//But also ignore Block-Start&End Stuff
-			case GraphMessage.ADDITION: //Node added, Create action and modify lastgraph
+		switch(m.getChangeStatus()&(~GraphMessage.BLOCK_ALL)) //Action must be spcific, therefore a switch but by ignoring Blocks (thats already handled)
+		{	case GraphMessage.ADDITION: //Node added, Create action and modify lastgraph
 				action = GraphAction.ADDITION;
 				tempG = trackedGraph; //get Information from actual Graph;
 				break;
@@ -106,6 +105,7 @@ public class GraphHistoryManager implements Observer
 		else if (m.getAction()==GraphMessage.SUBSET)
 		{
 			try { 
+				//TODO: Optimize Environment.
 				act = new GraphAction(tempG.getSubSet(m.getElementID()),action, tempG.getMathGraph().getSubSet(m.getElementID()),tempG.getSubSetName(m.getElementID()));
 			}
 			catch (GraphActionException e2)
@@ -125,11 +125,8 @@ public class GraphHistoryManager implements Observer
 		if ((m.getChangeStatus()&GraphMessage.BLOCK_ABORT)==GraphMessage.BLOCK_ABORT)
 			return; //Don't handle Block-Abort-Stuff
 		GraphAction act = null;
-		//TODO: More Single Stuff here
 		if ((m.getElementID() > 0) && (m.getAction()!=GraphMessage.SUBSET)) //Message for single stuff
-		{
 			act = handleSingleAction(m);
-		}
 		else //multiple modifications, up to know just a replace */
 		{
 			//Last status in action - Do i have to clone that?
@@ -252,23 +249,15 @@ public class GraphHistoryManager implements Observer
 			if ((m.getChangeStatus()&GraphMessage.BLOCK_END)==GraphMessage.BLOCK_END) //Block endet with this Message
 			{
 				if (blockdepth > 0)
-				{
 					blockdepth--;
-				}
 				//If We left Block #1 or never were in a Bock set active and give info about block
 				if (blockdepth==0)
-				{
+				{ //Block_END & not Aborted, so we have a Message to handle
 					active = true;
 					if (((m.getChangeStatus() & GraphMessage.BLOCK_ABORT) != GraphMessage.BLOCK_ABORT) && (Blockstart!=null))
-					{
-						/*
-						 * Handle Block Action here 
-						 */
 						addAction(Blockstart);
-					}
 					else if(Blockstart!=null)
-					Blockstart=null;
-					
+						Blockstart=null;					
 				}
 				return;
 			}
@@ -285,9 +274,7 @@ public class GraphHistoryManager implements Observer
 			if (!active)
 				return;
 			if (m.getElementID() != 0) //Temporary Node not mentioning
-			{
 				addAction(m);
-			}
 		}
 	}
 }

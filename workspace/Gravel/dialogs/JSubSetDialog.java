@@ -346,8 +346,12 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 			if (chSubSet==null)
 				startblock = new GraphMessage(GraphMessage.SUBSET, SetIndex, GraphMessage.ADDITION|GraphMessage.BLOCK_START, GraphMessage.NODE|GraphMessage.EDGE);
 			else
-				startblock = new GraphMessage(GraphMessage.SUBSET, SetIndex, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.NODE|GraphMessage.EDGE);
-				
+			{
+				if (SetIndex!=oldindex) //Index modify
+					startblock = new GraphMessage(GraphMessage.SUBSET, SetIndex, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.NODE|GraphMessage.EDGE);
+				else
+					startblock = new GraphMessage(GraphMessage.SUBSET, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS);
+			}	
 			//TESTS
 			//1. Falls der Graph neu ist
 			if (chSubSet==null) //neuer Untergraph, index testen
@@ -370,7 +374,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 			else //2. Untergraphenaenderungsdialog
 			{
 				//Auswertung der neuen Daten, Pruefung auf Korrektheit
-				//Falls sich der Kantenindex geaendert hat darf dieser nicht vergeben sein
+				//Falls sich der UGindex geaendert hat darf dieser nicht vergeben sein
 				if ((graphref.getSubSet(SetIndex)!=null)&&(SetIndex!=oldindex)) //So einen gibt es schon
 				{
 					JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung des Untergraphen nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);

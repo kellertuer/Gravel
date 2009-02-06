@@ -43,6 +43,7 @@ public class GraphMessage {
 	public static final int BLOCK_START = 512;
 	public static final int BLOCK_END = 1024;
 	public static final int BLOCK_ABORT = 2048;
+	public static final int BLOCK_ALL = 0xE00; //All 3 Block-Stati
 	
 	private int id, status, type, affected;
 	private String message="";
