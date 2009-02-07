@@ -202,7 +202,7 @@ import view.pieces.GridComponent;
 		
 		c.gridx = 0; c.gridy = 0;
 		c.gridwidth=3; c.anchor = GridBagConstraints.CENTER;
-		content.add(new JLabel("<html><b>Graph</b></html>"),c);
+		content.add(new JLabel("<html>Graph<</html>"),c);
 
 		c.gridx = 0; c.gridy++;c.gridwidth=2; 
 		c.anchor = GridBagConstraints.WEST;
@@ -226,11 +226,14 @@ import view.pieces.GridComponent;
 		c.gridy++;
 		c.gridx=0; c.gridwidth=2; c.anchor = GridBagConstraints.EAST;
 		content.add(prefStatus,c);
-		
-		
+
+		JSeparator separator = new JSeparator(JSeparator.HORIZONTAL);
+		c.gridx = 0; c.gridy++;c.gridwidth=2; 
+		content.add(separator,c);
+
 		c.gridy++; c.gridx=0;
 		c.gridwidth=3; c.anchor = GridBagConstraints.CENTER;
-		content.add(new JLabel("<html><b>Untergraph<b></html>"),c);
+		content.add(new JLabel("<html>Untergraph</html>"),c);
 
 		c.anchor = GridBagConstraints.EAST;
 		c.gridy++; c.gridx=0;
@@ -427,6 +430,12 @@ import view.pieces.GridComponent;
 		bLoadLastGraphOnStart = new JCheckBox("Beim Start letzten gespeicherten Graphen laden");
 		content.add(bLoadLastGraphOnStart,c);
 
+		JSeparator separator = new JSeparator(JSeparator.HORIZONTAL);
+		c.gridx = 0; c.gridy++;c.gridwidth=2; 
+		content.add(separator,c);
+		
+		c.gridx = 0; c.gridy++;c.gridwidth=2; 
+		content.add(new JLabel("<html>Die Einstellungen f"+main.CONST.html_ue+"r die Widerrufen/Wiederholen-Aktionen<br>werden erst auf einen neuen oder geladenen Graphen aktiv."),c);
 		c.gridx = 0; c.gridy++;c.gridwidth=1; 
 		content.add(new JLabel("<html>Anzahl widerrufbarer Aktionen<br><font size=-2>Experimentiereinstellung</font>"),c);
 		iUndoStacksize = new IntegerTextField();

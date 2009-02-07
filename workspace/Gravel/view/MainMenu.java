@@ -139,7 +139,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         if (!isMac) mEdit.setMnemonic(KeyEvent.VK_E);
         add(mEdit);
 
-        mEdUndo = new JMenuItem("Wiederrufen");
+        mEdUndo = new JMenuItem("Widerrufen");
        	mEdUndo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,MenuAccModifier));
         if (!isMac)
         	mEdUndo.setMnemonic(KeyEvent.VK_U);

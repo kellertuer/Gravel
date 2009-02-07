@@ -53,7 +53,7 @@
 	</group>
 	<group name="history">
 		<value name="Stacksize" type="Integer">50</value>
-		<value name="trackSelection" type="Boolean">true</value>
+		<value name="trackSelection" type="Boolean">false</value>
 	</group>
 	<group name="node">
 		<value name="name" type="String">v_{$ID}</value>
