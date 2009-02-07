@@ -3,7 +3,9 @@ Gravel 0.3
 CHANGELOG
 
 NEUE FEATURES
-- Implementierung von Redo/Undo. Dabei kann in den Einstellungen die Anzahl maximaler Undos eingestellt werden und, ob Selektionsveränderungen auch aufgenommen werden sollen in Undo.
+- Implementierung von Redo/Undo.
+- Experimentelle neue Einstellungen: Undo/Redo-Aktionsumfang
+- neue Einstellung: Sollen Selektionen auch widerrufbar sein können oder nicht.
 
 - Export als SVG-Graphik (danke für die Details & Hilfe an johny_b)
 - Export für TeX erweitert um eine Angabe der Auflösung, damit mehrere Graphen gleichgroß exportiert werden können
@@ -11,6 +13,9 @@ NEUE FEATURES
 - Maus-Aktion: Auf dem Hintergrund mit Shift ein Rechteck aufziehen erweitert die Selektion um das Rechteck
 - Maus-Aktion: Analog dazu mit Alt aufgezogenes Rechteck verringert die Selektion um eben jenes Rechteck
 - Maus-Aktion: Doppelklick auf Knoten öffnet dessen Eigenschaften
+- Die ESC-Taste bricht nun jeden Dialog so ab, als wenn man „Abbrechen“ drückt
+
+- Mac-Feature: Der Schließen-Button oben links zeigt nun auch den Status (Dokument geändert oder nicht) an, wie in den Apple-Guides beschrieben
 
 BUGFIXES
 - Fehler korrigiert, der beim Verändern mehrerer Kanten bewirkte, dass deren Linienart verloren ging
