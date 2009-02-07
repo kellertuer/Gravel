@@ -16,8 +16,12 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,6 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 
 import dialogs.components.CNodeNameParameters;
 
@@ -143,7 +148,22 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 		c.gridx = 0;
 		c.insets = new Insets(3,3,3,3);
 		bCancel = new JButton("Abbrechen");
-		bCancel.addActionListener(this);
+		bCancel.addActionListener(this); 
+		//ESC-Handling
+		InputMap iMap = getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+		
+		ActionMap aMap = getRootPane().getActionMap();
+		aMap.put("escape", new AbstractAction()
+			{
+				private static final long serialVersionUID = 1L;
+
+				public void actionPerformed(ActionEvent e)
+				{
+					dispose();
+				}
+		 	});
+		 	
 		content.add(bCancel,c);
 		
 		c.gridx = 1;
@@ -152,7 +172,6 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 			bOK = new JButton("Knoten erstellen");
 		else
 			bOK = new JButton("<html>"+main.CONST.html_Ae+"nderungen speichern</html>");
-		bOK.setMnemonic(KeyEvent.VK_ENTER);
 		bOK.addActionListener(this);
 		content.add(bOK,c);
 		

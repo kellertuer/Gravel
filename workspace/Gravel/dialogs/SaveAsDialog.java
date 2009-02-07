@@ -13,9 +13,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.KeyStroke;
 /**
  * A Dialog for Save as, where the properties of the GraphML Format are determined
  * - visual or mathematical file format
@@ -58,11 +63,25 @@ public class SaveAsDialog extends JDialog implements ActionListener
 		c.gridx = 0;
 		bCancel = new JButton("Abbrechen");
 		bCancel.addActionListener(this);
-		content.add(bCancel,c);	
+		content.add(bCancel,c);
+		InputMap iMap = getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+
+		ActionMap aMap = getRootPane().getActionMap();
+		aMap.put("escape", new AbstractAction()
+			{
+				private static final long serialVersionUID = 1L;
+
+				public void actionPerformed(ActionEvent e)
+				{
+					accepted = false;
+					dispose();
+				}
+		 	});
+
 
 		c.gridx = 1;
 		bOk = new JButton("Speichern");
-		bOk.setMnemonic(KeyEvent.VK_ENTER);
 		bOk.addActionListener(this);
 		content.add(bOk,c);
 		

@@ -3,7 +3,6 @@ package dialogs;
 
 import io.GeneralPreferences;
 
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -15,11 +14,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.ButtonGroup;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -28,7 +32,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
@@ -47,7 +51,7 @@ import view.pieces.GridComponent;
  * Dialog for changing the General Preferences, and check its validity
  * @author Ronny Bergmann
  *
- */public class JPreferencesDialog extends JDialog implements ActionListener, ItemListener, ChangeListener, CaretListener
+ */public class JPreferencesDialog extends JDialog implements ActionListener, ItemListener, ChangeListener, CaretListener, KeyListener
 {
 	/**
 	 * 
@@ -126,17 +130,26 @@ import view.pieces.GridComponent;
 		c.insets = new Insets(3,3,3,3);
 		bCancel.addActionListener(this);
 		ContentPane.add(bCancel,c);
-		
+		//Add ESC-Handling
+		InputMap iMap = getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+
+		ActionMap aMap = getRootPane().getActionMap();
+		aMap.put("escape", new AbstractAction()
+			{
+				private static final long serialVersionUID = 1L;
+
+				public void actionPerformed(ActionEvent e)
+				{
+					dispose();
+				}
+		 	});
+
 		c.gridx = 1;
 		c.anchor = GridBagConstraints.EAST;
 		bOK = new JButton("Ok");
-		bOK.setMnemonic(KeyEvent.VK_ENTER);
 		bOK.addActionListener(this);
 		ContentPane.add(bOK,c);
-		
-		//setSize(900,300);
-		//ContentPane.setMinimumSize(new Dimension(900,300));
-
 		
 		fillValues();
 		
@@ -624,12 +637,9 @@ import view.pieces.GridComponent;
 		{}
 	}
 	
-	public void itemStateChanged(ItemEvent event) 
-	{}
+	public void itemStateChanged(ItemEvent event) {}
 
-	public void stateChanged(ChangeEvent e) 
-	{
-	}
+	public void stateChanged(ChangeEvent e) {}
 	
 	public void caretUpdate(CaretEvent event) {
 /*		else if (event.getSource()==iEdgeWidth)
@@ -682,5 +692,12 @@ import view.pieces.GridComponent;
 				t = t.substring(0,15)+"...";
 			tSubSetPreview.setText("<html><font size=-1>Vorschau: <i>"+t+"</i> </font></html>");
 		} 
+	}
+	public void keyPressed(KeyEvent e) {}
+	public void keyReleased(KeyEvent e) {}
+	public void keyTyped(KeyEvent e) { //Handle ESC on Cancel
+		System.err.println(e.getKeyChar()+"=?="+KeyEvent.VK_ESCAPE+" and "+e.getKeyCode());
+	        if (e.getKeyChar() == KeyEvent.VK_ESCAPE)
+	            bCancel.doClick();
 	}
 }

@@ -12,12 +12,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.ButtonGroup;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
+import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
@@ -139,10 +144,23 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 		bCancel = new JButton("Abbrechen");
 		bCancel.addActionListener(this);
 		content.add(bCancel,c);	
-		
+		//Add ESC-Handling
+		InputMap iMap = getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+
+		ActionMap aMap = getRootPane().getActionMap();
+		aMap.put("escape", new AbstractAction()
+			{
+				private static final long serialVersionUID = 1L;
+
+				public void actionPerformed(ActionEvent e)
+				{	
+					accepted = false;
+					dispose();
+				}
+		 	});
 		c.gridx = 2;
 		bOk = new JButton("Speichern");
-		bOk.setMnemonic(KeyEvent.VK_ENTER);
 		bOk.addActionListener(this);
 		content.add(bOk,c);
 	

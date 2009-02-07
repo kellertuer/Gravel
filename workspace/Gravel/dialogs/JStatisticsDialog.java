@@ -17,10 +17,15 @@ import java.awt.event.TextListener;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 
 import model.GraphStatisticAtoms;
 
@@ -136,6 +141,22 @@ public class JStatisticsDialog extends JDialog implements ActionListener, TextLi
 		bCancel.addActionListener(this);
 		c.insets = new Insets(3,3,3,3);
 		content.add(bCancel,c);
+		//Add ESC-Handling
+		InputMap iMap = getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+
+		ActionMap aMap = getRootPane().getActionMap();
+		aMap.put("escape", new AbstractAction()
+			{
+				private static final long serialVersionUID = 1L;
+
+				public void actionPerformed(ActionEvent e)
+				{
+					dispose();
+				}
+		 	});
+
+		
 		
 		c.anchor = GridBagConstraints.EAST;
 		c.gridx = 1;
@@ -143,7 +164,6 @@ public class JStatisticsDialog extends JDialog implements ActionListener, TextLi
 			bOK = new JButton("Neuen Statistik Eintrag erstellen");
 		else
 			bOK = new JButton("<html>"+main.CONST.html_Ae+"nderungen speichern</html>");
-		bOK.setMnemonic(KeyEvent.VK_ENTER);
 		bOK.addActionListener(this);
 		content.add(bOK,c);
 		

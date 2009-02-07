@@ -8,14 +8,20 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.Observable;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -106,18 +112,19 @@ public class GridComponent extends Observable implements ChangeListener, ActionL
 		rbOrientated.setSelected(false);
 		content.add(rbOrientated,c);
 		
-		c.gridy++; c.gridx = 1; 
+		c.gridy++; c.gridx = 0; 
 		c.gridwidth = 1; c.anchor = GridBagConstraints.EAST;
-		bOk = new JButton("Ok");
-		bOk.setVisible(false);
-		bOk.addActionListener(this);
-		content.add(bOk,c);
-		c.gridx++;
 		bCancel = new JButton("Abbrechen");
 		bCancel.addActionListener(this);
 		bCancel.setVisible(false);
 		content.add(bCancel,c);
-		
+
+		c.gridx+=2;
+		bOk = new JButton("Ok");
+		bOk.setVisible(false);
+		bOk.addActionListener(this);
+		content.add(bOk,c);
+
 		reload();
 		content.revalidate();
 	}
@@ -239,10 +246,10 @@ public class GridComponent extends Observable implements ChangeListener, ActionL
 		content.revalidate();
 	}
 	/**
-	 * Öffnet die Einstellungen des Rasters in einem eigenständigen Dialog. 
-	 * Dieser kann über den Parameter modal (im Vordergrund) gesetzt werden
+	 * Opens Grid-Options in seperate Dialog (and therefore adds ESC-Handling 
+	 * This Diaog can be made modal by the parameter boolean
 	 * 
-	 * @param modal Modalität des Dialogs
+	 * @param modal sets the Dialog modal if true, els nonmodal
 	 */
 	public void showDialog(boolean modal)
 	{
@@ -260,6 +267,23 @@ public class GridComponent extends Observable implements ChangeListener, ActionL
 		p.x += Math.round(Gui.getInstance().getParentWindow().getWidth()/2);
 		p.y -= Math.round(GridDialog.getHeight()/2);
 		p.x -= Math.round(GridDialog.getWidth()/2);
+		
+		//ESC-Handling
+		InputMap iMap = GridDialog.getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+		
+		ActionMap aMap = GridDialog.getRootPane().getActionMap();
+		aMap.put("escape", new AbstractAction()
+			{
+				private static final long serialVersionUID = 1L;
+
+				public void actionPerformed(ActionEvent e)
+				{
+					doQuit();
+				}
+		 	});
+
+		
 		GridDialog.setLocation(p.x,p.y);
 		GridDialog.setVisible(true);
 	}
@@ -301,6 +325,20 @@ public class GridComponent extends Observable implements ChangeListener, ActionL
 			setChanged();
 			notifyObservers("Grid");
 		}
+	}
+	private void doQuit()
+	{
+		 //Setzt auf Anfangs-Werte zurück, informiert die Beobachter (dort neu zeichnen) und beendet den Dialog
+		valuex = gp.getIntValue("grid.x");
+		valuey = gp.getIntValue("grid.y");
+		rbEnabled.setSelected(gp.getBoolValue("grid.enabled"));
+		rbSynchron.setSelected(gp.getBoolValue("grid.synchron"));
+		rbOrientated.setSelected(gp.getBoolValue("grid.orientated"));
+		bOk.setVisible(false);
+		bCancel.setVisible(false);
+		setChanged();
+		notifyObservers("Grid");
+		GridDialog.dispose();
 	}
 	/**
 	 * Alle Klicks auf  Checkbox-Elemente und Buttons werden hier behandel
@@ -352,17 +390,8 @@ public class GridComponent extends Observable implements ChangeListener, ActionL
 			GridDialog.dispose();
 		}
 		else if (e.getSource()==bCancel)
-		{ //Setzt auf Anfangs-Werte zurück, informiert die Beobachter (dort neu zeichnen) und beendet den Dialog
-			valuex = gp.getIntValue("grid.x");
-			valuey = gp.getIntValue("grid.y");
-			rbEnabled.setSelected(gp.getBoolValue("grid.enabled"));
-			rbSynchron.setSelected(gp.getBoolValue("grid.synchron"));
-			rbOrientated.setSelected(gp.getBoolValue("grid.orientated"));
-			bOk.setVisible(false);
-			bCancel.setVisible(false);
-			setChanged();
-			notifyObservers("Grid");
-			GridDialog.dispose();
+		{
+			doQuit();
 		}
 	}
 	/**

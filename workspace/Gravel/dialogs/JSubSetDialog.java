@@ -17,13 +17,18 @@ import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 
 import view.Gui;
 
@@ -190,6 +195,19 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 		bCancel = new JButton("Abbrechen");
 		bCancel.addActionListener(this);
 		content.add(bCancel,c);
+		InputMap iMap = getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+
+		ActionMap aMap = getRootPane().getActionMap();
+		aMap.put("escape", new AbstractAction()
+			{
+				private static final long serialVersionUID = 1L;
+
+				public void actionPerformed(ActionEvent e)
+				{
+					dispose();
+				}
+		 	});
 
 		c.gridx = 1;
 		c.anchor = GridBagConstraints.EAST;
@@ -197,7 +215,6 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 			bOK = new JButton("Untergraphen erstellen");
 		else
 			bOK = new JButton("<html>"+main.CONST.html_Ae+"nderungen speichern</html>");
-		bOK.setMnemonic(KeyEvent.VK_ENTER);
 		bOK.addActionListener(this);
 		content.add(bOK,c);
 

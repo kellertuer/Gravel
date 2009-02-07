@@ -15,9 +15,13 @@ import java.awt.event.KeyEvent;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -25,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
@@ -180,11 +185,24 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		bCancel = new JButton("Abbrechen");
 		bCancel.addActionListener(this);
 		ContentPane.add(bCancel,c);
-		
+		//Add ESC-Handling
+		InputMap iMap = getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+
+		ActionMap aMap = getRootPane().getActionMap();
+		aMap.put("escape", new AbstractAction()
+			{
+				private static final long serialVersionUID = 1L;
+
+				public void actionPerformed(ActionEvent e)
+				{
+					dispose();
+				}
+		 	});
+
 		c.gridx = 1;
 		c.anchor = GridBagConstraints.EAST;
 		bOk = new JButton("Ok");
-		bOk.setMnemonic(KeyEvent.VK_ENTER);
 		bOk.addActionListener(this);
 		ContentPane.add(bOk,c);
 		

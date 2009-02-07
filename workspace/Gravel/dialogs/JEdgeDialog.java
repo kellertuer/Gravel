@@ -14,10 +14,14 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.ButtonGroup;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -26,6 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 
 import dialogs.components.*;
 
@@ -208,13 +213,27 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		bCancel.addActionListener(this);
 		ContentPane.add(bCancel,c);
 		
+		//Add ESC-Handling
+		InputMap iMap = getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+
+		ActionMap aMap = getRootPane().getActionMap();
+		aMap.put("escape", new AbstractAction()
+			{
+				private static final long serialVersionUID = 1L;
+
+				public void actionPerformed(ActionEvent e)
+				{
+					dispose();
+				}
+		 	});
+		
 		c.gridx = 1;
 		c.anchor = GridBagConstraints.EAST;
 		if (e==null)
 			bOK = new JButton("Kante erstellen");
 		else
 			bOK = new JButton("<html>"+main.CONST.html_Ae+"nderungen speichern</html>");
-		bOK.setMnemonic(KeyEvent.VK_ENTER);
 		bOK.addActionListener(this);
 		ContentPane.add(bOK,c);
 		
