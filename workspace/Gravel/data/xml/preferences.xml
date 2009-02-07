@@ -19,8 +19,8 @@
 		<value name="arrpart" type="Integer">75</value>
 		<value name="arrpos" type="Integer">100</value>
 		<value name="arrsize" type="Integer">14</value>
-		<value name="line_distance" type="Integer">5</value>
-		<value name="line_length" type="Integer">12</value>
+		<value name="line_distance" type="Integer">15</value>
+		<value name="line_length" type="Integer">10</value>
 		<value name="line_type" type="Integer">1</value>
 		<value name="loopclockwise" type="Boolean">true</value>
 		<value name="loopdirection" type="Integer">0</value>
@@ -34,12 +34,12 @@
 		<value name="text_size" type="Integer">12</value>
 		<value name="text_visible" type="Boolean">false</value>
 		<value name="value" type="Integer">1</value>
-		<value name="width" type="Integer">2</value>
+		<value name="width" type="Integer">1</value>
 	</group>
 	<group name="graph">
 		<value name="allowloops" type="Boolean">true</value>
 		<value name="allowmultiple" type="Boolean">true</value>
-		<value name="directed" type="Boolean">true</value>
+		<value name="directed" type="Boolean">false</value>
 		<value name="fileformat" type="String">visual</value>
 		<value name="lastfile" type="String">$NONE</value>
 		<value name="loadfileonstart" type="Boolean">false</value>
@@ -53,11 +53,11 @@
 	</group>
 	<group name="node">
 		<value name="name" type="String">v_{$ID}</value>
-		<value name="name_distance" type="Integer">13</value>
-		<value name="name_rotation" type="Integer">0</value>
+		<value name="name_distance" type="Integer">18</value>
+		<value name="name_rotation" type="Integer">270</value>
 		<value name="name_size" type="Integer">12</value>
 		<value name="name_visible" type="Boolean">false</value>
-		<value name="size" type="Integer">15</value>
+		<value name="size" type="Integer">8</value>
 	</group>
 	<group name="pref">
 		<value name="saveonexit" type="Boolean">true</value>

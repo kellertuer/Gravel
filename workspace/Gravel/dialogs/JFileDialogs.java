@@ -148,21 +148,20 @@ public class JFileDialogs implements Observer
 		}
 	}
 	
-	private boolean actualgraphsaved = false;
 	private boolean saveVisual = true;
 	
 	private VGraphic vGc;
-	
+	private boolean actualState;
 	/**
 	 * Constructor 
 	 * @param pvg the actual graph editor Component
 	 * @param programmstart initialize graphsaved
 	 */
-	public JFileDialogs(VGraphic pvg, boolean graphsaved)
+	public JFileDialogs(VGraphic pvg)
 	{
 		vGc = pvg;
 		vGc.getVGraph().addObserver(this);
-		actualgraphsaved = graphsaved;		
+		actualState=vGc.getGraphHistoryManager().IsGraphUnchanged();
 	}
 	
 	/**
@@ -220,7 +219,8 @@ public class JFileDialogs implements Observer
 					Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+"");
 	    			vGc.getVGraph().getMathGraph().deleteObserver(this);
 	    			vGc.getVGraph().addObserver(this);
-	    			actualgraphsaved = true;
+	    			//Set actual State saved.
+	    			vGc.getGraphHistoryManager().GraphSaved();
 	    			return true;
 	    		}
 	    		else
@@ -261,7 +261,8 @@ public class JFileDialogs implements Observer
 			if (iw.saveVisualToFile(f).equals("")) //Saving successfull
 			{
 				Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName());
-				actualgraphsaved = true;
+    			//Set actual State saved.
+    			vGc.getGraphHistoryManager().GraphSaved();
 				return true;
 			}
 		}
@@ -270,7 +271,8 @@ public class JFileDialogs implements Observer
 			if (iw.saveMathToFile(f).equals("")) //Saving sucessful
 			{
 				Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+" (math only)");
-				actualgraphsaved = true;
+    			//Set actual State saved.
+    			vGc.getGraphHistoryManager().GraphSaved();
 				return true;				
 			}
 		}
@@ -316,7 +318,8 @@ public class JFileDialogs implements Observer
 						vGc.getVGraph().getMathGraph().deleteObserver(this);
 						vGc.getVGraph().addObserver(this);
 						Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName());
-						actualgraphsaved = true;
+		    			//Set actual State saved.
+		    			vGc.getGraphHistoryManager().GraphSaved();
 					}
 				}
 				else
@@ -329,7 +332,8 @@ public class JFileDialogs implements Observer
 						vGc.getVGraph().getMathGraph().addObserver(this);
 						vGc.getVGraph().deleteObserver(this);
 						Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+" (math only)");
-						actualgraphsaved = true;
+		    			//Set actual State saved.
+		    			vGc.getGraphHistoryManager().GraphSaved();
 					}
 				}
 			} //End of SaveAsAccepted
@@ -424,15 +428,15 @@ public class JFileDialogs implements Observer
 
 	public boolean isGraphSaved()
 	{
-		return actualgraphsaved;
+		return vGc.getGraphHistoryManager().IsGraphUnchanged();
 	}
 	private boolean SaveOnNewOrOpen()
 	{
-		if ((!actualgraphsaved)&&(vGc.getVGraph().NodeCount()>0)) //save
+		if ((!vGc.getGraphHistoryManager().IsGraphUnchanged())&&(vGc.getVGraph().NodeCount()>0)) //saved/no changes
         {
         	if (GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
         	{ //SaveAs anbieten
-				int sel = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html><p>Der aktuelle Graph ist nicht gespeichert worden.M"+main.CONST.html_oe+"chten Sie den Graph noch speichern ?</p></html>"
+				int sel = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html><p>Der aktuelle Graph ist nicht gespeichert worden.<br>M"+main.CONST.html_oe+"chten Sie den Graph noch speichern ?</p></html>"
 						, "Graph nicht gespeichert", JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE);
 			if (sel == JOptionPane.CANCEL_OPTION)
 				return false;
@@ -442,7 +446,7 @@ public class JFileDialogs implements Observer
         	else //Sonst Save anbieten
         	{
         		File f = new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile"));
-				int sel = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html><p>Die letzten "+main.CONST.html_Ae+"nderungen an<br><i>"+f.getName()+"</i><br>wurden nicht gespeichert. M"+main.CONST.html_oe+"chten Sie diese jetzt speichern ?</p></html>"
+				int sel = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html><p>Die letzten "+main.CONST.html_Ae+"nderungen an<br><i>"+f.getName()+"</i><br>wurden nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie diese jetzt speichern ?</p></html>"
 						, "Graph nicht gespeichert", JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE);
 				if (sel == JOptionPane.CANCEL_OPTION)
 					return false;
@@ -470,32 +474,39 @@ public class JFileDialogs implements Observer
 	}	
 	
 	public void update(Observable arg0, Object arg1) {
-		if (!actualgraphsaved) //Not saved yet
+		if (this.actualState!=vGc.getGraphHistoryManager().IsGraphUnchanged()) //State Changed
+			actualState = vGc.getGraphHistoryManager().IsGraphUnchanged();
+		else
 			return;
-		
-		GraphMessage m = (GraphMessage)arg1;
-		if (m!=null)
-		{
-			//If anything other than selection is Affected or changed
-			if (((m.getAffectedTypes()!=0)&&(m.getAffectedTypes()!=GraphMessage.SELECTION))||((m.getAction()!=GraphMessage.SELECTION)&&(m.getAction()!=0)))
-			{	//Graph Changed => not Saved anymore
-				
-				actualgraphsaved = false;				
-				if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
-				{
-					if (saveVisual)
-					{
-						Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName())+"*");
-					}
-					else
-					{
-						Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName())+"* (math only)");					
-					}
-				}
+		String newtitle="";
+		if (actualState) //Graph is unchanged again
+		{			
+			if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
+			{	if (saveVisual)
+					newtitle = Gui.WindowName+" - "+(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName())+"";
 				else
-				Gui.getInstance().getParentWindow().setTitle(Gui.WindowName);
+					newtitle = Gui.WindowName+" - "+(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName())+" (math only)";					
 			}
+			else
+				newtitle = Gui.WindowName;
+        	if (System.getProperty("os.name").toLowerCase().indexOf("mac")!=-1) //Back to X as close
+        		Gui.getInstance().getParentWindow().getRootPane().putClientProperty( "Window.documentModified", Boolean.FALSE );
+		}		
+		else //Graph not saved
+		{
+			if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
+			{	if (saveVisual)
+					newtitle = Gui.WindowName+" - "+(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName())+"*";
+				else
+					newtitle = Gui.WindowName+" - "+(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName())+"* (math only)";					
+			}
+			else
+				newtitle = Gui.WindowName;
+        	if (System.getProperty("os.name").toLowerCase().indexOf("mac")!=-1) //Back to Circle on CLose
+        		Gui.getInstance().getParentWindow().getRootPane().putClientProperty( "Window.documentModified", Boolean.TRUE );
+
 		}
+		Gui.getInstance().getParentWindow().setTitle(newtitle);
 	}
 
 }

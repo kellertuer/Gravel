@@ -57,7 +57,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         GraphHistory = graphpart.getGraphHistoryManager();
         isMac = (System.getProperty("os.name").toLowerCase().indexOf("mac")!=-1);
         createMenuBar();
-		fileDialogs = new JFileDialogs(vgraphic, GeneralPreferences.getInstance().getBoolValue("graph.loadfileonstart"));
+		fileDialogs = new JFileDialogs(vgraphic);
 		setOpaque(true);
         setPreferredSize(new Dimension(200, 20));
         graphpart.getVGraph().addObserver(this);

@@ -21,7 +21,7 @@ public class GraphHistoryManager implements Observer
 	VGraph trackedGraph, lastGraph;
 	GraphMessage Blockstart;
 	boolean active = true, trackSelection;
-	int blockdepth, stacksize;
+	int blockdepth, stacksize, SavedUndoStackSize;
 	LinkedList<GraphAction> UndoStack, RedoStack;
 	
 	/**
@@ -39,6 +39,7 @@ public class GraphHistoryManager implements Observer
 		RedoStack = new LinkedList<GraphAction>();
 		stacksize=10;
 		trackSelection=false;
+		SavedUndoStackSize = 0;
 	}
    /**
 	 * Create an Action based on the message, that came from the Graph,
@@ -131,8 +132,7 @@ public class GraphHistoryManager implements Observer
 	 * Create an Action based on tracked Message
 	 * @param m
 	 */
-	private void addAction(GraphMessage m)
-	{	
+	private void addAction(GraphMessage m)	{	
 		if ((m.getChangeStatus()&GraphMessage.BLOCK_ABORT)==GraphMessage.BLOCK_ABORT)
 			return; //Don't handle Block-Abort-Stuff
 		GraphAction act = null;
@@ -156,11 +156,13 @@ public class GraphHistoryManager implements Observer
 			if (!RedoStack.isEmpty())
 				RedoStack.clear();
 			if (UndoStack.size()>=stacksize)
+			{	//Now it can't get Unchanged by Undo
+				SavedUndoStackSize--;
 				UndoStack.remove();
+			}
 			UndoStack.add(act);
 		}
 	}
-
 	/**
 	 * Indicates, whether an undo is possible or not
 	 * 
@@ -222,12 +224,32 @@ public class GraphHistoryManager implements Observer
 			System.err.println("An error occured when Redoing an Action: "+e.getMessage());
 		}
 		if (UndoStack.size()>=stacksize)
+		{	
+			SavedUndoStackSize--;
 			UndoStack.remove();
+		}
 		UndoStack.add(LastAction);
 		trackedGraph.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.UPDATE));
 		trackedGraph.addObserver(this); //Activate Tracking again
 	}
 	
+	/**
+	 * Is the Tracked Graph Unchanged since last 
+	 * @return
+	 */
+	public boolean IsGraphUnchanged()
+	{
+		return (SavedUndoStackSize==UndoStack.size());
+	}
+	/**
+	 * Set actual Graph as saved, this status is remembered, 
+	 * if the undoManager comes back to it, the graph is indicated as saved again
+	 *
+	 */
+	public void GraphSaved()
+	{
+		SavedUndoStackSize=UndoStack.size();
+	}
 	public void update(Observable o, Object arg) 
 	{
 		GraphMessage m = (GraphMessage) arg;
@@ -242,6 +264,7 @@ public class GraphHistoryManager implements Observer
 				UndoStack = new LinkedList<GraphAction>();
 				RedoStack = new LinkedList<GraphAction>();
 				active=true;
+				SavedUndoStackSize=0;
 				return;
 		}
 		if ((m.getAction()==GraphMessage.SELECTION)&&(!trackSelection))
