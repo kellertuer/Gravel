@@ -183,7 +183,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     	if (!isMac) mEdit.setMnemonic(KeyEvent.VK_E);
     	mEdit.add(mEdUndo);
     	mEdit.add(mEdRedo);
-    	
+    	mEdit.addSeparator();
     	mEdit.add(mEdDelSelection);        
         mEdit.add(mEdModifySelection);
         mEdit.add(mEdArrangeSelection);
