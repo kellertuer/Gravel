@@ -3,6 +3,7 @@ package dialogs;
 
 import io.GeneralPreferences;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -24,8 +25,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
@@ -51,10 +54,10 @@ import view.pieces.GridComponent;
 	 */
 	private static final long serialVersionUID = 42L;
 	private GeneralPreferences gp;
-	private IntegerTextField iNodeSize, iEdgeWidth, iEdgeValue, iControlPointSize;
+	private IntegerTextField iNodeSize, iEdgeWidth, iEdgeValue, iControlPointSize, iUndoStacksize;
 	private JTextField tNodeName, tSubSetName, tEdgeName;
 	private JLabel tNodePreview, tSubSetPreview, tEdgePreview;
-	private JCheckBox bControlPoint,bSaveOnExit,bAllowLoops, bAllowMultiple, bLoadLastGraphOnStart;
+	private JCheckBox bControlPoint,bSaveOnExit,bAllowLoops, bAllowMultiple, bLoadLastGraphOnStart, bUndotrackSelection;
 	private ButtonGroup GraphType;
 	private JRadioButton rDirected, rUndirected;
 	private GridComponent grid;
@@ -101,11 +104,11 @@ import view.pieces.GridComponent;
 		String[] nametemp = {"Pfeil","Beschriftung","Linienstil","Schleifen"};
 		edgesubtexts = nametemp;
 		tabs.setTabPlacement(JTabbedPane.TOP);
-		tabs.addTab("Allgemein", buildMainPane());
+		tabs.addTab("Allgemein", buildPropPane());
 		tabs.addTab("Ansicht", buildViewPane());
+		tabs.addTab("Graph", buildGraphPane());
 		tabs.addTab("Knoten",buildNodePane());
 		tabs.addTab("Kante", buildEdgePane());
-		tabs.addTab("Untergraph", buildSubSetPane());
 		Container ContentPane = this.getContentPane();
 		ContentPane.removeAll();
 		ContentPane.setLayout(new GridBagLayout());
@@ -131,8 +134,8 @@ import view.pieces.GridComponent;
 		bOK.addActionListener(this);
 		ContentPane.add(bOK,c);
 		
-		setSize(500,300);
-		ContentPane.setMinimumSize(new Dimension(500,300));
+		//setSize(900,300);
+		//ContentPane.setMinimumSize(new Dimension(900,300));
 
 		
 		fillValues();
@@ -158,6 +161,8 @@ import view.pieces.GridComponent;
 	{
 		bSaveOnExit.setSelected(gp.getBoolValue("pref.saveonexit"));
 		bLoadLastGraphOnStart.setSelected(gp.getBoolValue("graph.loadfileonstart"));
+		bUndotrackSelection.setSelected(gp.getBoolValue("history.trackSelection"));
+		iUndoStacksize.setValue(gp.getIntValue("history.Stacksize"));
 		
 		rDirected.setSelected(gp.getBoolValue("graph.directed"));
 		rUndirected.setSelected(!gp.getBoolValue("graph.directed"));
@@ -185,49 +190,22 @@ import view.pieces.GridComponent;
 	 * Build the main Tab with its parameter fields and
 	 * @return return the JPanel conaitning all fields
 	 */
-	private JPanel buildMainPane()
+	private JPanel buildGraphPane()
 	{
 		JPanel content = new JPanel();
 		content.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(7,7,7,7);
-		c.anchor = GridBagConstraints.WEST;
+		
+		
+		
 		
 		c.gridx = 0; c.gridy = 0;
-		c.gridwidth = 2;
-		content.add(new JLabel("<html>Alle Einstellungen sind Standardwerte, die als<br>Vorgabe beim Erstellen neuer Elemente genutzt werden."),c);
-		c.gridx = 0; c.gridy++;c.gridwidth=1;
-		
-		content.add(new JLabel("Letzte gespeicherte Werte laden"),c);
-		c.gridx++;
-		bLoad = new JButton("Laden");
-		bLoad.addActionListener(this);
-		content.add(bLoad,c);
-		
-		c.gridx = 0; c.gridy++;
-		content.add(new JLabel("Anfangswerte laden"),c);
-		c.gridx++;
-		bRestore = new JButton("<html>Zur"+main.CONST.html_ue+"cksetzen</html>");
-		bRestore.addActionListener(this);
-		content.add(bRestore,c);
-		
-		c.gridx = 0; c.gridy++;
-		content.add(new JLabel("Werte speichern"),c);
-		c.gridx++;
-		bSave = new JButton("Speichern");
-		bSave.addActionListener(this);
-		content.add(bSave,c);
-		
-		
-		c.gridx = 0; c.gridy++;c.gridwidth=2; 
-		bSaveOnExit  = new JCheckBox("Einstellungen bei Beenden des Programms speichern");		
-		content.add(bSaveOnExit,c);
+		c.gridwidth=3; c.anchor = GridBagConstraints.CENTER;
+		content.add(new JLabel("<html><b>Graph</b></html>"),c);
 
 		c.gridx = 0; c.gridy++;c.gridwidth=2; 
-		bLoadLastGraphOnStart = new JCheckBox("Beim Start letzten gespeicherten Graphen laden");
-		content.add(bLoadLastGraphOnStart,c);
-
-		c.gridx = 0; c.gridy++;c.gridwidth=2; 
+		c.anchor = GridBagConstraints.WEST;
 		GraphType = new ButtonGroup();
 		content.add(new JLabel("Neue Graphen erstellen mit den Eigenschaften"),c);
 		
@@ -248,6 +226,29 @@ import view.pieces.GridComponent;
 		c.gridy++;
 		c.gridx=0; c.gridwidth=2; c.anchor = GridBagConstraints.EAST;
 		content.add(prefStatus,c);
+		
+		
+		c.gridy++; c.gridx=0;
+		c.gridwidth=3; c.anchor = GridBagConstraints.CENTER;
+		content.add(new JLabel("<html><b>Untergraph<b></html>"),c);
+
+		c.anchor = GridBagConstraints.EAST;
+		c.gridy++; c.gridx=0;
+		c.gridwidth=1;
+		content.add(new JLabel("Name"),c);
+		tSubSetName = new JTextField();
+		tSubSetName.addCaretListener(this);
+		c.gridx++;
+		c.gridwidth=2;
+		content.add(tSubSetName,c);
+		tSubSetPreview = new JLabel();
+		c.insets = new Insets(0,14,7,0);
+		c.gridy++; content.add(tSubSetPreview,c);
+		tSubSetName.setPreferredSize(new Dimension(200, 20));
+		c.gridy++;
+		c.gridx=0;
+		c.insets = new Insets(7,7,7,7);
+
 		return content;
 	}
 	/**
@@ -319,30 +320,6 @@ import view.pieces.GridComponent;
 	 * Create the SubSet-Stanardvalues Parameter Tab
 	 * @return and return the JPanel
 	 */
-	private JPanel buildSubSetPane()
-	{
-		JPanel content = new JPanel();
-		
-		content.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.insets = new Insets(7,7,7,7);
-		c.anchor = GridBagConstraints.WEST;
-		
-		c.gridx = 0; c.gridy = 0; 
-		content.add(new JLabel("Name"),c);
-		tSubSetName = new JTextField();
-		tSubSetName.addCaretListener(this);
-		c.gridx++;
-		content.add(tSubSetName,c);
-		tSubSetPreview = new JLabel();
-		c.insets = new Insets(0,14,7,0);
-		c.gridy++; content.add(tSubSetPreview,c);
-		tSubSetName.setPreferredSize(new Dimension(200, 20));
-		c.gridy++;
-		c.gridx=0;
-		c.insets = new Insets(7,7,7,7);
-		return content;
-	}
 	/**
 	 * Build the Edge JPanel containing all Edge Standard Value and
 	 * @return return the JPanel
@@ -409,6 +386,60 @@ import view.pieces.GridComponent;
 		content.add(cArrowPreview,c);
 		return content;
 	}
+	
+	private JPanel buildPropPane() {
+		JPanel content = new JPanel();
+		content.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(7,7,7,7);
+		c.anchor = GridBagConstraints.WEST;
+		
+		c.gridx = 0; c.gridy = 0;
+		c.gridwidth = 2;
+		content.add(new JLabel("<html>Alle Einstellungen sind Standardwerte, die als<br>Vorgabe beim Erstellen neuer Elemente genutzt werden."),c);
+		c.gridx = 0; c.gridy++;c.gridwidth=1;
+		
+		content.add(new JLabel("Letzte gespeicherte Werte laden"),c);
+		c.gridx++;
+		bLoad = new JButton("Laden");
+		bLoad.addActionListener(this);
+		content.add(bLoad,c);
+		
+		c.gridx = 0; c.gridy++;
+		content.add(new JLabel("Anfangswerte laden"),c);
+		c.gridx++;
+		bRestore = new JButton("<html>Zur"+main.CONST.html_ue+"cksetzen</html>");
+		bRestore.addActionListener(this);
+		content.add(bRestore,c);
+		
+		c.gridx = 0; c.gridy++;
+		content.add(new JLabel("Werte speichern"),c);
+		c.gridx++;
+		bSave = new JButton("Speichern");
+		bSave.addActionListener(this);
+		content.add(bSave,c);	
+		
+		c.gridx = 0; c.gridy++;c.gridwidth=2; 
+		bSaveOnExit  = new JCheckBox("Einstellungen bei Beenden des Programms speichern");		
+		content.add(bSaveOnExit,c);
+
+		c.gridx = 0; c.gridy++;c.gridwidth=2; 
+		bLoadLastGraphOnStart = new JCheckBox("Beim Start letzten gespeicherten Graphen laden");
+		content.add(bLoadLastGraphOnStart,c);
+
+		c.gridx = 0; c.gridy++;c.gridwidth=1; 
+		content.add(new JLabel("<html>Anzahl widerrufbarer Aktionen<br><font size=-2>Experimentiereinstellung</font>"),c);
+		iUndoStacksize = new IntegerTextField();
+		c.gridx++;
+		content.add(iUndoStacksize,c);
+		iUndoStacksize.setPreferredSize(new Dimension(100, 20));
+		c.gridx = 0; c.gridy++;c.gridwidth=2; 
+		bUndotrackSelection = new JCheckBox("<html>Selektionsver"+main.CONST.html_ae+"nderungen aufzeichnen<br><font size=-2>Durch Aufzeichnung k"+main.CONST.html_oe+"nnen diese widerrufen werden.</font></html>");
+		content.add(bUndotrackSelection,c);
+
+		return content;
+	}
+
 	/**
 	 * Check all Parameter Fields and 
 	 * 
@@ -416,6 +447,8 @@ import view.pieces.GridComponent;
 	 */
 	private String check()
 	{
+		if (iUndoStacksize.getValue()==-1)
+			return "Die Anzahl Aktionen, die Widerrufen werden k"+main.CONST.html_oe+"nnen, ist nicht angegeben";
 		if (bControlPoint.isSelected()&&(iControlPointSize.getValue()==-1))
 		{
 			return "<html>Die Kantenkontrollpunktgr"+main.CONST.html_oe+""+main.CONST.html_sz+"e ist fehlerhaft</html>";
@@ -481,6 +514,10 @@ import view.pieces.GridComponent;
 		gp.setBoolValue("grid.synchron", grid.isSynchron());
 		gp.setIntValue("grid.x", grid.getGridX());
 		gp.setIntValue("grid.y", grid.getGridY());
+		
+		gp.setBoolValue("history.trackSelection", bUndotrackSelection.isSelected());
+		gp.setIntValue("history.Stacksize", iUndoStacksize.getValue());
+		
 		gp.setStringValue("node.name", tNodeName.getText());
 		gp.setIntValue("node.size", iNodeSize.getValue());
 		

@@ -478,7 +478,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			{
 				if (Gui.getInstance().getVGraph().NodeCount()>0) //es gibt überhaupt was
 				{
-					int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Der aktuelle Graph wurde nicht gespeichert. M"+main.CONST.html_oe+"chten Sie den Graph noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_OPTION);
+					int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Der aktuelle Graph wurde nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie den Graph noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_OPTION);
 					if (n==JOptionPane.YES_OPTION)
 					{
 						fileDialogs.SaveAs();
@@ -488,7 +488,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			else
 			{
 				String file = (new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName());
-				int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>M"+main.CONST.html_oe+"chten Sie die aktuellen "+main.CONST.html_Ae+"nderungen an dem Graphen noch in '"+file+"' speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_OPTION);
+				int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Die letzten "+main.CONST.html_Ae+"nderungen des Graphen<br><i>'"+file+"'</i><br>wurden noch nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie diese noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_OPTION);
 	    		if (n==JOptionPane.YES_OPTION)
 	    		{
 	    			fileDialogs.Save();

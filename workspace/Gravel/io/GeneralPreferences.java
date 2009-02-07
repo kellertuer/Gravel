@@ -322,7 +322,10 @@ public class GeneralPreferences extends Observable
 		if (BoolValues.get("grid.orientated")==null) return false;
 		if (IntValues.get("grid.x")==null) return false;
 		if (IntValues.get("grid.y")==null) return false;
-		
+
+		if (BoolValues.get("history.trackSelection")==null) return false;
+		if (IntValues.get("history.Stacksize")==null) return false;
+				
 		if (StringValues.get("node.name")==null) return false;
 		if (IntValues.get("node.size")==null) return false;
 		
@@ -390,6 +393,8 @@ public class GeneralPreferences extends Observable
 		
 		IntValues.put("grid.x",50);
 		IntValues.put("grid.y",50);
+		IntValues.put("history.Stacksize",50);
+
 		IntValues.put("node.size", 10);
 		IntValues.put("node.name_distance",18);
 		IntValues.put("node.name_rotation",270);
@@ -418,6 +423,8 @@ public class GeneralPreferences extends Observable
 		BoolValues.put("grid.enabled", false);
 		BoolValues.put("grid.synchron", true);
 		BoolValues.put("grid.orientated", true);
+		BoolValues.put("history.trackSelection", false);
+
 		BoolValues.put("node.name_visible",false);
 		BoolValues.put("pref.saveonexit",true);
 		BoolValues.put("vgraphic.cpshow",false);

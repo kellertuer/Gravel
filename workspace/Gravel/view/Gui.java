@@ -1,5 +1,6 @@
 package view;
 
+import history.GraphHistoryManager;
 import io.GeneralPreferences;
 import io.GravelMLReader;
 
@@ -237,7 +238,10 @@ public class Gui implements WindowListener
    {
 	   return frame;
    }
-   
+   public GraphHistoryManager getGraphHistoryManager()
+   {
+	   return graphpart.getGraphHistoryManager();
+   }
    public void windowActivated(WindowEvent arg0) {}
 	public void windowClosed(WindowEvent arg0) 
 	{

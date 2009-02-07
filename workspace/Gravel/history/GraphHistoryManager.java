@@ -2,6 +2,8 @@ package history;
 
 import model.*;
 
+import io.GeneralPreferences;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Observable;
@@ -37,8 +39,8 @@ public class GraphHistoryManager implements Observer
 		blockdepth=0;
 		UndoStack = new LinkedList<GraphAction>();
 		RedoStack = new LinkedList<GraphAction>();
-		stacksize=10;
-		trackSelection=false;
+		stacksize=GeneralPreferences.getInstance().getIntValue("history.Stacksize");
+		trackSelection=GeneralPreferences.getInstance().getBoolValue("history.trackSelection");
 		SavedUndoStackSize = 0;
 	}
    /**
@@ -250,6 +252,18 @@ public class GraphHistoryManager implements Observer
 	{
 		SavedUndoStackSize=UndoStack.size();
 	}
+	/**
+	 * Indicates whether Selection Changes on the Graph are put on the Undo Stack or not
+	 * @return true, if they are put on Stack, else false
+	 */
+	public boolean isSelectionTracked()
+	{
+		return trackSelection;
+	}
+	public int getUndoStackSize()
+	{
+		return stacksize;
+	}
 	public void update(Observable o, Object arg) 
 	{
 		GraphMessage m = (GraphMessage) arg;
@@ -265,6 +279,9 @@ public class GraphHistoryManager implements Observer
 				RedoStack = new LinkedList<GraphAction>();
 				active=true;
 				SavedUndoStackSize=0;
+				//Reload Standards
+				stacksize=GeneralPreferences.getInstance().getIntValue("history.Stacksize");
+				trackSelection=GeneralPreferences.getInstance().getBoolValue("history.trackSelection");
 				return;
 		}
 		if ((m.getAction()==GraphMessage.SELECTION)&&(!trackSelection))

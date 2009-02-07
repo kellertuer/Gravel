@@ -19,7 +19,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import model.GraphMessage;
 import model.VGraph;
 
 import view.Gui;

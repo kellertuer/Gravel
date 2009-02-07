@@ -377,6 +377,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 				}
 				else
 					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, iNodeIndex.getValue(), GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.NODE));
+				cNodeName.modifyNode(graphref.getNode(iNodeIndex.getValue()));
 			}
 			//Gruppen noch wieder aktualisieren
 			int temp = 0;
