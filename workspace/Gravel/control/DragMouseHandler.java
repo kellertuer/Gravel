@@ -275,9 +275,9 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 				else
 					moveSelEdges(x,y);
 				if (firstdrag) //Begin drag with a Block Start Notification
-					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.BLOCK_START|GraphMessage.UPDATE));
+					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.BLOCK_START|GraphMessage.UPDATE));
 				else		
-					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE));				
+					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.UPDATE));				
 			}
 		} //End handling ALT
 		//Handling selection Rectangle
@@ -300,9 +300,9 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 			 //weder shift noch alt -> Selektiertes auf SELECTED
 				updateSelection(VItem.SELECTED);
 			if (firstdrag)
-				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.BLOCK_START|GraphMessage.UPDATE));
+				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.BLOCK_START|GraphMessage.UPDATE,GraphMessage.SELECTION));
 			else		
-				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE));
+				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE,GraphMessage.SELECTION));
 		}
 		MouseOffSet = e.getPoint();
 		firstdrag = false;

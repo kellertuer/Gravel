@@ -51,9 +51,9 @@ public class StandardClickMouseHandler extends ClickMouseHandler {
 				if ((r.getSelectedStatus() & VItem.SELECTED) != VItem.SELECTED) {
 					vg.deselect();
 					r.setSelectedStatus(VItem.SELECTED);
+					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION, GraphMessage.UPDATE, GraphMessage.SELECTION|GraphMessage.NODE));
 				} else
 					vg.deselect();
-					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION, GraphMessage.UPDATE, GraphMessage.SELECTION|GraphMessage.NODE));
 			} else {
 				VEdge s = vg.getEdgeinRange(p,2.0);
 				if (s != null) 
@@ -62,6 +62,7 @@ public class StandardClickMouseHandler extends ClickMouseHandler {
 					{
 						vg.deselect();
 						s.setSelectedStatus(VItem.SELECTED);
+						vg.pushNotify(new GraphMessage(GraphMessage.SELECTION, GraphMessage.UPDATE, GraphMessage.SELECTION|GraphMessage.EDGE));
 					} else
 						vg.deselect();
 				} 
@@ -69,7 +70,6 @@ public class StandardClickMouseHandler extends ClickMouseHandler {
 				{
 					vg.deselect();
 				}
-				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION, GraphMessage.UPDATE, GraphMessage.SELECTION|GraphMessage.NODE));
 			}
 		}
 		if (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.SHIFT_MASK) // mit SHIFTlinks angeklickt, Selektion erweitern

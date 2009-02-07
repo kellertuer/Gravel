@@ -344,13 +344,13 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 			int SetIndex = iSubSetIndex.getValue();
 			GraphMessage startblock;
 			if (chSubSet==null)
-				startblock = new GraphMessage(GraphMessage.SUBSET, SetIndex, GraphMessage.ADDITION|GraphMessage.BLOCK_START, GraphMessage.NODE|GraphMessage.EDGE);
+				startblock = new GraphMessage(GraphMessage.SUBSET, SetIndex, GraphMessage.ADDITION|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS);
 			else
 			{
 				if (SetIndex!=oldindex) //Index modify
-					startblock = new GraphMessage(GraphMessage.SUBSET, SetIndex, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.NODE|GraphMessage.EDGE);
-				else
 					startblock = new GraphMessage(GraphMessage.SUBSET, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS);
+				else
+					startblock = new GraphMessage(GraphMessage.SUBSET, SetIndex, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS);
 			}	
 			//TESTS
 			//1. Falls der Graph neu ist
@@ -419,7 +419,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 				}	
 				
 			}
-			graphref.pushNotify(new GraphMessage(GraphMessage.SUBSET, SetIndex,GraphMessage.BLOCK_END, GraphMessage.NODE|GraphMessage.EDGE));
+			graphref.pushNotify(new GraphMessage(GraphMessage.SUBSET,GraphMessage.BLOCK_END, GraphMessage.NODE|GraphMessage.EDGE));
 			this.dispose();
 		}
 	}

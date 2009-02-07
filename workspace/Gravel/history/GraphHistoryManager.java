@@ -20,7 +20,7 @@ public class GraphHistoryManager implements Observer
 	//Lastgraph is for the creation of actions, for delete especially
 	VGraph trackedGraph, lastGraph;
 	GraphMessage Blockstart;
-	boolean active = true;
+	boolean active = true, trackSelection;
 	int blockdepth, stacksize;
 	LinkedList<GraphAction> UndoStack, RedoStack;
 	
@@ -38,6 +38,7 @@ public class GraphHistoryManager implements Observer
 		UndoStack = new LinkedList<GraphAction>();
 		RedoStack = new LinkedList<GraphAction>();
 		stacksize=10;
+		trackSelection=false;
 	}
    /**
 	 * Create an Action based on the message, that came from the Graph,
@@ -103,6 +104,29 @@ public class GraphHistoryManager implements Observer
 		return act;
 	}
 	/**
+	 * Updates the last Graph to the Selection of the tracked Graph
+	 *
+	 */
+	private void updateLastSelection()
+	{
+		Iterator<VNode> ni = trackedGraph.getNodeIterator();
+		while (ni.hasNext())
+		{
+			VNode n = ni.next();
+			VNode n2 = lastGraph.getNode(n.index);
+			if (n2!=null)
+				n2.setSelectedStatus(n.getSelectedStatus());
+		}
+		Iterator<VEdge> ei = trackedGraph.getEdgeIterator();
+		while (ei.hasNext())
+		{
+			VEdge e = ei.next();
+			VEdge e2 = lastGraph.getEdge(e.index);
+			if (e2!=null)
+				e2.setSelectedStatus(e.getSelectedStatus());
+		}
+	}
+	/**
 	 * Add Tracked Action to the Undo-Stuff
 	 * Create an Action based on tracked Message
 	 * @param m
@@ -112,12 +136,14 @@ public class GraphHistoryManager implements Observer
 		if ((m.getChangeStatus()&GraphMessage.BLOCK_ABORT)==GraphMessage.BLOCK_ABORT)
 			return; //Don't handle Block-Abort-Stuff
 		GraphAction act = null;
-		if ((m.getElementID() > 0) && (m.getAction()!=GraphMessage.SUBSET)) //Message for single stuff
+		if (m.getElementID() > 0) //Message for single stuff thats not just selection
 			act = handleSingleAction(m);
 		else //multiple modifications, up to know just a replace */
 		{
 			//Last status in action - and yes there was an Change in the items
-			try {	act = new GraphAction(lastGraph, GraphAction.UPDATE, true); }
+			try {						
+				//New Action, that tracks the graph, or only the selection
+				act = new GraphAction(lastGraph, GraphAction.UPDATE, m.getAction()!=GraphMessage.SELECTION); }
 			catch (GraphActionException e)
 			{
 				act=null; System.err.println("DEBUG: Edge.added.GraphAction Creation Failed:"+e.getMessage());				
@@ -134,7 +160,7 @@ public class GraphHistoryManager implements Observer
 			UndoStack.add(act);
 		}
 	}
-	
+
 	/**
 	 * Indicates, whether an undo is possible or not
 	 * 
@@ -165,6 +191,7 @@ public class GraphHistoryManager implements Observer
 		if (RedoStack.size()>=stacksize)
 			RedoStack.remove();
 		RedoStack.add(LastAction);
+		trackedGraph.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.UPDATE));
 		trackedGraph.addObserver(this); //Activate Tracking again
 	}
 	/**
@@ -197,6 +224,7 @@ public class GraphHistoryManager implements Observer
 		if (UndoStack.size()>=stacksize)
 			UndoStack.remove();
 		UndoStack.add(LastAction);
+		trackedGraph.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.UPDATE));
 		trackedGraph.addObserver(this); //Activate Tracking again
 	}
 	
@@ -216,29 +244,12 @@ public class GraphHistoryManager implements Observer
 				active=true;
 				return;
 		}
-		if (m.getAction()==GraphMessage.SELECTION) //Nur selektion -> Update in Copyx
-		{
+		if ((m.getAction()==GraphMessage.SELECTION)&&(!trackSelection))
+		{ //Reine Selection Veränderung, aber wir verfolgen sowas nicht -> Update LastGraph
 			if (active) //not every update but on ends of blocks
-			{
-				Iterator<VNode> ni = trackedGraph.getNodeIterator();
-				while (ni.hasNext())
-				{
-					VNode n = ni.next();
-					VNode n2 = lastGraph.getNode(n.index);
-					if (n2!=null)
-						n2.setSelectedStatus(n.getSelectedStatus());
-				}
-				Iterator<VEdge> ei = trackedGraph.getEdgeIterator();
-				while (ei.hasNext())
-				{
-					VEdge e = ei.next();
-					VEdge e2 = lastGraph.getEdge(e.index);
-					if (e2!=null)
-						e2.setSelectedStatus(e.getSelectedStatus());
-				}
-			}
+				updateLastSelection();
 		}
-		else
+		else //Sonst erst auf BlockEnde prüfen
 		{
 			if ((m.getChangeStatus()&GraphMessage.BLOCK_END)==GraphMessage.BLOCK_END) //Block endet with this Message
 			{
@@ -267,7 +278,8 @@ public class GraphHistoryManager implements Observer
 			}			
 			if (!active)
 				return;
-			if (m.getElementID() != 0) //Temporary Node not mentioning
+			//Single Action or Selection change
+			if (m.getElementID() != 0)
 				addAction(m);
 		}
 	}

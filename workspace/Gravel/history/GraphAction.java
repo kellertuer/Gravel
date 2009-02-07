@@ -241,11 +241,14 @@ public class GraphAction {
 		VGraph ret;
 		switch(Objecttype)
 		{
+			case SELECTION:
+				ret = graph;
+			break;
 			case GRAPH: //Replace whole graph and save the actual parameter als old object
 				ret = new VGraph(((VGraph)ActionObject).isDirected(), ((VGraph)ActionObject).isLoopAllowed(), ((VGraph)ActionObject).isMultipleAllowed());
 				ret.replace((VGraph)ActionObject);
 				((VGraph)ActionObject).replace(graph);
-				graph.replace(ret);				
+				graph.replace(ret);
 			break;
 			case NODE: //Replace Node and keep the given one in the graph as old one
 				VNode n = (VNode)ActionObject;
@@ -353,7 +356,7 @@ public class GraphAction {
 				if ((graph.getEdge(e.index)!=null)||(graph.getNode(StartNode)==null)||(graph.getNode(EndNode)==null)) //edge exists or one of its Nodes does not
 					throw new GraphActionException("Can't create edge, it already exists or one of its Nodes does not.");
 				graph.addEdge(e, StartNode, EndNode, Value, name);
-				recreateEdgeColor(e,graph);				
+				recreateEdgeColor(e,graph);
 				break;
 			case SUBSET:
 				VSubSet vs = (VSubSet)ActionObject;
@@ -436,10 +439,10 @@ public class GraphAction {
 				break;
 			default: throw new GraphActionException("No Action given.");
 		}
-		if (Objecttype==GRAPH) //Move Selection from old graph to new one
-			exChangeSelection((VGraph)ActionObject,ret);			
+		if ((Objecttype==GRAPH)||(Objecttype==SELECTION)) //Move Selection from old graph to new one
+			exChangeSelection((VGraph)ActionObject,graph);			
 		else if (Objecttype!=SUBSET) //SubSet has no env, so if no subset, update selection
-			exChangeSelection(env,ret);
+			exChangeSelection(env,graph);
 		return ret;
 	}
 	/**
@@ -480,7 +483,7 @@ public class GraphAction {
 			default:
 				throw new GraphActionException("No Action given");
 		}
-		if (Objecttype==GRAPH) //Move Selection from old graph to new one
+		if ((Objecttype==GRAPH)||(Objecttype==SELECTION)) //Move Selection from old graph to new one
 			exChangeSelection((VGraph)ActionObject,ret);			
 		else if (Objecttype!=SUBSET) //SubSet has no env, so if no subset, update selection
 			exChangeSelection(env,ret);
