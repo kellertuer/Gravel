@@ -116,8 +116,8 @@ public class GraphHistoryManager implements Observer
 			act = handleSingleAction(m);
 		else //multiple modifications, up to know just a replace */
 		{
-			//Last status in action - Do i have to clone that?
-			try {	act = new GraphAction(lastGraph, GraphAction.UPDATE); }
+			//Last status in action - and yes there was an Change in the items
+			try {	act = new GraphAction(lastGraph, GraphAction.UPDATE, true); }
 			catch (GraphActionException e)
 			{
 				act=null; System.err.println("DEBUG: Edge.added.GraphAction Creation Failed:"+e.getMessage());				

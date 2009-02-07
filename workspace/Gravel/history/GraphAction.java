@@ -30,6 +30,7 @@ public class GraphAction {
 	private static final int NODE = 1;
 	private static final int EDGE = 2;
 	private static final int SUBSET = 4;
+	private static final int SELECTION = 8;
 	private static final int GRAPH = 128;
 	
 	private Object ActionObject;
@@ -40,13 +41,17 @@ public class GraphAction {
 	//Environement
 	private VGraph env;
 	/**
-	 * Create a New Action with whole Graph
+	 * Create a New Action with whole Graph or an Selection Change
+	 * Only updates are possible, because Graphs can't be created or deleted while editing a graph
+	 * Selection is also simplified to updates, because the deselect-function does the same as the exChangeUpdate here
+	 * (in their computational comparison)
 	 *  
 	 * @param o VGraph
 	 * @param action Action that happened
+	 * @param boolean Itemchange Indicator for the change happened: True if an Node/Edge/SubSet was changed, false if only selection was changed
 	 * @throws GraphActionException E.g. a Graph can not be Created or Deleted within a Graph
 	 */
-	public GraphAction(VGraph o, int action) throws GraphActionException
+	public GraphAction(VGraph o, int action, boolean Itemchange) throws GraphActionException
 	{
 		if (o==null)
 			throw new GraphActionException("Could not Create Action: Graph must not be null.");
@@ -56,9 +61,12 @@ public class GraphAction {
 		{
 			ActionObject=null;
 			Action=0;
-			throw new GraphActionException("Creating Graph or Deleting it is not possible as an Trackable Action.");
+			throw new GraphActionException("Creating or Deletion Graph/Selection is not possible as an Trackable Action.");
 		}
-		Objecttype=GRAPH;
+		if (Itemchange)
+			Objecttype=GRAPH;
+		else
+			Objecttype=SELECTION;
 	}
 	/**
 	 * Create New Action inducted by a Node
@@ -184,6 +192,41 @@ public class GraphAction {
 				if (g.getSubSet(s.getIndex())==null)
 					throw new GraphActionException("Can't replace edge, replacements belongs to Subsets, that don't exists in given parameter graph");
 				g.addEdgetoSubSet(e.index, s.getIndex());
+			}
+		}
+	}
+	/**
+	 * Exchange  Selection between first and second Graph
+	 * The first graph might be smaller (e.g. might be environment of a node), so that one is iterated
+	 * 
+	 * @param first
+	 * @param second
+	 * @throws GraphActionException 
+	 */
+	public void exChangeSelection(VGraph first, VGraph second) throws GraphActionException
+	{
+		Iterator<VNode> ni = first.getNodeIterator();
+		while (ni.hasNext())
+		{
+			VNode n = ni.next();
+			int sel = n.getSelectedStatus();
+			VNode n2 = second.getNode(n.index);
+			if (n2!=null) //if its not null
+			{ 
+				n.setSelectedStatus(n2.getSelectedStatus());
+				n2.setSelectedStatus(sel);
+			}
+		}
+		Iterator<VEdge> ei = first.getEdgeIterator();
+		while (ei.hasNext())
+		{
+			VEdge e = ei.next();
+			int sel = e.getSelectedStatus();
+			VEdge e2 = second.getEdge(e.index);
+			if (e2!=null)
+			{
+				e.setSelectedStatus(e2.getSelectedStatus());
+				e2.setSelectedStatus(sel);
 			}
 		}
 	}
@@ -333,7 +376,7 @@ public class GraphAction {
 						graph.addEdgetoSubSet(eindex,vs.getIndex());
 				}
 				break;
-		}
+		}// End switch
 		return graph;
 	}
 	/**
@@ -366,6 +409,7 @@ public class GraphAction {
 				graph.removeSubSet(vs.getIndex());
 				break;
 			}
+		//Delete does not need to update selection
 		return graph;
 	}	
 	/**
@@ -376,20 +420,27 @@ public class GraphAction {
 	 */
 	public VGraph redoAction(VGraph graph) throws GraphActionException
 	{
-		if (Action==0)
-			throw new GraphActionException("No Action given");
 		if (ActionObject==null)
 			throw new GraphActionException("No Object available for the Action");
+		VGraph ret;
 		switch(Action) 
 		{
 			case UPDATE: 
-				return doReplace(graph);
+				ret = doReplace(graph);
+				break;
 			case ADDITION:
-				return doCreate(graph);
+				ret= doCreate(graph);
+				break;
 			case REMOVAL:
-				return doDelete(graph);
+				ret = doDelete(graph);
+				break;
+			default: throw new GraphActionException("No Action given.");
 		}
-		throw new GraphActionException("No Action given.");
+		if (Objecttype==GRAPH) //Move Selection from old graph to new one
+			exChangeSelection((VGraph)ActionObject,ret);			
+		else if (Objecttype!=SUBSET) //SubSet has no env, so if no subset, update selection
+			exChangeSelection(env,ret);
+		return ret;
 	}
 	/**
 	 * Apply the action to the Clone of a Graph. The given Parameter Graph is not manipulated but cloned
@@ -412,21 +463,28 @@ public class GraphAction {
 	 */
 	public VGraph UnDoAction(VGraph graph) throws GraphActionException
 	{
-		if (Action==0)
-			throw new GraphActionException("No Action given");
 		if (ActionObject==null)
 			throw new GraphActionException("No Object available for the Action");
+		VGraph ret;
 		switch(Action) 
 		{
 			case UPDATE:  //Undo a replace is repace itself
-				return doReplace(graph);
+				ret = doReplace(graph);
+				break;
 			case ADDITION: //Undo a Create is a delete
-				return doDelete(graph);
+				ret = doDelete(graph);
+				break;
 			case REMOVAL: //Undo Delete is Create
-				return doCreate(graph);
+				ret = doCreate(graph);
+				break;
+			default:
+				throw new GraphActionException("No Action given");
 		}
-		throw new GraphActionException("No Action given.");
-
+		if (Objecttype==GRAPH) //Move Selection from old graph to new one
+			exChangeSelection((VGraph)ActionObject,ret);			
+		else if (Objecttype!=SUBSET) //SubSet has no env, so if no subset, update selection
+			exChangeSelection(env,ret);
+		return ret;
 	}
 	/**
 	 * Undo The Action on the copy of the given graph

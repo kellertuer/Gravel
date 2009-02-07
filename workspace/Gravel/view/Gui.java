@@ -163,7 +163,7 @@ public class Gui implements WindowListener
         gToolBar = new MainToolbar(graphpart);
         gToolBar.setSize(new Dimension(gp.getIntValue("window.x"),gToolBar.getSize().height));
     	gToolBar.setMinimumSize(gToolBar.getSize());
-        mainPanel.add(gToolBar,BorderLayout.NORTH);
+    	mainPanel.add(gToolBar,BorderLayout.NORTH);
         
         //Liste
         graphlist = new GraphTree(MainGraph);

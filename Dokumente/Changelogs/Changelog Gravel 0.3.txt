@@ -1,0 +1,25 @@
+Gravel 0.3
+
+CHANGELOG
+
+NEUE FEATURES
+- Implementierung von Redo/Undo. Dabei kann in den Einstellungen die Anzahl maximaler Undos eingestellt werden und, ob Selektionsveränderungen auch aufgenommen werden sollen in Undo.
+
+- Export als SVG-Graphik (danke für die Details & Hilfe an johny_b)
+- Export für TeX erweitert um eine Angabe der Auflösung, damit mehrere Graphen gleichgroß exportiert werden können
+- Export als PNG-Grafik erweitert um eine Option, den Hintergrund auch weiß zu setzen (Vorschlag von BuZZ-Dee)
+- Maus-Aktion: Auf dem Hintergrund mit Shift ein Rechteck aufziehen erweitert die Selektion um das Rechteck
+- Maus-Aktion: Analog dazu mit Alt aufgezogenes Rechteck verringert die Selektion um eben jenes Rechteck
+- Maus-Aktion: Doppelklick auf Knoten öffnet dessen Eigenschaften
+
+BUGFIXES
+- Fehler korrigiert, der beim Verändern mehrerer Kanten bewirkte, dass deren Linienart verloren ging
+- Fehler korrigert, der bei Schleifen-Eigenschaften auftrat
+- Fehler korrigiert, der bei Editieren einer Kante auftrat, wenn man Start- oder Endknoten veränderte
+- kleinere Fehler im PNG-Export-Dialog korrigiert
+
+IM HINTERGRUND
+- Gemeinsame Superklasse für Knoten & Kanten, um Gemeinsamkeiten nur einmal zu definieren.
+- Benachrichtigungssystem der Graphenklasse über eigene Veränderungen stark verbessert.
+- Aktionsverfolgung implementiert, dabei auch das Zusammenfassen mehrere Aktionen zu einer Blockaktion, wie etwa beim Erstellen einer Kante im Drag&Drop (an sich pro Mausbewegung eine Aktion)
+- Effiziente Aufzeichnung des Aktionsverlaufes implementiert
