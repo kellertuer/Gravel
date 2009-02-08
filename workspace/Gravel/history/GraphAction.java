@@ -357,6 +357,7 @@ public class GraphAction {
 					throw new GraphActionException("Can't create edge, it already exists or one of its Nodes does not.");
 				graph.addEdge(e, StartNode, EndNode, Value, name);
 				recreateEdgeColor(e,graph);
+				graph.getEdge(e.index).setSelectedStatus(env.getEdge(e.index).getSelectedStatus());
 				break;
 			case SUBSET:
 				VSubSet vs = (VSubSet)ActionObject;
