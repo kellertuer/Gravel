@@ -696,7 +696,8 @@ public class VGraph extends Observable {
 		vNodes.remove(getNode(i));
 	}
 	/**
-	 * Replace the node with index given by parameter Node with the parameter, if such a node exists, else, do nothing
+	 * Replace the node with index given by an copy of Node with the parameter,
+	 * if a node with same index as parameter exists, else do nothing
 	 * 
 	 * Its SubSetStuff is not changed
 	 * 
@@ -706,6 +707,7 @@ public class VGraph extends Observable {
 	public void replaceNode(VNode node, String name)
 	{
 		mG.replaceNode(new MNode(node.index, name));
+		node = node.clone(); //Clone node to lose color
 		NodeLock.lock(); //Knoten finden
 		try
 		{
@@ -724,6 +726,14 @@ public class VGraph extends Observable {
 			}
 		}
 		finally {NodeLock.unlock();}
+		Iterator<VSubSet> esi = this.vSubSets.iterator();
+		while (esi.hasNext())
+		{
+			VSubSet s = esi.next();
+			if (SubSetcontainsEdge(node.index, s.getIndex()))
+				node.addColor(s.getColor());
+		}
+
 	}
 	/**
 	 *  get an unused node index
@@ -1037,10 +1047,11 @@ public class VGraph extends Observable {
 		return mG.getEdgeIndices(start, ende);
 	}
 	/**
-	 * Replace the edge with index given by parameter Edge with the parameter, 
-	 * if such an edge exists, else, do nothing
+	 * Replace the edge with index given by an copy of edge with the parameter,
+	 * if a node with same index as parameter exists, else do nothing
 	 * 
 	 * Its SubSetStuff is not changed
+	 * 
 	 * 
 	 * @param e VEdge to be replaced with its Edge with similar index in the graph
 	 * @param start - Startindex from e
@@ -1051,6 +1062,7 @@ public class VGraph extends Observable {
 	public void replaceEdge(VEdge e, int start, int ende, int value, String name)
 	{
 		mG.replaceEdge(new MEdge(e.index, start,ende,value,name));
+		e = e.clone(); //Lose color!
 		EdgeLock.lock(); //Knoten finden
 		try
 		{
@@ -1069,6 +1081,13 @@ public class VGraph extends Observable {
 			}
 		}
 		finally {EdgeLock.unlock();}
+		Iterator<VSubSet> esi = this.vSubSets.iterator();
+		while (esi.hasNext())
+		{
+			VSubSet s = esi.next();
+			if (SubSetcontainsEdge(e.index, s.getIndex()))
+				e.addColor(s.getColor());
+		}
 	}
 
 	/**

@@ -255,6 +255,14 @@ public class GraphAction {
 				if (graph.getNode(n.index)==null) //node does not exists
 					throw new GraphActionException("Can't replace node, none there.");
 				ActionObject = graph.getNode(n.index).clone(); //save old node
+				//Save Color of old node
+				Iterator<VSubSet> si = graph.getSubSetIterator();
+				while (si.hasNext())
+				{
+					VSubSet s = si.next();
+					if (graph.SubSetcontainsNode(n.index, s.getIndex()))
+						((VNode)ActionObject).addColor(s.getColor());
+				}
 				String tempnn = name;
 				name = graph.getNodeName(n.index); //save old name
 				graph.replaceNode(n,tempnn);
@@ -267,6 +275,14 @@ public class GraphAction {
 				if (graph.getEdge(e.index)==null) //edge does not exists
 					throw new GraphActionException("Can't replace edge, none there.");
 				ActionObject = graph.getEdge(e.index).clone(); //save old edge
+				//Save Color of old node
+				Iterator<VSubSet> esi = graph.getSubSetIterator();
+				while (esi.hasNext())
+				{
+					VSubSet s = esi.next();
+					if (graph.SubSetcontainsEdge(e.index, s.getIndex()))
+						((VEdge)ActionObject).addColor(s.getColor());
+				}
 				int temps = StartNode;
 				StartNode = graph.getEdgeProperties(e.index).get(MGraph.EDGESTARTINDEX);
 				int tempe = EndNode;
