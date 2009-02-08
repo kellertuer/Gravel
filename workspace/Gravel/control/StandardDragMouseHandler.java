@@ -201,6 +201,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 	/**
 	 * If the mouse button is pressed initialize a drag (only if left mouse button is pressed)
 	 */
+	@SuppressWarnings("unchecked")
 	public void mousePressed(MouseEvent e) {
 		super.mousePressed(e);
 		firstdrag = true;

@@ -363,8 +363,6 @@ public class GeneralPreferences extends Observable
 		return true; //Falls alle da sind, alles okay
 	}
 		
-	@SuppressWarnings("unchecked")
-	
 	/**
 	 * Return to the Defaut Values, the factory preset ones.
 	 */
@@ -378,7 +376,7 @@ public class GeneralPreferences extends Observable
 		IntValues.put("edge.value",1);		
 		IntValues.put("edge.arrsize",10);          // Size of the arrow segment
 		IntValues.put("edge.arrpart",75);          // Size of the arrow segments
-		IntValues.put("edge.arralpha",22);
+		IntValues.put("edge.arralpha",38);
 		IntValues.put("edge.arrpos",100);
 		IntValues.put("edge.text_distance",7);
 		IntValues.put("edge.text_position",25);
@@ -395,7 +393,7 @@ public class GeneralPreferences extends Observable
 		IntValues.put("grid.y",50);
 		IntValues.put("history.Stacksize",50);
 
-		IntValues.put("node.size", 10);
+		IntValues.put("node.size", 9);
 		IntValues.put("node.name_distance",18);
 		IntValues.put("node.name_rotation",270);
 		IntValues.put("node.name_size",12);

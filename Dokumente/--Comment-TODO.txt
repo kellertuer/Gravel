@@ -1,5 +1,0 @@
-noch kommentieren : 
-                
-MainMenu
-MainToolbar
-Statistics

@@ -27,6 +27,7 @@ public class MagnetismAndSpringsForm extends AlgorithmParameterForm
 		vGCopy = new VGraph(true,false,false);
 		vGCopy.replace(guigraph);
 	}
+	@SuppressWarnings("unchecked")
 	public HashMap showDialog() {
 		this.setTitle("Federn und Magnetfelder - Parameterangaben");
 		Container content = getContentPane();

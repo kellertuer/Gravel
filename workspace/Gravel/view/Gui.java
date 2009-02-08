@@ -194,7 +194,7 @@ public class Gui implements WindowListener
      */
     public void showAbout()
     {
-    	String text = "<html><div align=center><font size='+1'>Gravel "+main.CONST.version+"</font><br>Ein Editor für Graphen</div><br>\nCopyright (C) 2007 Ronny Bergmann<br>\n";
+    	String text = "<html><div align=center><font size='+1'>Gravel "+main.CONST.version+"</font><br>Ein Editor für Graphen</div><br>\nCopyright (C) 2007-2009 Ronny Bergmann<br>\n";
     	text += "<br>Für dieses Programm besteht KEINERLEI GARANTIE.<br>Dies ist freie Software, die Sie unter bestimmten";
     	text += "<br> Bedingungen weitergeben dürfen;<br>";
     	text += "Weitere Details in der LICENSE.txt oder ";

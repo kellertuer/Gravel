@@ -252,7 +252,11 @@ public class GraphHistoryManager implements Observer
 	 */
 	public void setGraphSaved()
 	{
+		trackedGraph.deleteObserver(this);
 		SavedUndoStackSize=UndoStack.size();
+		//Notify everyone despite us.
+		trackedGraph.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS, GraphMessage.UPDATE));
+		trackedGraph.addObserver(this);		
 	}
 	/**
 	 * Indicates whether Selection Changes on the Graph are put on the Undo Stack or not

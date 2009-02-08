@@ -730,7 +730,7 @@ public class VGraph extends Observable {
 		while (esi.hasNext())
 		{
 			VSubSet s = esi.next();
-			if (SubSetcontainsEdge(node.index, s.getIndex()))
+			if (SubSetcontainsNode(node.index, s.getIndex()))
 				node.addColor(s.getColor());
 		}
 

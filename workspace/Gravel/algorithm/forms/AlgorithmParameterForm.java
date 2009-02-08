@@ -13,6 +13,7 @@ import model.VGraph;
 
 public abstract class AlgorithmParameterForm extends JDialog implements ActionListener{
 
+	private static final long serialVersionUID = 1L;
 	public AlgorithmParameterForm(MGraph g)
 	{
 		
@@ -34,5 +35,6 @@ public abstract class AlgorithmParameterForm extends JDialog implements ActionLi
 	 * starts the dialog and returns 
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public abstract HashMap showDialog();
 }

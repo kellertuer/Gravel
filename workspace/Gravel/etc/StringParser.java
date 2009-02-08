@@ -65,7 +65,7 @@ public StringParser(ParserSharedInputState state) {
 			r=mexpr();
 			astFactory.addASTChild(currentAST, returnAST);
 			{
-			_loop104:
+			_loop20:
 			do {
 				switch ( LA(1)) {
 				case PLUS:
@@ -92,7 +92,7 @@ public StringParser(ParserSharedInputState state) {
 				}
 				default:
 				{
-					break _loop104;
+					break _loop20;
 				}
 				}
 			} while (true);
@@ -119,7 +119,7 @@ public StringParser(ParserSharedInputState state) {
 			r=dexpr();
 			astFactory.addASTChild(currentAST, returnAST);
 			{
-			_loop107:
+			_loop23:
 			do {
 				switch ( LA(1)) {
 				case MUL:
@@ -146,7 +146,7 @@ public StringParser(ParserSharedInputState state) {
 				}
 				default:
 				{
-					break _loop107;
+					break _loop23;
 				}
 				}
 			} while (true);
@@ -173,7 +173,7 @@ public StringParser(ParserSharedInputState state) {
 			r=atom();
 			astFactory.addASTChild(currentAST, returnAST);
 			{
-			_loop110:
+			_loop26:
 			do {
 				if ((LA(1)==EXP)) {
 					AST tmp5_AST = null;
@@ -185,7 +185,7 @@ public StringParser(ParserSharedInputState state) {
 					r = Math.pow(r,x);
 				}
 				else {
-					break _loop110;
+					break _loop26;
 				}
 				
 			} while (true);

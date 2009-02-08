@@ -6,8 +6,8 @@ package main;
  */
 public class CONST {
 
-	public final static String version = "0.2.2";
-	public final static String lastchanged = "15. Dezember 2007";
+	public final static String version = "0.3";
+	public final static String lastchanged = "8. Februar 2009";
 	
 	public final static String html_ae = "&auml;";
 	public final static String html_oe = "&ouml;";

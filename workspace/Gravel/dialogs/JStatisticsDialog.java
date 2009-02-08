@@ -386,7 +386,6 @@ public class JStatisticsDialog extends JDialog implements ActionListener, TextLi
 		lError.setText("");
 	}
 	
-	@SuppressWarnings("static-access")
 	public void actionPerformed(ActionEvent event)
 	{
 		if (event.getSource()==bHelp)

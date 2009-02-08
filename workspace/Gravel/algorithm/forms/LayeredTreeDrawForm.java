@@ -28,7 +28,7 @@ public class LayeredTreeDrawForm extends AlgorithmParameterForm
 		Parameters = new HashMap<String, Object>();
 		mGCopy = guigraph;
 	}
-	
+	@SuppressWarnings("unchecked")
 	public HashMap showDialog() {
 		this.setTitle("Binärbaum-Divide-and.Conquer - Parameter");
 		Container content = getContentPane();

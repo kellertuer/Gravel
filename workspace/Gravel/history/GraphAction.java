@@ -205,7 +205,7 @@ public class GraphAction {
 	 * @param second
 	 * @throws GraphActionException 
 	 */
-	public void exChangeSelection(VGraph first, VGraph second) throws GraphActionException
+	private void exChangeSelection(VGraph first, VGraph second) throws GraphActionException
 	{
 		Iterator<VNode> ni = first.getNodeIterator();
 		while (ni.hasNext())
@@ -306,7 +306,7 @@ public class GraphAction {
 				String newname = name; //temp for actual name
 				name = graph.getSubSetName(newSubSet.getIndex()); //Save Old Name
 				MSubSet tempm = mathsubset.clone();
-				mathsubset = graph.getMathGraph().getSubSet(newSubSet.getIndex());
+				mathsubset = graph.getMathGraph().getSubSet(newSubSet.getIndex()).clone();
 				graph.removeSubSet(newSubSet.getIndex()); //Remove old SubSet.
 				graph.addSubSet(newSubSet.getIndex(), newname, newSubSet.getColor());
 				graph.pushNotify(new GraphMessage(GraphMessage.SUBSET,newSubSet.getIndex(),GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.ALL_ELEMENTS));

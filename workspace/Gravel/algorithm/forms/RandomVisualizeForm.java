@@ -31,7 +31,7 @@ public class RandomVisualizeForm extends AlgorithmParameterForm
 		Parameters = new HashMap<String, Object>();
 		mGCopy = guigraph;
 	}
-	
+	@SuppressWarnings("unchecked")	
 	public HashMap showDialog() {
 		this.setTitle("Ein erster Testalgorithmus - Parameterangaben");
 		Container content = getContentPane();

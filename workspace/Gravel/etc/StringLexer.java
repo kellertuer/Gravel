@@ -308,34 +308,34 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		int _cnt98=0;
-		_loop98:
+		int _cnt14=0;
+		_loop14:
 		do {
 			if (((LA(1) >= '0' && LA(1) <= '9'))) {
 				mZIFFER(false);
 			}
 			else {
-				if ( _cnt98>=1 ) { break _loop98; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt14>=1 ) { break _loop14; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
-			_cnt98++;
+			_cnt14++;
 		} while (true);
 		}
 		{
 		if ((LA(1)=='.')) {
 			match('.');
 			{
-			int _cnt101=0;
-			_loop101:
+			int _cnt17=0;
+			_loop17:
 			do {
 				if (((LA(1) >= '0' && LA(1) <= '9'))) {
 					mZIFFER(false);
 				}
 				else {
-					if ( _cnt101>=1 ) { break _loop101; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt17>=1 ) { break _loop17; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				
-				_cnt101++;
+				_cnt17++;
 			} while (true);
 			}
 		}
