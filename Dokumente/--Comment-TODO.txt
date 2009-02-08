@@ -1,13 +1,5 @@
 noch kommentieren : 
                 
-GravelMLContentHandler
-GravelMLReader
-GravelMLWriter
-
-GraphTree
-Gui_Mac
-Gui
 MainMenu
 MainToolbar
 Statistics
-VGraphic

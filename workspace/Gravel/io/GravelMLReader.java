@@ -23,8 +23,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
  *  - Einen, um den Typ festzustellen und die Keys auf Korrektheit zu prüfen
  *  - Einen, um den Graphen einzulesen
  * 
- * @param f Datei, die eingelesen werden soll
- * @return
+ * @author Ronny Bergmann
+ * @since 0.2
  */
 public class GravelMLReader 
 {

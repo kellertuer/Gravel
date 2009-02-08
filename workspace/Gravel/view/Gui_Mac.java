@@ -59,7 +59,7 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
 		normalgui.show();
 		normalgui.getParentWindow().setMinimumSize(normalgui.getParentWindow().getSize());
 	}
-    /*
+    /**
      * buildmaingrid() baut ein Grid in dem oben eine Buttonliste ist und dadrunter ein
      * SplitPane in dem man die beiden Inhalte, den Graph und den Tree mit Eigenschaften in der Breite variieren kann
      */
@@ -67,11 +67,16 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
     {
         normalgui.buildmaingrid();
     }
-
+    /**
+     * Display About-Dialog
+     */
     public void showAbout()
     {
     	normalgui.showAbout();
     }
+    /**
+     * Handle Quit-Action
+     */
     public void doQuit()
     {
     	normalgui.doQuit();

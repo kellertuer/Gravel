@@ -25,7 +25,7 @@ import java.util.Observer;
 
 import dialogs.*;
 /**
- * Darstellung der Elemente des Graphen als schematischer Baum
+ * Sidebar Containing a Tree with the elements of the actual graph
  * 
  * @author ronny
  *
@@ -51,6 +51,10 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	JPopupMenu Menu;
 	//Für updates
 	private VGraph vG;
+	/**
+	 * Init sidebar to contain a specific VGraph. The Changes of the VGRaph are tracked
+	 * @param Graph
+	 */
 	public GraphTree(VGraph Graph)
 	{
 		super();
@@ -89,6 +93,9 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		updateEdges();
 		updateSets();
 	}
+	/**
+	 * Force an Update of the NodeList
+	 */
 	public void updateNodes()
 	{
 		Vector<String> nodenames = vG.getNodeNames();
@@ -107,6 +114,9 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		this.revalidate();
 		this.validate();
 	}
+	/**
+	 * Force an Update of the Edgelist
+	 */
 	public void updateEdges()
 	{
 		Vector<String> edges = vG.getEdgeNames();
@@ -125,6 +135,9 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		this.revalidate();
 		this.validate();
 	}
+	/**
+	 * Force an Update of the SubSet-List
+	 */
 	public void updateSets()
 	{
 		Vector<String> Sets = vG.getSetNames();
@@ -143,33 +156,31 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		this.revalidate();
 		this.validate();
 	}
-    /*
-     * Behandlung der Tree-Events
-     */
-    public void valueChanged(TreeSelectionEvent e) 
-    {
-    }
-	public void mouseClicked(MouseEvent e) {
-	}
-	public void mouseEntered(MouseEvent e) {
-	}
-	public void mouseExited(MouseEvent e) {
-	}
+  
+	//
+	// TreeListener-Actions
+	//
+	
+	public void valueChanged(TreeSelectionEvent e){}
+	
+	public void mouseClicked(MouseEvent e) {}
+	
+	public void mouseEntered(MouseEvent e) {}
+	
+	public void mouseExited(MouseEvent e) {}
+	
 	public void mousePressed(MouseEvent e)
 	{
 	    if (e.isPopupTrigger()) 
-	    {
 	    	popuphandling(e);
-	    }
 	}
+	
 	public void mouseReleased(MouseEvent e) 
 	{
 	    if (e.isPopupTrigger()) 
-	    {
 	    	popuphandling(e);
-	    }
-	
 	}
+
 	private void popuphandling(MouseEvent e)
     {
 		TreePath selPath = getPathForLocation(e.getX(), e.getY()); 
@@ -203,9 +214,9 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			return;
 		}
 		Menu.show(e.getComponent(), e.getX(), e.getY());
-	//	JOptionPane.showMessageDialog(this,message, "Fehler", JOptionPane.INFORMATION_MESSAGE);
-		
+	//	JOptionPane.showMessageDialog(this,message, "Fehler", JOptionPane.INFORMATION_MESSAGE);	
     }
+	
 	public void actionPerformed(ActionEvent e) 
 	{
 		if (e.getSource()==Properties)
@@ -242,6 +253,12 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			   }
 		}	
 	}
+	/**
+	 * Return the Index of an Graph-Element based on the Index it is set in the List
+	 * @param type
+	 * @param pos
+	 * @return
+	 */
 	private int StringPos2Index(int type, int pos)
 	{
 		Vector<String> s;
@@ -265,6 +282,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		}
 		return index;
 	}
+
 	public void update(Observable o, Object arg) 
 	{
 		if (o.equals(vG)&&(((GraphMessage)arg)!=null)) //Der Graph wurde aktualisiert und auch echt ein String gegeben, der Auftr�ge enth�lt

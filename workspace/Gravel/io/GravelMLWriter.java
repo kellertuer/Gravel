@@ -12,6 +12,12 @@ import java.io.OutputStreamWriter;
 import java.util.Iterator;
 import java.util.Vector;
 
+/**
+ * This Class provides a simple Writer for Graphs to a GravelML-XML-File
+ * 
+ * @author Ronny Bergmann
+ * @since 0.2
+ */
 public class GravelMLWriter {
 
 	private final static String nl = "\r\n";
@@ -24,8 +30,9 @@ public class GravelMLWriter {
 		gp = GeneralPreferences.getInstance();
 	}
 	
-	//General
-	
+	/**
+	 * Write the Header containing comments, standard values and so on. For Math and Visual Graphs
+	 */
 	private void writeHeader(OutputStreamWriter s) throws IOException
 	{
 		s.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+nl+"");
@@ -59,6 +66,11 @@ public class GravelMLWriter {
 		s.write("\t<key id=\"sn\" for=\"subset\" attr.name=\"name\" attr.type=\"string\"><!-- std name of a subset-->"+nl);
 		s.write("\t\t<default>"+gp.getStringValue("subset.name")+"</default>"+nl+"\t</key>"+nl);
 	}
+	/**
+	 *  Write the additional values needed for visual graphs
+	 * @param s
+	 * @throws IOException
+	 */
 	private void writeVisualHeaderAddon(OutputStreamWriter s) throws IOException
 	{
 		s.write(nl+nl+"<!-- Graphel key Definitions for a Graph with visual information -->"+nl);
@@ -123,14 +135,26 @@ public class GravelMLWriter {
 		s.write("\t<key id=\"sg\" for=\"subset\" attr.name=\"color.g\" attr.type=\"integer\" />    <!-- SubSetColor - Green -->"+nl);
 		s.write("\t<key id=\"sb\" for=\"subset\" attr.name=\"color.b\" attr.type=\"integer\" />    <!-- SubSetColor - blue -->"+nl);
 	}
+	/**
+	 * Write additional Stuff needed for visual graphs in the footer
+	 * @param s
+	 * @throws IOException
+	 */
 	private void writeVisualFooterAddon(OutputStreamWriter s) throws IOException{}
+	/**
+	 * Write the general footer
+	 * @param s
+	 * @throws IOException
+	 */
 	private void writeFooter(OutputStreamWriter s) throws IOException
 	{
 		s.write(nl+"</graphml>"+nl);
 	}
-	
-	//Visual
-	
+	/**
+	 * Write each node to a visual file
+	 * @param s
+	 * @throws IOException
+	 */
 	private void writeVisualNodes(OutputStreamWriter s) throws IOException
 	{
 	    //Nodes
@@ -160,6 +184,11 @@ public class GravelMLWriter {
 	    }
 
 	}
+	/**
+	 * Write the visual edges
+	 * @param s
+	 * @throws IOException
+	 */
 	private void writeVisualEdges(OutputStreamWriter s) throws IOException
 	{
 	       //Nodes
@@ -252,6 +281,11 @@ public class GravelMLWriter {
 	    	   s.write("\t\t</edge>"+nl);
  		}
 	}
+	/**
+	 * Write visual SubSets to File
+	 * @param s
+	 * @throws IOException
+	 */
 	private void writeVisualSubSets(OutputStreamWriter s) throws IOException
 	{
 	       //SubSets
@@ -290,6 +324,11 @@ public class GravelMLWriter {
 	       if (vg.SubSetCount()!=0)
     	       s.write("<!-- == END remove these lines to get a valid GraphML-FILE	-->"+nl);
 	}
+	/**
+	 * Complete Funktion to write an visual Graph to a File
+	 * @param f
+	 * @return
+	 */
 	public String saveVisualToFile(File f)
 	{
 		if (!f.exists())
@@ -331,8 +370,12 @@ public class GravelMLWriter {
 		return "";
 	}
 
-	//Math
 	
+	/**
+	 * Write Nodes, but only their mathematical values
+	 * @param s
+	 * @throws IOException
+	 */
 	private void writeMathNodes(OutputStreamWriter s) throws IOException
 	{
 	    //Nodes
@@ -348,6 +391,11 @@ public class GravelMLWriter {
 	    	s.write(" />");
  		}
 	}
+	/**
+	 * Write Edges, but only their mathematical values
+	 * @param s
+	 * @throws IOException
+	 */
 	private void writeMathEdges(OutputStreamWriter s) throws IOException
 	{
 	       //Edges
@@ -369,6 +417,11 @@ public class GravelMLWriter {
  		}
 
 	}
+	/**
+	 * Write mathematical Subsets to File
+	 * @param s
+	 * @throws IOException
+	 */
 	private void writeMathSubSets(OutputStreamWriter s) throws IOException
 	{
 	       //SubSets
@@ -404,6 +457,11 @@ public class GravelMLWriter {
 	       if (vg.getMathGraph().SubSetCount()!=0)
     	       s.write("<!-- == END remove these lines to get a valid GraphML-FILE	-->"+nl);
 	}
+	/**
+	 * Write complete math graph to file f
+	 * @param f
+	 * @return
+	 */
 	public String saveMathToFile(File f)
 	{
 		if (!f.exists())
@@ -442,7 +500,4 @@ public class GravelMLWriter {
 		}
 		return "";
 	}
-
-
-
 }

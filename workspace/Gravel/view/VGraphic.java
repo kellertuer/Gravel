@@ -69,13 +69,11 @@ public class VGraphic extends Component implements 	Observer
 	private DragMouseHandler Drag;
 	private ClickMouseHandler Click;
 	private static final long serialVersionUID = 1L;
-
-	/*----
-	 * Init Stuff *
-	 * 
-	 */
+	
 	/**
-	 * Konstruktor, der eine Groessenangabe fordert
+	 * Create a New Graphical representation of an VGraph with a given size
+	 * @param d Size of the Area the VGraphics gets
+	 * @param Graph Graph to be represented
 	 */
 	public VGraphic(Dimension d,VGraph Graph) {
 		//GeneralPreferences als beobachter eintragen
@@ -101,22 +99,19 @@ public class VGraphic extends Component implements 	Observer
 		Controls = new HashMap<String,Observable>();
 	}
 	
-	/*
-	 * @see java.awt.Component#paint(java.awt.Graphics)
-	 */
 	public void paint(Graphics g) 
 	{
 		Graphics2D g2 = (Graphics2D) g;
 		//Mit Antialiasing
 		paint(g2);
 	}
+	
 	public void paint(Graphics2D g2)
 	{
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		paintgrid(g2);
 		paintEdges(g2);
 		paintNodes(g2);
-		paintSubSetBorders(g2);
 		if (gp.getBoolValue("vgraphic.cpshow"))
 			paintControllPoints(g2);
 		if ((Drag!=null)&&(Drag.getSelectionRectangle()!=null))
@@ -126,15 +121,10 @@ public class VGraphic extends Component implements 	Observer
 			g2.draw(Drag.getSelectionRectangle());
 		}
 	}
-	private void paintSubSetBorders(Graphics2D g2) {
-		/*if (vG.getSubSet(1)!=null)
-		{
-			g2.setColor(Color.darkGray);
-			vG.getSubSet(1).buildBorder(g2,40,true);
-			g2.draw(vG.getSubSet(1).getBorder());
-		} */
-	}
-
+	/**
+	 * Paint Edges in the graphic
+	 * @param g
+	 */
 	private void paintEdges(Graphics g)
 	{
 		Graphics2D g2 = (Graphics2D) g;
@@ -219,7 +209,10 @@ public class VGraphic extends Component implements 	Observer
 			}
 		}
 	}
-
+	/**
+	 * Paint nodes in the Graphic g
+	 * @param g
+	 */
 	private void paintNodes(Graphics g)
 	{
 		Graphics2D g2 = (Graphics2D) g;
@@ -261,7 +254,10 @@ public class VGraphic extends Component implements 	Observer
 		}
 		g2.setColor(Color.black);
 	}
-	
+	/**
+	 * Paint Edge Controll-Points in the Graphic
+	 * @param g
+	 */
 	private void paintControllPoints(Graphics g)
 	{
 		Iterator<VEdge> edgeiter = vG.getEdgeIterator();
@@ -273,7 +269,11 @@ public class VGraphic extends Component implements 	Observer
 				drawCP(g,p.get(i));
 		}
 	}
-	
+	/**
+	 * Draw a single ControllPoint in
+	 * @param g the Graphic g
+	 * @param p at the Position of this point
+	 */
 	private void drawCP(Graphics g, Point p)
 	{
 		int cpsize = gp.getIntValue("vgraphic.cpsize");
@@ -284,7 +284,10 @@ public class VGraphic extends Component implements 	Observer
 		g2.drawLine(Math.round(p.x*zoomfactor),Math.round((p.y-cpsize)*zoomfactor),Math.round(p.x*zoomfactor),Math.round((p.y+cpsize)*zoomfactor));
 		
 	}
-	
+	/**
+	 * Paint a grid in the Graphics
+	 * @param g
+	 */
 	private void paintgrid(Graphics g)
 	{
 		Graphics2D g2 = (Graphics2D) g;
@@ -309,11 +312,11 @@ public class VGraphic extends Component implements 	Observer
 				g2.drawLine(minX, i, maxX, i);
 		}		
 	}
-	
 	/**
-	 * Returns the actual VGraph that is handled in the this GUI
+	 * Get the represented Graph for manipulation.
+	 * The Manipulation is handled by pushing Notifications to the Graph-Observers 
 	 * 
-	 * @return
+	 * @return the actual VGraph that is handled in the this GUI
 	 */
 	public VGraph getVGraph()
 	{
@@ -323,68 +326,100 @@ public class VGraphic extends Component implements 	Observer
 	 * Get the GraphHIstoryManager that tracks, records and enables undo for the graph
 	 * Use this Method to do the Undo/Redo and sth like that
 	 * 
-	 * @return
+	 * @return GraphHistoryManager
 	 */
 	public GraphHistoryManager getGraphHistoryManager()
 	{
 		return vGh;
 	}
-
+	/**
+	 * Set the ViewPort of the VGraphic
+	 * @param p new ViewPort
+	 */
 	public void setViewPort(JViewport p)
 	{
 		vp = p;
 	}
+	/**
+	 * Get the Viewport
+	 * @return
+	 */
 	public JViewport getViewPort()
 	{
 		return vp;
 	}
+	/**
+	 * Add an Element to the controls.
+	 * These Controls are observed for changes
+	 * The Name is used to identify the Piece and react on changes in it
+	 * @param name
+	 * @param element
+	 */
 	public void addPiece(String name, Observable element)
 	{
 		Controls.put(name,element);
 		element.addObserver(this);
 	}
-	
+	/**
+	 * Remove an Element of the controls. It is no longer observed
+	 * So no further action in the Observable object trigger changes here
+	 * @param name name of the Object to be removed
+	 */
 	public void removePiece(String name)
 	{
 		Controls.get(name).deleteObserver(this);
 		Controls.remove(name);
 	}
-	
+	/**
+	 * Change Mouse-Handling to a new State.
+	 * Mouse actions in Progress are stopped (e.g. an Drag in progress)
+	 * 
+	 * possible Values
+	 * - NO_MOUSEHANDLING - Mouse-Actions aren't handled in any way
+	 * - STD_MOUSEHANDLING - Standard-Mode (default)
+	 * - OCM_MOUSEHANDLING - Set to OneClick-Mode
+	 * 
+	 * @param state new Mousehandling state
+	 */
 	public void setMouseHandling(int state) {
 		if (Drag!=null)
 		{
 			MouseEvent e = new MouseEvent(this,111,System.nanoTime(),0,-1,-1,1,false);		
 			Drag.mouseReleased(e);
 		}
-		if (state == NO_MOUSEHANDLING)
+		switch (state) 
 		{
-			resetMouseHandling();
+			case NO_MOUSEHANDLING:
+				resetMouseHandling();
+			break;
+			case OCM_MOUSEHANDLING:
+				resetMouseHandling();
+				Click = new OCMClickMouseHandler(vG);
+				Drag = new OCMDragMouseHandler(vG);
+				this.addMouseListener(Drag);
+				this.addMouseMotionListener(Drag);
+				this.addMouseListener(Click);
+			break;
+			case STD_MOUSEHANDLING:
+			default:
+				resetMouseHandling();
+				Click = new StandardClickMouseHandler(vG);
+				Drag = new StandardDragMouseHandler(vG);
+				this.addMouseListener(Drag);
+				this.addMouseMotionListener(Drag);
+				this.addMouseListener(Click);
+				break;
 		}
-		else if (state == STD_MOUSEHANDLING)
-		{
-			resetMouseHandling();
-			Click = new StandardClickMouseHandler(vG);
-			Drag = new StandardDragMouseHandler(vG);
-			this.addMouseListener(Drag);
-			this.addMouseMotionListener(Drag);
-			this.addMouseListener(Click);
-		}
-		else if (state == OCM_MOUSEHANDLING)
-		{
-			resetMouseHandling();
-			Click = new OCMClickMouseHandler(vG);
-			Drag = new OCMDragMouseHandler(vG);
-			this.addMouseListener(Drag);
-			this.addMouseMotionListener(Drag);
-			this.addMouseListener(Click);
-		}
-		if (Drag!=null)
+		if (Drag!=null) //Update Info in the Drag-Handler about the Grid.
 		{
 			Drag.setGrid(gridy,gridy);
 			Drag.setGridOrientated(gridenabled&&gridorientated);
 		}
 		repaint();
 	}
+	/**
+	 * Set the MouseHandling to NO_MOUSEHANDLING
+	 */
 	private void resetMouseHandling()
 	{
 		this.removeMouseListener(Drag);
@@ -393,6 +428,10 @@ public class VGraphic extends Component implements 	Observer
 		Drag = null;
 		Click = null;
 	}
+	/**
+	 * Set The possibility to Zoom to a new value
+	 * @param activity ture, if zoom should be able, else false
+	 */
 	public void setZoomEnabled(boolean activity)
 	{
 		usezoom = activity;
@@ -405,6 +444,7 @@ public class VGraphic extends Component implements 	Observer
 			zoomfactor = 1.0f;
 		}
 	}
+	
 	public void update(Observable o, Object arg) 
 	{
 		if (o.equals(vG)&&(((GraphMessage)arg)!=null)) //Der Graph wurde aktualisiert und auch echt ein String gegeben
@@ -505,5 +545,4 @@ public class VGraphic extends Component implements 	Observer
 			repaint();
 		}
 	}
-
 }

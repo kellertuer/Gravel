@@ -129,8 +129,7 @@ public class Gui implements WindowListener
         frame.getContentPane().setMinimumSize(new Dimension(300,200));
    	}
 	/**
-	 * 
-	 *
+	 * 	Set the GUI visible
 	 */
 	public void show()
 	{
@@ -138,7 +137,7 @@ public class Gui implements WindowListener
         frame.setVisible(true);
         frame.setResizable(true);
 	}
-    /*
+    /**
      * buildmaingrid() baut ein Grid in dem oben eine Buttonliste ist und dadrunter ein
      * SplitPane in dem man die beiden Inhalte, den Graph und den Tree mit Eigenschaften in der Breite variieren kann
      */
@@ -190,7 +189,9 @@ public class Gui implements WindowListener
         mainPanel.setPreferredSize(new Dimension(gp.getIntValue("window.x"),gp.getIntValue("window.y")));
         mainPanel.doLayout();
     }
-
+    /**
+     * Show About-Dialog
+     */
     public void showAbout()
     {
     	String text = "<html><div align=center><font size='+1'>Gravel "+main.CONST.version+"</font><br>Ein Editor für Graphen</div><br>\nCopyright (C) 2007 Ronny Bergmann<br>\n";
@@ -204,6 +205,9 @@ public class Gui implements WindowListener
         AboutLabel.setOpaque(true);
 		JOptionPane.showMessageDialog(frame, AboutLabel,"Über Gravel",JOptionPane.INFORMATION_MESSAGE);
     }
+    /**
+     * Handle Quit
+     */
     public void doQuit()
     {
     		//Check File Saved
@@ -229,21 +233,34 @@ public class Gui implements WindowListener
 	{
 		MainGraph.replace(vg);
 	}
+   /**
+    * Get Entries of the Statistics
+    * @return
+    */
     public TreeMap<String, String> getStatRows()
     {
     	return stats.getRows();
     }
-    
+    /**
+     * Get GUI Parent(Main-)frame
+     * @return
+     */
    public JFrame getParentWindow()
    {
 	   return frame;
    }
+   /**
+    * Get the GraphHistoryManager that tracks actions in the actual graph
+    * @return the GraphHistoryManager
+    */
    public GraphHistoryManager getGraphHistoryManager()
    {
 	   return graphpart.getGraphHistoryManager();
    }
+  
    public void windowActivated(WindowEvent arg0) {}
-	public void windowClosed(WindowEvent arg0) 
+   
+   public void windowClosed(WindowEvent arg0) 
 	{
 		if (!gp.getBoolValue("pref.saveonexit")) //nicht speichern, also die alten sachen mal Laden
 			gp.readXML();
@@ -256,12 +273,16 @@ public class Gui implements WindowListener
 			gp.writetoXML();
 		System.exit(0);
 	}
-	public void windowClosing(WindowEvent e) {
+   
+   public void windowClosing(WindowEvent e) {
 		doQuit();
 		e.getWindow().dispose();		
 	}
-	public void windowDeactivated(WindowEvent arg0) {}
-	public void windowDeiconified(WindowEvent arg0) {}
-	public void windowIconified(WindowEvent arg0) {}
-	public void windowOpened(WindowEvent arg0) {}
+   public void windowDeactivated(WindowEvent arg0) {}
+   
+   public void windowDeiconified(WindowEvent arg0) {}
+   
+   public void windowIconified(WindowEvent arg0) {}
+   
+   public void windowOpened(WindowEvent arg0) {}
 }

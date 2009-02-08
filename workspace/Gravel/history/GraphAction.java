@@ -17,7 +17,9 @@ import model.*;
  *  
  *  If no specific action fits, it is recommended to use REPLACE with a complete graph, this suits e.g.
  *  for the manipulation of a node, where the ID changes.
+ *  
  * @author Ronny Bergmann
+ * @since 0.3
  */
 public class GraphAction {
 

@@ -39,11 +39,11 @@ import view.VGraphic;
  * 		LaTeX Picture Export
  * 		SVG		Export als Vektorgrafik
  * (	GraphML Export mit oder ohne visuelle Informationen, Subsets gehen verloren
- * 		.dot	Export das Format von Graphviz
+ * 		.dot	Export das Format von Graphviz 
  * 
  * 		GraphML Import eines mathematischen Graphen => Wizard starten
  *		.dot	Import so jeder Knoten mindestens x und y enthält VGraph sonst MGraph
- * 		GML Import ?		
+ * 		GML Import ?		)
  * 
  * @author Ronny Bergmann
  */
@@ -162,7 +162,6 @@ public class JFileDialogs implements Observer
 		vGc.getVGraph().addObserver(this);
 		actualState=vGc.getGraphHistoryManager().IsGraphUnchanged();
 	}
-	
 	/**
 	 * Extracts the extension of a File
 	 * 
@@ -179,7 +178,6 @@ public class JFileDialogs implements Observer
 	        }
 	        return ext;
 	}
-	
 	/**
 	 * Loads a Graph from a GravelGraphML Source
 	 * 
@@ -219,7 +217,7 @@ public class JFileDialogs implements Observer
 	    			vGc.getVGraph().getMathGraph().deleteObserver(this);
 	    			vGc.getVGraph().addObserver(this);
 	    			//Set actual State saved.
-	    			vGc.getGraphHistoryManager().GraphSaved();
+	    			vGc.getGraphHistoryManager().setGraphSaved();
 	    			return true;
 	    		}
 	    		else
@@ -237,7 +235,6 @@ public class JFileDialogs implements Observer
 	       }
 		return false; //Chosen Cancel
 	}
-	
 	/**
 	 * Saves a Graph to a GravelGraphML File 
 	 *
@@ -261,7 +258,7 @@ public class JFileDialogs implements Observer
 			{
 				Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName());
     			//Set actual State saved.
-    			vGc.getGraphHistoryManager().GraphSaved();
+    			vGc.getGraphHistoryManager().setGraphSaved();
 				return true;
 			}
 		}
@@ -271,13 +268,12 @@ public class JFileDialogs implements Observer
 			{
 				Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+" (math only)");
     			//Set actual State saved.
-    			vGc.getGraphHistoryManager().GraphSaved();
+    			vGc.getGraphHistoryManager().setGraphSaved();
 				return true;				
 			}
 		}
 		return false; //an error occured
 	}
-	
 	/**
 	 * Save as a File 
 	 *
@@ -318,7 +314,7 @@ public class JFileDialogs implements Observer
 						vGc.getVGraph().addObserver(this);
 						Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName());
 		    			//Set actual State saved.
-		    			vGc.getGraphHistoryManager().GraphSaved();
+		    			vGc.getGraphHistoryManager().setGraphSaved();
 					}
 				}
 				else
@@ -332,7 +328,7 @@ public class JFileDialogs implements Observer
 						vGc.getVGraph().deleteObserver(this);
 						Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+" (math only)");
 		    			//Set actual State saved.
-		    			vGc.getGraphHistoryManager().GraphSaved();
+		    			vGc.getGraphHistoryManager().setGraphSaved();
 					}
 				}
 			} //End of SaveAsAccepted
@@ -341,7 +337,6 @@ public class JFileDialogs implements Observer
 		//Chosen Cancel
 		return false;
 	}
-
 	/**
 	 * Export an File
 	 *	PNG
@@ -424,11 +419,19 @@ public class JFileDialogs implements Observer
 	       }	   
 		   return false;
 	}
-
+	/**
+	 * Get the actual status of the graph
+	 * @return true if the current Graph is saved in a file, else false
+	 */
 	public boolean isGraphSaved()
 	{
 		return vGc.getGraphHistoryManager().IsGraphUnchanged();
 	}
+	/**
+	 * Ask on File->New or File->Open to Save an unsaved Graph
+	 * and return, whether it was saved or the action was canceled.
+	 * @return true if the graph was saved or Saving was denied, false if the action was canceled
+	 */
 	private boolean SaveOnNewOrOpen()
 	{
 		if ((!vGc.getGraphHistoryManager().IsGraphUnchanged())&&(vGc.getVGraph().NodeCount()>0)) //saved/no changes
@@ -456,7 +459,10 @@ public class JFileDialogs implements Observer
 		//No one aborted so return true
 		return true;
 	}
-
+	/**
+	 * Create a New Graph in the GUI
+	 *
+	 */
 	public void NewGraph() 
 	{
 		if (!SaveOnNewOrOpen()) //s.o. aborted
@@ -471,7 +477,9 @@ public class JFileDialogs implements Observer
 		//Reset (and with that reactivate History
 		Gui.getInstance().getParentWindow().setTitle(Gui.WindowName);
 	}	
-	
+	/**
+	 * Handle Graph Updates and check, whether a loaded graph is still saved
+	 */
 	public void update(Observable arg0, Object arg1) {
 		if (this.actualState!=vGc.getGraphHistoryManager().IsGraphUnchanged()) //State Changed
 			actualState = vGc.getGraphHistoryManager().IsGraphUnchanged();

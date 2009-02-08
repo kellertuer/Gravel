@@ -31,6 +31,12 @@ import algorithm.AlgorithmFactory;
 
 import view.pieces.GridComponent;
 
+/**
+ * Class Containing the Menu and Handling actions on that Menu, for example evoke the Dialogs.
+ *
+ * @author Ronny Bergmann
+ * @since 0.2
+ */
 public class MainMenu extends JMenuBar implements ActionListener, Observer
 {	
 	private static final long serialVersionUID = 1L;
@@ -62,7 +68,9 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         setPreferredSize(new Dimension(200, 20));
         graphpart.getVGraph().addObserver(this);
  	}
-	@SuppressWarnings("deprecation")
+	/**
+	 * Create the Menu-Bar with all its items
+	 */
 	private void createMenuBar() {
 		int MenuAccModifier;
 		
@@ -334,6 +342,38 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         	mHelp.add(mHAbout);
         }
     }
+
+	/**
+	 * Check, whether a Graph is saved, if not ask for Saving and handle the answer
+	 */
+	public void checkSaved() 
+	{
+		if (!fileDialogs.isGraphSaved()) //Not Saved
+		{
+			//Fragen
+			if (GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
+			{
+				if (Gui.getInstance().getVGraph().NodeCount()>0) //es gibt überhaupt was
+				{
+					int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Der aktuelle Graph wurde nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie den Graph noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_OPTION);
+					if (n==JOptionPane.YES_OPTION)
+					{
+						fileDialogs.SaveAs();
+					}
+				}
+			}
+			else
+			{
+				String file = (new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName());
+				int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Die letzten "+main.CONST.html_Ae+"nderungen des Graphen<br><i>'"+file+"'</i><br>wurden noch nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie diese noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_OPTION);
+	    		if (n==JOptionPane.YES_OPTION)
+	    		{
+	    			fileDialogs.Save();
+	    		}				
+			}
+		}
+	}
+	
 	public void actionPerformed(ActionEvent e) 
 	{
 		if (e.getSource() instanceof JMenuItem) 
@@ -469,33 +509,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     		}
     	}
 	}
-	public void checkSaved() 
-	{
-		if (!fileDialogs.isGraphSaved()) //Not Saved
-		{
-			//Fragen
-			if (GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
-			{
-				if (Gui.getInstance().getVGraph().NodeCount()>0) //es gibt überhaupt was
-				{
-					int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Der aktuelle Graph wurde nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie den Graph noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_OPTION);
-					if (n==JOptionPane.YES_OPTION)
-					{
-						fileDialogs.SaveAs();
-					}
-				}
-			}
-			else
-			{
-				String file = (new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName());
-				int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Die letzten "+main.CONST.html_Ae+"nderungen des Graphen<br><i>'"+file+"'</i><br>wurden noch nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie diese noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_OPTION);
-	    		if (n==JOptionPane.YES_OPTION)
-	    		{
-	    			fileDialogs.Save();
-	    		}				
-			}
-		}
-	}
+	
 	public void update(Observable arg0, Object arg1) 
 	{
 		GraphMessage m = (GraphMessage)arg1;

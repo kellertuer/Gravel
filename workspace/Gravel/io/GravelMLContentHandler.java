@@ -18,8 +18,8 @@ import org.xml.sax.SAXException;
  * 
  * Der Typ ist entweder math oder visual
  * 
- * @author ronny
- *
+ * @author Ronny Bergmann
+ * @since 0.2
  */
 public class GravelMLContentHandler implements ContentHandler
 {

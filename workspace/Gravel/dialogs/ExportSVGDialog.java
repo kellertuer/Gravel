@@ -27,7 +27,9 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
 /**
- * 
+ * Dialog for the properties of an SVG-Export. 
+ * - Dimensions of the SVG
+ *
  * @author ronny
  *
  */

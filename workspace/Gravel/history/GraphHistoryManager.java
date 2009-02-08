@@ -11,11 +11,14 @@ import java.util.Observer;
 
 /**
  * This class tacks all actions happening to a graph and saves the last few ones.
+ * Depending on GeneralPreferences, the 
+ * - Number of Actions to be undo- or redoable may vary
+ * - Tracking of Selection-Changes may be active or inactive
  * 
- * It also enables the undo and redo functions
+ * It also provides Undo(), Redo() and the methods to check their possibility
  * 
  * @author Ronny Bergmann
- *
+ * @since 0.3
  */
 public class GraphHistoryManager implements Observer
 {
@@ -234,7 +237,6 @@ public class GraphHistoryManager implements Observer
 		trackedGraph.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.UPDATE));
 		trackedGraph.addObserver(this); //Activate Tracking again
 	}
-	
 	/**
 	 * Is the Tracked Graph Unchanged since last 
 	 * @return
@@ -248,7 +250,7 @@ public class GraphHistoryManager implements Observer
 	 * if the undoManager comes back to it, the graph is indicated as saved again
 	 *
 	 */
-	public void GraphSaved()
+	public void setGraphSaved()
 	{
 		SavedUndoStackSize=UndoStack.size();
 	}
@@ -260,10 +262,20 @@ public class GraphHistoryManager implements Observer
 	{
 		return trackSelection;
 	}
-	public int getUndoStackSize()
+	/**
+	 * get the maximum Size of Undo- and RedoStack
+	 * If one of them exceeds this size, the oldest action is discarded
+	 * 
+	 * This value can't be set directliy. It is set by changing the GeneralPreferences.
+	 * The new value gets set when a new Graph is loaded (or an empty one created) 
+	 *
+	 * @return the size of the stacks
+	 */
+	public int getStackSize()
 	{
 		return stacksize;
 	}
+
 	public void update(Observable o, Object arg) 
 	{
 		GraphMessage m = (GraphMessage) arg;

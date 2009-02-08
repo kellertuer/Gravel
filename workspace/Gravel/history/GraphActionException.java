@@ -1,5 +1,11 @@
 package history;
 
+/**
+ * Own Exception Class for GraphActions and their problems or errors
+ * 
+ * @author Ronny Bergmann
+ * @since 0.3
+ */
 public class GraphActionException extends Exception {
 
 	/**

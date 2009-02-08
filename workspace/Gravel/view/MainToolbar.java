@@ -13,21 +13,29 @@ import view.pieces.ZoomComponent;
 
 //import model.GeneralPreferences;
 /**
- * Die Toolbar zum Haupfenster inklusive eigenem Action Handling
+ * Toolbar, that belongs to the mainwindows
+ * Up to now it only contains a Zoom-Element
  * 
  * @author Ronny Bergmann
+ * @since 0.2
  */
 public class MainToolbar extends JToolBar implements ActionListener 
 {	
 	private static final long serialVersionUID = 1L;
 	private VGraphic vG;
-
+	/**
+	 * Init Toolbar, that is  added as an Control-Element to a VGraphic
+	 * @param g VGraphic it controls
+	 */
 	public MainToolbar (VGraphic g)
 	{
 		super();
 		vG = g;
 		buildToolBar();
 	}
+	/**
+	 * Build Toolbar
+	 */
 	private  void buildToolBar()
 	{
         setOpaque(true);
@@ -42,6 +50,7 @@ public class MainToolbar extends JToolBar implements ActionListener
 		vG.addPiece("Zoom", zoom);
 	    this.add(zoom.getContent(),c);   
 	}
+	
 	public void actionPerformed(ActionEvent e) 
 	{	
 	}

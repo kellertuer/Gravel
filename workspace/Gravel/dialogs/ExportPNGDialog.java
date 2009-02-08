@@ -30,7 +30,7 @@ import javax.swing.event.CaretListener;
 
 /**
  * Class for the propertie dialog of a PNG-Export, mainly the dimensions of the picture 
- * can be set
+ * can be set and the background of the picture
  *  
  * @author ronny
  *

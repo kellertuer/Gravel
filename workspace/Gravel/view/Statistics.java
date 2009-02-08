@@ -60,6 +60,10 @@ public class Statistics extends JPanel implements Observer, ActionListener
 	private JTable StatsTable;
 	private DefaultTableModel StatsModel;
 	private JButton bPlus,bMinus,bEdit;
+	/**
+	 * Init Statistics based on a VGraphic g
+	 * @param g
+	 */
 	public Statistics(VGraphic g)
 	{
 		vgs = new GraphStatisticAtoms(g);
@@ -120,7 +124,10 @@ public class Statistics extends JPanel implements Observer, ActionListener
 		this.validate();
 		//this.doLayout();
 	}
-	
+	/**
+	 * Set activity of the Statistics
+	 * @param a true, if active, else false
+	 */
 	public void setActive(boolean a)
 	{
 		bPlus.setVisible(a);
@@ -128,17 +135,26 @@ public class Statistics extends JPanel implements Observer, ActionListener
 		bMinus.setVisible(a);
 		StatsTable.setEnabled(a);
 	}
+	/**
+	 * Set Rows, that are the Table-Entries
+	 * @param f
+	 */
 	public void setRows(TreeMap<String, String> f)
 	{
 		formeln = f;
 		refreshTable();
 	}
-	@SuppressWarnings("unchecked")
+	/**
+	 * Return the actual Formulars represented in the statistics
+	 * @return
+	 */@SuppressWarnings("unchecked")	
 	public TreeMap<String, String> getRows()
 	{
 		return (TreeMap<String, String>)formeln.clone();
 	}
-	
+	/**
+	 * Build the Table with its model
+	 */
 	private void buildTable()
 	{
 		StatsModel = new MyDefaultTableModel(0,0);
@@ -167,7 +183,9 @@ public class Statistics extends JPanel implements Observer, ActionListener
 		((JLabel)StatsTable.getDefaultRenderer(String.class)).setHorizontalAlignment (JLabel.LEFT);
 		
 	}
-	
+	/**
+	 * Refresh Data in the table
+	 */
 	private void refreshTable()
 	{
 		StatsModel = new MyDefaultTableModel(0,0);
@@ -185,7 +203,9 @@ public class Statistics extends JPanel implements Observer, ActionListener
 		StatsTable.setModel(StatsModel);
 		StatsTable.getTableHeader().setReorderingAllowed(false);
 	}
-	
+	/**
+	 * (Re)Calculate Values in the right column
+	 */
 	private void CalcValues()
 	{
 		Iterator<String> iter = formeln.keySet().iterator();
@@ -198,7 +218,11 @@ public class Statistics extends JPanel implements Observer, ActionListener
 		}
 		
 	}
-	
+	/**
+	 * Interprete (Parse) one Formular identificated by its Name
+	 * @param key the formular identifier
+	 * @return Parsed Value
+	 */
 	public double interpreteKey(String key)
 	{
 		String formular = formeln.get(key);
@@ -207,7 +231,11 @@ public class Statistics extends JPanel implements Observer, ActionListener
 		else
 			return Double.NaN;
 	}
-	
+	/**
+	 * Interprese (Parse, Calculate) a String
+	 * @param s
+	 * @return
+	 */
 	public double interprete(String s)
 	{	
 		for (int i=0; i<GraphStatisticAtoms.ATOMS.length; i++)
@@ -226,7 +254,11 @@ public class Statistics extends JPanel implements Observer, ActionListener
 		//System.err.println("...evaluating "+s);
 		return evaluate(s);
 	}
-	
+	/**
+	 * Parse s
+	 * @param s
+	 * @return
+	 */
 	private double evaluate(String s)
 	{
 		StringReader reader = new StringReader(s);
@@ -243,7 +275,6 @@ public class Statistics extends JPanel implements Observer, ActionListener
 		}
 		return erg;
 	}	
-	
 	/**
 	 * Einfache SubStringersetzung
 	 * @param in Eingabe
@@ -271,7 +302,11 @@ public class Statistics extends JPanel implements Observer, ActionListener
 		if(oldIndex<inLength) sb.append(in.substring(oldIndex,inLength));
 		return sb.toString();
 	}
-	
+	/**
+	 * Get the Value of a fomular identified by its key
+	 * @param ValKey
+	 * @return
+	 */
 	public double getValue(String ValKey)
 	{
 		if (formeln.get(ValKey)!=null)
@@ -279,19 +314,33 @@ public class Statistics extends JPanel implements Observer, ActionListener
 		else
 			return Double.NEGATIVE_INFINITY;
 	}
-	
+	/**
+	 * Get Formular identified by its String
+	 * @param ValKey
+	 * @return
+	 */
 	public String getValueString(String ValKey)
 	{
 		return formeln.get(ValKey);
 	}
+	/**
+	 * Set Formular
+	 * @param valKey
+	 * @param Expr
+	 */
 	public void setValue(String valKey, String Expr)
 	{
 		formeln.put(valKey, Expr);
 	}
+	/**
+	 * Remove entry
+	 * @param valKey
+	 */
 	public void removeValue(String valKey)
 	{
 		formeln.remove(valKey);
 	}
+	
 	public void update(Observable arg0, Object arg1) {
 		refreshTable();
 	}
@@ -318,5 +367,4 @@ public class Statistics extends JPanel implements Observer, ActionListener
 			refreshTable();
 		}
 	}
-	
 }
