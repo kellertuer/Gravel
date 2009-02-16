@@ -1,7 +1,5 @@
 package model;
 
-import io.GeneralPreferences;
-
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Shape;
@@ -47,12 +45,8 @@ public abstract class VEdge extends VItem {
 	private VEdgeText Textvalues;
 	private VEdgeLinestyle Linestyle;
 	
-	protected float arrSize = GeneralPreferences.getInstance().getIntValue("edge.arrsize");          // Size of the arrow segments
-	protected float arrPart =  (float)GeneralPreferences.getInstance().getIntValue("edge.arrpart")/100;  		//Size of arrow height
-	protected float arrAlpha =  GeneralPreferences.getInstance().getIntValue("edge.arralpha")/2; //Winkel der Pfeilspitze 0 =< alpa =< 45
-	protected float arrPos =  (float)GeneralPreferences.getInstance().getIntValue("edge.arrpos")/100; //Position des Pfeils auf der Kante: 1 == spitze am Endknoten 0==Pfeilende am Startknoten je bündig
-	
-	
+	private VEdgeArrow Arrow;
+
 	/**
 	 * Constructor that initializes the Arrow-Part of the Edge with the GeneralPreferences Standard
 	 * 
@@ -67,6 +61,7 @@ public abstract class VEdge extends VItem {
 		colour = Color.black;
 		Textvalues = new VEdgeText();
 		Linestyle = new VEdgeLinestyle();
+		Arrow = new VEdgeArrow();
 	}
 	/**
 	 * Constructor for an edge with information about the arrow
@@ -77,64 +72,18 @@ public abstract class VEdge extends VItem {
 	 * @param part part of the arrow thats filled (so ist <1)
 	 * @param alpha Arrow in the arrowhead 0<alpha<90
 	 * @param pos position on the edge (0 means at the start 1 means at the end)
+	 * @deprecated
 	 */
-	public VEdge(int i,int w, float size, float part, float alpha, float pos)
+	public VEdge(int i,int w, VEdgeArrow arr, VEdgeText t, VEdgeLinestyle l)
 	{
 		super(i);
 		width=w;
 		setCount = 0;
 		colour = Color.black;
-		arrSize = size;
-		arrPart = part;
-		arrAlpha = alpha/2;
-		arrPos = pos;
-		Textvalues = new VEdgeText();
-		Linestyle = new VEdgeLinestyle();
-	}
-	/**
-	 * Initialize Edge with Text but without arrow
-	 * @param i index
-	 * @param w width
-	 * @param td text distance
-	 * @param tp text position
-	 * @param ts text size
-	 * @param tv text visibility
-	 * @param tw text property (true=value, false=name) 
-	 */
-	public VEdge(int i, int w, VEdgeText t)
-	{
-		this(i,w);
-		Textvalues = t;
-	}
-	public VEdge(int i, int w, VEdgeText t, VEdgeLinestyle l)
-	{
-		this(i,w);
+		Arrow = arr;
 		Textvalues = t;
 		Linestyle = l;
 	}
-	public VEdge(int i, int w, VEdgeLinestyle l)
-	{
-		this(i,w);
-		Linestyle = l;
-	}
-
-	public VEdge(int i,int w, float size, float part, float alpha, float pos, VEdgeText t)
-	{
-		this(i,w,size,part,alpha,pos);
-		Textvalues = t;
-	}
-	public VEdge(int i,int w, float size, float part, float alpha, float pos, VEdgeText t, VEdgeLinestyle l)
-	{
-		this(i,w,size,part,alpha,pos);
-		Textvalues = t;
-		Linestyle = l;
-	}
-	public VEdge(int i,int w, float size, float part, float alpha, float pos, VEdgeLinestyle l)
-	{
-		this(i,w,size,part,alpha,pos);
-		Linestyle = l;
-	}
-	
 	// Abstract Methoden, die von jedem Typ überschrieben werden müssen
 	/**
 	 * Returns true if the actual edge and the edge v are equal.
@@ -206,10 +155,7 @@ public abstract class VEdge extends VItem {
 		
 		target.setSelectedStatus(this.getSelectedStatus());
 		
-		target.setArrowAngle(getArrowAngle());
-		target.setArrowPart(getArrowPart());
-		target.setArrowPos(getArrowPos());
-		target.setArrowSize(getArrowSize());
+		target.setArrow(this.getArrow().clone());
 		return target;
 	}
 	/**returns a Shape for the Arrow on a directed Edge at the position in %
@@ -228,8 +174,8 @@ public abstract class VEdge extends VItem {
     	double x = 0.0, y = 0.0, lastx=0.0, lasty = 0.0;
 		//Länge der Kante
 		double length=getLength(Start,End);
-		double p1distance = (length-(double)startsize-(double)endsize - arrSize)*arrPos + (double)startsize+1.0d; //Arrowhead
-		double p2distance = p1distance + arrSize; 
+		double p1distance = (length-(double)startsize-(double)endsize - getArrow().getSize())*getArrow().getPos() + (double)startsize+1.0d; //Arrowhead
+		double p2distance = p1distance + getArrow().getSize(); 
 		if (p2distance > length) //Rundungsfehler
 			p2distance=length;
 		Point2D.Double p1=new Point2D.Double(0,0),p2 = new Point2D.Double(0,0);
@@ -268,12 +214,12 @@ public abstract class VEdge extends VItem {
 		 } //So we got the length. now we need to now the distance to both arrow points on the edge
 		//Much calculated but we got start end endpoint of the arrow, so let's build the arrow itself
 		GeneralPath path = new GeneralPath();
-		float beta = (float) (Math.PI*(90-arrAlpha)/360);
+		float beta = (float) (Math.PI*(90-getArrow().getAngle())/720);
 		//float adjCos = (float)(arrSize*Math.cos((arrAlpha/360)*Math.PI*2));
-		float adjSin = (float)((new Double(Math.sqrt(2))).floatValue()*arrSize*zoom*Math.sin((arrAlpha/360)*Math.PI*2));
-		float adjCosbeta = (float)((new Double(Math.sqrt(2))).floatValue()*arrSize*zoom*Math.cos(beta));
+		float adjSin = (float)((new Double(Math.sqrt(2))).floatValue()*getArrow().getSize()*zoom*Math.sin((getArrow().getAngle()/720)*Math.PI*2));
+		float adjCosbeta = (float)((new Double(Math.sqrt(2))).floatValue()*getArrow().getSize()*zoom*Math.cos(beta));
 		//float adjSinbeta = (float)(arrSize*Math.sin(beta));
-		float adjSize = arrSize*zoom;///zoom;
+		float adjSize = getArrow().getSize()*zoom;///zoom;
 		float ey,ex;
 		//Die Richtung ist von p1 kommend
 		ex = new Double(p2.x - p1.x).floatValue();
@@ -291,7 +237,7 @@ public abstract class VEdge extends VItem {
 		path.moveTo(ahx,ahy);
 		//path.lineTo(ahx + (ey - ex)*adjSize, ahy - (ex + ey)*adjSize);
 		path.lineTo(ahx + ey*adjSin - ex*adjCosbeta, ahy - ex*adjSin - ey*adjCosbeta);
-		path.lineTo(ahx-ex*adjSize*arrPart, ahy-ey*adjSize*arrPart);
+		path.lineTo(ahx-ex*adjSize*getArrow().getPart(), ahy-ey*adjSize*getArrow().getPart());
 		path.lineTo(ahx - ey*adjSin - ex*adjCosbeta, ahy + ex*adjSin - ey*adjCosbeta);
 		//2 Kanten zu einem Punkt zwischen dem MiitelPunkt hinten und der Spitze 
 		path.lineTo(ahx,ahy);
@@ -486,69 +432,6 @@ public abstract class VEdge extends VItem {
 		width = i;
 	}
 	/**
-	 * Get the actual Size of the Arrow
-	 * @return
-	 */
-	public float getArrowSize()
-	{
-		return arrSize;
-	}
-	/**
-	 * Set the Siize of the Arrow
-	 * @param i
-	 */
-	public void setArrowSize(float i)
-	{
-		arrSize = i;
-	}
-	/**
-	 * get the Arrowpart. That is the part from the arrowhead along the Edge thats filled with color. 0 means none, 1 means the whole arrow to arrowsize is filled
-	 * @return
-	 */
-	public float getArrowPart()
-	{
-		return arrPart;
-	}
-	/**
-	 * Set the Arrowpart. That is the part from the arrowhead along the Edge thats filled with color. 0 means none, 1 means the whole arrow to arrowsize is filled
-	 * @param i the new arrowpart - mus be between 0 and 1
-	 */
-	public void setArrowPart(float i)
-	{
-		arrPart = i;
-	}
-	/**
-	 * get the Angle in the arrowhead
-	 * @return
-	 */
-	public float getArrowAngle()
-	{
-		return arrAlpha*2.0f;
-	}
-	/**
-	 * set the angle in the arrowhead to
-	 * @param i Degree
-	 */
-	public void setArrowAngle(float i)
-	{
-		//Speicherung intern halbiert 
-		arrAlpha = i/2.0f;
-	}
-	/**
-	 * Position of the arrow on the edge. 0 means at the start 1 means at the end.
-	 * @return position
-	 */
-	public float getArrowPos() {
-		return arrPos;
-	}
-	/**
-	 * Set the position of the Arrow. 0 Start 1 End or in between
-	 * @param i
-	 */
-	public void setArrowPos(float i) {
-		arrPos = i;
-	}
-	/**
 	 * return the class for the textproperties
 	 * @return
 	 */
@@ -579,4 +462,16 @@ public abstract class VEdge extends VItem {
 	 * @param points
 	 */
 	public void setControlPoints(Vector<Point> points){}
+	/**
+	 * @param arrow the arrow to set
+	 */
+	public void setArrow(VEdgeArrow arrow) {
+		Arrow = arrow;
+	}
+	/**
+	 * @return the arrow
+	 */
+	public VEdgeArrow getArrow() {
+		return Arrow;
+	}
 }

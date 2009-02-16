@@ -947,16 +947,16 @@ public class VGraph extends Observable {
 					Point.Double orthogonal_norm = new Point.Double ((double)dir.y/length,-(double)dir.x/length);
 					Point bz1 = new Point(Math.round((float)start.x + (float)dir.x/2 + (float)orthogonal_norm.x*(float)length/4),Math.round((float)start.y + (float)dir.y/2 + (float)orthogonal_norm.y*(float)length/4));
 					Point bz2 = new Point(Math.round((float)start.x + (float)dir.x/2 - (float)orthogonal_norm.x*(float)length/4),Math.round((float)start.y + (float)dir.y/2 - (float)orthogonal_norm.y*(float)length/4));
-					float arrsize = edge.getArrowSize();float arralpha = edge.getArrowAngle();float arrpart = edge.getArrowPart(); float arrpos = edge.getArrowPos();
+					VEdgeArrow arr = edge.getArrow().clone();
 					//Update the new Edge
 					edge = new VQuadCurveEdge(edge.getIndex(),edge.width,bz1);
-					edge.setArrowSize(arrsize);edge.setArrowAngle(arralpha);edge.setArrowPart(arrpart); edge.setArrowPos(arrpos);
+					edge.setArrow(arr);
 					//Update the old edge
 					VEdge temp = getEdge(getEdgeIndices(e,s).firstElement());
-					arrsize = temp.getArrowSize();arralpha = temp.getArrowAngle();arrpart = temp.getArrowPart(); arrpos = temp.getArrowPos();
+					arr = temp.getArrow().clone();
 					vEdges.remove(temp);
 					temp = new VQuadCurveEdge(temp.getIndex(),temp.width,bz2);
-					temp.setArrowSize(arrsize);temp.setArrowAngle(arralpha);temp.setArrowPart(arrpart); temp.setArrowPos(arrpos);
+					temp.setArrow(arr);
 					Iterator<VSubSet> siter = vSubSets.iterator();
 					//The new edge color must be rebuild. The Subsets are all up to date because the index hasn't changed
 					while(siter.hasNext())

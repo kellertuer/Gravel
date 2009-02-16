@@ -15,7 +15,7 @@
 
 <gravel.preferences>
 	<group name="edge">
-		<value name="arralpha" type="Integer">20</value>
+		<value name="arralpha" type="Integer">24</value>
 		<value name="arrpart" type="Integer">75</value>
 		<value name="arrpos" type="Integer">100</value>
 		<value name="arrsize" type="Integer">14</value>
@@ -39,7 +39,7 @@
 	<group name="graph">
 		<value name="allowloops" type="Boolean">true</value>
 		<value name="allowmultiple" type="Boolean">true</value>
-		<value name="directed" type="Boolean">false</value>
+		<value name="directed" type="Boolean">true</value>
 		<value name="fileformat" type="String">visual</value>
 		<value name="lastfile" type="String">$NONE</value>
 		<value name="loadfileonstart" type="Boolean">false</value>

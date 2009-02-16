@@ -341,7 +341,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 		    	path.next();
 		    }
 		    //How many lines on one of the two parts ?
-		    int maxcount = (new Double (Math.round(actual.getArrowSize()*LINESPPT/sizeppt))).intValue();
+		    int maxcount = (new Double (Math.round(actual.getArrow().getSize()*LINESPPT/sizeppt))).intValue();
 		    //Shorten the direction vectors to a 1/maxcount th of the length
 		    line1.x = line1.x/maxcount; line1.y = line1.y/maxcount;
 		    line2.x = line2.x/maxcount; line2.y = line2.y/maxcount;

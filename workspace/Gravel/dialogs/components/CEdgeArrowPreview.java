@@ -77,10 +77,10 @@ public class CEdgeArrowPreview extends Container implements Observer{
 		if (e!=null)
 		{
 			ArrowEdge = ArrowG.getVGraph().getEdge(1);
-			ArrowEdge.setArrowAngle(e.getArrowAngle());
-			ArrowEdge.setArrowPart(e.getArrowPart());
-			ArrowEdge.setArrowSize(e.getArrowSize());
-			ArrowEdge.setArrowPos(e.getArrowPos());
+			ArrowEdge.getArrow().setAngle(e.getArrow().getAngle());
+			ArrowEdge.getArrow().setPart(e.getArrow().getPart());
+			ArrowEdge.getArrow().setSize(e.getArrow().getSize());
+			ArrowEdge.getArrow().setPos(e.getArrow().getPos());
 			
 			ArrowEdge.getTextProperties().setDistance(e.getTextProperties().getDistance());
 			ArrowEdge.getTextProperties().setPosition(e.getTextProperties().getPosition());
@@ -95,10 +95,10 @@ public class CEdgeArrowPreview extends Container implements Observer{
 		else
 		{
 			GeneralPreferences gp = GeneralPreferences.getInstance();
-			ArrowEdge.setArrowAngle(gp.getIntValue("edge.arralpha"));
-			ArrowEdge.setArrowPart((float)gp.getIntValue("edge.arrpart")/100.0f);
-			ArrowEdge.setArrowSize(gp.getIntValue("edge.arrsize"));
-			ArrowEdge.setArrowPos(gp.getIntValue("edge.arrpos")/100.0f);
+			ArrowEdge.getArrow().setAngle(gp.getIntValue("edge.arralpha"));
+			ArrowEdge.getArrow().setPart((float)gp.getIntValue("edge.arrpart")/100.0f);
+			ArrowEdge.getArrow().setSize(gp.getIntValue("edge.arrsize"));
+			ArrowEdge.getArrow().setPos(gp.getIntValue("edge.arrpos")/100.0f);
 			
 			ArrowEdge.getTextProperties().setDistance(gp.getIntValue("edge.text_distance"));
 			ArrowEdge.getTextProperties().setPosition(gp.getIntValue("edge.text_position"));
@@ -133,10 +133,10 @@ public class CEdgeArrowPreview extends Container implements Observer{
 			{
 				if (v.firstElement()==CEdgeArrowParameters.CEDGEARROWPARAMETERS)
 				{
-					ArrowEdge.setArrowSize(v.get(CEdgeArrowParameters.ARROW_SIZE));
-					ArrowEdge.setArrowAngle(v.get(CEdgeArrowParameters.ARROW_ANGLE));
-					ArrowEdge.setArrowPos(v.get(CEdgeArrowParameters.ARROW_POS)/100.0f);
-					ArrowEdge.setArrowPart(v.get(CEdgeArrowParameters.ARROW_PART)/100.0f);
+					ArrowEdge.getArrow().setSize(v.get(CEdgeArrowParameters.ARROW_SIZE));
+					ArrowEdge.getArrow().setAngle(v.get(CEdgeArrowParameters.ARROW_ANGLE));
+					ArrowEdge.getArrow().setPos(v.get(CEdgeArrowParameters.ARROW_POS)/100.0f);
+					ArrowEdge.getArrow().setPart(v.get(CEdgeArrowParameters.ARROW_PART)/100.0f);
 					ArrowG.repaint();
 
 				}

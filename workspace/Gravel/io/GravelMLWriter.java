@@ -206,14 +206,14 @@ public class GravelMLWriter {
 	    	   if (actual.getWidth()!=gp.getIntValue("edge.width")) //if width is not std
 	    		   s.write("\t\t\t<data key=\"ew\">"+actual.getWidth()+"</data>"+nl);
 	    	   s.write("\t\t\t<data key=\"en\">"+vg.getEdgeName(actual.getIndex())+"</data>"+nl);
-	    	   if (actual.getArrowSize()!=((float)gp.getIntValue("edge.arrsize"))) //if arrpart is not std
-	    		   s.write("\t\t\t<data key=\"es\">"+actual.getArrowSize()+"</data>"+nl);
-	    	   if (actual.getArrowPart()!=((float)gp.getIntValue("edge.arrpart")/100)) //if arrpart is not std
-	    		   s.write("\t\t\t<data key=\"ep\">"+actual.getArrowPart()+"</data>"+nl);
-	    	   if (actual.getArrowAngle()!=((float)gp.getIntValue("edge.arralpha"))) //if arrangle is not std
-	    		   s.write("\t\t\t<data key=\"ea\">"+actual.getArrowAngle()+"</data>"+nl);
-	    	   if (actual.getArrowPos()!=((float)gp.getIntValue("edge.arrpos")/100)) //if arrangle is not std
-	    		   s.write("\t\t\t<data key=\"eapos\">"+actual.getArrowPos()+"</data>"+nl);
+	    	   if (actual.getArrow().getSize()!=((float)gp.getIntValue("edge.arrsize"))) //if arrpart is not std
+	    		   s.write("\t\t\t<data key=\"es\">"+actual.getArrow().getSize()+"</data>"+nl);
+	    	   if (actual.getArrow().getPart()!=((float)gp.getIntValue("edge.arrpart")/100)) //if arrpart is not std
+	    		   s.write("\t\t\t<data key=\"ep\">"+actual.getArrow().getPart()+"</data>"+nl);
+	    	   if (actual.getArrow().getAngle()!=((float)gp.getIntValue("edge.arralpha"))) //if arrangle is not std
+	    		   s.write("\t\t\t<data key=\"ea\">"+actual.getArrow().getAngle()+"</data>"+nl);
+	    	   if (actual.getArrow().getPos()!=((float)gp.getIntValue("edge.arrpos")/100)) //if arrangle is not std
+	    		   s.write("\t\t\t<data key=\"eapos\">"+actual.getArrow().getPos()+"</data>"+nl);
 	    	   
 	    	   if (actual.getType()==VEdge.ORTHOGONAL)
 	    	   {

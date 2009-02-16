@@ -257,12 +257,12 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 			}
 			else if (movingEdge!=null)
 			{//Single Edge moving
-				float arrpos = movingEdge.getArrowPos()+(float)x/100;
+				float arrpos = movingEdge.getArrow().getPos()+(float)x/100;
 				if (arrpos>1.0f)
 					arrpos = 1.0f;
 				else if (arrpos<0.0f)
 					arrpos = 0.0f;
-				movingEdge.setArrowPos(arrpos);
+				movingEdge.getArrow().setPos(arrpos);
 				if (firstdrag) //Begin Drag with a Block Start-Notification
 					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_START|GraphMessage.UPDATE));
 				else		
@@ -347,12 +347,12 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 			VEdge temp = edgeiter.next();
 			if ((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
 			{
-				float arrpos = temp.getArrowPos()+(float)x/100;
+				float arrpos = temp.getArrow().getPos()+(float)x/100;
 				if (arrpos>1.0f)
 					arrpos = 1.0f;
 				else if (arrpos<0.0f)
 					arrpos = 0.0f;
-				temp.setArrowPos(arrpos);
+				temp.getArrow().setPos(arrpos);
 			}
 		}
 	}

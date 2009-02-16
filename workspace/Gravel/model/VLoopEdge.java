@@ -9,7 +9,7 @@ import java.util.Vector;
  * They are ellipsoids with one length and the proportion of the second length (length*proportion)
  * and a direction to wich the first length runs from the node.
  *  
- * @author ronny
+ * @author Ronny Bergmann
  *
  */
 public class VLoopEdge extends VEdge {

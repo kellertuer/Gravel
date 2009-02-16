@@ -25,6 +25,7 @@ import javax.swing.event.ChangeListener;
 import dialogs.IntegerTextField;
 
 import model.VEdge;
+import model.VEdgeArrow;
 /**
  * Container for the Parameters Fields of the Arrow Properties of an edge
  * @author ronny
@@ -153,10 +154,11 @@ public class CEdgeArrowParameters extends Observable implements CaretListener, C
 	{
 		if (e!=null)
 		{
-			values.set(ARROW_SIZE, Math.round(e.getArrowSize()));
-			values.set(ARROW_ANGLE, Math.round(e.getArrowAngle()));
-			values.set(ARROW_PART, Math.round(e.getArrowPart()*100.0f));
-			values.set(ARROW_POS, Math.round(e.getArrowPos()*100.0f));
+			VEdgeArrow arr = e.getArrow();
+			values.set(ARROW_SIZE, Math.round(arr.getSize()));
+			values.set(ARROW_ANGLE, Math.round(arr.getAngle()));
+			values.set(ARROW_PART, Math.round(arr.getPart()*100.0f));
+			values.set(ARROW_POS, Math.round(arr.getPos()*100.0f));
 		}
 		else
 		{
@@ -247,20 +249,20 @@ public class CEdgeArrowParameters extends Observable implements CaretListener, C
 		if (checksEnabled)
 		{
 			if (bChArrowAngle.isSelected())
-				e.setArrowAngle(sArrowAngle.getValue());
+				e.getArrow().setAngle(sArrowAngle.getValue());
 			if (bChArrowPart.isSelected())
-				e.setArrowPart((float)sArrowPart.getValue()/100);
+				e.getArrow().setPart((float)sArrowPart.getValue()/100);
 			if (bChArrowSize.isSelected())
-				e.setArrowSize(iArrowSize.getValue());
+				e.getArrow().setSize(iArrowSize.getValue());
 			if (bChArrowPos.isSelected())
-				e.setArrowPos((float)sArrowPos.getValue()/100);			
+				e.getArrow().setPos((float)sArrowPos.getValue()/100);			
 		}
 		else
 		{
-			e.setArrowAngle(sArrowAngle.getValue());
-			e.setArrowPart((float)sArrowPart.getValue()/100);
-			e.setArrowSize(iArrowSize.getValue());
-			e.setArrowPos((float)sArrowPos.getValue()/100);
+			e.getArrow().setAngle(sArrowAngle.getValue());
+			e.getArrow().setPart((float)sArrowPart.getValue()/100);
+			e.getArrow().setSize(iArrowSize.getValue());
+			e.getArrow().setPos((float)sArrowPos.getValue()/100);
 		}
 		return e;
 	}

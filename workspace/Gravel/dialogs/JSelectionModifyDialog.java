@@ -663,14 +663,14 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 					if (pre.getLinestyle().getType()!=temp.getLinestyle().getType())
 						preEdgeLineTypegiven=false;
 					
-					if (pre.getArrowAngle()!=temp.getArrowAngle())
-						pre.setArrowAngle(-1f);
-					if (pre.getArrowPart()!=temp.getArrowPart())
-						pre.setArrowPart(-1f);
-					if (pre.getArrowPos()!=temp.getArrowPos())
-						pre.setArrowPos(-1f);
-					if (pre.getArrowSize()!=temp.getArrowSize())
-						pre.setArrowSize(-1f);
+					if (pre.getArrow().getAngle()!=temp.getArrow().getAngle())
+						pre.getArrow().setAngle(-1f);
+					if (pre.getArrow().getPart()!=temp.getArrow().getPart())
+						pre.getArrow().setPart(-1f);
+					if (pre.getArrow().getPos()!=temp.getArrow().getPos())
+						pre.getArrow().setPos(-1f);
+					if (pre.getArrow().getSize()!=temp.getArrow().getSize())
+						pre.getArrow().setSize(-1f);
 					if (preEdgeName!=null)
 					{
 						String tname = GeneralPreferences.replace(preEdgeName,"$ID",""+temp.getIndex());

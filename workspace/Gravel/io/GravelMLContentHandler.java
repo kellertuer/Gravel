@@ -533,7 +533,7 @@ public class GravelMLContentHandler implements ContentHandler
 			if ((ep==0.0f)||(ep>1.0f)) ep = (new Integer(gp.getIntValue("edge.arrpart"))).floatValue()/100;
 			if (ea==0.0f) ea = (new Integer(gp.getIntValue("edge.arralpha"))).floatValue();
 			if ((eapos<0.0f)||(eapos>1.0f)) eapos = (new Integer(gp.getIntValue("edge.arrpos"))).floatValue()/100;
-			toAdd.setArrowSize(es); toAdd.setArrowPart(ep); toAdd.setArrowAngle(ea); toAdd.setArrowPos(eapos);
+			toAdd.setArrow(new VEdgeArrow(es,ep,ea,eapos));
 			//huh just text left, but that one is initiated with default values and on error theyre alle set to default so text must be okay
 			toAdd.setTextProperties(etxt);
 			//and edge line style, also no checks, initiated with default, so every value missing is std
