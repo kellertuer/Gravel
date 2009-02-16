@@ -331,7 +331,20 @@ public class GraphHistoryManager implements Observer
 					Blockstart = m;
 				}
 				return;
-			}			
+			}
+			if ((blockdepth>0)&&(Blockstart!=null)) //we are in a block
+			{		//Node Translation or Edge Controlpoint Movement
+				if (((Blockstart.getAction()==GraphMessage.NODE)&&((Blockstart.getChangeStatus()&GraphMessage.TRANSLATION) > 0))
+						|| ((Blockstart.getAction()==GraphMessage.EDGE)&&((Blockstart.getChangeStatus()&GraphMessage.UPDATE) > 0)))
+				{
+					if ((m.getAction()==(GraphMessage.NODE|GraphMessage.EDGE)) //while that the whole graph
+					&&(m.getChangeStatus()==GraphMessage.TRANSLATION)) //is translated
+					{ //Don't do Node/Edge-Update anymore but graph replacement
+						System.err.println("Switching from Node replacement to graph replacement.");
+						Blockstart = m;
+					}
+				}	
+			}
 			if (!active)
 				return;
 			//Single Action or Selection change

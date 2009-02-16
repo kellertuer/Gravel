@@ -159,9 +159,9 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			translateAdjacentEdges(movingNode.index,Gtransx,Gtransy);	
 			movingNode.setPosition(GPos);
 			if (firstdrag) //Start Block for Node Movement else just update graphic
-				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.index,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.NODE|GraphMessage.EDGE));
+				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.index,GraphMessage.TRANSLATION|GraphMessage.BLOCK_START,GraphMessage.NODE|GraphMessage.EDGE));
 			else
-				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.index,GraphMessage.UPDATE,GraphMessage.NODE|GraphMessage.EDGE)); //Kanten aktualisiert
+				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.index,GraphMessage.TRANSLATION,GraphMessage.NODE|GraphMessage.EDGE)); //Kanten aktualisiert
 		}
 		else if (movingControlPointEdge!=null)
 		{
