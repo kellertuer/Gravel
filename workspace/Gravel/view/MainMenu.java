@@ -300,7 +300,8 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         if (!isMac) mAlg.setMnemonic(KeyEvent.VK_A);
         mAlg.getAccessibleContext().setAccessibleDescription(
                 "Algorithmen in dem Graphen (oder in Mengen)");
-        add(mAlg);
+        //TODO: Activate Again when AlgorithmInterface is done
+        //add(mAlg);
         mAlgV = new JMenu("Visualisiere");
         mAlg.add(mAlgV);
         mAVTest = new JMenuItem(AlgorithmFactory.RANDOM_VISUALIZE+"...");
