@@ -20,17 +20,7 @@ import java.util.Observable;
  * 
  * in addition the mgraph contains information whether loops (startnode==endnode) or multiple edges between 2 nodes are allowed
  * This class is called from multiple threads, so its implemented threadsafe 
- *  
- * * the update may give Information about the updated parts
- *
- * <br>- N for the nodes
- * <br>- E for the edges 
- * <br>- S for the Subsets
- * <br> - M for the marked nodes and edges in the graph
- * <br> - L for change in LoopAllow
- * <br> - D for change in Directed or not
- * <br> - A for change in Multple Edges
-  
+ *   
  * @author Ronny Bergmann
  *
  */
@@ -646,6 +636,24 @@ public class MGraph extends Observable
 			setChanged();
 			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.REMOVAL,GraphMessage.EDGE));	
 		}
+	}
+	/**
+	 * Get the Mathematical Edge with index i
+	 * @param i index of edge
+	 * @return the edge if an edge with this index exists, else null
+	 */
+	public MEdge getEdge(int i)
+	{
+		Iterator<MEdge> n = mEdges.iterator();
+		while (n.hasNext())
+		{
+			MEdge e = n.next();
+			if (e.index==i)
+			{
+				return e;
+			}
+		}
+		return null;
 	}
 	/**
 	 * get a free edge index

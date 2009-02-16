@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
-import java.util.Vector;
 import java.awt.Color;
 
 
@@ -126,7 +125,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 		int count=0;
 		while (setiter.hasNext())
 		{
-			if (vg.SubSetcontainsNode(nodeindex, setiter.next().getIndex()))
+			if (vg.getMathGraph().SubSetcontainsNode(nodeindex, setiter.next().getIndex()))
 					count++;
 		}
 		int part = Math.round(100.0f/(float)count);
@@ -148,7 +147,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 					"(ID"+actual.getIndex()+") at ("+actual.getPosition().x+","+(max.y - actual.getPosition().y)+")");
 	    	if (actual.isNameVisible()) //draw name
 			{	
-				s.write("{$"+formname(vg.getNodeName(actual.getIndex()))+"$};");
+				s.write("{$"+formname(vg.getMathGraph().getNodeName(actual.getIndex()))+"$};");
 				//TODO Text
 				//{\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(vg.getNodeName(actual.index))+"}}");
 			}
@@ -197,11 +196,12 @@ public class MyTikZPictureWriter implements TeXWriter {
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();
-	    	   Vector<Integer> values = vg.getEdgeProperties(actual.getIndex());
-	    	   int start = values.elementAt(MGraph.EDGESTARTINDEX);
-	    	   int ende = values.elementAt(MGraph.EDGEENDINDEX);
-    		   s.write(NL+"\t\t\\draw[line with="+actual.getWidth());
-    		   if (vg.isDirected())
+	    	   MEdge me = vg.getMathGraph().getEdge(actual.getIndex());
+	    	   
+	    	   int start = me.StartIndex;
+	    	   int ende = me.EndIndex;
+	    	   s.write(NL+"\t\t\\draw[line with="+actual.getWidth());
+    		   if (vg.getMathGraph().isDirected())
     			   s.write(",->");
     		   else
     			   s.write(",--");

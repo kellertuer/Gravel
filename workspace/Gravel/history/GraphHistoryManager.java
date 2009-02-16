@@ -100,7 +100,7 @@ public class GraphHistoryManager implements Observer
 		{
 			try { 
 				//TODO: Optimize Environment.
-				act = new GraphAction(tempG.getSubSet(m.getElementID()),action, tempG.getMathGraph().getSubSet(m.getElementID()),tempG.getSubSetName(m.getElementID()));
+				act = new GraphAction(tempG.getSubSet(m.getElementID()),action, tempG.getMathGraph().getSubSet(m.getElementID()),tempG.getMathGraph().getSubSetName(m.getElementID()));
 			}
 			catch (GraphActionException e2)
 			{

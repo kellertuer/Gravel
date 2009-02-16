@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import model.GraphMessage;
-import model.MGraph;
+import model.MEdge;
 import model.VEdge;
 import model.VGraph;
 import model.VItem;
@@ -107,8 +107,9 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		while (edgeiter.hasNext())
 		{
 			VEdge e = edgeiter.next();
-			int start = vg.getEdgeProperties(e.getIndex()).elementAt(MGraph.EDGESTARTINDEX);
-			int ende = vg.getEdgeProperties(e.getIndex()).elementAt(MGraph.EDGEENDINDEX);
+			MEdge me = vg.getMathGraph().getEdge(e.getIndex());
+			int start = me.StartIndex;
+			int ende = me.EndIndex;
 			Point sp = (Point) vg.getNode(start).getPosition().clone();
 			sp.x = Math.round((float)sp.x*zoom);sp.y = Math.round((float)sp.y*zoom);
 			Point ep = (Point) vg.getNode(ende).getPosition().clone();
@@ -168,7 +169,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		VNode inrangeN = vg.getNodeinRange(p);
 		
 		VEdge inrangeE;
-		if (vg.isDirected())
+		if (vg.getMathGraph().isDirected())
 			inrangeE = vg.getEdgeinRange(p,2.0d);
 		else
 			inrangeE=null;

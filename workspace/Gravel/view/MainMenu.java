@@ -205,7 +205,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         if (!isMac) mVGraph.setMnemonic(KeyEvent.VK_G);
         mView.add(mVGraph);
         
-        if (graphpart.getVGraph().isDirected())
+        if (graphpart.getVGraph().getMathGraph().isDirected())
         	mVGDirCh = new JMenuItem("ungerichtet");
         else
         	mVGDirCh = new JMenuItem("umformen zu gerichtetem Graph");        	
@@ -214,7 +214,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         if (!isMac) mVGDirCh.setMnemonic(KeyEvent.VK_D);
         mVGraph.add(mVGDirCh);        
 
-        if (graphpart.getVGraph().isLoopAllowed())
+        if (graphpart.getVGraph().getMathGraph().isLoopAllowed())
         	mVGLoopCh = new JMenuItem("entferne Schleifen");
         else
         	mVGLoopCh = new JMenuItem("erlaube Schleifen");        	
@@ -223,7 +223,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         if (!isMac) mVGLoopCh.setMnemonic(KeyEvent.VK_L);
         mVGraph.add(mVGLoopCh);        
        
-        if (graphpart.getVGraph().isMultipleAllowed())
+        if (graphpart.getVGraph().getMathGraph().isMultipleAllowed())
         	mVGMultipleCh = new JMenuItem("entferne Mehrfachkanten");
         else
         	mVGMultipleCh = new JMenuItem("erlaube Mehrfachkanten");        	
@@ -354,7 +354,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			//Fragen
 			if (GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
 			{
-				if (Gui.getInstance().getVGraph().NodeCount()>0) //es gibt überhaupt was
+				if (Gui.getInstance().getVGraph().getMathGraph().NodeCount()>0) //es gibt überhaupt was
 				{
 					int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Der aktuelle Graph wurde nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie den Graph noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_OPTION);
 					if (n==JOptionPane.YES_OPTION)
@@ -427,7 +427,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     	    } else 
     	    if (item==mVGDirCh)
     	    {
-    	    	if (graphpart.getVGraph().isDirected())
+    	    	if (graphpart.getVGraph().getMathGraph().isDirected())
     	    	{
     				int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Wirklich umformen in ungerichteten Graphen ?<br>Dabei k"+main.CONST.html_oe+"nnen Kanten verloren gehen.","Umformen bestätigen",JOptionPane.YES_NO_OPTION);
     	    		if (n==JOptionPane.YES_OPTION)
@@ -440,7 +440,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
        	    } else
         	if (item==mVGLoopCh)
         	{
-        	  	if (graphpart.getVGraph().isLoopAllowed())
+        	  	if (graphpart.getVGraph().getMathGraph().isLoopAllowed())
         	   	{
         			int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Wirklich umformen in einen Graphen ohne Schleifen ?<br>Dabei werdem alle existenten Schleifen gel"+main.CONST.html_oe+"scht.","Umformen bestätigen",JOptionPane.YES_NO_OPTION);
         	   		if (n==JOptionPane.YES_OPTION)
@@ -453,7 +453,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
            	} else	
             if (item==mVGMultipleCh)
            	{
-           	  	if (graphpart.getVGraph().isMultipleAllowed())
+           	  	if (graphpart.getVGraph().getMathGraph().isMultipleAllowed())
            	   	{
             			int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Wirklich umformen in einen Graphen ohne Mehrfachkanten ?<br>Dabei werden alle Mehrfachkanten zwischen Knoten auf eine Kante reduziert.","Umformen bestätigen",JOptionPane.YES_NO_OPTION);
             	   		if (n==JOptionPane.YES_OPTION)
@@ -525,21 +525,21 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 		}
 		else if ((m.getAction()&GraphMessage.DIRECTION)==GraphMessage.DIRECTION) //directed changed
 		{
-	    	if (graphpart.getVGraph().isDirected())
+	    	if (graphpart.getVGraph().getMathGraph().isDirected())
 	        	mVGDirCh.setText("ungerichtet");
 	        else
 	        	mVGDirCh.setText("gerichtet");        	
 		}
 		else if ((m.getAction()&GraphMessage.LOOPS)==GraphMessage.LOOPS) //Loops changed
 		{
-	    	if (graphpart.getVGraph().isLoopAllowed())
+	    	if (graphpart.getVGraph().getMathGraph().isLoopAllowed())
 	        	mVGLoopCh.setText("entferne Schleifen");
 	        else
 	        	mVGLoopCh.setText("erlaube Schleifen");        	
 		}
 		else if ((m.getAction()&GraphMessage.MULTIPLE)==GraphMessage.MULTIPLE) //Multiple Edges Changed
 		{
-	    	if (graphpart.getVGraph().isMultipleAllowed())
+	    	if (graphpart.getVGraph().getMathGraph().isMultipleAllowed())
 	        	mVGMultipleCh.setText("entferne Mehrfachkanten");
 	        else
 	        	mVGMultipleCh.setText("erlaube Mehrfachkanten");        	

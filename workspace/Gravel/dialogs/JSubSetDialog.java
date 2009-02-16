@@ -33,7 +33,7 @@ import javax.swing.KeyStroke;
 import view.Gui;
 
 import model.GraphMessage;
-import model.MGraph;
+import model.MEdge;
 import model.VEdge;
 import model.VGraph;
 import model.VNode;
@@ -113,7 +113,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 		else
 		{
 			chSubSet = s;
-			oldname = graphref.getSubSetName(s.getIndex());
+			oldname = graphref.getMathGraph().getSubSetName(s.getIndex());
 			oldindex = s.getIndex();
 			oldcolor = s.getColor();
 			//Knoten finden
@@ -121,16 +121,16 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 			while (nodeiter.hasNext())
 			{
 				VNode n = nodeiter.next();
-				oldnodes.set(n.getIndex(),graphref.SubSetcontainsNode(n.getIndex(), s.getIndex()));
+				oldnodes.set(n.getIndex(),graphref.getMathGraph().SubSetcontainsNode(n.getIndex(), s.getIndex()));
 			}
 			//Kanten finden
 			Iterator <VEdge> edgeiter = graphref.getEdgeIterator();
 			while (edgeiter.hasNext())
 			{
 				VEdge e = edgeiter.next();
-				oldedges.set(e.getIndex(),graphref.SubSetcontainsEdge(e.getIndex(), s.getIndex()));
+				oldedges.set(e.getIndex(),graphref.getMathGraph().SubSetcontainsEdge(e.getIndex(), s.getIndex()));
 			}
-			this.setTitle("Eigenschaften des Untergraphen '"+graphref.getSubSetName(s.getIndex())+"'");	
+			this.setTitle("Eigenschaften des Untergraphen '"+graphref.getMathGraph().getSubSetName(s.getIndex())+"'");	
 		}
 		
 		Container content = getContentPane();
@@ -264,7 +264,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 		{
 			if (nodelist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				nodechecks[temp] = new JCheckBox(graphref.getNodeName(i)+"   (#"+i+")");
+				nodechecks[temp] = new JCheckBox(graphref.getMathGraph().getNodeName(i)+"   (#"+i+")");
 				nodechecks[temp].setSelected(oldnodes.get(i));
 				CiNodes.add(nodechecks[temp],c);
 				c.gridy++;
@@ -303,11 +303,11 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 		{
 			if (edgelist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				Vector<Integer> werte = graphref.getEdgeProperties(i);
-				String actualname = "#"+werte.elementAt(MGraph.EDGESTARTINDEX)+" -";
-				if (graphref.isDirected()) 
+				MEdge me = graphref.getMathGraph().getEdge(i);
+				String actualname = "#"+me.StartIndex+" -";
+				if (graphref.getMathGraph().isDirected()) 
 					actualname+=">";
-				actualname +=" #"+werte.elementAt(MGraph.EDGEENDINDEX);
+				actualname +=" #"+me.EndIndex;
 				edgechecks[temp] = new JCheckBox(actualname);
 				edgechecks[temp].setSelected(oldedges.get(i));
 				CiEdges.add(edgechecks[temp],c);

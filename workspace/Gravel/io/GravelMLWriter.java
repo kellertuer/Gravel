@@ -52,9 +52,9 @@ public class GravelMLWriter {
 		s.write("\t<key id=\"gt\" for=\"graph\" attr.name=\"type\" attr.type=\"string\">"+nl);
 		s.write("\t\t<default>math</default>"+nl+"\t</key>"+nl+""+nl);
 		s.write("\t<key id=\"gt\" for=\"graph\" attr.name=\"allowloops\" attr.type=\"boolean\">"+nl);
-		s.write("\t\t<default>"+vg.isLoopAllowed()+"</default>"+nl+"\t</key>"+nl+""+nl);
+		s.write("\t\t<default>"+vg.getMathGraph().isLoopAllowed()+"</default>"+nl+"\t</key>"+nl+""+nl);
 		s.write("\t<key id=\"gt\" for=\"graph\" attr.name=\"allowmultiple\" attr.type=\"boolean\">"+nl);
-		s.write("\t\t<default>"+vg.isMultipleAllowed()+"</default>"+nl+"\t</key>"+nl+""+nl);
+		s.write("\t\t<default>"+vg.getMathGraph().isMultipleAllowed()+"</default>"+nl+"\t</key>"+nl+""+nl);
 		
 		s.write("<!-- Gravel key Definitions for any graph -->"+nl);
 		s.write("\t<key id=\"ev\" for=\"edge\" attr.name=\"value\" attr.type=\"integer\"> <!-- Value of an edge-->"+nl+"");
@@ -164,8 +164,8 @@ public class GravelMLWriter {
 	    	VNode actual = nodeiter.next();
 	    	s.write(nl+"\t\t<node id=\"node"+actual.getIndex()+"\">"+nl);
 	    	//if the name is not a standard name
-	    	if (!vg.getNodeName(actual.getIndex()).equals(gp.getStringValue("node.name")+actual.getIndex()))
-	    		s.write("\t\t\t<data key=\"nn\">"+vg.getNodeName(actual.getIndex())+"</data>"+nl);
+	    	if (!vg.getMathGraph().getNodeName(actual.getIndex()).equals(gp.getStringValue("node.name")+actual.getIndex()))
+	    		s.write("\t\t\t<data key=\"nn\">"+vg.getMathGraph().getNodeName(actual.getIndex())+"</data>"+nl);
 	    	//Position
 	    	s.write("\t\t\t<data key=\"nx\">"+actual.getPosition().x+"</data>"+nl);
 	    	s.write("\t\t\t<data key=\"ny\">"+actual.getPosition().y+"</data>"+nl);
@@ -196,16 +196,16 @@ public class GravelMLWriter {
 	       while (edgeiter.hasNext())
 	       {
 	    	   VEdge actual = edgeiter.next();
-	    	   Vector<Integer> values = vg.getEdgeProperties(actual.getIndex());
-	    	   int start = values.elementAt(MGraph.EDGESTARTINDEX);
-	    	   int ende = values.elementAt(MGraph.EDGEENDINDEX);
-	    	   int value = values.elementAt(MGraph.EDGEVALUE);
+	    	   MEdge me = vg.getMathGraph().getEdge(actual.getIndex());
+	    	   int start = me.StartIndex;
+	    	   int ende = me.EndIndex;
+	    	   int value = me.Value;
 	    	   s.write(nl+"\t\t<edge id=\"edge"+actual.getIndex()+"\" source=\"node"+start+"\" target=\"node"+ende+"\">"+nl);
 	    	   if (value!=gp.getIntValue("edge.value")) 	    	   //if the value is not std
 	    		   s.write("\t\t\t<data key=\"ev\">"+value+"</data>"+nl);
 	    	   if (actual.getWidth()!=gp.getIntValue("edge.width")) //if width is not std
 	    		   s.write("\t\t\t<data key=\"ew\">"+actual.getWidth()+"</data>"+nl);
-	    	   s.write("\t\t\t<data key=\"en\">"+vg.getEdgeName(actual.getIndex())+"</data>"+nl);
+	    	   s.write("\t\t\t<data key=\"en\">"+vg.getMathGraph().getEdgeName(actual.getIndex())+"</data>"+nl);
 	    	   if (actual.getArrow().getSize()!=((float)gp.getIntValue("edge.arrsize"))) //if arrpart is not std
 	    		   s.write("\t\t\t<data key=\"es\">"+actual.getArrow().getSize()+"</data>"+nl);
 	    	   if (actual.getArrow().getPart()!=((float)gp.getIntValue("edge.arrpart")/100)) //if arrpart is not std
@@ -290,15 +290,15 @@ public class GravelMLWriter {
 	{
 	       //SubSets
 	       Iterator<VSubSet> subsetiter = vg.getSubSetIterator();
-	       if (vg.SubSetCount()!=0)
+	       if (vg.getMathGraph().SubSetCount()!=0)
 	    	   s.write("<!-- == remove these lines to get a valid GraphML-FILE	-->"+nl);
 	       while (subsetiter.hasNext())
 	       {
 	    	   VSubSet actual = subsetiter.next();
 	    	   s.write(nl+"\t\t<subset id=\"subset"+actual.getIndex()+"\">"+nl);
 	    	   //if the name is not a standard name
-	    	   if (!vg.getSubSetName(actual.getIndex()).equals(gp.getStringValue("subset.name")+actual.getIndex()))
-	    		   s.write("\t\t\t<data key=\"sn\">"+vg.getSubSetName(actual.getIndex())+"</data>"+nl);
+	    	   if (!vg.getMathGraph().getSubSetName(actual.getIndex()).equals(gp.getStringValue("subset.name")+actual.getIndex()))
+	    		   s.write("\t\t\t<data key=\"sn\">"+vg.getMathGraph().getSubSetName(actual.getIndex())+"</data>"+nl);
 	    	   
     		   s.write("\t\t\t<data key=\"sr\">"+actual.getColor().getRed()+"</data>"+nl);
     		   s.write("\t\t\t<data key=\"sg\">"+actual.getColor().getGreen()+"</data>"+nl);
@@ -308,7 +308,7 @@ public class GravelMLWriter {
     		   while (nodeiter.hasNext())
     		   {
     			   VNode n = nodeiter.next();
-    			   if (vg.SubSetcontainsNode(n.getIndex(),actual.getIndex()))
+    			   if (vg.getMathGraph().SubSetcontainsNode(n.getIndex(),actual.getIndex()))
     				   s.write("\t\t\t<snode node=\"node"+n.getIndex()+"\" />"+nl);
     		   }
 
@@ -316,12 +316,12 @@ public class GravelMLWriter {
     		   while (edgeiter.hasNext())
     		   {
     			   VEdge e = edgeiter.next();
-    			   if (vg.SubSetcontainsEdge(e.getIndex(),actual.getIndex()))
+    			   if (vg.getMathGraph().SubSetcontainsEdge(e.getIndex(),actual.getIndex()))
     				   s.write("\t\t\t<sedge edge=\"edge"+e.getIndex()+"\" />"+nl);
     		   }
     		   s.write("\t\t</subset>");
  		}
-	       if (vg.SubSetCount()!=0)
+	       if (vg.getMathGraph().SubSetCount()!=0)
     	       s.write("<!-- == END remove these lines to get a valid GraphML-FILE	-->"+nl);
 	}
 	/**
@@ -346,13 +346,13 @@ public class GravelMLWriter {
 	        OutputStreamWriter out = new OutputStreamWriter(bout, "UTF8");
 	        writeHeader(out);
 	        writeVisualHeaderAddon(out);
-	       if (vg.isDirected())
+	       if (vg.getMathGraph().isDirected())
 	    	   out.write(nl+"\t<graph id=\"G\" edgedefault=\"directed\">"+nl);     
 	       else
 	    	   out.write(nl+"\t<graph id=\"G\" edgedefault=\"undirected\">"+nl);     	    	   
 	       //set type to visual
 	       out.write("\t\t<data key=\"gt\">visual</data>"+nl);
-	       out.write("\t\t<data key=\"gl\">"+vg.isLoopAllowed()+"</data>"+nl);
+	       out.write("\t\t<data key=\"gl\">"+vg.getMathGraph().isLoopAllowed()+"</data>"+nl);
 	       //Nodes
 	       writeVisualNodes(out);
 	       writeVisualEdges(out);
@@ -441,7 +441,7 @@ public class GravelMLWriter {
     		   while (nodeiter.hasNext())
     		   {
     			   VNode n = nodeiter.next();
-    			   if (vg.SubSetcontainsNode(n.getIndex(),actual.getIndex()))
+    			   if (vg.getMathGraph().SubSetcontainsNode(n.getIndex(),actual.getIndex()))
     				   s.write("\t\t\t<snode node=\"node"+n.getIndex()+"\" />"+nl);
     		   }
 
@@ -449,7 +449,7 @@ public class GravelMLWriter {
     		   while (edgeiter.hasNext())
     		   {
     			   VEdge e = edgeiter.next();
-    			   if (vg.SubSetcontainsEdge(e.getIndex(),actual.getIndex()))
+    			   if (vg.getMathGraph().SubSetcontainsEdge(e.getIndex(),actual.getIndex()))
     				   s.write("\t\t\t<sedge edge=\"edge"+e.getIndex()+"\" />"+nl);
     		   }
     		   s.write("\t\t</subset>"+nl);
@@ -478,13 +478,13 @@ public class GravelMLWriter {
 	        OutputStream bout= new BufferedOutputStream(fout);
 	        OutputStreamWriter out = new OutputStreamWriter(bout, "UTF8");
 	        writeHeader(out);
-	       if (vg.isDirected())
+	       if (vg.getMathGraph().isDirected())
 	    	   out.write(nl+"\t<graph id=\"G\" edgedefault=\"directed\">"+nl);     
 	       else
 	    	   out.write(nl+"\t<graph id=\"G\" edgedefault=\"undirected\">"+nl);     	    	   
 	       //set type to math
 	       out.write("\t\t<data key=\"gt\">math</data>"+nl);
-	       out.write("\t\t<data key=\"gl\">"+vg.isLoopAllowed()+"</data>"+nl);
+	       out.write("\t\t<data key=\"gl\">"+vg.getMathGraph().isLoopAllowed()+"</data>"+nl);
 	       //Nodes
 	       writeMathNodes(out);
 	       writeMathEdges(out);

@@ -26,8 +26,8 @@ public class VStraightLineEdge extends VEdge
 	public int getType() {
 		return VEdge.STRAIGHTLINE;
 	}
-	@Override
-	public void translate(int x, int y) {}
+	public void translate(int x, int y)
+	{}
 	public Point getMax()
 	{	//Kein Kontrollpunkt also ein Minimum zur�ckgeben
 		return new Point(0,0);

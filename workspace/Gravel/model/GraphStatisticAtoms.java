@@ -95,8 +95,8 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		{
 			//Valenzen
 			VEdge actual = edgeiter.next();
-			Vector<Integer> values = vg.getEdgeProperties(actual.getIndex());
-			int start = values.get(MGraph.EDGESTARTINDEX), ende = values.get(MGraph.EDGEENDINDEX);
+			MEdge me = vg.getMathGraph().getEdge(actual.getIndex());
+			int start = me.StartIndex, ende = me.EndIndex;
 			if (valenz.get(start)==null)
 				valenz.put(start,0);
 			if (valenz.get(ende)==null)
@@ -194,7 +194,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		}
 		//Nun noch werte Setzen
 		//Valenzen
-		if (!vg.isDirected())
+		if (!vg.getMathGraph().isDirected())
 		{
 			invalenz = valenz; outvalenz = valenz;
 		}
@@ -305,8 +305,8 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		atomvalues.put("$Graph.MinX",(double)vg.getMinPoint(vgc.getGraphics()).x);
 		atomvalues.put("$Graph.MinY",(double)vg.getMinPoint(vgc.getGraphics()).y);
 		atomvalues.put("$Graph.Area",(double)0);
-		atomvalues.put("$Node.Count",(double)vg.NodeCount()); 
-		atomvalues.put("$Edge.Count",(double)vg.EdgeCount()); 
+		atomvalues.put("$Node.Count",(double)vg.getMathGraph().NodeCount()); 
+		atomvalues.put("$Edge.Count",(double)vg.getMathGraph().EdgeCount()); 
 		setChanged();
 		notifyObservers("Atoms");
 	}

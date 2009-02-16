@@ -17,7 +17,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import model.GraphMessage;
-import model.MGraph;
+import model.MEdge;
 import model.VGraph;
 
 import java.util.Observable;
@@ -192,15 +192,15 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		if (selectedNode.getParent().toString().equals("Knoten"))
 		{
 			ParentType = USENODES;
-			Text.setText(vG.getNodeName(StringPos2Index(USENODES,selectedPosition)));
+			Text.setText(vG.getMathGraph().getNodeName(StringPos2Index(USENODES,selectedPosition)));
 		}
 		else if (selectedNode.getParent().toString().equals("Kanten"))
 		{
 			ParentType = USEEDGES;
-			Vector<Integer> p = vG.getEdgeProperties(StringPos2Index(USEEDGES,selectedPosition));
-			String t = p.get(MGraph.EDGESTARTINDEX)+" -";
-			if (vG.isDirected()) t+="> "; 
-			t+=""+p.get(MGraph.EDGEENDINDEX);
+			MEdge me = vG.getMathGraph().getEdge(StringPos2Index(USEEDGES,selectedPosition));
+			String t = me.StartIndex+" -";
+			if (vG.getMathGraph().isDirected()) t+="> "; 
+			t+=""+me.EndIndex;
 			Text.setText(t);
 		}
 		else if (selectedNode.getParent().toString().equals("Untergraphen"))

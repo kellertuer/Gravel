@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import model.GraphMessage;
-import model.MGraph;
+import model.MEdge;
 import model.VEdge;
 import model.VGraph;
 import model.VItem;
@@ -91,8 +91,9 @@ public class StandardDragMouseHandler extends DragMouseHandler
 		while (edgeiter.hasNext())
 		{
 			VEdge e = edgeiter.next();
-			int start = vg.getEdgeProperties(e.getIndex()).elementAt(MGraph.EDGESTARTINDEX);
-			int ende = vg.getEdgeProperties(e.getIndex()).elementAt(MGraph.EDGEENDINDEX);
+			MEdge me = vg.getMathGraph().getEdge(e.getIndex());
+			int start = me.StartIndex;
+			int ende = me.EndIndex;
 			if ((start==nodeindex)||(ende==nodeindex))
 					e.translate(x, y);
 		}
@@ -231,7 +232,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			VEdge selE = vg.getEdgeinRange(p, 2.0);
 			if ((selE!=null)&&((selE.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED))
 			{ //Selected Edge, we move the selection so set the node to one of the edge adjacent nodes
-				movingNode = vg.getNode(vg.getEdgeProperties(selE.getIndex()).get(MGraph.EDGESTARTINDEX)); 
+				movingNode = vg.getNode(vg.getMathGraph().getEdge(selE.getIndex()).StartIndex); 
 			}
 		}
 	}

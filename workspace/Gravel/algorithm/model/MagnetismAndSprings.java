@@ -3,10 +3,9 @@ package algorithm.model;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Vector;
 
 import model.GraphMessage;
-import model.MGraph;
+import model.MEdge;
 import model.VEdge;
 import model.VGraph;
 import model.VNode;
@@ -87,8 +86,8 @@ public class MagnetismAndSprings implements VAlgorithmIF
 			while (edgeiterator.hasNext())
 			{
 				VEdge e = edgeiterator.next();
-				Vector<Integer> values = vg.getEdgeProperties(e.getIndex());
-				int start = values.get(MGraph.EDGESTARTINDEX), ende = values.get(MGraph.EDGEENDINDEX);
+				MEdge me = vg.getMathGraph().getEdge(e.getIndex());
+				int start = me.StartIndex, ende = me.EndIndex;
 				int uindex=0;
 				if (start==v.getIndex())
 					uindex=ende;
@@ -100,7 +99,7 @@ public class MagnetismAndSprings implements VAlgorithmIF
 					double distance = v.getPosition().distance(u.getPosition());
 					double elength = edgelength; //length the edge wishes to have
 					if (useedgevalue)
-						elength *= values.get(MGraph.EDGEVALUE);
+						elength *= me.Value;
 					force_x += edgestrength * (distance-elength) * (u.getPosition().x-v.getPosition().x)/distance;
 					force_y += edgestrength * (distance-elength) * (u.getPosition().y-v.getPosition().y)/distance;
 				}

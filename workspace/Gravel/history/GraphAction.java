@@ -85,7 +85,7 @@ public class GraphAction {
 			throw new GraphActionException("Could not Create Action: Environment must contains at least the node itself.");			
 		ActionObject = o;
 		Action=action;
-		name=environment.getNodeName(o.getIndex());
+		name=environment.getMathGraph().getNodeName(o.getIndex());
 		env = environment;
 		Objecttype=NODE;
 	}
@@ -122,10 +122,11 @@ public class GraphAction {
 			throw new GraphActionException("Could not Create Action: Environment must contain edge");
 		ActionObject=o.clone();
 		Action=action;
-		name=environment.getEdgeName(o.getIndex());
-		StartNode=environment.getEdgeProperties(o.getIndex()).get(MGraph.EDGESTARTINDEX);
-		EndNode=environment.getEdgeProperties(o.getIndex()).get(MGraph.EDGEENDINDEX);
-		Value=environment.getEdgeProperties(o.getIndex()).get(MGraph.EDGEVALUE);
+		name=environment.getMathGraph().getEdgeName(o.getIndex());
+		MEdge me = environment.getMathGraph().getEdge(o.getIndex());
+		StartNode=me.StartIndex;
+		EndNode=me.EndIndex;
+		Value=me.Value;
 		env = environment;
 		Objecttype=EDGE;
 	}
@@ -149,8 +150,8 @@ public class GraphAction {
 			VSubSet s = si.next();
 			if (ItemType==NODE)
 			{
-				boolean wasfirst = first.SubSetcontainsNode(itemindex, s.getIndex());
-				boolean wassecond = second.SubSetcontainsNode(itemindex, s.getIndex());
+				boolean wasfirst = first.getMathGraph().SubSetcontainsNode(itemindex, s.getIndex());
+				boolean wassecond = second.getMathGraph().SubSetcontainsNode(itemindex, s.getIndex());
 				if (wasfirst)
 					second.addNodetoSubSet(itemindex, s.getIndex());
 				else
@@ -162,8 +163,8 @@ public class GraphAction {
 			}
 			else if (ItemType==EDGE)
 			{
-				boolean wasfirst = first.SubSetcontainsEdge(itemindex, s.getIndex());
-				boolean wassecond = second.SubSetcontainsEdge(itemindex, s.getIndex());
+				boolean wasfirst = first.getMathGraph().SubSetcontainsEdge(itemindex, s.getIndex());
+				boolean wassecond = second.getMathGraph().SubSetcontainsEdge(itemindex, s.getIndex());
 				if (wasfirst)
 					second.addEdgetoSubSet(itemindex, s.getIndex());
 				else
@@ -189,7 +190,7 @@ public class GraphAction {
 		while (si.hasNext())
 		{
 			VSubSet s = si.next();
-			if (env.SubSetcontainsEdge(e.getIndex(), s.getIndex()))
+			if (env.getMathGraph().SubSetcontainsEdge(e.getIndex(), s.getIndex()))
 			{
 				if (g.getSubSet(s.getIndex())==null)
 					throw new GraphActionException("Can't replace edge, replacements belongs to Subsets, that don't exists in given parameter graph");
@@ -247,7 +248,7 @@ public class GraphAction {
 				ret = graph;
 			break;
 			case GRAPH: //Replace whole graph and save the actual parameter als old object
-				ret = new VGraph(((VGraph)ActionObject).isDirected(), ((VGraph)ActionObject).isLoopAllowed(), ((VGraph)ActionObject).isMultipleAllowed());
+				ret = new VGraph(((VGraph)ActionObject).getMathGraph().isDirected(), ((VGraph)ActionObject).getMathGraph().isLoopAllowed(), ((VGraph)ActionObject).getMathGraph().isMultipleAllowed());
 				ret.replace((VGraph)ActionObject);
 				((VGraph)ActionObject).replace(graph);
 				graph.replace(ret);
@@ -262,11 +263,11 @@ public class GraphAction {
 				while (si.hasNext())
 				{
 					VSubSet s = si.next();
-					if (graph.SubSetcontainsNode(n.getIndex(), s.getIndex()))
+					if (graph.getMathGraph().SubSetcontainsNode(n.getIndex(), s.getIndex()))
 						((VNode)ActionObject).addColor(s.getColor());
 				}
 				String tempnn = name;
-				name = graph.getNodeName(n.getIndex()); //save old name
+				name = graph.getMathGraph().getNodeName(n.getIndex()); //save old name
 				graph.replaceNode(n,tempnn);
 				env.replaceNode((VNode)ActionObject,name);
 				exchangeSubSetMembership(NODE,n.getIndex(),env,graph);
@@ -282,17 +283,18 @@ public class GraphAction {
 				while (esi.hasNext())
 				{
 					VSubSet s = esi.next();
-					if (graph.SubSetcontainsEdge(e.getIndex(), s.getIndex()))
+					if (graph.getMathGraph().SubSetcontainsEdge(e.getIndex(), s.getIndex()))
 						((VEdge)ActionObject).addColor(s.getColor());
 				}
 				int temps = StartNode;
-				StartNode = graph.getEdgeProperties(e.getIndex()).get(MGraph.EDGESTARTINDEX);
+				MEdge me = graph.getMathGraph().getEdge(e.getIndex());
+				StartNode = me.StartIndex;
 				int tempe = EndNode;
-				EndNode = graph.getEdgeProperties(e.getIndex()).get(MGraph.EDGEENDINDEX);
+				EndNode = me.EndIndex;
 				int tempv = Value;
-				Value = graph.getEdgeProperties(e.getIndex()).get(MGraph.EDGEVALUE);
+				Value = me.Value;
 				String tempn = name;
-				name = graph.getEdgeName(e.getIndex());
+				name = graph.getMathGraph().getEdgeName(e.getIndex());
 				graph.replaceEdge(e, temps, tempe, tempv, tempn);
 				env.replaceEdge((VEdge)ActionObject, StartNode, EndNode, Value, name);
 				exchangeSubSetMembership(EDGE,e.getIndex(),env,graph);
@@ -304,7 +306,7 @@ public class GraphAction {
 					throw new GraphActionException("Can't replace subset, none there.");
 				ActionObject = graph.getSubSet(newSubSet.getIndex()); //Save old one in action
 				String newname = name; //temp for actual name
-				name = graph.getSubSetName(newSubSet.getIndex()); //Save Old Name
+				name = graph.getMathGraph().getSubSetName(newSubSet.getIndex()); //Save Old Name
 				MSubSet tempm = mathsubset.clone();
 				mathsubset = graph.getMathGraph().getSubSet(newSubSet.getIndex()).clone();
 				graph.removeSubSet(newSubSet.getIndex()); //Remove old SubSet.
@@ -352,7 +354,7 @@ public class GraphAction {
 				while (si.hasNext())
 				{
 					VSubSet s = si.next();
-					if (env.SubSetcontainsNode(n.getIndex(), s.getIndex()))
+					if (env.getMathGraph().SubSetcontainsNode(n.getIndex(), s.getIndex()))
 						graph.addNodetoSubSet(n.getIndex(), s.getIndex());
 				}
 				//Recreate adjacent edges and their subsets
@@ -360,11 +362,10 @@ public class GraphAction {
 				while (ei.hasNext())
 				{
 					VEdge e = ei.next();
-					if ((env.getEdgeProperties(e.getIndex()).get(MGraph.EDGESTARTINDEX)==n.getIndex())||(env.getEdgeProperties(e.getIndex()).get(MGraph.EDGEENDINDEX)==n.getIndex()))
+					MEdge me = env.getMathGraph().getEdge(e.getIndex());
+					if ((me.StartIndex==n.getIndex())||(me.EndIndex==n.getIndex()))
 					{
-						graph.addEdge(e, env.getEdgeProperties(e.getIndex()).get(MGraph.EDGESTARTINDEX),
-								env.getEdgeProperties(e.getIndex()).get(MGraph.EDGEENDINDEX),
-								env.getEdgeProperties(e.getIndex()).get(MGraph.EDGEVALUE), env.getEdgeName(e.getIndex()));
+						graph.addEdge(e, me.StartIndex, me.EndIndex, me.Value, me.name);
 						recreateEdgeColor(e,graph);
 					}
 				}

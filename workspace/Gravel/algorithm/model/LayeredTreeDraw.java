@@ -4,8 +4,8 @@ import io.GeneralPreferences;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Vector;
 
+import model.MEdge;
 import model.MGraph;
 import model.MNode;
 import model.VEdge;
@@ -110,14 +110,14 @@ public class LayeredTreeDraw implements VAlgorithmIF
 		while (copynodes.hasNext())
 		{
 			VNode shift = copynodes.next();
-			leftsubtree.addNode(shift,rightsubtree.getNodeName(shift.getIndex()));
+			leftsubtree.addNode(shift,rightsubtree.getMathGraph().getNodeName(shift.getIndex()));
 		}	
 		Iterator<VEdge> copyedges = rightsubtree.getEdgeIterator();
 		while (copyedges.hasNext())
 		{
 			VEdge shift = copyedges.next();
-			Vector<Integer> vals = rightsubtree.getEdgeProperties(shift.getIndex());
-			leftsubtree.addEdge(shift,vals.elementAt(MGraph.EDGESTARTINDEX),vals.elementAt(MGraph.EDGEENDINDEX),vals.elementAt(MGraph.EDGEVALUE));
+			MEdge shiftm = rightsubtree.getMathGraph().getEdge(shift.getIndex());
+			leftsubtree.addEdge(shift,shiftm.StartIndex,shiftm.EndIndex,shiftm.Value,shiftm.name);
 		}
 		//Nun sind beide im left, also auf höhe 1 noch den neuen in der mitte zwischen left und right
 		int x = Math.round((leftsubtree.getNode(left.index).getPosition().x + leftsubtree.getNode(right.index).getPosition().x)/2);
@@ -127,15 +127,15 @@ public class LayeredTreeDraw implements VAlgorithmIF
 		{
 			int l = mG.getEdgeIndices(subtreeroot.index, left.index).firstElement();
 			int r = mG.getEdgeIndices(subtreeroot.index, right.index).firstElement();
-			leftsubtree.addEdge(new VStraightLineEdge(l,gp.getIntValue("edge.width")),subtreeroot.index, left.index);
-			leftsubtree.addEdge(new VStraightLineEdge(r,gp.getIntValue("edge.width")), subtreeroot.index, right.index);
+			leftsubtree.addEdge(new VStraightLineEdge(l,gp.getIntValue("edge.width")),subtreeroot.index, left.index,1,"");
+			leftsubtree.addEdge(new VStraightLineEdge(r,gp.getIntValue("edge.width")), subtreeroot.index, right.index,1,"");
 		}
 		else
 		{
 			int l = mG.getEdgeIndices(left.index,subtreeroot.index).firstElement();
 			int r = mG.getEdgeIndices(right.index,subtreeroot.index).firstElement();
-			leftsubtree.addEdge(new VStraightLineEdge(l,gp.getIntValue("edge.width")),left.index, subtreeroot.index);
-			leftsubtree.addEdge(new VStraightLineEdge(r,gp.getIntValue("edge.width")), right.index, subtreeroot.index);			
+			leftsubtree.addEdge(new VStraightLineEdge(l,gp.getIntValue("edge.width")),left.index, subtreeroot.index,1,"");
+			leftsubtree.addEdge(new VStraightLineEdge(r,gp.getIntValue("edge.width")), right.index, subtreeroot.index,1,"");			
 		}
 		return leftsubtree;
 	}

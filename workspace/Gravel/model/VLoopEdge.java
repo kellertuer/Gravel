@@ -18,7 +18,15 @@ public class VLoopEdge extends VEdge {
 	private double proportion;
 	private boolean clockwise;
 	private Point tempstart = new Point(0,0);
-	
+	/**
+	 * Create new LoopEdge with
+	 * @param i edge index
+	 * @param w edge width	
+	 * @param l length of long axis of the eclipse
+	 * @param d direction of the long axis
+	 * @param p part (times length is the smaller axis)
+	 * @param c clockwise indicator
+	 */
 	public VLoopEdge(int i, int w, int l, int d, double p, boolean c) {
 		super(i, w);
 		length = l;

@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
-import java.util.Vector;
 
 import view.VGraphic;
 /**
@@ -118,7 +117,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 				//Invert y
 				int y = drawpoint.y + Math.round((float)actual.getNameDistance()*(float)Math.sin(Math.toRadians((double)actual.getNameRotation())));
 				double tsize = Math.round((double)actual.getNameSize()*sizeppt*((double)1000))/1000;
-				s.write(NL+"\t\t\\put("+x+","+y+"){\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(vg.getNodeName(actual.getIndex()))+"}}");
+				s.write(NL+"\t\t\\put("+x+","+y+"){\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(vg.getMathGraph().getNodeName(actual.getIndex()))+"}}");
 			}
 		}
 	}
@@ -161,9 +160,10 @@ public class LaTeXPictureWriter implements TeXWriter {
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();
-	    	   Vector<Integer> values = vg.getEdgeProperties(actual.getIndex());
-	    	   int start = values.elementAt(MGraph.EDGESTARTINDEX);
-	    	   int ende = values.elementAt(MGraph.EDGEENDINDEX);
+	    	   MEdge me = vg.getMathGraph().getEdge(actual.getIndex());
+//	    	   Vector<Integer> values = vg.getEdgeProperties(actual.getIndex());
+	    	   int start = me.StartIndex;
+	    	   int ende = me.EndIndex;
 	    	   //not needed int value = values.elementAt(MGraph.EDGEVALUE);
 			   //Mittlere Linie der Kante...immer Zeichnen
 			   s.write(NL+drawOneEdgeLine(actual,start,ende,0.0d));
@@ -214,9 +214,9 @@ public class LaTeXPictureWriter implements TeXWriter {
 					//get the text wich should be displayd
 				    String text = "";
 				    if (t.isshowvalue())
-						text = values.get(MGraph.EDGEVALUE).toString();
+						text = ""+me.Value;
 				    else
-				    	text = vg.getEdgeName(actual.getIndex());
+				    	text = vg.getMathGraph().getEdgeName(actual.getIndex());
 				    double tsize = Math.round((double)t.getSize()*sizeppt*((double)1000))/1000;
 					s.write(NL+"\t\t\\put("+(m.x-offset.x)+","+(max.y-m.y)+"){\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(text)+"}}");
 				}
@@ -308,7 +308,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 		String s = "";
 		if (actual.getWidth()>1) //Dann wurde die kante mit Thicklines verbreitert -> wiederzurück zu thin
 			s += NL+"\\thinlines";
-		if (vg.isDirected())
+		if (vg.getMathGraph().isDirected())
 		{
 		  	Shape arrow = actual.getArrowShape(vg.getNode(start).getPosition(),vg.getNode(ende).getPosition(),Math.round(vg.getNode(start).getSize()/2),Math.round(vg.getNode(ende).getSize()/2),1.0f);
 		  	PathIterator path = arrow.getPathIterator(null, 0.001);

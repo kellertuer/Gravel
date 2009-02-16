@@ -434,7 +434,7 @@ public class JFileDialogs implements Observer
 	 */
 	private boolean SaveOnNewOrOpen()
 	{
-		if ((!vGc.getGraphHistoryManager().IsGraphUnchanged())&&(vGc.getVGraph().NodeCount()>0)) //saved/no changes
+		if ((!vGc.getGraphHistoryManager().IsGraphUnchanged())&&(vGc.getVGraph().getMathGraph().NodeCount()>0)) //saved/no changes
         {
         	if (GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
         	{ //SaveAs anbieten

@@ -22,7 +22,7 @@ import control.StandardClickMouseHandler;
 import control.StandardDragMouseHandler;
 
 import model.GraphMessage;
-import model.MGraph;
+import model.MEdge;
 import model.VEdge;
 import model.VGraph;
 import model.VItem;
@@ -130,14 +130,14 @@ public class VGraphic extends Component implements 	Observer
 		Graphics2D g2 = (Graphics2D) g;
 		Iterator<VEdge> ei = vG.getEdgeIterator();
 		g2.setStroke(vEdgeStyle);
-		boolean directed = vG.isDirected();
+		boolean directed = vG.getMathGraph().isDirected();
 		while (ei.hasNext()) // drawEdges
 		{
 			VEdge temp = ei.next(); //Grafischer Teil
-			Vector<Integer> val = vG.getEdgeProperties(temp.getIndex()); //Daten dazu
-			Point p1 = vG.getNode(val.get(MGraph.EDGESTARTINDEX)).getPosition(); //Startkoordinaten
-			VNode EndNode = vG.getNode(val.get(MGraph.EDGEENDINDEX)); //Endknoten
-			VNode StartNode = vG.getNode(val.get(MGraph.EDGESTARTINDEX)); //Endknoten
+			MEdge tempm = vG.getMathGraph().getEdge(temp.getIndex());
+			Point p1 = vG.getNode(tempm.StartIndex).getPosition(); //Startkoordinaten
+			VNode EndNode = vG.getNode(tempm.EndIndex); //Endknoten
+			VNode StartNode = vG.getNode(tempm.StartIndex); //Endknoten
 			Point p2 = EndNode.getPosition();
 			if ((((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)||((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))&&((temp.getSelectedStatus()&VItem.SOFT_DESELECTED)!=VItem.SOFT_DESELECTED))
 			{
@@ -189,9 +189,9 @@ public class VGraphic extends Component implements 	Observer
 				//get the text wich should be displayd
 			    String text = "";
 			    if (temp.getTextProperties().isshowvalue())
-					text = val.get(MGraph.EDGEVALUE).toString();
+					text = ""+tempm.Value;
 			    else
-			    	text = vG.getEdgeName(temp.getIndex());
+			    	text = tempm.name;
 			    //Show it
 				Font f = new Font("Arial",Font.PLAIN, Math.round(temp.getTextProperties().getSize()*zoomfactor));
 				g2.setFont(f);
@@ -244,11 +244,11 @@ public class VGraphic extends Component implements 	Observer
 				//					+" and ("+temp.getPosition().y+"+"+Math.round((float)temp.getNameDistance()*(float)Math.sin(Math.toRadians((double)temp.getNameRotation())))+") = "+y);
 			    FontMetrics metrics = g2.getFontMetrics(f);
 			    int hgt = metrics.getAscent()-metrics.getLeading()-metrics.getDescent();
-			    int adv = metrics.stringWidth(vG.getNodeName(temp.getIndex()));
+			    int adv = metrics.stringWidth(vG.getMathGraph().getNodeName(temp.getIndex()));
 			    x = Math.round(x*zoomfactor);
 			    y = Math.round(y*zoomfactor);
 			    x -= Math.round(adv/2); y += Math.round(hgt/2);
-				g2.drawString(vG.getNodeName(temp.getIndex()), x,y);
+				g2.drawString(vG.getMathGraph().getNodeName(temp.getIndex()), x,y);
 				
 			}
 		}

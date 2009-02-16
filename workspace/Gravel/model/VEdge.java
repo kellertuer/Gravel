@@ -42,10 +42,9 @@ public abstract class VEdge extends VItem {
 	private Color colour; //Farbe des Knotens
 	private int setCount; //Anzahl Mengen in denen der Knoten beteiligt ist, f�r Color 
 	
-	private VEdgeText Textvalues;
-	private VEdgeLinestyle Linestyle;
-	
-	private VEdgeArrow Arrow;
+	private VEdgeText text;
+	private VEdgeLinestyle linestyle;
+	private VEdgeArrow arrow;
 
 	/**
 	 * Constructor that initializes the Arrow-Part of the Edge with the GeneralPreferences Standard
@@ -59,20 +58,17 @@ public abstract class VEdge extends VItem {
 		width=w;
 		setCount = 0;
 		colour = Color.black;
-		Textvalues = new VEdgeText();
-		Linestyle = new VEdgeLinestyle();
-		Arrow = new VEdgeArrow();
+		text = new VEdgeText();
+		linestyle = new VEdgeLinestyle();
+		arrow = new VEdgeArrow();
 	}
 	/**
-	 * Constructor for an edge with information about the arrow
-	 * 
-	 * @param i index of the edge - must be the same as the index in the mathematical corresponding edge
-	 * @param w line width of the edge when drawn
-	 * @param size size of the arrow (measured in px of the line he uses)
-	 * @param part part of the arrow thats filled (so ist <1)
-	 * @param alpha Arrow in the arrowhead 0<alpha<90
-	 * @param pos position on the edge (0 means at the start 1 means at the end)
-	 * @deprecated
+	 * Create an Edge with specific Arrow, Text and LineStyle Elements
+	 * @param i index of the new Edge
+	 * @param w Width of the new edge
+	 * @param arr Arrow of Edge
+	 * @param t Text-Specifications of the edge
+	 * @param l Linestyle values of the Edge
 	 */
 	public VEdge(int i,int w, VEdgeArrow arr, VEdgeText t, VEdgeLinestyle l)
 	{
@@ -80,9 +76,9 @@ public abstract class VEdge extends VItem {
 		width=w;
 		setCount = 0;
 		colour = Color.black;
-		Arrow = arr;
-		Textvalues = t;
-		Linestyle = l;
+		arrow = arr;
+		text = t;
+		linestyle = l;
 	}
 	// Abstract Methoden, die von jedem Typ überschrieben werden müssen
 	/**
@@ -140,7 +136,7 @@ public abstract class VEdge extends VItem {
 	 */
 	public GeneralPath getDrawPath(Point Start, Point End, float zoom)
 	{
-		return Linestyle.modifyPath(getPath(Start,End,zoom), width, zoom);
+		return linestyle.modifyPath(getPath(Start,End,zoom), width, zoom);
 	}
 	/**
 	 * Apply the Properties of this Edge to another (possibly clone) the given parameter edge is modified
@@ -437,17 +433,17 @@ public abstract class VEdge extends VItem {
 	 */
 	public VEdgeText getTextProperties()
 	{
-		return this.Textvalues;
+		return this.text;
 	}
 	public void setTextProperties(VEdgeText newtext)
 	{
-		Textvalues = newtext;
+		text = newtext;
 	}
 	public VEdgeLinestyle getLinestyle() {
-		return Linestyle;
+		return linestyle;
 	}
-	public void setLinestyle(VEdgeLinestyle linestyle) {
-		Linestyle = linestyle;
+	public void setLinestyle(VEdgeLinestyle plinestyle) {
+		linestyle = plinestyle;
 	}
 	/**
 	 * Returns an empty Vector of Points. Each Edge with Controllpoints must implement this method and return its CPs
@@ -463,15 +459,15 @@ public abstract class VEdge extends VItem {
 	 */
 	public void setControlPoints(Vector<Point> points){}
 	/**
-	 * @param arrow the arrow to set
+	 * @param parrow the arrow to set
 	 */
-	public void setArrow(VEdgeArrow arrow) {
-		Arrow = arrow;
+	public void setArrow(VEdgeArrow parrow) {
+		arrow = parrow;
 	}
 	/**
 	 * @return the arrow
 	 */
 	public VEdgeArrow getArrow() {
-		return Arrow;
+		return arrow;
 	}
 }

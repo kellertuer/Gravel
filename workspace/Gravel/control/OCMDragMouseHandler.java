@@ -82,7 +82,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 				firstdrag=false;
 				if (!multiple)
 				{
-					int i = vg.getNextEdgeIndex();
+					int i = vg.getMathGraph().getNextEdgeIndex();
 					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_START|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
 					vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),StartNode.getIndex(),DragNode.getIndex(),gp.getIntValue("edge.value"),"\u22C6");
 				}
@@ -168,8 +168,8 @@ public class OCMDragMouseHandler extends DragMouseHandler
 			{
 				if (!multiple)
 				{ //Only One Edge created
-					int i = vg.getNextEdgeIndex();
-					if ((StartNode.getIndex()==EndNode.getIndex())&&(vg.isLoopAllowed()))
+					int i = vg.getMathGraph().getNextEdgeIndex();
+					if ((StartNode.getIndex()==EndNode.getIndex())&&(vg.getMathGraph().isLoopAllowed()))
 					{
 						VLoopEdge t = new VLoopEdge(i,gp.getIntValue("edge.width"),gp.getIntValue("edge.looplength"),gp.getIntValue("edge.loopdirection"),(double)gp.getIntValue("edge.loopproportion")/100.0d,gp.getBoolValue("edge.loopclockwise"));
 						vg.addEdge(t,StartNode.getIndex(),EndNode.getIndex(),gp.getIntValue("edge.value"),gp.getEdgeName(i,StartNode.getIndex(),EndNode.getIndex()));							

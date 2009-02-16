@@ -38,7 +38,7 @@ import dialogs.components.*;
 import view.Gui;
 
 import model.GraphMessage;
-import model.MGraph;
+import model.MEdge;
 import model.VEdge;
 import model.VGraph;
 import model.VItem;
@@ -140,7 +140,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		//If selected nodes exist and the porperties should be shown
 		show_nodeprop = properties & vg.selectedNodeExists();
 		show_edgeprop = properties & vg.selectedEdgeExists();
-		show_subsets = subgraphs & (vg.selectedEdgeExists() || vg.selectedNodeExists())&&(vg.SubSetCount() > 0);
+		show_subsets = subgraphs & (vg.selectedEdgeExists() || vg.selectedNodeExists())&&(vg.getMathGraph().SubSetCount() > 0);
 		//None of the tabs should be shown, that would be quite wrong
 		setTitle(title);
 		tabs = new JTabbedPane();
@@ -462,7 +462,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 					preNodeTextSize = temp.getNameSize();
 					preNodeTextDis = temp.getNameDistance();
 					preNodeTextRot = temp.getNameRotation();
-					nodename = vg.getNodeName(temp.getIndex());
+					nodename = vg.getMathGraph().getNodeName(temp.getIndex());
 					//Replace the id numer by $ID (at least try to get a common name
 					nodename = GeneralPreferences.replace(nodename,""+temp.getIndex(), "$ID");
 				}
@@ -480,7 +480,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 						preNodeTextRot=-1;
 					if (nodename!=null)
 					{
-						if (!GeneralPreferences.replace(nodename,"$ID",""+temp.getIndex()).equals(vg.getNodeName(temp.getIndex())))
+						if (!GeneralPreferences.replace(nodename,"$ID",""+temp.getIndex()).equals(vg.getMathGraph().getNodeName(temp.getIndex())))
 							nodename = null;
 					}	
 				}	
@@ -583,7 +583,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		EdgeTabs.add("Beschriftung",cText.getContent());
 		cLine = new CEdgeLineParameters(null,false,true); //not global, with CheckBoxes, Std-Values
 		EdgeTabs.add("Linienart", cLine.getContent());
-		if (vg.isDirected())
+		if (vg.getMathGraph().isDirected())
 		{
 			cArrow = new CEdgeArrowParameters(null,true); //std values, with checks
 			EdgeTabs.add("Pfeil", cArrow.getContent());
@@ -597,7 +597,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		}
 		if (loops)
 		{
-			cLoop = new CLoopParameters(null,vg.isDirected(),true);
+			cLoop = new CLoopParameters(null,vg.getMathGraph().isDirected(),true);
 			EdgeTabs.add("Schleife",cLoop);
 		}
 		EdgeContent.add(EdgeTabs,c);
@@ -627,12 +627,13 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				{
 					beginning = false;
 					pre = temp.clone();
-					preEdgeValue = vg.getEdgeProperties(temp.getIndex()).get(MGraph.EDGEVALUE);
-					preEdgeName = vg.getEdgeName(temp.getIndex());
+					MEdge me = vg.getMathGraph().getEdge(temp.getIndex());
+					preEdgeValue = me.Value;
+					preEdgeName = me.name;
 					//Replace the id numer by $ID (at least try to get a common name
 					preEdgeName = GeneralPreferences.replace(preEdgeName,""+temp.getIndex(), "$ID");
-					preEdgeName = GeneralPreferences.replace(preEdgeName,""+vg.getEdgeProperties(temp.getIndex()).get(MGraph.EDGESTARTINDEX), "$SID");
-					preEdgeName = GeneralPreferences.replace(preEdgeName,""+vg.getEdgeProperties(temp.getIndex()).get(MGraph.EDGEENDINDEX), "$EID");					
+					preEdgeName = GeneralPreferences.replace(preEdgeName,""+me.StartIndex, "$SID");
+					preEdgeName = GeneralPreferences.replace(preEdgeName,""+me.EndIndex, "$EID");					
 					if (pre.getType()==VEdge.LOOP) // very first is a Loop
 					{
 						vle = (VLoopEdge)pre.clone();
@@ -640,7 +641,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				}
 				else
 				{ // if an edge value differs set common name to -1
-					if (vg.getEdgeProperties(temp.getIndex()).get(MGraph.EDGEVALUE)!=preEdgeValue)
+					if (vg.getMathGraph().getEdge(temp.getIndex()).Value!=preEdgeValue)
 						preEdgeValue=-1;
 					if (pre.getWidth()!=temp.getWidth())
 						pre.setWidth(-1);
@@ -674,9 +675,10 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 					if (preEdgeName!=null)
 					{
 						String tname = GeneralPreferences.replace(preEdgeName,"$ID",""+temp.getIndex());
-						tname = GeneralPreferences.replace(tname,"$SID",""+vg.getEdgeProperties(temp.getIndex()).get(MGraph.EDGESTARTINDEX));
-						tname = GeneralPreferences.replace(tname,"$EID",""+vg.getEdgeProperties(temp.getIndex()).get(MGraph.EDGEENDINDEX));
-						if (!tname.equals(vg.getEdgeName(temp.getIndex())))
+						MEdge me = vg.getMathGraph().getEdge(temp.getIndex());
+						tname = GeneralPreferences.replace(tname,"$SID",""+me.StartIndex);
+						tname = GeneralPreferences.replace(tname,"$EID",""+me.EndIndex);
+						if (!tname.equals(vg.getMathGraph().getEdgeName(temp.getIndex())))
 							preEdgeName = null;
 					}
 					if (temp.getType()==VEdge.LOOP)
@@ -720,7 +722,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		cLine.InitValues(pre);
 		cLine.updateUI(preEdgeLineTypegiven);
 		
-		if (vg.isDirected())
+		if (vg.getMathGraph().isDirected())
 		{
 			cArrow.InitValues(pre);
 		}
@@ -781,7 +783,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		{
 			if (subsetnames.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				bSubSet[temp] = new JCheckBox(vg.getSubSetName(i));
+				bSubSet[temp] = new JCheckBox(vg.getMathGraph().getSubSetName(i));
 				SubSetList.add(bSubSet[temp],c);
 				c.gridy++;
 				temp++; //Anzahl Knoten zaehlen
@@ -813,10 +815,10 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				{
 					VSubSet s = subsetiter.next();
 					if (beginning) //Set the Subsets the first node belongs to...
-						subsets.set(s.getIndex(), new Boolean(vg.SubSetcontainsNode(actual.getIndex(), s.getIndex())));
+						subsets.set(s.getIndex(), new Boolean(vg.getMathGraph().SubSetcontainsNode(actual.getIndex(), s.getIndex())));
 					else
 					{
-						if (subsets.get(s.getIndex()).booleanValue()!=vg.SubSetcontainsNode(actual.getIndex(), s.getIndex()))
+						if (subsets.get(s.getIndex()).booleanValue()!=vg.getMathGraph().SubSetcontainsNode(actual.getIndex(), s.getIndex()))
 							preSubSetsequal = false;
 					}
 				}
@@ -834,10 +836,10 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				{
 					VSubSet s = subsetiter.next();
 					if (beginning) //Set the Subsets the first edge belongs to (happens if no node selected) belongs to...
-						subsets.set(s.getIndex(), new Boolean(vg.SubSetcontainsEdge(actual.getIndex(), s.getIndex())));
+						subsets.set(s.getIndex(), new Boolean(vg.getMathGraph().SubSetcontainsEdge(actual.getIndex(), s.getIndex())));
 					else
 					{
-						if (subsets.get(s.getIndex()).booleanValue()!=vg.SubSetcontainsEdge(actual.getIndex(), s.getIndex()))
+						if (subsets.get(s.getIndex()).booleanValue()!=vg.getMathGraph().SubSetcontainsEdge(actual.getIndex(), s.getIndex()))
 							preSubSetsequal = false;
 					}
 				}
@@ -881,9 +883,8 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		while (edgeiter.hasNext())
 		{
 			VEdge e = edgeiter.next();
-			int start = vg.getEdgeProperties(e.getIndex()).elementAt(MGraph.EDGESTARTINDEX);
-			int ende = vg.getEdgeProperties(e.getIndex()).elementAt(MGraph.EDGEENDINDEX);
-			if ((start==nodeindex)||(ende==nodeindex))
+			MEdge me = vg.getMathGraph().getEdge(e.getIndex());
+			if ((me.StartIndex==nodeindex)||(me.EndIndex==nodeindex))
 					e.translate(x, y);
 		}
 	}
@@ -1024,8 +1025,8 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				{
 					String t = sEdgeName.getText();
 					t = GeneralPreferences.replace(t,"$ID",actual.getIndex()+"");
-					t = GeneralPreferences.replace(t,"$SID",vg.getEdgeProperties(actual.getIndex()).get(MGraph.EDGESTARTINDEX)+"");
-					t = GeneralPreferences.replace(t,"$EID",vg.getEdgeProperties(actual.getIndex()).get(MGraph.EDGEENDINDEX)+"");
+					t = GeneralPreferences.replace(t,"$SID",vg.getMathGraph().getEdge(actual.getIndex()).StartIndex+"");
+					t = GeneralPreferences.replace(t,"$EID",vg.getMathGraph().getEdge(actual.getIndex()).EndIndex+"");
 					vg.setEdgeName(actual.getIndex(), t);
 					changed=true;
 				}
@@ -1042,7 +1043,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				actual = cText.modifyEdge(actual);
 				actual = cLine.modifyEdge(actual);
 				
-				if (vg.isDirected())
+				if (vg.getMathGraph().isDirected())
 				{
 					actual = cArrow.modifyEdge(actual);
 					changed=true;
@@ -1200,7 +1201,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			JOptionPane.showMessageDialog(this, "<html><p>Ver"+main.CONST.html_ae+"ndern der Werte nicht m"+main.CONST.html_oe+"glich.<br>"+t+".</p></html>","Fehler",JOptionPane.ERROR_MESSAGE);
 			return false;				
 		}
-		if (vg.isDirected())
+		if (vg.getMathGraph().isDirected())
 		{
 			t = cArrow.VerifyInput();
 			if (!t.equals(""))

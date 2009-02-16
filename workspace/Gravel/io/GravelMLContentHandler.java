@@ -145,7 +145,7 @@ public class GravelMLContentHandler implements ContentHandler
 		if (Status==PARSE_EDGES)
 		{
 			if (isVisual)
-			{	if ((vG==null)||(vG.NodeCount()==0))
+			{	if ((vG==null)||(vG.getMathGraph().NodeCount()==0))
 						{isValid=false; System.err.println("No VGraph or no Nodes existent. Can't Parse Edges"); return;}
 			} 
 			else if (mG==null)
@@ -276,7 +276,7 @@ public class GravelMLContentHandler implements ContentHandler
 			if (data_key.equals("sn")) //SubSetName
 			{
 				if (isVisual)
-					vG.setSubSetName(id,CDATA);
+					vG.getMathGraph().setSubSetName(id,CDATA);
 				else
 					mG.setSubSetName(id,CDATA);
 			}
@@ -334,7 +334,7 @@ public class GravelMLContentHandler implements ContentHandler
 			catch (Exception e)
 			{
 				if (isVisual)
-					id = vG.getNextNodeIndex();
+					id = vG.getMathGraph().getNextNodeIndex();
 				else
 					id = mG.getNextNodeIndex();
 				System.err.println("DEBUG : Malformed ID - generating own ("+id+")");
@@ -442,7 +442,7 @@ public class GravelMLContentHandler implements ContentHandler
 			catch (Exception e)
 			{
 				if (isVisual)
-					id = vG.getNextEdgeIndex();
+					id = vG.getMathGraph().getNextEdgeIndex();
 				else
 					id = mG.getNextEdgeIndex();
 			}				
@@ -481,7 +481,7 @@ public class GravelMLContentHandler implements ContentHandler
 					et = gp.getStringValue("edge.edgetype");
 			if (start==ende)
 			{
-				if (!vG.isLoopAllowed())
+				if (!vG.getMathGraph().isLoopAllowed())
 				{
 					isValid=false;
 					return;
@@ -565,7 +565,7 @@ public class GravelMLContentHandler implements ContentHandler
 			catch (Exception e)
 			{
 				if (isVisual)
-					id = vG.getNextSubSetIndex();
+					id = vG.getMathGraph().getNextSetIndex();
 				else
 					id = mG.getNextSetIndex();
 				System.err.println("DEBUG : Malformed ID - generating own ("+id+")");

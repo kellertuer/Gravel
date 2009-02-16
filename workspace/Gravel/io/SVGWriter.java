@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
-import java.util.Vector;
 import java.awt.Color;
 
 import view.VGraphic;
@@ -105,7 +104,7 @@ public class SVGWriter
 					//mittelpunkt des Textes
 					int x = actual.getPosition().x + Math.round((float)actual.getNameDistance()*(float)Math.cos(Math.toRadians((double)actual.getNameRotation())));
 					int y = actual.getPosition().y - Math.round((float)actual.getNameDistance()*(float)Math.sin(Math.toRadians((double)actual.getNameRotation())));
-					s.write("\t\t\t<text x=\""+x+"\" y=\""+y+"\" style=\"font-size:"+actual.getNameSize()+"px; baseline-shift:-"+(actual.getNameSize()/2)+";\">"+formname(vg.getNodeName(actual.getIndex()))+"</text>");
+					s.write("\t\t\t<text x=\""+x+"\" y=\""+y+"\" style=\"font-size:"+actual.getNameSize()+"px; baseline-shift:-"+(actual.getNameSize()/2)+";\">"+formname(vg.getMathGraph().getNodeName(actual.getIndex()))+"</text>");
 				}
 			}
 		}
@@ -167,9 +166,9 @@ public class SVGWriter
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();
-	    	   Vector<Integer> values = vg.getEdgeProperties(actual.getIndex());
-	    	   int start = values.elementAt(MGraph.EDGESTARTINDEX);
-	    	   int ende = values.elementAt(MGraph.EDGEENDINDEX);
+	    	   MEdge me = vg.getMathGraph().getEdge(actual.getIndex());
+	    	   int start = me.StartIndex;
+	    	   int ende = me.EndIndex;
 	    	   Point b = vg.getNode(start).getPosition();
 	    	   Point e = vg.getNode(ende).getPosition();
 	    	   b.x = b.x; b.y = b.y;
@@ -205,7 +204,7 @@ public class SVGWriter
 	    	   {
 	    		   VLoopEdge l = (VLoopEdge)actual;
 	    		   Point m = l.getControlPoints().firstElement();
-	    		   Point n = vg.getNode(vg.getEdgeProperties(actual.getIndex()).elementAt(MGraph.EDGEENDINDEX)).getPosition();
+	    		   Point n = vg.getNode(me.EndIndex).getPosition();
 	    		   //Mitte zwischen Kontrollpunkt und Start/Endknoten der hier der selbe ist
 	    		   m.x = (n.x+m.x)/2;
 	    		   m.y = (n.y+m.y)/2;
@@ -261,10 +260,10 @@ public class SVGWriter
 					//get the text wich should be displayd
 				    String text = "";
 				    if (t.isshowvalue())
-						text = values.get(MGraph.EDGEVALUE).toString();
+						text = ""+me.Value;
 				    else
-				    	text = vg.getEdgeName(actual.getIndex());
-					s.write(NL+"\t<text x=\""+(m.x)+"\" y=\""+(m.y)+"\" style=\"font-size:"+actual.getTextProperties().getSize()+"pt; baseline-shift:-"+(actual.getTextProperties().getSize()/2)+";\">"+formname(text)+"</text>"+NL);
+				    	text = me.name;
+				    s.write(NL+"\t<text x=\""+(m.x)+"\" y=\""+(m.y)+"\" style=\"font-size:"+actual.getTextProperties().getSize()+"pt; baseline-shift:-"+(actual.getTextProperties().getSize()/2)+";\">"+formname(text)+"</text>"+NL);
 				}
 			  s.write(drawArrow(actual,start,ende));
 	       }//End while edges.hasNext()
@@ -282,7 +281,7 @@ public class SVGWriter
 			int x = 0, y = 0;
 			//Point2D.Double arrowhead = new Point2D.Double(),line1start = new Point2D.Double(),line1 = new Point2D.Double(),line2start = new Point2D.Double(),line2 = new Point2D.Double();
 			String s = "";
-			if (vg.isDirected())
+			if (vg.getMathGraph().isDirected())
 			{
 			  	Shape arrow = edge.getArrowShape(vg.getNode(start).getPosition(),vg.getNode(ende).getPosition(),Math.round(vg.getNode(start).getSize()/2),Math.round(vg.getNode(ende).getSize()/2),1.0f);
 			  	PathIterator path = arrow.getPathIterator(null, 0.001);

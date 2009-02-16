@@ -35,7 +35,7 @@ import javax.swing.KeyStroke;
 import dialogs.components.*;
 
 import model.GraphMessage;
-import model.MGraph;
+import model.MEdge;
 import model.VEdge;
 import model.VEdgeLinestyle;
 import model.VEdgeText;
@@ -141,14 +141,14 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		{
 			chEdge = e;
 			oldindex = e.getIndex();
-			Vector<Integer> werte = graphref.getEdgeProperties(e.getIndex());
-			oldstart = werte.elementAt(MGraph.EDGESTARTINDEX);
-			oldend = werte.elementAt(MGraph.EDGEENDINDEX);
-			oldvalue = werte.elementAt(MGraph.EDGEVALUE);
+			MEdge me = graphref.getMathGraph().getEdge(e.getIndex());
+			oldstart = me.StartIndex;
+			oldend = me.EndIndex;
+			oldvalue = me.Value;
 			oldwidth = e.getWidth();
 			oldText = e.getTextProperties().clone();
 			oldLinestyle = e.getLinestyle().clone(); 
-			this.setTitle("Eigenschaften der Kante '"+graphref.getEdgeName(e.getIndex())+"' (#"+e.getIndex()+") von '"+graphref.getNodeName(oldstart)+"'->'"+graphref.getNodeName(oldend)+"'");	
+			this.setTitle("Eigenschaften der Kante '"+graphref.getMathGraph().getEdgeName(e.getIndex())+"' (#"+e.getIndex()+") von '"+graphref.getMathGraph().getNodeName(oldstart)+"'->'"+graphref.getMathGraph().getNodeName(oldend)+"'");	
 		}
 		
 		tabs = new JTabbedPane();
@@ -186,7 +186,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		else
 			tabs.addTab("Kantentyp", cEdgeTypeField);
 		
-		if (graphref.isDirected())
+		if (graphref.getMathGraph().isDirected())
 		{
 			cArrow = new CEdgeArrowParameters(chEdge,false);
 			cArrow.addObserver(cArrowP);
@@ -359,7 +359,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			EdgeName.setText("#"+oldstart+"->#"+oldend);
 		else
 		{
-			EdgeName.setText(graphref.getEdgeName(oldindex));
+			EdgeName.setText(graphref.getMathGraph().getEdgeName(oldindex));
 		}	
 	}
 	/**
@@ -381,7 +381,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		{
 			if (nodelist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				nodenames[temp] = graphref.getNodeName(i)+"   (#"+i+")";
+				nodenames[temp] = graphref.getMathGraph().getNodeName(i)+"   (#"+i+")";
 				temp++; //Anzahl Knoten zaehlen
 			}
 		}
@@ -411,9 +411,9 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		{
 			if (subsetlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				SubSetChecks[temp] = new JCheckBox(graphref.getSubSetName(i));
+				SubSetChecks[temp] = new JCheckBox(graphref.getMathGraph().getSubSetName(i));
 				if (chEdge!=null)
-					SubSetChecks[temp].setSelected(graphref.SubSetcontainsEdge(chEdge.getIndex(),i));
+					SubSetChecks[temp].setSelected(graphref.getMathGraph().SubSetcontainsEdge(chEdge.getIndex(),i));
 				CiSubSets.add(SubSetChecks[temp],c);
 				SubSetChecks[temp].addItemListener(this);
 				c.gridy++;
@@ -482,7 +482,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 	    cEdgeTypeField.add(cQuadCurve,c);
 	    cEdgeTypeField.add(cSegmented,c);
 	    cEdgeTypeField.add(cOrthogonal,c);
-		cLoop = new CLoopParameters(chEdge, graphref.isDirected(),false); //without checks
+		cLoop = new CLoopParameters(chEdge, graphref.getMathGraph().isDirected(),false); //without checks
 		//Set Loop Field Width to the same width as the cEdgeTypefield width
 		cLoop.setPreferredSize(new Dimension(cEdgeTypeField.getPreferredSize().width,cLoop.getPreferredSize().height));
 	}
@@ -721,7 +721,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			}
 			if (startindex==endindex)
 			{
-				if (!graphref.isLoopAllowed()) //keine Schleifen erlaubt
+				if (!graphref.getMathGraph().isLoopAllowed()) //keine Schleifen erlaubt
 				{	
 					JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Schleifen sind in diesem Graphen nicht erlaubt.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					
 					return;
@@ -748,7 +748,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			{
 				if (startindex==endindex)
 				{
-					if (!graphref.isLoopAllowed())
+					if (!graphref.getMathGraph().isLoopAllowed())
 					{
 						JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"ndern der Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Eine Selbstkante (Start- und Endknoten identisch) sind deaktiviert.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					
 						return;
@@ -765,7 +765,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 				return;
 			if (graphref.similarPathEdgeIndex(CheckType(),startindex,endindex) > 0) //do the actual input fields create an edge similar to an existing ?
 			{
-				if ((!graphref.isMultipleAllowed())&&(graphref.similarPathEdgeIndex(CheckType(),startindex,endindex) != oldindex)) //ist nicht die alte Kante
+				if ((!graphref.getMathGraph().isMultipleAllowed())&&(graphref.similarPathEdgeIndex(CheckType(),startindex,endindex) != oldindex)) //ist nicht die alte Kante
 				{	
 					JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"ndern der Kante nicht m&ouml;glich.<br><br>Eine Kante zwischen den Knoten existiert bereits.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					
 					return;
@@ -815,7 +815,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 	{
 		VEdge retvalue=null;
 		//Check des Arrows
-		if (graphref.isDirected())
+		if (graphref.getMathGraph().isDirected())
 		{
 			String t = cArrow.VerifyInput();
 			if (!t.equals(""))
@@ -828,7 +828,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		}
 		int start = StringPos2Index(cStart.getSelectedIndex());
 		int end = StringPos2Index(cEnd.getSelectedIndex());
-		if ((start==end)&&(graphref.isLoopAllowed()))
+		if ((start==end)&&(graphref.getMathGraph().isLoopAllowed()))
 		{
 			retvalue = cLoop.createEdge(iEdgeIndex.getValue(), iWidth.getValue());
 		}
@@ -862,7 +862,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			}
 		if (retvalue!=null)
 		{
-			if (graphref.isDirected()) //Pfeildaten setzen
+			if (graphref.getMathGraph().isDirected()) //Pfeildaten setzen
 			{
 				retvalue = cArrow.modifyEdge(retvalue);
 			}
@@ -943,7 +943,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			int end = StringPos2Index(cEnd.getSelectedIndex());
 			if (tabs.getTabCount() > 2)
 			{
-				if ((start==end)&&(graphref.isLoopAllowed()))
+				if ((start==end)&&(graphref.getMathGraph().isLoopAllowed()))
 				{
 					tabs.setComponentAt(2,cLoop);
 					tabs.setTitleAt(2," Schleife ");

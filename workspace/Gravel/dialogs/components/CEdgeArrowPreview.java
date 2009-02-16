@@ -54,10 +54,10 @@ public class CEdgeArrowPreview extends Container implements Observer{
 		ArrowTest.addNodetoSubSet(1,1);
 		ArrowTest.addNodetoSubSet(2,1);
 		ArrowEdge = new VStraightLineEdge(1,2);
-		ArrowTest.addEdge(ArrowEdge,1,2);
+		ArrowTest.addEdge(ArrowEdge,1,2,1,"");
 		ArrowTest.setEdgeName(ArrowEdge.getIndex(),"e");
-		ArrowTest.getEdge(ArrowTest.getEdgeIndices(1,2).firstElement()).setTextProperties(new VEdgeText());
-		ArrowTest.getEdge(ArrowTest.getEdgeIndices(1,2).firstElement()).setLinestyle(new VEdgeLinestyle());
+		ArrowTest.getEdge(ArrowTest.getMathGraph().getEdgeIndices(1,2).firstElement()).setTextProperties(new VEdgeText());
+		ArrowTest.getEdge(ArrowTest.getMathGraph().getEdgeIndices(1,2).firstElement()).setLinestyle(new VEdgeLinestyle());
 		ArrowG = new VGraphic(new Dimension(200,60), ArrowTest);
 		ArrowG.setMouseHandling(VGraphic.NO_MOUSEHANDLING);
 		ArrowG.setPreferredSize(new Dimension(200,62));
