@@ -108,7 +108,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				Knoten.add(t);
 			}
 		}
-		//Zur Ruecktransformation zum Index bei Selektion
+		//Zur Ruecktransformation zum Index bei Auswahl
 		Knotennamen = nodenames;
 		this.updateUI();
 		this.revalidate();
@@ -129,7 +129,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				Kanten.add(t);
 			}
 		}
-		//Zur Ruecktransformation zum Index bei Selektion
+		//Zur Ruecktransformation zum Index bei Auswahl
 		Kantennamen = edges;
 		this.updateUI();
 		this.revalidate();
@@ -150,7 +150,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				Mengen.add(t);
 			}
 		}
-		//Zur Ruecktransformation zum Index bei Selektion
+		//Zur Ruecktransformation zum Index bei Auswahl
 		Mengennamen = Sets;
 		this.updateUI();
 		this.revalidate();

@@ -456,7 +456,7 @@ import view.pieces.GridComponent;
 		content.add(iUndoStacksize,c);
 		iUndoStacksize.setPreferredSize(new Dimension(100, 20));
 		c.gridx = 0; c.gridy++;c.gridwidth=2; 
-		bUndotrackSelection = new JCheckBox("<html>Selektionsver"+main.CONST.html_ae+"nderungen aufzeichnen<br><font size=-2>Durch Aufzeichnung k"+main.CONST.html_oe+"nnen diese widerrufen werden.</font></html>");
+		bUndotrackSelection = new JCheckBox("<html>Ver"+main.CONST.html_ae+"nderungen der Auswahl aufzeichnen<br><font size=-2>Durch Aufzeichnung k"+main.CONST.html_oe+"nnen diese widerrufen werden.</font></html>");
 		content.add(bUndotrackSelection,c);
 
 		return content;

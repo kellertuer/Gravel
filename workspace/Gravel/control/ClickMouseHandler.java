@@ -103,7 +103,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		NremfromSet = new JMenu("Knoten entfernen aus");
 		NremfromSet.setEnabled(false);
 		NremfromSet.addActionListener(this);
-		NDelSelection = new JMenuItem("Selektion löschen");
+		NDelSelection = new JMenuItem("Auswahl löschen");
 		NDelSelection.setEnabled(vg.selectedNodeExists()||vg.selectedEdgeExists());
 		NDelSelection.addActionListener(this);	
 		NodePopup = new JPopupMenu();
@@ -131,7 +131,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		EremfromSet = new JMenu("Kante entfernen aus");
 		EremfromSet.setEnabled(false);
 		EremfromSet.addActionListener(this);
-		EDelSelection = new JMenuItem("Selektion löschen");
+		EDelSelection = new JMenuItem("Auswahl löschen");
 		EDelSelection.setEnabled(vg.selectedNodeExists()||vg.selectedEdgeExists());
 		EDelSelection.addActionListener(this);	
 		EdgePopup = new JPopupMenu();
@@ -253,7 +253,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 				CreationPoint = p;
 			}
 		}
-		if (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.SHIFT_MASK) // mit SHIFTlinks angeklickt, Selektion erweitern
+		if (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.SHIFT_MASK) // mit SHIFTlinks angeklickt, Auswahl erweitern
 		{
 			VNode r = vg.getNodeinRange(p);
 			if (r != null) //Clicked on a node -> Select it
@@ -390,7 +390,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		{
 			new JEdgeDialog(selectedEdge,vg);
 		}
-		//Knoten oder Kantenmenü Selektion löschen
+		//Knoten oder Kantenmenü Auswahl löschen
 		if ((e.getSource()==EDelSelection)||(e.getSource()==NDelSelection))
 		{
 			vg.removeSelection();

@@ -64,8 +64,8 @@ public class VGraphic extends Component implements 	Observer
 	
 	// Visual Styles
 	private BasicStroke vEdgeStyle;
-	private Color selColor; //Farbe der Selektion
-	private int selWidth; //Breite der Selektion
+	private Color selColor; //Color of selected Elements
+	private int selWidth; //Width of selection border
 	private DragMouseHandler Drag;
 	private ClickMouseHandler Click;
 	private static final long serialVersionUID = 1L;

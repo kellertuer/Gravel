@@ -162,7 +162,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         mEdRedo.setEnabled(GraphHistory.CanRedo());
 
         //Delete Selection
-        mEdDelSelection = new JMenuItem("Selektion löschen");
+        mEdDelSelection = new JMenuItem("Auswahl löschen");
     	if (isMac)
     		mEdDelSelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, MenuAccModifier));    		
     	else
@@ -173,14 +173,14 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     	mEdDelSelection.addActionListener(this);
     	mEdDelSelection.setEnabled(graphpart.getVGraph().selectedEdgeExists()||graphpart.getVGraph().selectedNodeExists());
     	
-    	mEdModifySelection = new JMenuItem("Selektion bearbeiten...");
+    	mEdModifySelection = new JMenuItem("Auswahl bearbeiten...");
    		mEdModifySelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, MenuAccModifier));    		
        	if (!isMac)
            mEdModifySelection.setMnemonic(KeyEvent.VK_M);
     	mEdModifySelection.addActionListener(this);
     	mEdModifySelection.setEnabled(graphpart.getVGraph().selectedEdgeExists()||graphpart.getVGraph().selectedNodeExists());
 
-    	mEdArrangeSelection = new JMenuItem("Selektion anordnen...");
+    	mEdArrangeSelection = new JMenuItem("Auswahl anordnen...");
    		//mEdArrangeSelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, MenuAccModifier));    		
        	if (!isMac)
            mEdArrangeSelection.setMnemonic(KeyEvent.VK_R);
@@ -501,7 +501,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     		}
      		else if (item == mEdModifySelection)
     		{
-    			new JSelectionModifyDialog(false, true, true, "Selektion bearbeiten", graphpart.getVGraph());
+    			new JSelectionModifyDialog(false, true, true, "Auswahl bearbeiten", graphpart.getVGraph());
     		}
      		else if (item == mEdArrangeSelection)
     		{

@@ -120,7 +120,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	 */
 	public JSelectionModifyDialog(VGraph vg)
 	{
-		this(true, true, true, "Selektion bearbeiten", vg);
+		this(true, true, true, "Auswahl bearbeiten", vg);
 	}
 	/**
 	 * Initializes the Dialog with the possibility to disable some tabs
@@ -442,7 +442,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	 */
 	private void fillCommonNodeValues()
 	{
-		//Werte suchen fuer die Initialisierung/Gemeinsame werte der Selektion
+		//Werte suchen fuer die Initialisierung/Gemeinsame werte der Auswahl
 		Iterator<VNode> nodeiter = vg.getNodeIterator();
 		int preNodeSize=-1, preNodeTextSize=-1, preNodeTextDis=-1, preNodeTextRot=-1;
 		//ShowText ist der wert und given sagt, ob der allgemeingültig ist
@@ -610,7 +610,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	 */
 	private void fillCommonEdgeValues()
 	{
-		//Werte suchen fuer die Initialisierung/Gemeinsame werte der Selektion
+		//Werte suchen fuer die Initialisierung/Gemeinsame werte der Auswahl
 		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
 		VEdge pre = new VStraightLineEdge(0,0);
 		int preEdgeValue=0;
@@ -765,7 +765,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		c.anchor = GridBagConstraints.CENTER;
 		c.gridy = 0;
 		c.gridx = 0;
-		bChSubSets = new JCheckBox("<html><p>Selektion den Untergraphen zuprdnen:</p></html>");
+		bChSubSets = new JCheckBox("<html><p>Auswahl den Untergraphen zuprdnen:</p></html>");
 		bChSubSets.addActionListener(this);
 		SubSetContent.add(bChSubSets,c);
 		subsetnames = vg.getSetNames();
@@ -1276,7 +1276,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				changed |= GraphMessage.SUBSET;
 
 		GraphMessage startblock = new GraphMessage(changed,GraphMessage.BLOCK_START|GraphMessage.UPDATE);
-		startblock.setMessage("Selektion verändert");
+		startblock.setMessage("Auswahl verändert");
 		vg.pushNotify(startblock);
 		if (show_nodeprop)
 			modifyNodes();
