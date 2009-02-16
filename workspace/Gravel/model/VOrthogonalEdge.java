@@ -69,7 +69,7 @@ public class VOrthogonalEdge extends VEdge {
 	}
 	public VEdge clone()
 	{
-		VEdge cloneedge = new VOrthogonalEdge(index,width,verticalfirst);
+		VEdge cloneedge = new VOrthogonalEdge(getIndex(),width,verticalfirst);
 		return copyCommonProperties(cloneedge);
 	}
 	public boolean PathEquals(VEdge v)

@@ -29,7 +29,7 @@ public class VLoopEdge extends VEdge {
 
 	public VEdge clone() 
 	{
-		VEdge cloneedge = new VLoopEdge(index,width,length, direction, proportion, clockwise);
+		VEdge cloneedge = new VLoopEdge(getIndex(),width,length, direction, proportion, clockwise);
 		return copyCommonProperties(cloneedge);
 	}
 

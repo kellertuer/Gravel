@@ -87,12 +87,12 @@ public class MagnetismAndSprings implements VAlgorithmIF
 			while (edgeiterator.hasNext())
 			{
 				VEdge e = edgeiterator.next();
-				Vector<Integer> values = vg.getEdgeProperties(e.index);
+				Vector<Integer> values = vg.getEdgeProperties(e.getIndex());
 				int start = values.get(MGraph.EDGESTARTINDEX), ende = values.get(MGraph.EDGEENDINDEX);
 				int uindex=0;
-				if (start==v.index)
+				if (start==v.getIndex())
 					uindex=ende;
-				else if (ende==v.index)
+				else if (ende==v.getIndex())
 					uindex=start;
 				if (uindex!=0) //Edge is connected with u and so a force is added
 				{
@@ -109,7 +109,7 @@ public class MagnetismAndSprings implements VAlgorithmIF
 			while (nodeiterator.hasNext())
 			{
 				VNode u = nodeiterator.next();
-				if (u.index!=v.index)
+				if (u.getIndex()!=v.getIndex())
 				{
 					double distance = v.getPosition().distance(u.getPosition());
 					force_x += nodestrength/(distance*distance) * (u.getPosition().x-v.getPosition().x)/distance;

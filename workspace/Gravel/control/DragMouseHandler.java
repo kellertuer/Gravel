@@ -107,8 +107,8 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		while (edgeiter.hasNext())
 		{
 			VEdge e = edgeiter.next();
-			int start = vg.getEdgeProperties(e.index).elementAt(MGraph.EDGESTARTINDEX);
-			int ende = vg.getEdgeProperties(e.index).elementAt(MGraph.EDGEENDINDEX);
+			int start = vg.getEdgeProperties(e.getIndex()).elementAt(MGraph.EDGESTARTINDEX);
+			int ende = vg.getEdgeProperties(e.getIndex()).elementAt(MGraph.EDGEENDINDEX);
 			Point sp = (Point) vg.getNode(start).getPosition().clone();
 			sp.x = Math.round((float)sp.x*zoom);sp.y = Math.round((float)sp.y*zoom);
 			Point ep = (Point) vg.getNode(ende).getPosition().clone();

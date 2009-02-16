@@ -114,12 +114,12 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 		else
 		{
 			chNode = v;
-			oldindex = v.index;
+			oldindex = v.getIndex();
 			oldx = v.getPosition().x;
 			oldy = v.getPosition().y;
 			oldsize = v.getSize();
 			oldname = graphref.getNodeName(oldindex);
-			this.setTitle("Eigenschaften des Knotens '"+graphref.getNodeName(v.index)+"' (#"+v.index+")");	
+			this.setTitle("Eigenschaften des Knotens '"+graphref.getNodeName(v.getIndex())+"' (#"+v.getIndex()+")");	
 		}
 		
 		Container content = getContentPane();
@@ -313,7 +313,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 			{
 				SubSetChecks[temp] = new JCheckBox(graphref.getSubSetName(i));
 				if (chNode!=null)
-					SubSetChecks[temp].setSelected(graphref.SubSetcontainsNode(chNode.index,i));
+					SubSetChecks[temp].setSelected(graphref.SubSetcontainsNode(chNode.getIndex(),i));
 				CiSubSets.add(SubSetChecks[temp],c);
 				SubSetChecks[temp].addItemListener(this);
 				c.gridy++;

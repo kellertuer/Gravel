@@ -95,7 +95,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		{
 			//Valenzen
 			VEdge actual = edgeiter.next();
-			Vector<Integer> values = vg.getEdgeProperties(actual.index);
+			Vector<Integer> values = vg.getEdgeProperties(actual.getIndex());
 			int start = values.get(MGraph.EDGESTARTINDEX), ende = values.get(MGraph.EDGEENDINDEX);
 			if (valenz.get(start)==null)
 				valenz.put(start,0);
@@ -115,13 +115,13 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 			switch(actual.getType())
 			{
 				case VEdge.ORTHOGONAL : {
-					bends.put(actual.index,1); 
+					bends.put(actual.getIndex(),1); 
 					Point cp;
 					if (((VOrthogonalEdge)actual).getVerticalFirst())
 						cp = new Point(startpoint.x,endpoint.y);
 					else
 						cp = new Point(startpoint.x,endpoint.x);
-					kantenlaenge.put(actual.index,startpoint.distance(cp) + cp.distance(endpoint));
+					kantenlaenge.put(actual.getIndex(),startpoint.distance(cp) + cp.distance(endpoint));
 					break;
 				}
 				case VEdge.SEGMENTED : {
@@ -132,36 +132,36 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 						if (p.get(i)!=null)
 						{
 							if (count==0)
-								kantenlaenge.put(actual.index,startpoint.distance(p.get(i)));
+								kantenlaenge.put(actual.getIndex(),startpoint.distance(p.get(i)));
 							else
-								kantenlaenge.put(actual.index, kantenlaenge.get(actual.index)+p.get(lastindex).distance(p.get(i)));
+								kantenlaenge.put(actual.getIndex(), kantenlaenge.get(actual.getIndex())+p.get(lastindex).distance(p.get(i)));
 							lastindex = i; count++;
 						}
 					}
 					if (count==0) 
-						kantenlaenge.put(actual.index,startpoint.distance(endpoint)); //Kommt sowas vor ?
+						kantenlaenge.put(actual.getIndex(),startpoint.distance(endpoint)); //Kommt sowas vor ?
 					else
-						kantenlaenge.put(actual.index, kantenlaenge.get(actual.index) + p.get(lastindex).distance(endpoint));
-					bends.put(actual.index,count);
+						kantenlaenge.put(actual.getIndex(), kantenlaenge.get(actual.getIndex()) + p.get(lastindex).distance(endpoint));
+					bends.put(actual.getIndex(),count);
 					break;
 				}
 				case VEdge.STRAIGHTLINE : {
-					kantenlaenge.put(actual.index,startpoint.distance(endpoint));
-					bends.put(actual.index,0);
+					kantenlaenge.put(actual.getIndex(),startpoint.distance(endpoint));
+					bends.put(actual.getIndex(),0);
 					break;
 				}
 				case VEdge.LOOP : 
 				case VEdge.QUADCURVE : {
-						bends.put(actual.index,0);
+						bends.put(actual.getIndex(),0);
 						PathIterator path = actual.getPath(startpoint, endpoint, 1.0f).getPathIterator(null,0.001);
 						double[] coords = new double[2]; double x = 0.0, y = 0.0, lastx=0.0, lasty = 0.0;
-						kantenlaenge.put(actual.index,0.0d);
+						kantenlaenge.put(actual.getIndex(),0.0d);
 						while( !path.isDone() ) 
 					    {
 					    	int type = path.currentSegment(coords);
 					    	x = coords[0]; y = coords[1];
 					    	if (type==PathIterator.SEG_LINETO)
-					    			kantenlaenge.put(actual.index, kantenlaenge.get(actual.index) + (new Point.Double(x,y)).distance(lastx,lasty));
+					    			kantenlaenge.put(actual.getIndex(), kantenlaenge.get(actual.getIndex()) + (new Point.Double(x,y)).distance(lastx,lasty));
 					    	lastx = x; lasty = y;
 					    	path.next();
 					    }
@@ -177,12 +177,12 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		while (nodeiter.hasNext())
 		{
 			VNode actual = nodeiter.next();
-			if (valenz.get(actual.index)==null) //Oben nie dran gewesen ==> 0 setzen
-				valenz.put(actual.index,0);
-			if (invalenz.get(actual.index)==null) //Oben nie dran gewesen ==> 0 setzen
-				invalenz.put(actual.index,0);
-			if (outvalenz.get(actual.index)==null) //Oben nie dran gewesen ==> 0 setzen
-				outvalenz.put(actual.index,0);
+			if (valenz.get(actual.getIndex())==null) //Oben nie dran gewesen ==> 0 setzen
+				valenz.put(actual.getIndex(),0);
+			if (invalenz.get(actual.getIndex())==null) //Oben nie dran gewesen ==> 0 setzen
+				invalenz.put(actual.getIndex(),0);
+			if (outvalenz.get(actual.getIndex())==null) //Oben nie dran gewesen ==> 0 setzen
+				outvalenz.put(actual.getIndex(),0);
 			
 			//Mit allen folgenden vergleichen
 			Iterator<VNode> rest = vg.getNodeIterator();

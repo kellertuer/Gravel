@@ -88,7 +88,7 @@ public class VSegmentedEdge extends VEdge
 	public VEdge clone()
 	{
 		Vector<Point> p = (Vector<Point>) points.clone();
-		VEdge cloneedge =  new VSegmentedEdge(index,width,p);
+		VEdge cloneedge =  new VSegmentedEdge(getIndex(),width,p);
 		return copyCommonProperties(cloneedge);
 	}
 	public boolean PathEquals(VEdge v)

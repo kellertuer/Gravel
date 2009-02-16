@@ -140,15 +140,15 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		else
 		{
 			chEdge = e;
-			oldindex = e.index;
-			Vector<Integer> werte = graphref.getEdgeProperties(e.index);
+			oldindex = e.getIndex();
+			Vector<Integer> werte = graphref.getEdgeProperties(e.getIndex());
 			oldstart = werte.elementAt(MGraph.EDGESTARTINDEX);
 			oldend = werte.elementAt(MGraph.EDGEENDINDEX);
 			oldvalue = werte.elementAt(MGraph.EDGEVALUE);
 			oldwidth = e.getWidth();
 			oldText = e.getTextProperties().clone();
 			oldLinestyle = e.getLinestyle().clone(); 
-			this.setTitle("Eigenschaften der Kante '"+graphref.getEdgeName(e.index)+"' (#"+e.index+") von '"+graphref.getNodeName(oldstart)+"'->'"+graphref.getNodeName(oldend)+"'");	
+			this.setTitle("Eigenschaften der Kante '"+graphref.getEdgeName(e.getIndex())+"' (#"+e.getIndex()+") von '"+graphref.getNodeName(oldstart)+"'->'"+graphref.getNodeName(oldend)+"'");	
 		}
 		
 		tabs = new JTabbedPane();
@@ -413,7 +413,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			{
 				SubSetChecks[temp] = new JCheckBox(graphref.getSubSetName(i));
 				if (chEdge!=null)
-					SubSetChecks[temp].setSelected(graphref.SubSetcontainsEdge(chEdge.index,i));
+					SubSetChecks[temp].setSelected(graphref.SubSetcontainsEdge(chEdge.getIndex(),i));
 				CiSubSets.add(SubSetChecks[temp],c);
 				SubSetChecks[temp].addItemListener(this);
 				c.gridy++;

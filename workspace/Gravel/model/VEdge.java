@@ -23,9 +23,9 @@ public abstract class VEdge extends VItem {
 	public static class EdgeIndexComparator implements Comparator<VEdge>
 	{
 		public int compare(VEdge a, VEdge b) {
-			if (a.index < b.index)
+			if (a.getIndex() < b.getIndex())
 				return -1;
-			if (a.index==b.index)
+			if (a.getIndex()==b.getIndex())
 				return 0;
 			else
 				return 1;
@@ -40,7 +40,6 @@ public abstract class VEdge extends VItem {
 	public static final int ORTHOGONAL = 4;
 	public static final int LOOP = 5;
 	
-	public int index;  //kind of Edgekey, same as in the mgraph, unique and not changeable
 	protected int width;
 	private Color colour; //Farbe des Knotens
 	private int setCount; //Anzahl Mengen in denen der Knoten beteiligt ist, f�r Color 
@@ -62,7 +61,7 @@ public abstract class VEdge extends VItem {
 	 */
 	public VEdge(int i,int w)
 	{
-		index = i;
+		super(i);
 		width=w;
 		setCount = 0;
 		colour = Color.black;
@@ -81,7 +80,7 @@ public abstract class VEdge extends VItem {
 	 */
 	public VEdge(int i,int w, float size, float part, float alpha, float pos)
 	{
-		index = i;
+		super(i);
 		width=w;
 		setCount = 0;
 		colour = Color.black;
@@ -579,6 +578,5 @@ public abstract class VEdge extends VItem {
 	 * Set the Controllpoints to the given Values. Does nothing, if not implemented
 	 * @param points
 	 */
-	public void setControlPoints(Vector<Point> points){};
-	
+	public void setControlPoints(Vector<Point> points){}
 }

@@ -99,13 +99,13 @@ public class SVGWriter
 		    {
 		    	VNode actual = nodeiter.next();
 				s.write(NL+"\t\t<circle cx=\""+actual.getPosition().x+"\" cy=\""+actual.getPosition().y+"\" r=\""+(actual.getSize()/2)+"px\" ");
-				s.write("style=\"fill:"+getNodeColorString(actual.index)+"\"/>"+NL);
+				s.write("style=\"fill:"+getNodeColorString(actual.getIndex())+"\"/>"+NL);
 		    	if (actual.isNameVisible()) //draw name
 				{	
 					//mittelpunkt des Textes
 					int x = actual.getPosition().x + Math.round((float)actual.getNameDistance()*(float)Math.cos(Math.toRadians((double)actual.getNameRotation())));
 					int y = actual.getPosition().y - Math.round((float)actual.getNameDistance()*(float)Math.sin(Math.toRadians((double)actual.getNameRotation())));
-					s.write("\t\t\t<text x=\""+x+"\" y=\""+y+"\" style=\"font-size:"+actual.getNameSize()+"px; baseline-shift:-"+(actual.getNameSize()/2)+";\">"+formname(vg.getNodeName(actual.index))+"</text>");
+					s.write("\t\t\t<text x=\""+x+"\" y=\""+y+"\" style=\"font-size:"+actual.getNameSize()+"px; baseline-shift:-"+(actual.getNameSize()/2)+";\">"+formname(vg.getNodeName(actual.getIndex()))+"</text>");
 				}
 			}
 		}
@@ -167,7 +167,7 @@ public class SVGWriter
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();
-	    	   Vector<Integer> values = vg.getEdgeProperties(actual.index);
+	    	   Vector<Integer> values = vg.getEdgeProperties(actual.getIndex());
 	    	   int start = values.elementAt(MGraph.EDGESTARTINDEX);
 	    	   int ende = values.elementAt(MGraph.EDGEENDINDEX);
 	    	   Point b = vg.getNode(start).getPosition();
@@ -205,7 +205,7 @@ public class SVGWriter
 	    	   {
 	    		   VLoopEdge l = (VLoopEdge)actual;
 	    		   Point m = l.getControlPoints().firstElement();
-	    		   Point n = vg.getNode(vg.getEdgeProperties(actual.index).elementAt(MGraph.EDGEENDINDEX)).getPosition();
+	    		   Point n = vg.getNode(vg.getEdgeProperties(actual.getIndex()).elementAt(MGraph.EDGEENDINDEX)).getPosition();
 	    		   //Mitte zwischen Kontrollpunkt und Start/Endknoten der hier der selbe ist
 	    		   m.x = (n.x+m.x)/2;
 	    		   m.y = (n.y+m.y)/2;
@@ -222,7 +222,7 @@ public class SVGWriter
 		      if (style.getType()==VEdgeLinestyle.DOTDASHED)
 		    		s.write(" stroke-dasharray:"+style.getLength()+","+style.getDistance()+",0,"+style.getDistance()+";");  
 		      
-			  s.write(" stroke-linecap:round; stroke-linejoin:round; stroke:"+getEdgeColorString(actual.index)+"; stroke-width:"+actual.getWidth()+"px; fill:none;\"/>"+NL);
+			  s.write(" stroke-linecap:round; stroke-linejoin:round; stroke:"+getEdgeColorString(actual.getIndex())+"; stroke-width:"+actual.getWidth()+"px; fill:none;\"/>"+NL);
 		      
 			  if (actual.getTextProperties().isVisible()) //draw name
 				{	
@@ -263,7 +263,7 @@ public class SVGWriter
 				    if (t.isshowvalue())
 						text = values.get(MGraph.EDGEVALUE).toString();
 				    else
-				    	text = vg.getEdgeName(actual.index);
+				    	text = vg.getEdgeName(actual.getIndex());
 					s.write(NL+"\t<text x=\""+(m.x)+"\" y=\""+(m.y)+"\" style=\"font-size:"+actual.getTextProperties().getSize()+"pt; baseline-shift:-"+(actual.getTextProperties().getSize()/2)+";\">"+formname(text)+"</text>"+NL);
 				}
 			  s.write(drawArrow(actual,start,ende));
@@ -302,7 +302,7 @@ public class SVGWriter
 			    	}
 			    	path.next();
 			    }
-			  s +="z\" style=\"fill:"+getEdgeColorString(edge.index)+"\"/>";
+			  s +="z\" style=\"fill:"+getEdgeColorString(edge.getIndex())+"\"/>";
 			}
 			return s;
 		}

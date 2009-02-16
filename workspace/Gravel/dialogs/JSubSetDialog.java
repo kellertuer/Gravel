@@ -121,14 +121,14 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 			while (nodeiter.hasNext())
 			{
 				VNode n = nodeiter.next();
-				oldnodes.set(n.index,graphref.SubSetcontainsNode(n.index, s.getIndex()));
+				oldnodes.set(n.getIndex(),graphref.SubSetcontainsNode(n.getIndex(), s.getIndex()));
 			}
 			//Kanten finden
 			Iterator <VEdge> edgeiter = graphref.getEdgeIterator();
 			while (edgeiter.hasNext())
 			{
 				VEdge e = edgeiter.next();
-				oldedges.set(e.index,graphref.SubSetcontainsEdge(e.index, s.getIndex()));
+				oldedges.set(e.getIndex(),graphref.SubSetcontainsEdge(e.getIndex(), s.getIndex()));
 			}
 			this.setTitle("Eigenschaften des Untergraphen '"+graphref.getSubSetName(s.getIndex())+"'");	
 		}

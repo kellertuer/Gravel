@@ -91,8 +91,8 @@ public class StandardDragMouseHandler extends DragMouseHandler
 		while (edgeiter.hasNext())
 		{
 			VEdge e = edgeiter.next();
-			int start = vg.getEdgeProperties(e.index).elementAt(MGraph.EDGESTARTINDEX);
-			int ende = vg.getEdgeProperties(e.index).elementAt(MGraph.EDGEENDINDEX);
+			int start = vg.getEdgeProperties(e.getIndex()).elementAt(MGraph.EDGESTARTINDEX);
+			int ende = vg.getEdgeProperties(e.getIndex()).elementAt(MGraph.EDGEENDINDEX);
 			if ((start==nodeindex)||(ende==nodeindex))
 					e.translate(x, y);
 		}
@@ -134,7 +134,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 					}
 					temp.setPosition(newpoint); //Translate selected node
 					//move Adjacent Edges
-					translateAdjacentEdges(temp.index, Gtransx,Gtransy);
+					translateAdjacentEdges(temp.getIndex(), Gtransx,Gtransy);
 				}
 			}
 			if (firstdrag) //First Drag: Start a Block for the Movement else just update
@@ -156,12 +156,12 @@ public class StandardDragMouseHandler extends DragMouseHandler
 				vg.translate(0,Math.abs(newpos.y));
 				GPos.y = 0;
 			}
-			translateAdjacentEdges(movingNode.index,Gtransx,Gtransy);	
+			translateAdjacentEdges(movingNode.getIndex(),Gtransx,Gtransy);	
 			movingNode.setPosition(GPos);
 			if (firstdrag) //Start Block for Node Movement else just update graphic
-				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.index,GraphMessage.TRANSLATION|GraphMessage.BLOCK_START,GraphMessage.NODE|GraphMessage.EDGE));
+				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.getIndex(),GraphMessage.TRANSLATION|GraphMessage.BLOCK_START,GraphMessage.NODE|GraphMessage.EDGE));
 			else
-				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.index,GraphMessage.TRANSLATION,GraphMessage.NODE|GraphMessage.EDGE)); //Kanten aktualisiert
+				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.getIndex(),GraphMessage.TRANSLATION,GraphMessage.NODE|GraphMessage.EDGE)); //Kanten aktualisiert
 		}
 		else if (movingControlPointEdge!=null)
 		{
@@ -182,9 +182,9 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			points.set(movingControlPointIndex, GPos);
 			movingControlPointEdge.setControlPoints(points);
 			if (firstdrag) //On First Drag Movement start a Block for CP-Movement else just update it
-				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,movingControlPointEdge.index,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE)); //Kanten aktualisiert
+				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,movingControlPointEdge.getIndex(),GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE)); //Kanten aktualisiert
 			else
-				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,movingControlPointEdge.index,GraphMessage.UPDATE,GraphMessage.EDGE)); //Kanten aktualisiert
+				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,movingControlPointEdge.getIndex(),GraphMessage.UPDATE,GraphMessage.EDGE)); //Kanten aktualisiert
 		}
 		MouseOffSet = e.getPoint();
 		if (firstdrag)
@@ -231,7 +231,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			VEdge selE = vg.getEdgeinRange(p, 2.0);
 			if ((selE!=null)&&((selE.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED))
 			{ //Selected Edge, we move the selection so set the node to one of the edge adjacent nodes
-				movingNode = vg.getNode(vg.getEdgeProperties(selE.index).get(MGraph.EDGESTARTINDEX)); 
+				movingNode = vg.getNode(vg.getEdgeProperties(selE.getIndex()).get(MGraph.EDGESTARTINDEX)); 
 			}
 		}
 	}
@@ -265,9 +265,9 @@ public class StandardDragMouseHandler extends DragMouseHandler
 				movingNode.setPosition(newpos);	
 			}
 			if (movingNode!=null) //End Nove Movement-Block
-				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.index,GraphMessage.UPDATE|GraphMessage.BLOCK_END,GraphMessage.NODE|GraphMessage.EDGE));
+				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.getIndex(),GraphMessage.UPDATE|GraphMessage.BLOCK_END,GraphMessage.NODE|GraphMessage.EDGE));
 			else if (movingControlPointEdge!=null) //End Edge-CP Movement-Block
-				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,movingControlPointEdge.index,GraphMessage.UPDATE|GraphMessage.BLOCK_END,GraphMessage.EDGE)); //Kanten aktualisiert
+				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,movingControlPointEdge.getIndex(),GraphMessage.UPDATE|GraphMessage.BLOCK_END,GraphMessage.EDGE)); //Kanten aktualisiert
 			movingNode=null;
 			movingControlPointEdge=null;
 			movingControlPointIndex = -1;

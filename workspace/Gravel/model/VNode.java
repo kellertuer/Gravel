@@ -16,19 +16,18 @@ public class VNode extends VItem {
 		{
 			public int compare(VNode a, VNode b)
 			{
-				if (a.index < b.index)
+				if (a.getIndex() < b.getIndex())
 					return -1;
-				if (a.index == b.index)
+				if (a.getIndex() == b.getIndex())
 					return 0;
 				else // >
 					return 1;
 			}
 			public boolean equals(VNode a, VNode b)
 			{
-				return a.index==b.index;
+				return a.getIndex()==b.getIndex();
 			}
 		}
-		public int index;  //kind of Nodekey
 		private Point Pos; //Position in the middle
 		private int size; //Radius des Knotens
 		
@@ -38,17 +37,16 @@ public class VNode extends VItem {
 		protected Color colour; //Farbe des Knotens
 		protected int setCount; //Anzahl Mengen in denen der Knoten beteiligt ist, f�r Color 
 		/**
-		 * 
+		 * Internal constructor for the std-values
 		 * @param i
 		 * @param x
 		 * @param y
 		 * @param s
 		 * 
-		 * @deprecated please user the Constructor with name_visibility_values
 		 */
-		public VNode(int i,int x,int y,int s)
+		private VNode(int i,int x,int y,int s)
 		{
-			index = i;
+			super(i);
 			Pos = new Point(x,y);
 			size = s;
 			setCount = 0;
@@ -80,7 +78,7 @@ public class VNode extends VItem {
 		 */
 		public VNode clone()
 		{
-			VNode nodeclone = new VNode(index,getPosition().x,getPosition().y,getSize(),getNameDistance(),getNameRotation(), getNameSize(),isNameVisible());
+			VNode nodeclone = new VNode(getIndex(),getPosition().x,getPosition().y,getSize(),getNameDistance(),getNameRotation(), getNameSize(),isNameVisible());
 			nodeclone.setSelectedStatus(getSelectedStatus());
 			return nodeclone;
 		}
@@ -190,7 +188,7 @@ public class VNode extends VItem {
 		}
 		public String toString()
 		{
-			return "(#"+index+") - Pos:"+Pos;
+			return "(#"+getIndex()+") - Pos:"+Pos;
 		}
 		/**
 		 * Get the Distance from the node position to the middle of the text that should be displayd

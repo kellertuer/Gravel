@@ -162,10 +162,10 @@ public class GravelMLWriter {
 	    while (nodeiter.hasNext())
 	    {
 	    	VNode actual = nodeiter.next();
-	    	s.write(nl+"\t\t<node id=\"node"+actual.index+"\">"+nl);
+	    	s.write(nl+"\t\t<node id=\"node"+actual.getIndex()+"\">"+nl);
 	    	//if the name is not a standard name
-	    	if (!vg.getNodeName(actual.index).equals(gp.getStringValue("node.name")+actual.index))
-	    		s.write("\t\t\t<data key=\"nn\">"+vg.getNodeName(actual.index)+"</data>"+nl);
+	    	if (!vg.getNodeName(actual.getIndex()).equals(gp.getStringValue("node.name")+actual.getIndex()))
+	    		s.write("\t\t\t<data key=\"nn\">"+vg.getNodeName(actual.getIndex())+"</data>"+nl);
 	    	//Position
 	    	s.write("\t\t\t<data key=\"nx\">"+actual.getPosition().x+"</data>"+nl);
 	    	s.write("\t\t\t<data key=\"ny\">"+actual.getPosition().y+"</data>"+nl);
@@ -196,16 +196,16 @@ public class GravelMLWriter {
 	       while (edgeiter.hasNext())
 	       {
 	    	   VEdge actual = edgeiter.next();
-	    	   Vector<Integer> values = vg.getEdgeProperties(actual.index);
+	    	   Vector<Integer> values = vg.getEdgeProperties(actual.getIndex());
 	    	   int start = values.elementAt(MGraph.EDGESTARTINDEX);
 	    	   int ende = values.elementAt(MGraph.EDGEENDINDEX);
 	    	   int value = values.elementAt(MGraph.EDGEVALUE);
-	    	   s.write(nl+"\t\t<edge id=\"edge"+actual.index+"\" source=\"node"+start+"\" target=\"node"+ende+"\">"+nl);
+	    	   s.write(nl+"\t\t<edge id=\"edge"+actual.getIndex()+"\" source=\"node"+start+"\" target=\"node"+ende+"\">"+nl);
 	    	   if (value!=gp.getIntValue("edge.value")) 	    	   //if the value is not std
 	    		   s.write("\t\t\t<data key=\"ev\">"+value+"</data>"+nl);
 	    	   if (actual.getWidth()!=gp.getIntValue("edge.width")) //if width is not std
 	    		   s.write("\t\t\t<data key=\"ew\">"+actual.getWidth()+"</data>"+nl);
-	    	   s.write("\t\t\t<data key=\"en\">"+vg.getEdgeName(actual.index)+"</data>"+nl);
+	    	   s.write("\t\t\t<data key=\"en\">"+vg.getEdgeName(actual.getIndex())+"</data>"+nl);
 	    	   if (actual.getArrowSize()!=((float)gp.getIntValue("edge.arrsize"))) //if arrpart is not std
 	    		   s.write("\t\t\t<data key=\"es\">"+actual.getArrowSize()+"</data>"+nl);
 	    	   if (actual.getArrowPart()!=((float)gp.getIntValue("edge.arrpart")/100)) //if arrpart is not std
@@ -308,16 +308,16 @@ public class GravelMLWriter {
     		   while (nodeiter.hasNext())
     		   {
     			   VNode n = nodeiter.next();
-    			   if (vg.SubSetcontainsNode(n.index,actual.getIndex()))
-    				   s.write("\t\t\t<snode node=\"node"+n.index+"\" />"+nl);
+    			   if (vg.SubSetcontainsNode(n.getIndex(),actual.getIndex()))
+    				   s.write("\t\t\t<snode node=\"node"+n.getIndex()+"\" />"+nl);
     		   }
 
     		   Iterator<VEdge> edgeiter = vg.getEdgeIterator();
     		   while (edgeiter.hasNext())
     		   {
     			   VEdge e = edgeiter.next();
-    			   if (vg.SubSetcontainsEdge(e.index,actual.getIndex()))
-    				   s.write("\t\t\t<sedge edge=\"edge"+e.index+"\" />"+nl);
+    			   if (vg.SubSetcontainsEdge(e.getIndex(),actual.getIndex()))
+    				   s.write("\t\t\t<sedge edge=\"edge"+e.getIndex()+"\" />"+nl);
     		   }
     		   s.write("\t\t</subset>");
  		}
@@ -441,16 +441,16 @@ public class GravelMLWriter {
     		   while (nodeiter.hasNext())
     		   {
     			   VNode n = nodeiter.next();
-    			   if (vg.SubSetcontainsNode(n.index,actual.getIndex()))
-    				   s.write("\t\t\t<snode node=\"node"+n.index+"\" />"+nl);
+    			   if (vg.SubSetcontainsNode(n.getIndex(),actual.getIndex()))
+    				   s.write("\t\t\t<snode node=\"node"+n.getIndex()+"\" />"+nl);
     		   }
 
     		   Iterator<VEdge> edgeiter = vg.getEdgeIterator();
     		   while (edgeiter.hasNext())
     		   {
     			   VEdge e = edgeiter.next();
-    			   if (vg.SubSetcontainsEdge(e.index,actual.getIndex()))
-    				   s.write("\t\t\t<sedge edge=\"edge"+e.index+"\" />"+nl);
+    			   if (vg.SubSetcontainsEdge(e.getIndex(),actual.getIndex()))
+    				   s.write("\t\t\t<sedge edge=\"edge"+e.getIndex()+"\" />"+nl);
     		   }
     		   s.write("\t\t</subset>"+nl);
  		}

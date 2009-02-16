@@ -134,7 +134,7 @@ public class VGraphic extends Component implements 	Observer
 		while (ei.hasNext()) // drawEdges
 		{
 			VEdge temp = ei.next(); //Grafischer Teil
-			Vector<Integer> val = vG.getEdgeProperties(temp.index); //Daten dazu
+			Vector<Integer> val = vG.getEdgeProperties(temp.getIndex()); //Daten dazu
 			Point p1 = vG.getNode(val.get(MGraph.EDGESTARTINDEX)).getPosition(); //Startkoordinaten
 			VNode EndNode = vG.getNode(val.get(MGraph.EDGEENDINDEX)); //Endknoten
 			VNode StartNode = vG.getNode(val.get(MGraph.EDGESTARTINDEX)); //Endknoten
@@ -191,7 +191,7 @@ public class VGraphic extends Component implements 	Observer
 			    if (temp.getTextProperties().isshowvalue())
 					text = val.get(MGraph.EDGEVALUE).toString();
 			    else
-			    	text = vG.getEdgeName(temp.index);
+			    	text = vG.getEdgeName(temp.getIndex());
 			    //Show it
 				Font f = new Font("Arial",Font.PLAIN, Math.round(temp.getTextProperties().getSize()*zoomfactor));
 				g2.setFont(f);
@@ -244,11 +244,11 @@ public class VGraphic extends Component implements 	Observer
 				//					+" and ("+temp.getPosition().y+"+"+Math.round((float)temp.getNameDistance()*(float)Math.sin(Math.toRadians((double)temp.getNameRotation())))+") = "+y);
 			    FontMetrics metrics = g2.getFontMetrics(f);
 			    int hgt = metrics.getAscent()-metrics.getLeading()-metrics.getDescent();
-			    int adv = metrics.stringWidth(vG.getNodeName(temp.index));
+			    int adv = metrics.stringWidth(vG.getNodeName(temp.getIndex()));
 			    x = Math.round(x*zoomfactor);
 			    y = Math.round(y*zoomfactor);
 			    x -= Math.round(adv/2); y += Math.round(hgt/2);
-				g2.drawString(vG.getNodeName(temp.index), x,y);
+				g2.drawString(vG.getNodeName(temp.getIndex()), x,y);
 				
 			}
 		}

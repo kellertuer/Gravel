@@ -230,8 +230,8 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 			VNode r = vg.getNodeinRange(p);
 			VEdge s = vg.getEdgeinRange(p,2.0);
 			if (r != null) {
-				updateNodeSetList(r.index);
-				Nname.setText(vg.getNodeName(r.index) + " - (#" + r.index + ")");
+				updateNodeSetList(r.getIndex());
+				Nname.setText(vg.getNodeName(r.getIndex()) + " - (#" + r.getIndex() + ")");
 				NaddEdgesTo.setEnabled(vg.selectedNodeExists());
 				NaddEdgesFrom.setEnabled(vg.selectedNodeExists());
 				NDelSelection.setEnabled(vg.selectedEdgeExists()||vg.selectedNodeExists());
@@ -241,8 +241,8 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 			else if (s!=null) //Kante rechts angeklickt
 			{
 				selectedEdge = s;
-				updateEdgeSetList(s.index);
-				Ename.setText("Value : "+vg.getEdgeProperties(s.index).elementAt(MGraph.EDGEVALUE)+" - Index : "+s.index+"");
+				updateEdgeSetList(s.getIndex());
+				Ename.setText("Value : "+vg.getEdgeProperties(s.getIndex()).elementAt(MGraph.EDGEVALUE)+" - Index : "+s.getIndex()+"");
 				EDelSelection.setEnabled(vg.selectedEdgeExists()||vg.selectedNodeExists());
 				EdgePopup.show(e.getComponent(), e.getX(),e.getY());	
 			}
@@ -346,21 +346,21 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 			//In diesem Fall wars ein Knotenmen� (selectedNode != null)
 			if (selectedNode!=null)
 			{
-				if (vg.SubSetcontainsNode(selectedNode.index,vSubSetNMenus.indexOf(t))) // gew�hlt und enth�lt den Knoten => entfernen
+				if (vg.SubSetcontainsNode(selectedNode.getIndex(),vSubSetNMenus.indexOf(t))) // gew�hlt und enth�lt den Knoten => entfernen
 				{
-					vg.removeNodefromSubSet(selectedNode.index,vSubSetNMenus.indexOf(t));
+					vg.removeNodefromSubSet(selectedNode.getIndex(),vSubSetNMenus.indexOf(t));
 				} else {
-					vg.addNodetoSubSet(selectedNode.index,vSubSetNMenus.indexOf(t));
+					vg.addNodetoSubSet(selectedNode.getIndex(),vSubSetNMenus.indexOf(t));
 				}
 			}
 			//In diesem Fall wars eine Kante
 			if (selectedEdge!=null)
 			{
-				if (vg.SubSetcontainsEdge(selectedEdge.index,vSubSetNMenus.indexOf(t))) // gew�hlt und enth�lt den Knoten => entfernen
+				if (vg.SubSetcontainsEdge(selectedEdge.getIndex(),vSubSetNMenus.indexOf(t))) // gew�hlt und enth�lt den Knoten => entfernen
 				{
-					vg.removeEdgefromSubSet(selectedEdge.index,vSubSetNMenus.indexOf(t));
+					vg.removeEdgefromSubSet(selectedEdge.getIndex(),vSubSetNMenus.indexOf(t));
 				} else {
-					vg.addEdgetoSubSet(selectedEdge.index,vSubSetNMenus.indexOf(t));
+					vg.addEdgetoSubSet(selectedEdge.getIndex(),vSubSetNMenus.indexOf(t));
 				}
 			}
 		} 
@@ -378,12 +378,12 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		} 
 		//KnotenMen� : Knoten entfernen
 		if (e.getSource() == Ndelete) {
-			vg.removeNode(selectedNode.index);
+			vg.removeNode(selectedNode.getIndex());
 		}
 		//KantenMen� : L�schen
 		if (e.getSource()==Edelete)
 		{
-			vg.removeEdge(selectedEdge.index);
+			vg.removeEdge(selectedEdge.getIndex());
 		}
 		//KantenMen� : Eigenschaften
 		if (e.getSource()==Eproperties)

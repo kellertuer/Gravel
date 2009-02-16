@@ -110,13 +110,13 @@ public class LayeredTreeDraw implements VAlgorithmIF
 		while (copynodes.hasNext())
 		{
 			VNode shift = copynodes.next();
-			leftsubtree.addNode(shift,rightsubtree.getNodeName(shift.index));
+			leftsubtree.addNode(shift,rightsubtree.getNodeName(shift.getIndex()));
 		}	
 		Iterator<VEdge> copyedges = rightsubtree.getEdgeIterator();
 		while (copyedges.hasNext())
 		{
 			VEdge shift = copyedges.next();
-			Vector<Integer> vals = rightsubtree.getEdgeProperties(shift.index);
+			Vector<Integer> vals = rightsubtree.getEdgeProperties(shift.getIndex());
 			leftsubtree.addEdge(shift,vals.elementAt(MGraph.EDGESTARTINDEX),vals.elementAt(MGraph.EDGEENDINDEX),vals.elementAt(MGraph.EDGEVALUE));
 		}
 		//Nun sind beide im left, also auf höhe 1 noch den neuen in der mitte zwischen left und right

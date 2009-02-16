@@ -144,11 +144,11 @@ public class MyTikZPictureWriter implements TeXWriter {
 	    while (nodeiter.hasNext())
 	    {
 	    	VNode actual = nodeiter.next();
-			s.write(NL+"\t\t\\node[circle,fill="+getNodeColorString(actual.index)+"]"+
-					"(ID"+actual.index+") at ("+actual.getPosition().x+","+(max.y - actual.getPosition().y)+")");
+			s.write(NL+"\t\t\\node[circle,fill="+getNodeColorString(actual.getIndex())+"]"+
+					"(ID"+actual.getIndex()+") at ("+actual.getPosition().x+","+(max.y - actual.getPosition().y)+")");
 	    	if (actual.isNameVisible()) //draw name
 			{	
-				s.write("{$"+formname(vg.getNodeName(actual.index))+"$};");
+				s.write("{$"+formname(vg.getNodeName(actual.getIndex()))+"$};");
 				//TODO Text
 				//{\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(vg.getNodeName(actual.index))+"}}");
 			}
@@ -197,7 +197,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();
-	    	   Vector<Integer> values = vg.getEdgeProperties(actual.index);
+	    	   Vector<Integer> values = vg.getEdgeProperties(actual.getIndex());
 	    	   int start = values.elementAt(MGraph.EDGESTARTINDEX);
 	    	   int ende = values.elementAt(MGraph.EDGEENDINDEX);
     		   s.write(NL+"\t\t\\draw[line with="+actual.getWidth());

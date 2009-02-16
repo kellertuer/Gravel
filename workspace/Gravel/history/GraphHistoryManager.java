@@ -119,7 +119,7 @@ public class GraphHistoryManager implements Observer
 		while (ni.hasNext())
 		{
 			VNode n = ni.next();
-			VNode n2 = lastGraph.getNode(n.index);
+			VNode n2 = lastGraph.getNode(n.getIndex());
 			if (n2!=null)
 				n2.setSelectedStatus(n.getSelectedStatus());
 		}
@@ -127,7 +127,7 @@ public class GraphHistoryManager implements Observer
 		while (ei.hasNext())
 		{
 			VEdge e = ei.next();
-			VEdge e2 = lastGraph.getEdge(e.index);
+			VEdge e2 = lastGraph.getEdge(e.getIndex());
 			if (e2!=null)
 				e2.setSelectedStatus(e.getSelectedStatus());
 		}
