@@ -244,11 +244,11 @@ public class VGraphic extends Component implements 	Observer
 				//					+" and ("+temp.getPosition().y+"+"+Math.round((float)temp.getNameDistance()*(float)Math.sin(Math.toRadians((double)temp.getNameRotation())))+") = "+y);
 			    FontMetrics metrics = g2.getFontMetrics(f);
 			    int hgt = metrics.getAscent()-metrics.getLeading()-metrics.getDescent();
-			    int adv = metrics.stringWidth(vG.getMathGraph().getNodeName(temp.getIndex()));
+			    int adv = metrics.stringWidth(vG.getMathGraph().getNode(temp.getIndex()).name);
 			    x = Math.round(x*zoomfactor);
 			    y = Math.round(y*zoomfactor);
 			    x -= Math.round(adv/2); y += Math.round(hgt/2);
-				g2.drawString(vG.getMathGraph().getNodeName(temp.getIndex()), x,y);
+				g2.drawString(vG.getMathGraph().getNode(temp.getIndex()).name, x,y);
 				
 			}
 		}

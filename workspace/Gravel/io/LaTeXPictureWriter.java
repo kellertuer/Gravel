@@ -117,7 +117,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 				//Invert y
 				int y = drawpoint.y + Math.round((float)actual.getNameDistance()*(float)Math.sin(Math.toRadians((double)actual.getNameRotation())));
 				double tsize = Math.round((double)actual.getNameSize()*sizeppt*((double)1000))/1000;
-				s.write(NL+"\t\t\\put("+x+","+y+"){\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(vg.getMathGraph().getNodeName(actual.getIndex()))+"}}");
+				s.write(NL+"\t\t\\put("+x+","+y+"){\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(vg.getMathGraph().getNode(actual.getIndex()).name)+"}}");
 			}
 		}
 	}

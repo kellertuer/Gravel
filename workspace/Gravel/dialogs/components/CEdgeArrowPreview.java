@@ -14,12 +14,16 @@ import java.util.Vector;
 
 import view.VGraphic;
 
+import model.MEdge;
+import model.MNode;
+import model.MSubSet;
 import model.VEdge;
 import model.VEdgeLinestyle;
 import model.VEdgeText;
 import model.VGraph;
 import model.VNode;
 import model.VStraightLineEdge;
+import model.VSubSet;
 /**
  * This Class contains the Preview for an edge, that is edited. It is an Observer, 
  * so that it might react on Input Fields, for example the Input Fields of the Arrow Properties
@@ -48,13 +52,13 @@ public class CEdgeArrowPreview extends Container implements Observer{
 		c.anchor = GridBagConstraints.WEST;
 
 		VGraph ArrowTest = new VGraph(true,false,false); //directed without loops nor multiple
-		ArrowTest.addNode(new VNode(1,30,15,20,0,0,0,false),"T1");
-		ArrowTest.addNode(new VNode(2,170,15,20,0,0,0,false),"T2");
-		ArrowTest.addSubSet(1,"white", new Color(0.5f,0.5f,0.5f,1f));
+		ArrowTest.addNode(new VNode(1,30,15,20,0,0,0,false), new MNode(1,"T1"));
+		ArrowTest.addNode(new VNode(2,170,15,20,0,0,0,false), new MNode(2,"T2"));
+		ArrowTest.addSubSet(new VSubSet(1,new Color(0.5f,0.5f,0.5f,1f)), new MSubSet(1,"white"));
 		ArrowTest.addNodetoSubSet(1,1);
 		ArrowTest.addNodetoSubSet(2,1);
 		ArrowEdge = new VStraightLineEdge(1,2);
-		ArrowTest.addEdge(ArrowEdge,1,2,1,"");
+		ArrowTest.addEdge(ArrowEdge, new MEdge(ArrowEdge.getIndex(),1,2,1,""));
 		ArrowTest.setEdgeName(ArrowEdge.getIndex(),"e");
 		ArrowTest.getEdge(ArrowTest.getMathGraph().getEdgeIndices(1,2).firstElement()).setTextProperties(new VEdgeText());
 		ArrowTest.getEdge(ArrowTest.getMathGraph().getEdgeIndices(1,2).firstElement()).setLinestyle(new VEdgeLinestyle());

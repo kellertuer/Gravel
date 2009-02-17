@@ -148,7 +148,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			oldwidth = e.getWidth();
 			oldText = e.getTextProperties().clone();
 			oldLinestyle = e.getLinestyle().clone(); 
-			this.setTitle("Eigenschaften der Kante '"+graphref.getMathGraph().getEdgeName(e.getIndex())+"' (#"+e.getIndex()+") von '"+graphref.getMathGraph().getNodeName(oldstart)+"'->'"+graphref.getMathGraph().getNodeName(oldend)+"'");	
+			this.setTitle("Eigenschaften der Kante '"+graphref.getMathGraph().getEdgeName(e.getIndex())+"' (#"+e.getIndex()+") von '"+graphref.getMathGraph().getNode(oldstart).name+"'->'"+graphref.getMathGraph().getNode(oldend).name+"'");	
 		}
 		
 		tabs = new JTabbedPane();
@@ -368,7 +368,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 	 */
 	private void buildNodeList()
 	{
-		nodelist = graphref.getNodeNames();
+		nodelist = graphref.getMathGraph().getNodeNames();
 		int temp = 0;
 		for (int i=0; i<nodelist.size(); i++)
 		{
@@ -381,7 +381,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		{
 			if (nodelist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				nodenames[temp] = graphref.getMathGraph().getNodeName(i)+"   (#"+i+")";
+				nodenames[temp] = graphref.getMathGraph().getNode(i).name+"   (#"+i+")";
 				temp++; //Anzahl Knoten zaehlen
 			}
 		}
@@ -398,7 +398,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		subsetlist = graphref.getSetNames();
+		subsetlist = graphref.getMathGraph().getSetNames();
 		int temp = 0;
 		for (int i=0; i<subsetlist.size(); i++)
 		{
@@ -780,7 +780,8 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			graphref.removeEdge(oldindex);
 		}
 		//hinzufuegen
-		 graphref.addEdge(CheckType(), startindex, endindex, iValue.getValue(),EdgeName.getText());
+		VEdge addEdge = CheckType();
+		 graphref.addEdge(addEdge, new MEdge(addEdge.getIndex(),startindex, endindex, iValue.getValue(),EdgeName.getText()));
 		//Gruppen einbauen
 		int temp = 0;
 		for (int i=0; i<subsetlist.size(); i++)

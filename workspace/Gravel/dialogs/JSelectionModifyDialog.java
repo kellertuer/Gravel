@@ -462,7 +462,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 					preNodeTextSize = temp.getNameSize();
 					preNodeTextDis = temp.getNameDistance();
 					preNodeTextRot = temp.getNameRotation();
-					nodename = vg.getMathGraph().getNodeName(temp.getIndex());
+					nodename = vg.getMathGraph().getNode(temp.getIndex()).name;
 					//Replace the id numer by $ID (at least try to get a common name
 					nodename = GeneralPreferences.replace(nodename,""+temp.getIndex(), "$ID");
 				}
@@ -480,7 +480,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 						preNodeTextRot=-1;
 					if (nodename!=null)
 					{
-						if (!GeneralPreferences.replace(nodename,"$ID",""+temp.getIndex()).equals(vg.getMathGraph().getNodeName(temp.getIndex())))
+						if (!GeneralPreferences.replace(nodename,"$ID",""+temp.getIndex()).equals(vg.getMathGraph().getNode(temp.getIndex()).name))
 							nodename = null;
 					}	
 				}	
@@ -770,7 +770,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		bChSubSets = new JCheckBox("<html><p>Auswahl den Untergraphen zuprdnen:</p></html>");
 		bChSubSets.addActionListener(this);
 		SubSetContent.add(bChSubSets,c);
-		subsetnames = vg.getSetNames();
+		subsetnames = vg.getMathGraph().getSetNames();
 		int temp = 0;
 		for (int i=0; i<subsetnames.size(); i++)
 		{
@@ -801,8 +801,8 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	private void fillCommonSubSets()
 	{
 		boolean preSubSetsequal = true;
-		Vector<Boolean> subsets = new Vector<Boolean>(vg.getSetNames().size());
-		subsets.setSize(vg.getSetNames().size());
+		Vector<Boolean> subsets = new Vector<Boolean>(vg.getMathGraph().getSetNames().size());
+		subsets.setSize(vg.getMathGraph().getSetNames().size());
 		Iterator<VNode> nodeiter = vg.getNodeIterator();
 		boolean beginning = true;
 		while (nodeiter.hasNext())
@@ -1032,7 +1032,8 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				}
 				if (bChEdgeValue.isSelected())
 				{
-					vg.getMathGraph().setEdgeValue(actual.getIndex(), iEdgeValue.getValue());
+					MEdge e = vg.getMathGraph().getEdge(actual.getIndex());
+					e.Value = iEdgeValue.getValue();
 					changed=true;
 				}
 				if (bChEdgeWidth.isSelected())
@@ -1078,7 +1079,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			VNode actual = nodeiter.next();
 			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
-				Vector<String> names = vg.getSetNames();
+				Vector<String> names = vg.getMathGraph().getSetNames();
 				int position = 0;
 				for (int i=0; i<names.size(); i++)
 				{
@@ -1100,7 +1101,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			VEdge actual = edgeiter.next();
 			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
-				Vector<String> names = vg.getSetNames();
+				Vector<String> names = vg.getMathGraph().getSetNames();
 				int position = 0;
 				for (int i=0; i<names.size(); i++)
 				{

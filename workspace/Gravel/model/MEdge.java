@@ -16,18 +16,21 @@ public class MEdge	{
 	public int StartIndex;
 	public int EndIndex;
 	public int Value;
-	public String name; 
-	public MEdge(int i,int s, int e, int v)
+	public String name;
+	/**
+	 * Constructor of an Egde
+	 * @param i index of the Edge
+	 * @param s adjacent Startnodeindex
+	 * @param e adjacent Endnodeindex
+	 * @param v value of the edge
+	 * @param n name of the edge
+	 */
+	public MEdge(int i,int s, int e, int v,String n)
 	{
 		index = i;
 		StartIndex = s;
 		EndIndex = e;
 		Value = v;
-		name="";
-	}
-	public MEdge(int i,int s, int e, int v,String n)
-	{
-		this(i,s,e,v);
 		name = n;
 	}
 }

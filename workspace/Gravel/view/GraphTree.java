@@ -98,7 +98,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	 */
 	public void updateNodes()
 	{
-		Vector<String> nodenames = vG.getNodeNames();
+		Vector<String> nodenames = vG.getMathGraph().getNodeNames();
 		Knoten.removeAllChildren();
 		for (int i=0; i<nodenames.size(); i++)
 		{
@@ -119,7 +119,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	 */
 	public void updateEdges()
 	{
-		Vector<String> edges = vG.getEdgeNames();
+		Vector<String> edges = vG.mG.getEdgeNames();
 		Kanten.removeAllChildren();
 		for (int i=0; i<edges.size(); i++)
 		{
@@ -140,7 +140,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	 */
 	public void updateSets()
 	{
-		Vector<String> Sets = vG.getSetNames();
+		Vector<String> Sets = vG.getMathGraph().getSetNames();
 		Mengen.removeAllChildren();
 		for (int i=0; i<Sets.size(); i++)
 		{
@@ -192,7 +192,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		if (selectedNode.getParent().toString().equals("Knoten"))
 		{
 			ParentType = USENODES;
-			Text.setText(vG.getMathGraph().getNodeName(StringPos2Index(USENODES,selectedPosition)));
+			Text.setText(vG.getMathGraph().getNode(StringPos2Index(USENODES,selectedPosition)).name);
 		}
 		else if (selectedNode.getParent().toString().equals("Kanten"))
 		{
@@ -207,7 +207,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		{
 			//System.err.println("")
 			ParentType = USESETS;
-			Text.setText(vG.getSetNames().elementAt(StringPos2Index(USESETS,selectedPosition)));
+			Text.setText(vG.getMathGraph().getSetNames().elementAt(StringPos2Index(USESETS,selectedPosition)));
 		}
 		else if (true) //sonst kein menu anzeigen
 		{

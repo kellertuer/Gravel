@@ -65,14 +65,15 @@ public class MGraph extends Observable
 		while (n1.hasNext())
 		{
 			MSubSet actualSet = n1.next();
-			clone.addSubSet(actualSet.getIndex(),actualSet.getName()); //Jedes Set kopieren
+			clone.addSubSet(actualSet.clone()); //Jedes Set kopieren
 		}
 		//Knoten
 		Iterator<MNode> n2 = mNodes.iterator();
 		while (n2.hasNext())
 		{
 			MNode actualNode = n2.next();
-			clone.addNode(actualNode.index, actualNode.name);
+			MNode Nodeclone = new MNode(actualNode.index, actualNode.name);
+			clone.addNode(Nodeclone);
 			//In alle Sets einfuegen
 			n1 = mSubSets.iterator();
 			while (n1.hasNext())
@@ -87,7 +88,8 @@ public class MGraph extends Observable
 		while (n3.hasNext())
 		{
 			MEdge actualEdge = n3.next();
-			clone.addEdge(actualEdge.index, actualEdge.StartIndex, actualEdge.EndIndex, actualEdge.Value);
+			MEdge cEdge = new MEdge(actualEdge.index, actualEdge.StartIndex, actualEdge.EndIndex, actualEdge.Value, actualEdge.name);
+			clone.addEdge(cEdge);
 			//In alle Sets einfuegen
 			n1 = mSubSets.iterator();
 			while (n1.hasNext())
@@ -151,7 +153,8 @@ public class MGraph extends Observable
 							{
 								int e1 = ttot2.firstElement();
 								int e2 = t2tot.firstElement();
-								this.setEdgeValue(e2, getEdgeProperties(e2).get(EDGEVALUE)+getEdgeProperties(e1).get(EDGEVALUE));
+								MEdge m = getEdge(e2);
+								m.Value = getEdge(e2).Value+getEdge(e1).Value;
 								removeEdge(e1);
 								removed.set(e1);
 							}
@@ -250,18 +253,18 @@ public class MGraph extends Observable
 							if (existsEdge(t.index,t2.index)>1) //we have to delete
 							{
 								Vector<Integer> multipleedges = getEdgeIndices(t.index,t2.index);
-								int value = getEdgeProperties(multipleedges.firstElement()).get(EDGEVALUE);
+								int value = getEdge(multipleedges.firstElement()).Value;
 								//Add up the values and remove the edges from the second to the last
 								Iterator<Integer> iter = multipleedges.iterator();
 								iter.next();
 								while(iter.hasNext())
 								{
 									int nextindex = iter.next();
-									value += getEdgeProperties(nextindex).get(EDGEVALUE);
+									value += getEdge(nextindex).Value;
 									removeEdge(nextindex);
 									removed.set(nextindex);
 								}
-								this.setEdgeValue(multipleedges.firstElement(),value);
+								getEdge(multipleedges.firstElement()).Value = value;
 							}
 						}					
 					}
@@ -281,17 +284,18 @@ public class MGraph extends Observable
 	 */
 	/**
 	 * Adds a new node to the graph with
-	 * @param i the index
-	 * @param n the name
+	 * @param m as the new MNode
 	 */
-	public void addNode(int i, String n)
+	public void addNode(MNode m)
 	{
+		if (getNode(m.index)!=null)
+			return;
 		NodeLock.lock();
 		try 
 		{
-			mNodes.add(new MNode(i,n));
+			mNodes.add(m);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.ADDITION,GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphMessage.NODE,m.index,GraphMessage.ADDITION,GraphMessage.NODE));	
 		} 
 		finally {NodeLock.unlock();}
 	}
@@ -466,7 +470,7 @@ public class MGraph extends Observable
 	 * @param i node with index i
 	 * @return the node name as string
 	 */
-	public String getNodeName(int i)
+	public MNode getNode(int i)
 	{
 		NodeLock.lock();
 		try
@@ -476,10 +480,30 @@ public class MGraph extends Observable
 			{
 				MNode t = n.next();
 				if (t.index==i)
-					return t.name;
+					return t;
 			}
 		} finally {NodeLock.unlock();}
 		return null;
+	}
+	/**
+	 * get a list of the node names in a vector, where each node name is stored at it's index
+	 * every other component of the vector is null
+	 * 
+	 * TODO: Move to Mathematical Graph
+	 * @return a Vector of all node names, 
+	 */
+	public Vector<String> getNodeNames() {
+		Vector<String> ret = new Vector<String>();
+		Iterator<MNode> n = mNodes.iterator();
+		while (n.hasNext()) {
+			MNode actual = n.next();
+			if ((actual.index + 1) > ret.size()) {
+				ret.setSize(actual.index + 1);
+			}
+			if (actual.index!=0) //kein temp-knoten
+				ret.set(actual.index, getNode(actual.index).name);
+		}
+		return ret;
 	}
 	/**
 	 * Set the node name of a node. If the node does not exist, nothing happens
@@ -554,28 +578,27 @@ public class MGraph extends Observable
 	 * Add an edge with index i between s and e width value v
 	 * If an edge exists between s and e, a new edge is only added if multiple edges are allowed
 	 * If start and end are equal, the edge is only added if loops are allowed
+	 *  
+	 * If itis possible to add this edge, a copy of the parameter is added
 	 * 
-	 * @param i index of the new edge
-	 * @param s start node index
-	 * @param e end node index
-	 * @param v value of the edge
+	 * @param e the new edge
 	 * 
 	 * @return true if the edge is added, else false
 	 */
-	public boolean addEdge(int i,int s,int e,int v)
+	public boolean addEdge(MEdge e)
 	{
-		if ((s==e)&&(!allowloops)) //adding tries a loop but loops are not allowed
+		if ((e.StartIndex==e.EndIndex)&&(!allowloops)) //adding tries a loop but loops are not allowed
 			return false;
-		if ((existsEdge(s,e)>0)&&(!allowmultiple)) //adding tries a second edge between s and e and multiple edges are not allowed
+		if ((existsEdge(e.StartIndex, e.EndIndex)>0)&&(!allowmultiple)) //adding tries a second edge between s and e and multiple edges are not allowed
 			return false;
-		if (getEdgeProperties(i)!=null) //index already in use
+		if (getEdge(e.index)!=null) //index already in use
 			return false;
 		EdgeLock.lock();
 		try 
 		{
-			mEdges.add(new MEdge(i,s,e,v));
+			mEdges.add(new MEdge(e.index, e.StartIndex, e.EndIndex, e.Value, e.name));
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.ADDITION,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphMessage.EDGE,e.index,GraphMessage.ADDITION,GraphMessage.EDGE));	
 		} 
 		finally
 		{
@@ -584,15 +607,12 @@ public class MGraph extends Observable
 		return true;
 	}
 	/**
-	 * Add an edge between s and e with index i and Value 1
-	 * @param i index of the new edge
-	 * @param s start node
-	 * @param e end node
+	 * Replace the an edge in the graph
+	 * The index may not be changed, so the edge, that is replaced (if existent)
+	 * is identfied by the index of the parameter edge given
+	 * 
+	 * @param edge Replacement for the edge in the graph with same index
 	 */
-	public boolean addEdge(int i,int s,int e)
-	{		
-		return addEdge(i,s,e,1);
-	}
 	public void replaceEdge(MEdge edge)
 	{
 		EdgeLock.lock();
@@ -678,67 +698,31 @@ public class MGraph extends Observable
 		return index;
 	}
 	/**
-	 * Get the Values of an edge. There are atm 3 values  start and end node index and the value of the edge
-	 * for each value a static value for the vector position exists
-	 * @param i index of the edge
-	 * @return the values of the edge if it exists, else null
-	 */
-	public Vector<Integer> getEdgeProperties(int i)
-	{
-		MEdge toGet = null;
-		EdgeLock.lock();
-		try{
-				Iterator<MEdge> n = mEdges.iterator();
-			while (n.hasNext())
-			{
-				MEdge e = n.next();
-				if (e.index==i)
-				{
-					toGet = e;
-					break;
-				}
+	 * get a list of the edge names in a vector, where each edge name is stored at it's index
+	 * every other component of the vector is null
+	 * <br><br>
+	 * an edge name is the mathematical given edge name 
+	 * <br><br>
+	 * @return a Vector of all edge names, 
+	 */	
+	public Vector<String> getEdgeNames() {
+		Vector<String> ret = new Vector<String>();
+		Iterator<MEdge> n = mEdges.iterator();
+		while (n.hasNext()) {
+			MEdge actual = n.next();
+			if ((actual.index + 1) > ret.size()) {
+				ret.setSize(actual.index + 1);
 			}
-		} finally {EdgeLock.unlock();}
-		if (toGet!=null)
-		{
-			Vector<Integer> ergebnis = new Vector<Integer>();
-			ergebnis.setSize(3);
-			ergebnis.set(EDGESTARTINDEX, toGet.StartIndex);
-			ergebnis.set(EDGEENDINDEX, toGet.EndIndex);
-			ergebnis.set(EDGEVALUE, toGet.Value);
-			return ergebnis;
+			if ((actual.StartIndex==0)||(actual.EndIndex==0))
+			{
+				//temporäre Kante
+			}
+			else
+			{
+				ret.set(actual.index, actual.name);
+			}
 		}
-		return null;
-	}
-	/**
-	 * Set the value of an edge to a new value if the edge exists
-	 * if the value is changed a notify is pushed
-	 * @param i index of the edge
-	 * @param newvalue new value
-	 */
-	public void setEdgeValue(int i, int newvalue)
-	{
-		boolean change = false;
-		EdgeLock.lock();
-		try{
-				Iterator<MEdge> n = mEdges.iterator();
-				while (n.hasNext())
-				{
-					MEdge e = n.next();
-					if ( e.index==i )
-					{
-						if (e.Value!=newvalue)
-						{	e.Value = newvalue;
-							change = true;
-						}
-					}
-				}
-			} finally {EdgeLock.unlock();}
-			if (change)
-			{
-				setChanged();
-				notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.UPDATE,GraphMessage.EDGE));	
-			}
+		return ret;
 	}
 	/**
 	 * Returns the number of edges between two given nodes. For the non-multiple case 0 means no edge 1 means an edge exists
@@ -871,17 +855,15 @@ public class MGraph extends Observable
 	 */
 	/**
 	 * Add a new subset. if the index is already in use, nothing happens
-	 * @param index the new subset index
-	 * @param name subsetname
-	 * 
+	 * @param s Mathematical Subset, which should be added, a clone of the parameter is added
 	 */
-	public void addSubSet(int index, String name)
+	public void addSubSet(MSubSet s)
 	{
-		if (getSubSet(index)==null)
+		if (getSubSet(s.getIndex())==null)
 		{
-			mSubSets.add(new MSubSet(index,name));
+			mSubSets.add(s.clone());
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,index,GraphMessage.ADDITION,GraphMessage.SUBSET));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,s.getIndex(),GraphMessage.ADDITION,GraphMessage.SUBSET));	
 
 		}
 		//TODO if Subsetindex already in use -> Exception ?
@@ -1073,7 +1055,7 @@ public class MGraph extends Observable
 	 */
 	public void addEdgetoSubSet(int edgeindex, int SetIndex)
 	{
-		if (getEdgeProperties(edgeindex)==null)
+		if (getEdge(edgeindex)==null)
 			return;
 		Iterator<MSubSet> iter = mSubSets.iterator();
 		while (iter.hasNext())
@@ -1099,7 +1081,7 @@ public class MGraph extends Observable
 	public boolean removeEdgefromSet(int edgeindex, int SetIndex)
 	{
 		boolean change = false;
-		if (getEdgeProperties(edgeindex)==null)
+		if (getEdge(edgeindex)==null)
 			return false;
 		Iterator<MSubSet> iter = mSubSets.iterator();
 		while (iter.hasNext())
@@ -1126,7 +1108,7 @@ public class MGraph extends Observable
 	 */
 	public boolean SubSetcontainsEdge(int edgeindex,int SetIndex)
 	{
-		if (getEdgeProperties(edgeindex)==null)
+		if (getEdge(edgeindex)==null)
 			return false;
 		Iterator<MSubSet> iter = mSubSets.iterator();
 		while (iter.hasNext())
@@ -1154,5 +1136,23 @@ public class MGraph extends Observable
 	public int SubSetCount() {
 		return mSubSets.size();
 	}
+	/**
+	 * get a list of the subset names in a vector, where each subset name is stored at it's index
+	 * every other component of the vector is null
+	 * @return a Vector of all subset names, 
+	 */	
+	public Vector<String> getSetNames() {
+		Vector<String> ret = new Vector<String>();
+		Iterator<MSubSet> s = mSubSets.iterator();
+		while (s.hasNext()) {
+			MSubSet actual = s.next();
+			if ((actual.getIndex() + 1) > ret.size()) {
+				ret.setSize(actual.getIndex() + 1);
+			}
+			ret.set(actual.getIndex(), getSubSetName(actual.getIndex()));
+		}
+		return ret;
+	}
+
 }
 

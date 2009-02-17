@@ -101,7 +101,7 @@ public class RandomVisualize implements VAlgorithmIF {
 				else
 					size = GeneralPreferences.getInstance().getIntValue("node.size");
 					
-				ErgebnisGraph.addNode(new VNode(actualNode.index,posx, posy,size,35,0,14,false), actualNode.name);
+				ErgebnisGraph.addNode(new VNode(actualNode.index,posx, posy,size,35,0,14,false), new MNode(actualNode.index,actualNode.name));
 				Iterator<MEdge> edgeiter = mG.getEdgeIterator();
 				while (edgeiter.hasNext())
 				{
@@ -117,7 +117,7 @@ public class RandomVisualize implements VAlgorithmIF {
 						}
 						else
 							width = GeneralPreferences.getInstance().getIntValue("edge.width");						
-						ErgebnisGraph.addEdge(new VStraightLineEdge(e.index,width),e.StartIndex,e.EndIndex,e.Value,"");
+						ErgebnisGraph.addEdge(new VStraightLineEdge(e.index,width),e);
 					}		
 				}
 				ErgebnisGraph.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATE));

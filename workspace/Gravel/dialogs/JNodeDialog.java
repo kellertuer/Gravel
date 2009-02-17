@@ -36,6 +36,7 @@ import dialogs.components.CNodeNameParameters;
 import view.Gui;
 
 import model.GraphMessage;
+import model.MNode;
 import model.VGraph;
 import model.VNode;
 
@@ -118,8 +119,8 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 			oldx = v.getPosition().x;
 			oldy = v.getPosition().y;
 			oldsize = v.getSize();
-			oldname = graphref.getMathGraph().getNodeName(oldindex);
-			this.setTitle("Eigenschaften des Knotens '"+graphref.getMathGraph().getNodeName(v.getIndex())+"' (#"+v.getIndex()+")");	
+			oldname = graphref.getMathGraph().getNode(oldindex).name;
+			this.setTitle("Eigenschaften des Knotens '"+oldname+"' (#"+v.getIndex()+")");	
 		}
 		
 		Container content = getContentPane();
@@ -298,7 +299,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		subsetlist = graphref.getSetNames();
+		subsetlist = graphref.getMathGraph().getSetNames();
 		int temp = 0;
 		for (int i=0; i<subsetlist.size(); i++)
 		{
@@ -374,7 +375,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 					//Neuen Knoten einfuegen
 					VNode newnode = new VNode(iNodeIndex.getValue(),ixPos.getValue(), iyPos.getValue(), iSize.getValue(),0,0,0,false);
 					newnode = cNodeName.modifyNode(newnode);
-					graphref.addNode(newnode,this.sname.getText());
+					graphref.addNode(newnode,new MNode(newnode.getIndex(),sname.getText()));
 				}
 			}
 			else //Knoten geaendert

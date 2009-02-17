@@ -213,7 +213,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			movingNode = vg.getNodeinRange(p); //kein Shift == moving Node merken, sonst werden alle selected Bewegt
 			if (gp.getBoolValue("vgraphic.cpshow")) 
 			{
-				Vector c = vg.getControlPointinRange(p, gp.getIntValue("vgraphic.cpsize"));
+				Vector c = vg.getControlPointinRange(p,(new Integer(gp.getIntValue("vgraphic.cpsize"))).doubleValue());
 				if (c!=null)
 				{
 					movingControlPointEdge = (VEdge) c.get(0);

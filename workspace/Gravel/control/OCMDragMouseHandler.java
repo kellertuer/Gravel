@@ -8,6 +8,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
 import model.GraphMessage;
+import model.MEdge;
+import model.MNode;
 import model.VGraph;
 import model.VItem;
 import model.VLoopEdge;
@@ -84,7 +86,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 				{
 					int i = vg.getMathGraph().getNextEdgeIndex();
 					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_START|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
-					vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),StartNode.getIndex(),DragNode.getIndex(),gp.getIntValue("edge.value"),"\u22C6");
+					vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),new MEdge(i,StartNode.getIndex(),DragNode.getIndex(),gp.getIntValue("edge.value"),"\u22C6"));
 				}
 				else
 				{
@@ -125,7 +127,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 					return;
 				DragNode = new VNode(0,p.x,p.y,3,0,0,0,false);
 				DragNode.addColor(Color.white);
-				vg.addNode(DragNode,"-");
+				vg.addNode(DragNode,new MNode(DragNode.getIndex(),"-"));
 			}
 			else
 			{
@@ -138,7 +140,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 				//Temp Node index #0 erstellen in weiß
 				DragNode = new VNode(0,p.x,p.y,1,0,0,0,false);
 				DragNode.addColor(Color.white);
-				vg.addNode(DragNode,"-");
+				vg.addNode(DragNode,new MNode(DragNode.getIndex(),"-"));
 			}
 			firstdrag=true;
 		}		
@@ -169,18 +171,15 @@ public class OCMDragMouseHandler extends DragMouseHandler
 				if (!multiple)
 				{ //Only One Edge created
 					int i = vg.getMathGraph().getNextEdgeIndex();
+					MEdge m = new MEdge(i,StartNode.getIndex(),EndNode.getIndex(),gp.getIntValue("edge.value"),gp.getEdgeName(i,StartNode.getIndex(),EndNode.getIndex()));
 					if ((StartNode.getIndex()==EndNode.getIndex())&&(vg.getMathGraph().isLoopAllowed()))
 					{
 						VLoopEdge t = new VLoopEdge(i,gp.getIntValue("edge.width"),gp.getIntValue("edge.looplength"),gp.getIntValue("edge.loopdirection"),(double)gp.getIntValue("edge.loopproportion")/100.0d,gp.getBoolValue("edge.loopclockwise"));
-						vg.addEdge(t,StartNode.getIndex(),EndNode.getIndex(),gp.getIntValue("edge.value"),gp.getEdgeName(i,StartNode.getIndex(),EndNode.getIndex()));							
+						vg.addEdge(t,m);							
 						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
 					}
 					else if (StartNode.getIndex()!=EndNode.getIndex())
-					{	vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),
-									StartNode.getIndex(),
-									EndNode.getIndex(),
-									gp.getIntValue("edge.value"),
-									gp.getEdgeName(i,StartNode.getIndex(),EndNode.getIndex()));
+					{	vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),m);
 						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
 					}
 				}

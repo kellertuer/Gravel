@@ -176,7 +176,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		
 		boolean alt = ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK); // alt ?
 		boolean shift = ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK); //shift ?
-		boolean cpnonactive = ((vg.getControlPointinRange(p,gp.getIntValue("vgraphic.cpsize"))==null)||(!gp.getBoolValue("vgraphic.cpshow")));
+		boolean cpnonactive = ((vg.getControlPointinRange(p,(new Integer(gp.getIntValue("vgraphic.cpsize"))).doubleValue())==null)||(!gp.getBoolValue("vgraphic.cpshow")));
 		
 		if ((!alt)&&(!shift))
 		{// insgesamt auf dem Hintergrund ohne shift und ohne alt

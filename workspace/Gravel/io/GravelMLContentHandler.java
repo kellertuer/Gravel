@@ -403,7 +403,7 @@ public class GravelMLContentHandler implements ContentHandler
 					nr = gp.getIntValue("node.name_rotation");
 				if (nns==-1) //parse error or none found => std value
 					nns = gp.getIntValue("node.name_size");
-				vG.addNode(new VNode(id,nx,ny,ns,nd,nr,nns,nnv), nn);
+				vG.addNode(new VNode(id,nx,ny,ns,nd,nr,nns,nnv), new MNode(id,nn));
 				this.NodeIdtoIndex.put(idString, id);
 			}
 			else //im Mathgraph reicht der Name schon
@@ -414,7 +414,7 @@ public class GravelMLContentHandler implements ContentHandler
 					isValid=false;
 					return;
 				}
-				mG.addNode(id,nn);
+				mG.addNode(new MNode(id,nn));
 				this.NodeIdtoIndex.put(idString, id);					
 			}
 		}
@@ -470,10 +470,9 @@ public class GravelMLContentHandler implements ContentHandler
 				ev = gp.getIntValue("edge.value");
 			if (!isVisual) //MathGraph
 			{
-				isValid = mG.addEdge(id, start, ende, ev);
-				if (isValid)
-					mG.setEdgeName(id, en);
-				else
+				MEdge newedge = new MEdge(id,start,ende,ev,en);
+				isValid = mG.addEdge(newedge);
+				if (!isValid)
 					return;
 			}
 			if (ew==0)   ew = gp.getIntValue("edge.width");
@@ -547,7 +546,7 @@ public class GravelMLContentHandler implements ContentHandler
 				System.err.println("DEBUG : Error Parsing File : An (similar) Edge already existst between the two Nodes"); 
 				return;
 			}
-			vG.addEdge(toAdd,start,ende,ev,en);
+			vG.addEdge(toAdd,new MEdge(toAdd.getIndex(),start,ende,ev,en));
 			this.EdgeIdtoIndex.put(idString,id);
 		}
 	}
@@ -572,10 +571,12 @@ public class GravelMLContentHandler implements ContentHandler
 			}				
 			idString = atts.getValue("id");
 			//Sonderfall, hier mal zuerst erstellen, da kein andres SubSet schwarz ist...dies hier schwarz machen, bis eine Farbe eintrudelt
+			VSubSet vs = new VSubSet(id,Color.BLACK);
+			MSubSet ms = new MSubSet(id,gp.getSubSetName(id));
 			if (isVisual)
-				vG.addSubSet(id, gp.getStringValue("subset.name")+id,Color.BLACK);
+				vG.addSubSet(vs,ms);
 			else
-				mG.addSubSet(id, gp.getStringValue("subset.name")+id);
+				mG.addSubSet(ms);
 		}
 		else if (position.equals("graphml.graph.subset.snode"))
 		{
@@ -617,7 +618,7 @@ public class GravelMLContentHandler implements ContentHandler
 			}
 			else
 			{
-				if (mG.getEdgeProperties(edgeindex).get(MGraph.EDGEVALUE)!=-1)
+				if (mG.getEdge(edgeindex).Value!=-1)
 					vG.addEdgetoSubSet(edgeindex, id);
 				else
 					{isValid=false; System.err.println("The Node '"+edgeid+"' does not exist."); return;}

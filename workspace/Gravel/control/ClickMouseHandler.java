@@ -231,7 +231,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 			VEdge s = vg.getEdgeinRange(p,2.0);
 			if (r != null) {
 				updateNodeSetList(r.getIndex());
-				Nname.setText(vg.getMathGraph().getNodeName(r.getIndex()) + " - (#" + r.getIndex() + ")");
+				Nname.setText(vg.getMathGraph().getNode(r.getIndex()).name + " - (#" + r.getIndex() + ")");
 				NaddEdgesTo.setEnabled(vg.selectedNodeExists());
 				NaddEdgesFrom.setEnabled(vg.selectedNodeExists());
 				NDelSelection.setEnabled(vg.selectedEdgeExists()||vg.selectedNodeExists());

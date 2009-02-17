@@ -164,8 +164,8 @@ public class GravelMLWriter {
 	    	VNode actual = nodeiter.next();
 	    	s.write(nl+"\t\t<node id=\"node"+actual.getIndex()+"\">"+nl);
 	    	//if the name is not a standard name
-	    	if (!vg.getMathGraph().getNodeName(actual.getIndex()).equals(gp.getStringValue("node.name")+actual.getIndex()))
-	    		s.write("\t\t\t<data key=\"nn\">"+vg.getMathGraph().getNodeName(actual.getIndex())+"</data>"+nl);
+	    	if (!(vg.getMathGraph().getNode(actual.getIndex()).name).equals(gp.getStringValue("node.name")+actual.getIndex()))
+	    		s.write("\t\t\t<data key=\"nn\">"+vg.getMathGraph().getNode(actual.getIndex()).name+"</data>"+nl);
 	    	//Position
 	    	s.write("\t\t\t<data key=\"nx\">"+actual.getPosition().x+"</data>"+nl);
 	    	s.write("\t\t\t<data key=\"ny\">"+actual.getPosition().y+"</data>"+nl);
@@ -385,8 +385,8 @@ public class GravelMLWriter {
 	    	MNode actual = nodeiter.next();
 	    	s.write(nl+"\t\t<node id=\"node"+actual.index+"\"");
 	    	//if the name is not a standard name
-	    	if (!vg.getMathGraph().getNodeName(actual.index).equals(gp.getStringValue("node.name")+actual.index))
-	    		s.write(">"+nl+"\t\t\t<data key=\"nn\">"+vg.getMathGraph().getNodeName(actual.index)+"</data>"+nl+"\t\t</node>");
+	    	if (!(vg.getMathGraph().getNode(actual.index).name).equals(gp.getStringValue("node.name")+actual.index))
+	    		s.write(">"+nl+"\t\t\t<data key=\"nn\">"+vg.getMathGraph().getNode(actual.index).name+"</data>"+nl+"\t\t</node>");
 	    	else //no data one tag beginning and end
 	    	s.write(" />");
  		}
@@ -404,10 +404,9 @@ public class GravelMLWriter {
 	       while (edgeiter.hasNext())
 	       {
 	    	   MEdge actual = edgeiter.next();
-	    	   Vector<Integer> values = vg.getMathGraph().getEdgeProperties(actual.index);
-	    	   int start = values.elementAt(MGraph.EDGESTARTINDEX);
-	    	   int ende = values.elementAt(MGraph.EDGEENDINDEX);
-	    	   int value = values.elementAt(MGraph.EDGEVALUE);
+	    	   int start = actual.StartIndex;
+	    	   int ende = actual.EndIndex;
+	    	   int value = actual.Value;
 	    	   
 	    	   s.write(nl+"\t\t<edge id=\"edge"+actual.index+"\" source=\"node"+start+"\" target=\"node"+ende+"\"");
 	    	   if (value!=gp.getIntValue("edge.value")) 	    	   //if the value is not std

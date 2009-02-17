@@ -147,7 +147,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 					"(ID"+actual.getIndex()+") at ("+actual.getPosition().x+","+(max.y - actual.getPosition().y)+")");
 	    	if (actual.isNameVisible()) //draw name
 			{	
-				s.write("{$"+formname(vg.getMathGraph().getNodeName(actual.getIndex()))+"$};");
+				s.write("{$"+formname(vg.getMathGraph().getNode(actual.getIndex()).name)+"$};");
 				//TODO Text
 				//{\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(vg.getNodeName(actual.index))+"}}");
 			}

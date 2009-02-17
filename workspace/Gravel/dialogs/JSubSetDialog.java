@@ -34,6 +34,7 @@ import view.Gui;
 
 import model.GraphMessage;
 import model.MEdge;
+import model.MSubSet;
 import model.VEdge;
 import model.VGraph;
 import model.VNode;
@@ -251,7 +252,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		nodelist = graphref.getNodeNames();
+		nodelist = graphref.getMathGraph().getNodeNames();
 		int temp = 0;
 		for (int i=0; i<nodelist.size(); i++)
 		{
@@ -264,7 +265,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 		{
 			if (nodelist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				nodechecks[temp] = new JCheckBox(graphref.getMathGraph().getNodeName(i)+"   (#"+i+")");
+				nodechecks[temp] = new JCheckBox(graphref.getMathGraph().getNode(i).name+"   (#"+i+")");
 				nodechecks[temp].setSelected(oldnodes.get(i));
 				CiNodes.add(nodechecks[temp],c);
 				c.gridy++;
@@ -290,7 +291,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		edgelist = graphref.getEdgeNames();
+		edgelist = graphref.mG.getEdgeNames();
 		int temp = 0;
 		for (int i=0; i<edgelist.size(); i++)
 		{
@@ -410,7 +411,9 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 			}
 			//Und (im zweiten Fall neu, sonst allgemein) einfuegen
 			//Sonst geht alles seiner Wege und wir fuegen den Untergraphen ein
-			graphref.addSubSet(SetIndex, iSubSetName.getText(),Colorfield.getBackground());
+			VSubSet vs = new VSubSet(SetIndex,Colorfield.getBackground());
+			MSubSet ms = new MSubSet(SetIndex,iSubSetName.getText());
+			graphref.addSubSet(vs,ms);
 			//Einfuegen der Knoten und Kanten in den Untergraphen
 			//Kanten
 			int temp = 0;

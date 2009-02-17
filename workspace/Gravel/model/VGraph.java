@@ -28,7 +28,7 @@ import model.VNode;
 /**
  * VGraph encapsulates an MGraph and keeps visual information about every node, edge and subset in the MGraph
  * each manipulation on the VGraph is also given to the MGraph
- * The MGraph may the extracted and beeing used to generate another VGraph to the same MGraph
+ * The MGraph may the extracted and being used to generate another VGraph to the same MGraph
  *
  * The VGraph is observable, so that every Observer may update itself, if something changes here
  *
@@ -39,10 +39,10 @@ import model.VNode;
 public class VGraph extends Observable {
 
 	private TreeSet<VNode> vNodes;
-	private TreeSet<VEdge> vEdges;
+	TreeSet<VEdge> vEdges;
 	private HashSet<VSubSet> vSubSets;
 	private Lock EdgeLock, NodeLock;
-	private MGraph mG;
+	public MGraph mG;
 	/**
 	 * Constructor
 	 * 
@@ -150,7 +150,9 @@ public class VGraph extends Observable {
 								{
 									int e1 = ttot2.firstElement();
 									int e2 = t2tot.firstElement();
-									mG.setEdgeValue(e2, getEdgeProperties(e2).get(MGraph.EDGEVALUE)+getEdgeProperties(e1).get(MGraph.EDGEVALUE));
+									MEdge m = mG.getEdge(e2);
+									m.Value = mG.getEdge(e2).Value+mG.getEdge(e1).Value;
+								//	mG.replaceEdge(m); Notify is pushed for MGraph at the end of the method
 									removeEdge(e1);
 									removed.set(e1);
 								}
@@ -178,14 +180,14 @@ public class VGraph extends Observable {
 					while (e.hasNext())
 					{
 						VEdge t = e.next();
-						int ts = mG.getEdgeProperties(t.getIndex()).get(MGraph.EDGESTARTINDEX);
-						int te = mG.getEdgeProperties(t.getIndex()).get(MGraph.EDGEENDINDEX);
+						int ts = mG.getEdge(t.getIndex()).StartIndex;
+						int te = mG.getEdge(t.getIndex()).StartIndex;
 						Vector<Integer> indices = mG.getEdgeIndices(ts,te);
 						Iterator<Integer> iiter = indices.iterator();
 						while (iiter.hasNext())
 						{
 							VEdge act = getEdge(iiter.next());
-							if ((mG.getEdgeProperties(act.getIndex()).get(MGraph.EDGESTARTINDEX)==te)&&(!mG.isDirected())&&(act.getType()==VEdge.ORTHOGONAL)&&(t.getType()==VEdge.ORTHOGONAL)) 
+							if ((mG.getEdge(act.getIndex()).StartIndex==te)&&(!mG.isDirected())&&(act.getType()==VEdge.ORTHOGONAL)&&(t.getType()==VEdge.ORTHOGONAL)) 
 							//ungerichtet, beide orthogonal und entgegengesetz gespeichert
 							{
 								if ((((VOrthogonalEdge)act).getVerticalFirst()!=((VOrthogonalEdge)t).getVerticalFirst())&&(!removed.get(act.getIndex())))
@@ -289,14 +291,14 @@ public class VGraph extends Observable {
 		while (n1.hasNext())
 		{
 			VSubSet actualSet = n1.next();
-			clone.addSubSet(actualSet.getIndex(),mG.getSubSetName(actualSet.index),actualSet.getColor()); //Jedes Set kopieren
+			clone.addSubSet(actualSet,mG.getSubSet(actualSet.index)); //Jedes Set kopieren
 		}
 		//Knoten
 		Iterator<VNode> n2 = vNodes.iterator();
 		while (n2.hasNext())
 		{
 			VNode nodeclone = n2.next().clone();
-			clone.addNode(nodeclone, mG.getNodeName(nodeclone.getIndex()));
+			clone.addNode(nodeclone, mG.getNode(nodeclone.getIndex()));
 			//In alle Sets einfuegen
 			n1 = vSubSets.iterator();
 			while (n1.hasNext())
@@ -311,8 +313,8 @@ public class VGraph extends Observable {
 		while (n3.hasNext())
 		{
 			VEdge cloneEdge = n3.next().clone();
-			Vector<Integer> values = mG.getEdgeProperties(cloneEdge.getIndex());
-			clone.addEdge(cloneEdge,values.elementAt(MGraph.EDGESTARTINDEX),values.elementAt(MGraph.EDGEENDINDEX),values.elementAt(MGraph.EDGEVALUE),mG.getEdgeName(cloneEdge.getIndex()));
+			MEdge me = mG.getEdge(cloneEdge.getIndex());
+			clone.addEdge(cloneEdge,me);
 			//In alle Sets einfuegen
 			n1 = vSubSets.iterator();
 			while (n1.hasNext())
@@ -358,7 +360,7 @@ public class VGraph extends Observable {
 			
 				FontMetrics metrics = g2.getFontMetrics(f);
 				int hgt = metrics.getAscent()-metrics.getLeading()+metrics.getDescent();
-				int adv = metrics.stringWidth(mG.getNodeName(actual.getIndex()));
+				int adv = metrics.stringWidth(mG.getNode(actual.getIndex()).name);
 				x += new Double(Math.floor((double)adv/2.0d)).intValue(); y += new Double(Math.floor((double)hgt/2.0d)).intValue(); //Bottom Right Corner
 				if (x > maximum.x)
 					maximum.x = x;
@@ -413,7 +415,7 @@ public class VGraph extends Observable {
 			
 				FontMetrics metrics = g2.getFontMetrics(f);
 				int hgt = metrics.getAscent()-metrics.getLeading()+metrics.getDescent();
-				int adv = metrics.stringWidth(mG.getNodeName(actual.getIndex()));
+				int adv = metrics.stringWidth(mG.getNode(actual.getIndex()).name);
 				x -= new Double(Math.floor((double)adv/2.0d)).intValue(); y -= new Double(Math.floor((double)hgt/2.0d)).intValue(); //Top Left Corner
 				if (x < minimum.x)
 					minimum.x = x;
@@ -450,7 +452,8 @@ public class VGraph extends Observable {
 				while (n2.hasNext())
 				{
 					VEdge e = n2.next();
-					if (mG.getEdgeProperties(e.getIndex()).get(MGraph.EDGESTARTINDEX)==mG.getEdgeProperties(e.getIndex()).get(MGraph.EDGEENDINDEX))
+					MEdge me = mG.getEdge(e.getIndex());
+					if (me.StartIndex==me.EndIndex)
 					{
 						removed.set(e.getIndex());
 						deledges.add(e);
@@ -504,18 +507,20 @@ public class VGraph extends Observable {
 							if (mG.existsEdge(t.getIndex(),t2.getIndex())>1) //we have to delete
 							{
 								Vector<Integer> multipleedges = mG.getEdgeIndices(t.getIndex(),t2.getIndex());
-								int value = getEdgeProperties(multipleedges.firstElement()).get(MGraph.EDGEVALUE);
+								int value = mG.getEdge(multipleedges.firstElement()).Value;
 								//Add up the values and remove the edges from the second to the last
 								Iterator<Integer> iter = multipleedges.iterator();
 								iter.next();
 								while(iter.hasNext())
 								{
 									int nextindex = iter.next();
-									value += getEdgeProperties(nextindex).get(MGraph.EDGEVALUE);
+									value += mG.getEdge(nextindex).Value;
 									removeEdge(nextindex);
 									removed.set(nextindex);
 								}
-								mG.setEdgeValue(multipleedges.firstElement(),value);
+								MEdge e = mG.getEdge(multipleedges.firstElement());
+								e.Value = value;
+								//mG.replaceEdge(e); Notify is pushed below
 							}
 						}					
 					}
@@ -553,17 +558,23 @@ public class VGraph extends Observable {
 	//
 	//
 	/**
-	 * Adds a new Node to the VGraph (and the MGraph underneath)
+	 * Adds a new Node to the VGraph (and the corresponding mnode to the MGraph underneath)
+	 * If one of the arguments is null nothing happens
+	 * If a Node with the index of the VNode already exists, nothing happens
 	 * 
 	 * @param node
 	 *            the new VNode
-	 * @param name
-	 *            name of the VNode that is stored in the MGraph
+	 * @param mnode
+	 *            the depending mnode. If its index differs from the VNode its set to the VNodes index
 	 */
-	public void addNode(VNode node, String name) {
+	public void addNode(VNode node, MNode mnode) {
+		if ((node==null)||(mnode==null))
+			return;
 		if (getNode(node.getIndex()) == null) {
+			if (mnode.index!=node.getIndex())
+				mnode.index = node.getIndex();
 			vNodes.add(node);
-			mG.addNode(node.getIndex(), name);
+			mG.addNode(mnode);
 			setChanged();
 			//Graph changed with an add, only nodes affected
 			notifyObservers(new GraphMessage(GraphMessage.NODE,node.getIndex(),GraphMessage.ADDITION,GraphMessage.NODE));	
@@ -668,11 +679,16 @@ public class VGraph extends Observable {
 	 * Its SubSetStuff is not changed
 	 * 
 	 * @param node - Node that is exchanged into the graph (if a node exists with same index)
-	 * @param name - name of the node
+	 * @param mnode - mnode to change e.g. the name - if its index differs from the node-index, the node index is taken
+	 * 
 	 */
-	public void replaceNode(VNode node, String name)
+	public void replaceNode(VNode node, MNode mnode)
 	{
-		mG.replaceNode(new MNode(node.getIndex(), name));
+		if ((node==null)||(mnode==null))
+			return;
+		if (mnode.index!=node.getIndex())
+			mnode.index = node.getIndex();
+		mG.replaceNode(new MNode(node.getIndex(), mnode.name));
 		node = node.clone(); //Clone node to lose color
 		NodeLock.lock(); //Knoten finden
 		try
@@ -731,25 +747,6 @@ public class VGraph extends Observable {
 		return false;
 	}
 	/**
-	 * get a list of the node names in a vector, where each node name is stored at it's index
-	 * every other component of the vector is null
-	 * 
-	 * @return a Vector of all node names, 
-	 */
-	public Vector<String> getNodeNames() {
-		Vector<String> ret = new Vector<String>();
-		Iterator<VNode> n = vNodes.iterator();
-		while (n.hasNext()) {
-			VNode actual = n.next();
-			if ((actual.getIndex() + 1) > ret.size()) {
-				ret.setSize(actual.getIndex() + 1);
-			}
-			if (actual.getIndex()!=0) //kein temp-knoten
-				ret.set(actual.getIndex(), mG.getNodeName(actual.getIndex()));
-		}
-		return ret;
-	}
-	/**
 	 * add edges from a given node to evey selected node
 	 * 
 	 * @param Start 
@@ -765,10 +762,13 @@ public class VGraph extends Observable {
 				{
 					int i = mG.getNextEdgeIndex();
 					//Standard ist eine StraightLineEdge
+					MEdge me;
 					if (Start.getIndex()==0)
-						addEdge(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")),Start.getIndex(),temp.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),"\u22C6");
+						me = new MEdge(i,Start.getIndex(),temp.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),"\u22C6");
 					else
-						addEdge(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")),Start.getIndex(),temp.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),GeneralPreferences.getInstance().getEdgeName(i, Start.getIndex(), temp.getIndex()));
+						me = new MEdge(i,Start.getIndex(),temp.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),GeneralPreferences.getInstance().getEdgeName(i, Start.getIndex(), temp.getIndex()));
+					
+						addEdge(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")),me);
 				}
 		}
 		this.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END));
@@ -789,10 +789,12 @@ public class VGraph extends Observable {
 				{
 					int i = mG.getNextEdgeIndex();
 					//Standard ist eine StraightLineEdge
+					MEdge me;
 					if (Ende.getIndex()==0)
-						addEdge(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")),temp.getIndex(),Ende.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),"\u22C6");
+						me = new MEdge(i,temp.getIndex(),Ende.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),"\u22C6");
 					else
-						addEdge(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")),temp.getIndex(),Ende.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),GeneralPreferences.getInstance().getEdgeName(i, temp.getIndex(), Ende.getIndex()));
+						me = new MEdge(i,temp.getIndex(),Ende.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),GeneralPreferences.getInstance().getEdgeName(i, temp.getIndex(), Ende.getIndex()));					
+						addEdge(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")),me);
 				}
 		}
 		this.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END));
@@ -816,32 +818,30 @@ public class VGraph extends Observable {
 	 * 
 	 * @param edge 
 	 * 				the new VEdge
-	 * @param s 
-	 * 				the source of the edge
-	 * @param e
-	 * 				the target of the edge
-	 * @param v
-	 * 				the value of the  edge
-	 * @param name
-	 * 				name of the edge
+	 * @param medge 
+	 * 				mathematical elements of the new edge, if its index differs, this index is ignored
 	 */
-	public void addEdge(VEdge edge, int s, int e, int v, String name) 
+	public void addEdge(VEdge edge, MEdge medge) 
 	{
-		if (similarPathEdgeIndex(edge,s,e) > 0)
+		if ((edge==null)||(medge==null))
+				return;
+		if (medge.index!=edge.getIndex())
+			medge.index = edge.getIndex();
+		if (similarPathEdgeIndex(edge,medge.StartIndex,medge.EndIndex) > 0)
 		{
 			System.err.println("DEBUG : Similar Edge Exists, doing nothing");
 			return;
 		}
-		if (mG.addEdge(edge.getIndex(), s, e, v)) //succesfull added in MathGraph
+		if (mG.addEdge(medge)) //succesfull added in MathGraph
 		{
 			EdgeLock.lock();
 			try 
 			{
 				// In einem ungerichteten Graphen existiert eine Kante von e zu s und die ist StraightLine und die neue Kante ist dies auch	
-				if ((s!=e)&&(mG.isDirected())&&(mG.existsEdge(e, s)==1)&&(getEdge(mG.getEdgeIndices(e,s).firstElement()).getType()==VEdge.STRAIGHTLINE)&&(edge.getType()==VEdge.STRAIGHTLINE))
+				if ((medge.StartIndex!=medge.EndIndex)&&(mG.isDirected())&&(mG.existsEdge(medge.EndIndex, medge.StartIndex)==1)&&(getEdge(mG.getEdgeIndices(medge.EndIndex, medge.StartIndex).firstElement()).getType()==VEdge.STRAIGHTLINE)&&(edge.getType()==VEdge.STRAIGHTLINE))
 				{ //Dann würde diese Kante direkt auf der anderen liegen
-					Point start = getNode(s).getPosition();
-					Point ende = getNode(e).getPosition();
+					Point start = getNode(medge.StartIndex).getPosition();
+					Point ende = getNode(medge.EndIndex).getPosition();
 					Point dir = new Point(ende.x-start.x,ende.y-start.y);
 					double length = dir.distanceSq(new Point(0,0));
 					Point.Double orthogonal_norm = new Point.Double ((double)dir.y/length,-(double)dir.x/length);
@@ -852,7 +852,7 @@ public class VGraph extends Observable {
 					edge = new VQuadCurveEdge(edge.getIndex(),edge.width,bz1);
 					edge.setArrow(arr);
 					//Update the old edge
-					VEdge temp = getEdge(mG.getEdgeIndices(e,s).firstElement());
+					VEdge temp = getEdge(mG.getEdgeIndices(medge.EndIndex, medge.StartIndex).firstElement());
 					arr = temp.getArrow().clone();
 					vEdges.remove(temp);
 					temp = new VQuadCurveEdge(temp.getIndex(),temp.width,bz2);
@@ -868,7 +868,7 @@ public class VGraph extends Observable {
 					vEdges.add(temp); //add modified edge in counter directtion
 				}
 				vEdges.add(edge); //add edge
-				mG.setEdgeName(edge.getIndex(), name);
+				mG.setEdgeName(edge.getIndex(), medge.name);
 			} 
 			finally {EdgeLock.unlock();}
 			setChanged();
@@ -899,7 +899,8 @@ public class VGraph extends Observable {
 			while (iiter.hasNext())
 			{
 				VEdge act = getEdge(iiter.next());
-				if ((mG.getEdgeProperties(act.getIndex()).get(MGraph.EDGESTARTINDEX)==e)&&(!mG.isDirected())&&(act.getType()==VEdge.ORTHOGONAL)&&(edge.getType()==VEdge.ORTHOGONAL)) 
+				MEdge me = mG.getEdge(act.getIndex());
+				if ((me.StartIndex==e)&&(!mG.isDirected())&&(act.getType()==VEdge.ORTHOGONAL)&&(edge.getType()==VEdge.ORTHOGONAL)) 
 				//ungerichtet, beide orthogonal und entgegengesetz gespeichert
 				{
 					if (((VOrthogonalEdge)act).getVerticalFirst()!=((VOrthogonalEdge)edge).getVerticalFirst())
@@ -943,14 +944,15 @@ public class VGraph extends Observable {
 	 * 
 	 * 
 	 * @param e VEdge to be replaced with its Edge with similar index in the graph
-	 * @param start - Startindex from e
-	 * @param ende - Endindex form e
-	 * @param value - Value of e
-	 * @param name - name of e 
+	 * @param me Medge containing the mathematical stuff of the VEdge - index of his edge is ignored,
+	 * 			if it differs from first parameter index
 	 */
-	public void replaceEdge(VEdge e, int start, int ende, int value, String name)
+	public void replaceEdge(VEdge e, MEdge me)
 	{
-		mG.replaceEdge(new MEdge(e.getIndex(), start,ende,value,name));
+		if (me.index!=e.getIndex())
+			me.index = e.getIndex();
+		
+		mG.replaceEdge(me);
 		e = e.clone(); //Lose color!
 		EdgeLock.lock(); //Knoten finden
 		try
@@ -1030,9 +1032,9 @@ public class VGraph extends Observable {
 		while (n.hasNext()) {
 			VEdge temp = n.next();
 			// naechste Kante
-			Vector<Integer> Properties = mG.getEdgeProperties(temp.getIndex()); // Deren abstrakte Werte
-			Point p1 = (Point)getNode(Properties.get(MGraph.EDGESTARTINDEX)).getPosition().clone();
-			Point p2 = (Point)getNode(Properties.get(MGraph.EDGEENDINDEX)).getPosition().clone();
+			MEdge me = mG.getEdge(temp.getIndex());
+			Point p1 = (Point)getNode(me.StartIndex).getPosition().clone();
+			Point p2 = (Point)getNode(me.EndIndex).getPosition().clone();
 			// getEdgeShape
 			GeneralPath p = temp.getPath(p1, p2,1.0f); //no zoom on check!
 		    PathIterator path = p.getPathIterator(null, 0.001); 
@@ -1090,49 +1092,6 @@ public class VGraph extends Observable {
 		return false;
 	}
 	/**
-	 * returns a vector with the mathematical properties of an edge, if the edge exists
-	 * <br><br>Use the MGraph CONSTANTS to extract single values!
-	 * @param i
-	 * @return a vector with the int properties of the edge, if no edge exists null
-	 * @see MGraph.getEdgeProperties(int index)
-	 * @deprecated
-	 */
-	public Vector<Integer> getEdgeProperties(int i) {
-		return mG.getEdgeProperties(i);
-	}
-	/**
-	 * get a list of the edge names in a vector, where each edge name is stored at it's index
-	 * every other component of the vector is null
-	 * <br><br>
-	 * an edge name is the mathematical given edge name 
-	 * <br><br>
-	 * @return a Vector of all edge names, 
-	 */	
-	public Vector<String> getEdgeNames() {
-		Vector<String> ret = new Vector<String>();
-		Iterator<VEdge> n = vEdges.iterator();
-		while (n.hasNext()) {
-			VEdge actual = n.next();
-			if ((actual.getIndex() + 1) > ret.size()) {
-				ret.setSize(actual.getIndex() + 1);
-			}
-			Vector<Integer> v = getEdgeProperties(actual.getIndex());
-			if (v==null)
-			{
-				//In diesem Fall ist die Aktualisierung zu langsam
-			}
-			else if ((v.elementAt(MGraph.EDGESTARTINDEX).toString().equals("0"))&&(v.elementAt(MGraph.EDGEENDINDEX).toString().equals("0")))
-			{
-				//temporäre Kante
-			}
-			else
-			{
-				ret.set(actual.getIndex(), mG.getEdgeName(actual.getIndex()));
-			}
-		}
-		return ret;
-	}
-	/**
 	 * sets the the name of a node with the index, if this node exists, else it does nothing
 	 * @param i
 	 * @param newname
@@ -1157,12 +1116,12 @@ public class VGraph extends Observable {
 	 * 
 	 * @param m
 	 * 			a Point 
-	 * @param abweichung
+	 * @param variation
 	 * 			the distance from the point m
-	 * @return
+	 * @return an Vector containing an edge and the number of its CP in Range if exists, else null
 	 */
 	@SuppressWarnings("unchecked")
-	public Vector getControlPointinRange(Point m, int abweichung) {
+	public Vector getControlPointinRange(Point m, double variation) {
 		Iterator<VEdge> n = vEdges.iterator();
 		while (n.hasNext()) {
 			VEdge temp = n.next(); // naechste Kante
@@ -1171,7 +1130,7 @@ public class VGraph extends Observable {
 				case VEdge.QUADCURVE : // Wenns eine Bezierkante ist
 				{
 					Point p = temp.getControlPoints().firstElement();
-					if (p.distance(m) <= ((float) abweichung)) {
+					if (p.distance(m) <= variation) {
 						Vector c = new Vector();
 						c.add(temp);
 						c.add(new Integer(0));
@@ -1182,7 +1141,7 @@ public class VGraph extends Observable {
 				case VEdge.SEGMENTED : {
 					Vector<Point> p = temp.getControlPoints();
 					for (int i = 0; i < p.size(); i++) {
-						if (p.get(i).distance(m) <= ((float) abweichung)) {
+						if (p.get(i).distance(m) <= variation) {
 							Vector c = new Vector();
 							c.add(temp); // Kante anfügen
 							c.add(new Integer(i)); // Punkt angeben
@@ -1204,21 +1163,45 @@ public class VGraph extends Observable {
 	//
 	//
 	/**
-	 * add a new Set to the VGraph
-	 * @param SetIndex
-	 * 				index of the new Set, must not be used by other Sets
-	 * @param SetName
-	 * 				name of the new Set
-	 * @patam SetColor
-	 * 				Color of the new Set (that is given to the nodes or edges in this set or the sets boundary)
+	 * Add a new SubSet to the VGraph
+	 * The Index of the msubset is ignored (if differs from VSubSet-Index)
+	 * 
+	 * The Mathematical SubSet may be used to introduce the new subset with already given stuff
+	 * So if a node in this VGraph exists, that is marked as belonging to the
+	 * MSubSet it gets by adding the new Color added, too
+	 * 
+	 * If a SubSet with same index as VSUbSet exists or one of the arguments in null
+	 * nothing happens
+	 * 
+	 * @paran subset new VSubSet to be added here
+	 * @param msubset new MSubSet to be added in MGraph underneath and used for initialization of SubSet
 	 */
-	public void addSubSet(int SetIndex, String SetName, Color SetColor) {
-		if (getSubSet(SetIndex)!=null)
+	public void addSubSet(VSubSet subset, MSubSet msubset)
+	{
+		if ((subset==null)||(msubset==null)) //Oneof them Null
+				return;
+		if (getSubSet(subset.getIndex())!=null) //SubSet exists?
 			return;
-		mG.addSubSet(SetIndex, SetName);
-		vSubSets.add(new VSubSet(SetIndex, SetColor));
+		//Create an empty temporary SubSet for Math
+		MSubSet temp = new MSubSet(subset.getIndex(),msubset.getName());		
+		mG.addSubSet(temp);
+		vSubSets.add(subset.clone());
+		Iterator<VNode> nit = vNodes.iterator();
+		while (nit.hasNext())
+		{
+			int nindex = nit.next().getIndex();
+			if (msubset.containsNode(nindex))
+				addNodetoSubSet(nindex,subset.getIndex());
+		}
+		Iterator<VEdge> eit = vEdges.iterator();
+		while (eit.hasNext())
+		{
+			int eindex = eit.next().getIndex();
+			if (msubset.containsEdge(eindex))
+				addEdgetoSubSet(eindex,subset.getIndex());
+		}
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.ADDITION,GraphMessage.SUBSET));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBSET,subset.getIndex(),GraphMessage.ADDITION,GraphMessage.ALL_ELEMENTS));	
 	}
 	/**
 	 * remove a set from the VGraph and remove the Sets color from each node or edge contained in the set
@@ -1330,7 +1313,7 @@ public class VGraph extends Observable {
 	 * @see MGraph.addEdgetoSet(edgeindex,setindex)
 	 */
 	public void addEdgetoSubSet(int edgeindex, int SetIndex) {
-		if ((mG.getEdgeProperties(edgeindex) != null)
+		if ((mG.getEdge(edgeindex) != null)
 				&& (mG.getSubSet(SetIndex)!=null)
 				&& (!mG.SubSetcontainsEdge(edgeindex, SetIndex))) {
 			// Mathematisch hinzufuegen
@@ -1379,23 +1362,6 @@ public class VGraph extends Observable {
 					getEdge(edgeindex).removeColor(actual.getColor());
 			}
 		}
-	}
-	/**
-	 * get a list of the subset names in a vector, where each subset name is stored at it's index
-	 * every other component of the vector is null
-	 * @return a Vector of all subset names, 
-	 */	
-	public Vector<String> getSetNames() {
-		Vector<String> ret = new Vector<String>();
-		Iterator<VSubSet> s = vSubSets.iterator();
-		while (s.hasNext()) {
-			VSubSet actual = s.next();
-			if ((actual.index + 1) > ret.size()) {
-				ret.setSize(actual.index + 1);
-			}
-			ret.set(actual.getIndex(), mG.getSubSetName(actual.index));
-		}
-		return ret;
 	}
 	/**
 	 * get the set with index i

@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import model.*;
 
@@ -94,14 +93,14 @@ public class TreeFunctions implements Observer {
 			if (acount==1) //Case (a)
 			{
 				order.put(aindex,nextorderindex++);
-				startnode = new MNode(aindex, mg.getNodeName(aindex));
+				startnode = new MNode(aindex, mg.getNode(aindex).name);
 				if (!isDirectedTreeRecursive(false,startnode))
 						return false; //No Tree
 			}
 			else if (bcount==1)
 			{
 				order.put(bindex,nextorderindex++);
-				startnode = new MNode(aindex, mg.getNodeName(aindex));
+				startnode = new MNode(aindex, mg.getNode(aindex).name);
 				if (!isDirectedTreeRecursive(true,startnode))
 					return false; //No Tree
 			}
@@ -169,14 +168,14 @@ public class TreeFunctions implements Observer {
 			if (acount==1) //Case (a)
 			{
 				order.put(aindex,nextorderindex++);
-				startnode =  new MNode(aindex, mg.getNodeName(aindex));
+				startnode =  new MNode(aindex, mg.getNode(aindex).name);
 				if (!isDirectedTreeRecursive(false,startnode))
 						return false; //No Tree
 			}
 			else if (bcount==1)
 			{
 				order.put(bindex,nextorderindex++);
-				startnode =  new MNode(aindex, mg.getNodeName(aindex));
+				startnode =  new MNode(aindex, mg.getNode(aindex).name);
 				if (!isDirectedTreeRecursive(true,startnode))
 					return false; //No Tree
 			}
@@ -330,8 +329,7 @@ public class TreeFunctions implements Observer {
 		while (edgeiter.hasNext())
 		{
 			MEdge actual = edgeiter.next();
-			Vector<Integer> values = mg.getEdgeProperties(actual.index);
-			int start = values.get(MGraph.EDGESTARTINDEX), ende = values.get(MGraph.EDGEENDINDEX);
+			int start = actual.StartIndex, ende = actual.EndIndex;
 			if (degree.get(start)==null)
 				degree.put(start,0);
 			if (degree.get(ende)==null)

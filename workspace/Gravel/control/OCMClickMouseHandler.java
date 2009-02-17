@@ -5,6 +5,7 @@ import io.GeneralPreferences;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
+import model.MNode;
 import model.VGraph;
 import model.VNode;
 /**
@@ -42,7 +43,7 @@ public class OCMClickMouseHandler extends ClickMouseHandler {
 				//TODO: Semantisch nochmal überlegen, ob die Auswahl entfertn werden soll, so ein neuer Knoten erstellt wird
 				if ((vg.selectedEdgeExists()||vg.selectedNodeExists()))
 					vg.deselect();
-				vg.addNode(new VNode(i,p.x,p.y, gp.getIntValue("node.size"), gp.getIntValue("node.name_distance"), gp.getIntValue("node.name_rotation"), gp.getIntValue("node.name_size"), gp.getBoolValue("node.name_visible")),gp.getNodeName(i));
+				vg.addNode(new VNode(i,p.x,p.y, gp.getIntValue("node.size"), gp.getIntValue("node.name_distance"), gp.getIntValue("node.name_rotation"), gp.getIntValue("node.name_size"), gp.getBoolValue("node.name_visible")),new MNode(i,gp.getNodeName(i)));
 			}	
 		}
 	}	
