@@ -21,7 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
-import model.GraphMessage;
+import model.Messages.GraphMessage;
 
 import dialogs.JFileDialogs;
 import dialogs.JPreferencesDialog;
@@ -171,21 +171,21 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
             mEdDelSelection.setMnemonic(KeyEvent.VK_D);
     	}
     	mEdDelSelection.addActionListener(this);
-    	mEdDelSelection.setEnabled(graphpart.getVGraph().selectedEdgeExists()||graphpart.getVGraph().selectedNodeExists());
+    	mEdDelSelection.setEnabled(graphpart.getVGraph().modifyEdges.selectedEdgeExists()||graphpart.getVGraph().modifyNodes.selectedNodeExists());
     	
     	mEdModifySelection = new JMenuItem("Auswahl bearbeiten...");
    		mEdModifySelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, MenuAccModifier));    		
        	if (!isMac)
            mEdModifySelection.setMnemonic(KeyEvent.VK_M);
     	mEdModifySelection.addActionListener(this);
-    	mEdModifySelection.setEnabled(graphpart.getVGraph().selectedEdgeExists()||graphpart.getVGraph().selectedNodeExists());
+    	mEdModifySelection.setEnabled(graphpart.getVGraph().modifyEdges.selectedEdgeExists()||graphpart.getVGraph().modifyNodes.selectedNodeExists());
 
     	mEdArrangeSelection = new JMenuItem("Auswahl anordnen...");
    		//mEdArrangeSelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, MenuAccModifier));    		
        	if (!isMac)
            mEdArrangeSelection.setMnemonic(KeyEvent.VK_R);
     	mEdArrangeSelection.addActionListener(this);
-    	mEdArrangeSelection.setEnabled(graphpart.getVGraph().selectedNodeExists());
+    	mEdArrangeSelection.setEnabled(graphpart.getVGraph().modifyNodes.selectedNodeExists());
 
     	
     	if (!isMac) mEdit.setMnemonic(KeyEvent.VK_E);
@@ -445,11 +445,11 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         			int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Wirklich umformen in einen Graphen ohne Schleifen ?<br>Dabei werdem alle existenten Schleifen gel"+main.CONST.html_oe+"scht.","Umformen bestätigen",JOptionPane.YES_NO_OPTION);
         	   		if (n==JOptionPane.YES_OPTION)
         	   		{
-        	   			graphpart.getVGraph().setLoopsAllowed(false);
+        	   			graphpart.getVGraph().modifyEdges.setLoopsAllowed(graphpart.getVGraph(), false);
         	   		}
         	   	}
         	   	else
-        	   		graphpart.getVGraph().setLoopsAllowed(true);
+        	   		graphpart.getVGraph().modifyEdges.setLoopsAllowed(graphpart.getVGraph(), true);
            	} else	
             if (item==mVGMultipleCh)
            	{
@@ -517,27 +517,27 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 		if (m==null)
 			return;
 		//either Selection changed or was affected
-		if (((m.getAffectedTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION)||((m.getAction()&GraphMessage.SELECTION)==GraphMessage.SELECTION))
+		if (((m.getAffectedElementTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION)||((m.getModifiedElementTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION))
 		{
-			mEdDelSelection.setEnabled(graphpart.getVGraph().selectedEdgeExists()||graphpart.getVGraph().selectedNodeExists());		
-			mEdModifySelection.setEnabled(graphpart.getVGraph().selectedEdgeExists()||graphpart.getVGraph().selectedNodeExists());		
-			mEdArrangeSelection.setEnabled(graphpart.getVGraph().selectedNodeExists());
+			mEdDelSelection.setEnabled(graphpart.getVGraph().modifyEdges.selectedEdgeExists()||graphpart.getVGraph().modifyNodes.selectedNodeExists());		
+			mEdModifySelection.setEnabled(graphpart.getVGraph().modifyEdges.selectedEdgeExists()||graphpart.getVGraph().modifyNodes.selectedNodeExists());		
+			mEdArrangeSelection.setEnabled(graphpart.getVGraph().modifyNodes.selectedNodeExists());
 		}
-		else if ((m.getAction()&GraphMessage.DIRECTION)==GraphMessage.DIRECTION) //directed changed
+		else if ((m.getModifiedElementTypes()&GraphMessage.DIRECTION)==GraphMessage.DIRECTION) //directed changed
 		{
 	    	if (graphpart.getVGraph().getMathGraph().isDirected())
 	        	mVGDirCh.setText("ungerichtet");
 	        else
 	        	mVGDirCh.setText("gerichtet");        	
 		}
-		else if ((m.getAction()&GraphMessage.LOOPS)==GraphMessage.LOOPS) //Loops changed
+		else if ((m.getModifiedElementTypes()&GraphMessage.LOOPS)==GraphMessage.LOOPS) //Loops changed
 		{
 	    	if (graphpart.getVGraph().getMathGraph().isLoopAllowed())
 	        	mVGLoopCh.setText("entferne Schleifen");
 	        else
 	        	mVGLoopCh.setText("erlaube Schleifen");        	
 		}
-		else if ((m.getAction()&GraphMessage.MULTIPLE)==GraphMessage.MULTIPLE) //Multiple Edges Changed
+		else if ((m.getModifiedElementTypes()&GraphMessage.MULTIPLE)==GraphMessage.MULTIPLE) //Multiple Edges Changed
 		{
 	    	if (graphpart.getVGraph().getMathGraph().isMultipleAllowed())
 	        	mVGMultipleCh.setText("entferne Mehrfachkanten");

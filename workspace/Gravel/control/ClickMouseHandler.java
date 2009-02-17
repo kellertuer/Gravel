@@ -21,19 +21,20 @@ import dialogs.JEdgeDialog;
 import dialogs.JNodeDialog;
 import dialogs.JSubSetDialog;
 
-import model.GraphMessage;
 import model.MEdge;
 import model.VEdge;
 import model.VGraph;
 import model.VItem;
 import model.VNode;
 import model.VSubSet;
+import model.Messages.GraphMessage;
 /**
  * Super class for the mouse handler for mouseclicks
  * this class is abstract, and is implemented by every mouse mode that is available in gravel
  * 
  * This abstract superclass is also an observer. it is an oberserv the VGraph
  * 
+ * This Observer may only subscribe to Observables that send GraphMessages
  * @author ronny
  *
  */
@@ -104,7 +105,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		NremfromSet.setEnabled(false);
 		NremfromSet.addActionListener(this);
 		NDelSelection = new JMenuItem("Auswahl löschen");
-		NDelSelection.setEnabled(vg.selectedNodeExists()||vg.selectedEdgeExists());
+		NDelSelection.setEnabled(vg.modifyNodes.selectedNodeExists()||vg.modifyEdges.selectedEdgeExists());
 		NDelSelection.addActionListener(this);	
 		NodePopup = new JPopupMenu();
 		NodePopup.add(Nname);
@@ -132,7 +133,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		EremfromSet.setEnabled(false);
 		EremfromSet.addActionListener(this);
 		EDelSelection = new JMenuItem("Auswahl löschen");
-		EDelSelection.setEnabled(vg.selectedNodeExists()||vg.selectedEdgeExists());
+		EDelSelection.setEnabled(vg.modifyNodes.selectedNodeExists()||vg.modifyEdges.selectedEdgeExists());
 		EDelSelection.addActionListener(this);	
 		EdgePopup = new JPopupMenu();
 		EdgePopup.add(Ename);
@@ -219,7 +220,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //rausrechnen
 		if ((e.getClickCount()==2)&&(e.getModifiers() == MouseEvent.BUTTON1_MASK))
 		{ //Double Click on Node
-			VNode dcn = vg.getNodeinRange(p);
+			VNode dcn = vg.modifyNodes.getNodeinRange(p);
 			if (dcn!=null) //Doubleclick really on Node
 			{
 				new JNodeDialog(dcn,vg);
@@ -227,14 +228,14 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		}
 		if ((e.getModifiers() == MouseEvent.BUTTON3_MASK) || (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.CTRL_MASK)) // mit rechts oder strg links
 		{
-			VNode r = vg.getNodeinRange(p);
+			VNode r = vg.modifyNodes.getNodeinRange(p);
 			VEdge s = vg.getEdgeinRange(p,2.0);
 			if (r != null) {
 				updateNodeSetList(r.getIndex());
 				Nname.setText(vg.getMathGraph().getNode(r.getIndex()).name + " - (#" + r.getIndex() + ")");
-				NaddEdgesTo.setEnabled(vg.selectedNodeExists());
-				NaddEdgesFrom.setEnabled(vg.selectedNodeExists());
-				NDelSelection.setEnabled(vg.selectedEdgeExists()||vg.selectedNodeExists());
+				NaddEdgesTo.setEnabled(vg.modifyNodes.selectedNodeExists());
+				NaddEdgesFrom.setEnabled(vg.modifyNodes.selectedNodeExists());
+				NDelSelection.setEnabled(vg.modifyEdges.selectedEdgeExists()||vg.modifyNodes.selectedNodeExists());
 				selectedNode = r;
 				NodePopup.show(e.getComponent(), e.getX(), e.getY());
 			} 
@@ -244,7 +245,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 				updateEdgeSetList(s.getIndex());
 				MEdge me = vg.getMathGraph().getEdge(s.getIndex());
 				Ename.setText("Value : "+me.Value+" - Index : "+s.getIndex()+"");
-				EDelSelection.setEnabled(vg.selectedEdgeExists()||vg.selectedNodeExists());
+				EDelSelection.setEnabled(vg.modifyEdges.selectedEdgeExists()||vg.modifyNodes.selectedNodeExists());
 				EdgePopup.show(e.getComponent(), e.getX(),e.getY());	
 			}
 			else //Weder Knoten noch Kante angeklickt -> Background popup
@@ -256,7 +257,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		}
 		if (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.SHIFT_MASK) // mit SHIFTlinks angeklickt, Auswahl erweitern
 		{
-			VNode r = vg.getNodeinRange(p);
+			VNode r = vg.modifyNodes.getNodeinRange(p);
 			if (r != null) //Clicked on a node -> Select it
 			{
 				if ((r.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED)
@@ -285,7 +286,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 	public void updateSubSetList()
 	{
 		vSubSetNMenus.removeAllElements(); //Untergraphen-Menues aktualisieren
-		Iterator<VSubSet> subsetiter = vg.getSubSetIterator();
+		Iterator<VSubSet> subsetiter = vg.modifySubSets.getSubSetIterator();
 		while (subsetiter.hasNext())
 		{
 			VSubSet actual = subsetiter.next();
@@ -302,12 +303,14 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 	 * update is inherited from the Observer Interface and is called if the Graph changes.
 	 * Then the subsetlist ist updated
 	 */
-	public void update(Observable o, Object arg) {
-		if (((GraphMessage)arg)!=null)
-		{ //If we get an GraphMessage and a SUBSET is AFFECTED
-			if ((((GraphMessage)arg).getAffectedTypes()&GraphMessage.SUBSET)==GraphMessage.SUBSET)
-				updateSubSetList();
-		}
+	public void update(Observable o, Object arg)
+	{
+		GraphMessage m = (GraphMessage)arg;
+			if (m!=null)
+			{ //If we get an GraphMessage and a SUBSET is AFFECTED
+				if ((m.getAffectedElementTypes()&GraphMessage.SUBSET)==GraphMessage.SUBSET)
+					updateSubSetList();
+			}
 	}
 	/**
 	 * inherited from the Action LIstener to handle all clicks on the popup menus and call the specific functions
@@ -329,7 +332,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 			{
 				c = Color.getHSBColor((float)Math.random(), (float)Math.random(), (float)Math.random());
 				colorgone = false;
-				Iterator<VSubSet> subsetiter = vg.getSubSetIterator();
+				Iterator<VSubSet> subsetiter = vg.modifySubSets.getSubSetIterator();
 				while (subsetiter.hasNext())
 				{
 					if (subsetiter.next().getColor().equals(c)) //Farbe vergeben!
@@ -349,9 +352,9 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 			{
 				if (vg.getMathGraph().SubSetcontainsNode(selectedNode.getIndex(),vSubSetNMenus.indexOf(t))) // gew�hlt und enth�lt den Knoten => entfernen
 				{
-					vg.removeNodefromSubSet(selectedNode.getIndex(),vSubSetNMenus.indexOf(t));
+					vg.modifySubSets.removeNodefromSubSet(vg, selectedNode.getIndex(),vSubSetNMenus.indexOf(t));
 				} else {
-					vg.addNodetoSubSet(selectedNode.getIndex(),vSubSetNMenus.indexOf(t));
+					vg.modifySubSets.addNodetoSubSet(selectedNode.getIndex(), vSubSetNMenus.indexOf(t));
 				}
 			}
 			//In diesem Fall wars eine Kante
@@ -359,18 +362,18 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 			{
 				if (vg.getMathGraph().SubSetcontainsEdge(selectedEdge.getIndex(),vSubSetNMenus.indexOf(t))) // gew�hlt und enth�lt den Knoten => entfernen
 				{
-					vg.removeEdgefromSubSet(selectedEdge.getIndex(),vSubSetNMenus.indexOf(t));
+					vg.modifySubSets.removeEdgefromSubSet(selectedEdge.getIndex(), vSubSetNMenus.indexOf(t));
 				} else {
-					vg.addEdgetoSubSet(selectedEdge.getIndex(),vSubSetNMenus.indexOf(t));
+					vg.modifySubSets.addEdgetoSubSet(vg, selectedEdge.getIndex(),vSubSetNMenus.indexOf(t));
 				}
 			}
 		} 
 		//KnotenMen� : Kanten hinzuf�gen zu allen Selektierten Knoten
 		if (e.getSource() == NaddEdgesTo) { // Add Edges to alle selected Nodes
-			vg.addEdgestoSelectedNodes(selectedNode);
+			vg.addEdgestoSelectedNodes(vg.modifyEdges, selectedNode);
 		} 
 		if (e.getSource() == NaddEdgesFrom) { // Add Edges to alle selected Nodes
-			vg.addEdgesfromSelectedNodes(selectedNode);
+			vg.addEdgesfromSelectedNodes(vg.modifyEdges, selectedNode);
 		} 
 		//KNotenMen� : KnotenEigenschaftenDialog
 		if (e.getSource() == Nproperties) 
@@ -379,12 +382,12 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		} 
 		//KnotenMen� : Knoten entfernen
 		if (e.getSource() == Ndelete) {
-			vg.removeNode(selectedNode.getIndex());
+			vg.modifyNodes.removeNode(selectedNode.getIndex());
 		}
 		//KantenMen� : L�schen
 		if (e.getSource()==Edelete)
 		{
-			vg.removeEdge(selectedEdge.getIndex());
+			vg.modifyEdges.removeEdge(selectedEdge.getIndex());
 		}
 		//KantenMen� : Eigenschaften
 		if (e.getSource()==Eproperties)

@@ -80,7 +80,7 @@ public class SVGWriter
 		 */
 		private String getNodeColorString(int nodeindex)
 		{
-			VNode v = vg.getNode(nodeindex);
+			VNode v = vg.modifyNodes.getNode(nodeindex);
 			String c="";
 			if (v==null)
 				return c;
@@ -93,7 +93,7 @@ public class SVGWriter
 		private void writeNodes(OutputStreamWriter s) throws IOException
 		{
 		    //Nodes
-		    Iterator<VNode> nodeiter = vg.getNodeIterator();
+		    Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
 		    while (nodeiter.hasNext())
 		    {
 		    	VNode actual = nodeiter.next();
@@ -149,7 +149,7 @@ public class SVGWriter
 		 */
 		private String getEdgeColorString(int edgeindex)
 		{
-			VEdge e = vg.getEdge(edgeindex);
+			VEdge e = vg.modifyEdges.getEdge(edgeindex);
 			String c="";
 			if (e==null)
 				return c;
@@ -162,15 +162,15 @@ public class SVGWriter
 		private void writeEdges(OutputStreamWriter s) throws IOException
 		{
 		       //Nodes
-	    	Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+	    	Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();
 	    	   MEdge me = vg.getMathGraph().getEdge(actual.getIndex());
 	    	   int start = me.StartIndex;
 	    	   int ende = me.EndIndex;
-	    	   Point b = vg.getNode(start).getPosition();
-	    	   Point e = vg.getNode(ende).getPosition();
+	    	   Point b = vg.modifyNodes.getNode(start).getPosition();
+	    	   Point e = vg.modifyNodes.getNode(ende).getPosition();
 	    	   b.x = b.x; b.y = b.y;
 	    	   e.x = e.x; e.y = e.y;
 	    	   //not needed int value = values.elementAt(MGraph.EDGEVALUE);
@@ -204,7 +204,7 @@ public class SVGWriter
 	    	   {
 	    		   VLoopEdge l = (VLoopEdge)actual;
 	    		   Point m = l.getControlPoints().firstElement();
-	    		   Point n = vg.getNode(me.EndIndex).getPosition();
+	    		   Point n = vg.modifyNodes.getNode(me.EndIndex).getPosition();
 	    		   //Mitte zwischen Kontrollpunkt und Start/Endknoten der hier der selbe ist
 	    		   m.x = (n.x+m.x)/2;
 	    		   m.y = (n.y+m.y)/2;
@@ -240,8 +240,8 @@ public class SVGWriter
 						top = true;
 						part = ((double)pos)*2.0d/100.0d;
 					}
-					Point p = actual.getPointonEdge(vg.getNode(start).getPosition(),vg.getNode(ende).getPosition(), part);
-					Point2D.Double dir = actual.getDirectionatPointonEdge(vg.getNode(start).getPosition(),vg.getNode(ende).getPosition(), part);
+					Point p = actual.getPointonEdge(vg.modifyNodes.getNode(start).getPosition(),vg.modifyNodes.getNode(ende).getPosition(), part);
+					Point2D.Double dir = actual.getDirectionatPointonEdge(vg.modifyNodes.getNode(start).getPosition(),vg.modifyNodes.getNode(ende).getPosition(), part);
 					double l = dir.distance(0.0d,0.0d);
 					//and norm dir
 					dir.x = dir.x/l; dir.y = dir.y/l;
@@ -283,7 +283,7 @@ public class SVGWriter
 			String s = "";
 			if (vg.getMathGraph().isDirected())
 			{
-			  	Shape arrow = edge.getArrowShape(vg.getNode(start).getPosition(),vg.getNode(ende).getPosition(),Math.round(vg.getNode(start).getSize()/2),Math.round(vg.getNode(ende).getSize()/2),1.0f);
+			  	Shape arrow = edge.getArrowShape(vg.modifyNodes.getNode(start).getPosition(),vg.modifyNodes.getNode(ende).getPosition(),Math.round(vg.modifyNodes.getNode(start).getSize()/2),Math.round(vg.modifyNodes.getNode(ende).getSize()/2),1.0f);
 			  	PathIterator path = arrow.getPathIterator(null, 0.001);
 //			  	int i=0;
 			  	s += "<path d=\"";

@@ -35,10 +35,10 @@ import dialogs.components.CNodeNameParameters;
 
 import view.Gui;
 
-import model.GraphMessage;
 import model.MNode;
 import model.VGraph;
 import model.VNode;
+import model.Messages.GraphMessage;
 
 /** JNodeDialog
  *  Dialog for creation and variation of nodes
@@ -359,7 +359,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 			}
 			if (chNode==null) //neuer Knoten, index testen
 			{
-				if (graphref.getNode(iNodeIndex.getValue())!=null) //So einen gibt es schon
+				if (graphref.modifyNodes.getNode(iNodeIndex.getValue())!=null) //So einen gibt es schon
 				{
 					JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Knotens nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -375,14 +375,14 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 					//Neuen Knoten einfuegen
 					VNode newnode = new VNode(iNodeIndex.getValue(),ixPos.getValue(), iyPos.getValue(), iSize.getValue(),0,0,0,false);
 					newnode = cNodeName.modifyNode(newnode);
-					graphref.addNode(newnode,new MNode(newnode.getIndex(),sname.getText()));
+					graphref.modifyNodes.addNode(newnode, new MNode(newnode.getIndex(),sname.getText()));
 				}
 			}
 			else //Knoten geaendert
 			{
 				if (oldindex != iNodeIndex.getValue()) //Der Benutzer hat den Index geaendert
 				{
-					if (graphref.getNode(iNodeIndex.getValue())!=null) //So einen gibt es schon
+					if (graphref.modifyNodes.getNode(iNodeIndex.getValue())!=null) //So einen gibt es schon
 					{
 						JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -393,19 +393,19 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 						return;					
 					}
 					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS));
-					graphref.changeNodeIndex(oldindex, iNodeIndex.getValue());
+					graphref.modifyNodes.changeNodeIndex(oldindex, iNodeIndex.getValue());
 				}
 				else
 				{
 					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, iNodeIndex.getValue(), GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.NODE));
 				}
 				//Allgemeine Werte aktualisieren
-				graphref.setNodeName(iNodeIndex.getValue(),sname.getText());
-				VNode n = graphref.getNode(iNodeIndex.getValue()); 
+				graphref.modifyNodes.setNodeName(iNodeIndex.getValue(), sname.getText());
+				VNode n = graphref.modifyNodes.getNode(iNodeIndex.getValue()); 
 				n.setPosition(new Point(ixPos.getValue(), iyPos.getValue()));
 				n.setSize(iSize.getValue());
 				//Knotennamenanzeigewerte
-				cNodeName.modifyNode(graphref.getNode(iNodeIndex.getValue()));
+				cNodeName.modifyNode(graphref.modifyNodes.getNode(iNodeIndex.getValue()));
 				
 
 			}
@@ -416,15 +416,15 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 				if (subsetlist.elementAt(i)!=null) //Ein Untergraph mit dem Index existiert
 				{
 					if (SubSetChecks[temp].isSelected())
-						graphref.addNodetoSubSet(iNodeIndex.getValue(), i);
+						graphref.modifySubSets.addNodetoSubSet(iNodeIndex.getValue(), i);
 					else //Sonst entfernen, da das nur geupdated wird oben !
-						graphref.removeNodefromSubSet(iNodeIndex.getValue(), i);
+						graphref.modifySubSets.removeNodefromSubSet(graphref, iNodeIndex.getValue(), i);
 					temp++; //Anzahl Knoten zaehlen
 				}
 			}
 			if (gp.getBoolValue("grid.orientated")&&gp.getBoolValue("grid.enabled"))
 			{ //Noch am Raster ausrichten, falls das aktiv ist
-				graphref.getNode(iNodeIndex.getValue()).setPosition(gridsnap(iNodeIndex.getValue()));	
+				graphref.modifyNodes.getNode(iNodeIndex.getValue()).setPosition(gridsnap(iNodeIndex.getValue()));	
 			}
 			graphref.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.BLOCK_END));
 			this.dispose();
@@ -438,7 +438,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 	 */
 	private Point gridsnap(int nodeindex)
 	{
-		VNode movingNode = graphref.getNode(iNodeIndex.getValue());
+		VNode movingNode = graphref.modifyNodes.getNode(iNodeIndex.getValue());
 		int gridx = gp.getIntValue("grid.x");
 		int gridy = gp.getIntValue("grid.y");
 		int xdistanceupper = movingNode.getPosition().x%gridx;
@@ -474,7 +474,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 					{
 						if (SubSetChecks[temp].isSelected())
 						{
-							Color newc = graphref.getSubSet(j).getColor();
+							Color newc = graphref.modifySubSets.getSubSet(j).getColor();
 							int b=colour.getBlue()*colourcount + newc.getBlue();
 							int a=colour.getAlpha()*colourcount + newc.getAlpha();
 							int g=colour.getGreen()*colourcount + newc.getGreen();

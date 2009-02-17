@@ -34,7 +34,6 @@ import javax.swing.KeyStroke;
 
 import dialogs.components.*;
 
-import model.GraphMessage;
 import model.MEdge;
 import model.VEdge;
 import model.VEdgeLinestyle;
@@ -45,6 +44,7 @@ import model.VOrthogonalEdge;
 import model.VQuadCurveEdge;
 import model.VSegmentedEdge;
 import model.VStraightLineEdge;
+import model.Messages.GraphMessage;
 
 import view.Gui;
 /**
@@ -703,7 +703,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		if (chEdge==null) //neuer Kante, index testen
 		{
 			//Index bereits vergeben ?
-			if (graphref.getEdge(iEdgeIndex.getValue())!=null) //So einen gibt es schon
+			if (graphref.modifyEdges.getEdge(iEdgeIndex.getValue())!=null) //So einen gibt es schon
 			{
 				JOptionPane.showMessageDialog(this, "<html><p>Erstellen der Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 				return;
@@ -714,7 +714,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 				return;
 			}
 			//Existiert schon eine Kante zwischen den beiden Knoten (ungerichtet) oder gar in die Richtung ?
-			if (graphref.similarPathEdgeIndex(typeedge, startindex, endindex) > 0) //ähnliche Kante existiert schon Doppelkanten darf es nicht geben
+			if (graphref.modifyEdges.similarPathEdgeIndex(typeedge, startindex, endindex) > 0) //ähnliche Kante existiert schon Doppelkanten darf es nicht geben
 			{
 				JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Eine Kante zwischen den Knoten existiert bereits.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					
 				return;
@@ -738,7 +738,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		{
 //			Auswertung der neuen Daten, Pruefung auf Korrektheit
 			//Falls sich der Kantenindex geaendert hat darf dieser nicht vergeben sein
-			if ((graphref.getEdge(iEdgeIndex.getValue())!=null)&&(iEdgeIndex.getValue()!=oldindex)) //So einen gibt es schon
+			if ((graphref.modifyEdges.getEdge(iEdgeIndex.getValue())!=null)&&(iEdgeIndex.getValue()!=oldindex)) //So einen gibt es schon
 			{
 				JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung der Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);
 				return;
@@ -763,9 +763,9 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			}
 			if (CheckType()==null)
 				return;
-			if (graphref.similarPathEdgeIndex(CheckType(),startindex,endindex) > 0) //do the actual input fields create an edge similar to an existing ?
+			if (graphref.modifyEdges.similarPathEdgeIndex(CheckType(), startindex,endindex) > 0) //do the actual input fields create an edge similar to an existing ?
 			{
-				if ((!graphref.getMathGraph().isMultipleAllowed())&&(graphref.similarPathEdgeIndex(CheckType(),startindex,endindex) != oldindex)) //ist nicht die alte Kante
+				if ((!graphref.getMathGraph().isMultipleAllowed())&&(graphref.modifyEdges.similarPathEdgeIndex(CheckType(), startindex,endindex) != oldindex)) //ist nicht die alte Kante
 				{	
 					JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"ndern der Kante nicht m&ouml;glich.<br><br>Eine Kante zwischen den Knoten existiert bereits.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					
 					return;
@@ -777,11 +777,11 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 				graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,oldindex,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
 			else
 				graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
-			graphref.removeEdge(oldindex);
+			graphref.modifyEdges.removeEdge(oldindex);
 		}
 		//hinzufuegen
 		VEdge addEdge = CheckType();
-		 graphref.addEdge(addEdge, new MEdge(addEdge.getIndex(),startindex, endindex, iValue.getValue(),EdgeName.getText()));
+		 graphref.modifyEdges.addEdge(addEdge, new MEdge(addEdge.getIndex(),startindex, endindex, iValue.getValue(),EdgeName.getText()), null, null);
 		//Gruppen einbauen
 		int temp = 0;
 		for (int i=0; i<subsetlist.size(); i++)
@@ -790,13 +790,13 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			{
 				if (SubSetChecks[temp].isSelected())
 				{
-					graphref.addEdgetoSubSet(iEdgeIndex.getValue(), i);
+					graphref.modifySubSets.addEdgetoSubSet(graphref, iEdgeIndex.getValue(), i);
 				}
 				temp++; //Anzahl Knoten zaehlen
 			}
 		}
 		//Text bauen
-		VEdge e = graphref.getEdge(iEdgeIndex.getValue());
+		VEdge e = graphref.modifyEdges.getEdge(iEdgeIndex.getValue());
 		e = cText.modifyEdge(e);
 		e = cLine.modifyEdge(e);			
 		if (chEdge!=null)//Change edge, end block
@@ -982,7 +982,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 					{
 						if (SubSetChecks[temp].isSelected())
 						{
-							Color newc = graphref.getSubSet(j).getColor();
+							Color newc = graphref.modifySubSets.getSubSet(j).getColor();
 							int b=colour.getBlue()*colourcount + newc.getBlue();
 							int a=colour.getAlpha()*colourcount + newc.getAlpha();
 							int g=colour.getGreen()*colourcount + newc.getGreen();

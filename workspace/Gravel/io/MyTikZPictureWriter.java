@@ -102,7 +102,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	 */
 	private void writeColors(OutputStreamWriter s) throws IOException
 	{
-		Iterator<VSubSet> setiter = vg.getSubSetIterator();
+		Iterator<VSubSet> setiter = vg.modifySubSets.getSubSetIterator();
 		while (setiter.hasNext())
 		{
 			VSubSet actual = setiter.next();
@@ -116,12 +116,12 @@ public class MyTikZPictureWriter implements TeXWriter {
 	}
 	private String getNodeColorString(int nodeindex)
 	{
-		VNode v = vg.getNode(nodeindex);
+		VNode v = vg.modifyNodes.getNode(nodeindex);
 		String c="";
 		if (v==null)
 			return c;
 		//Count Subsets
-		Iterator<VSubSet> setiter = vg.getSubSetIterator();
+		Iterator<VSubSet> setiter = vg.modifySubSets.getSubSetIterator();
 		int count=0;
 		while (setiter.hasNext())
 		{
@@ -129,7 +129,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 					count++;
 		}
 		int part = Math.round(100.0f/(float)count);
-		setiter = vg.getSubSetIterator();
+		setiter = vg.modifySubSets.getSubSetIterator();
 		while (setiter.hasNext())
 		{ //Add the Color of the subset with the part it takes in the color
 			c += "SubSet"+setiter.next().getIndex()+"!"+part;
@@ -139,7 +139,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	private void writeNodes(OutputStreamWriter s) throws IOException
 	{
 	    //Nodes
-	    Iterator<VNode> nodeiter = vg.getNodeIterator();
+	    Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
 	    while (nodeiter.hasNext())
 	    {
 	    	VNode actual = nodeiter.next();
@@ -192,7 +192,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	private void writeEdges(OutputStreamWriter s) throws IOException
 	{
 	       //Nodes
-	    	Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+	    	Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();

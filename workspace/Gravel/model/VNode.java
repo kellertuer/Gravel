@@ -1,5 +1,4 @@
 package model;
-import java.awt.Color;
 import java.awt.Point;
 import java.util.Comparator;
 /**
@@ -34,8 +33,6 @@ public class VNode extends VItem {
 		private int name_distance, name_rotation, name_size;
 		private boolean name_visible=false;
 		
-		protected Color colour; //Farbe des Knotens
-		protected int setCount; //Anzahl Mengen in denen der Knoten beteiligt ist, f�r Color 
 		/**
 		 * Internal constructor for the std-values
 		 * @param i
@@ -49,8 +46,6 @@ public class VNode extends VItem {
 			super(i);
 			Pos = new Point(x,y);
 			size = s;
-			setCount = 0;
-			colour = Color.black;
 		}
 		/**
 		 * Initialize a visual Node
@@ -81,56 +76,6 @@ public class VNode extends VItem {
 			VNode nodeclone = new VNode(getIndex(),getPosition().x,getPosition().y,getSize(),getNameDistance(),getNameRotation(), getNameSize(),isNameVisible());
 			nodeclone.setSelectedStatus(getSelectedStatus());
 			return nodeclone;
-		}
-		/**
-		 * Actual Color the actual Color of the node
-		 * @return the color of the node
-		 */
-		public Color getColor()
-		{
-			return colour;
-		}
-		/**
-		 * Add a further Color to the node - used by subsets
-		 * the color is computed by the average of all color added to the node
-		 * @param newc new color added to the node
-		 */
-		public void addColor(Color newc)
-		{
-			if (newc==null)
-				return;
-			int b=colour.getBlue()*setCount + newc.getBlue();
-			int a=colour.getAlpha()*setCount + newc.getAlpha();
-			int g=colour.getGreen()*setCount + newc.getGreen();
-			int r=colour.getRed()*setCount + newc.getRed();
-			setCount++;
-			colour = new Color((r/setCount),(g/setCount),(b/setCount),(a/setCount));
-		}
-		/**
-		 * Remove a color by compuattion if at least one color was added to the node
-		 * @param newc
-		 */
-		public void removeColor(Color newc)
-		{
-			if (setCount > 1)
-			{
-				int b=colour.getBlue()*setCount - newc.getBlue();
-				int a=colour.getAlpha()*setCount - newc.getAlpha();
-				int g=colour.getGreen()*setCount - newc.getGreen();
-				int r=colour.getRed()*setCount - newc.getRed();
-				//Durch Rundungsfehler können dabei negative werte entstehen, diese also verhindern
-				if (b<0) b=0;
-				if (a<0) a=0;
-				if (r<0) r=0;
-				if (g<0) g=0;
-				setCount--;
-				colour = new Color((r/setCount),(g/setCount),(b/setCount),(a/setCount));
-			}
-			else
-			{
-				colour = Color.black;
-				setCount = 0;
-			}
 		}
 		/**
 		 * The Draw Point is the top left corner of the rectangle sorrounding the circle of the nodesize

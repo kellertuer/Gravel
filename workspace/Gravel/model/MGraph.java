@@ -7,6 +7,8 @@ import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.Observable;
+
+import model.Messages.GraphMessage;
 /**
  * MGraph
  * 
@@ -1153,6 +1155,5 @@ public class MGraph extends Observable
 		}
 		return ret;
 	}
-
 }
 

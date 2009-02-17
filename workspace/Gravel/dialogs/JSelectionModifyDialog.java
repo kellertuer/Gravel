@@ -37,7 +37,6 @@ import dialogs.components.*;
 
 import view.Gui;
 
-import model.GraphMessage;
 import model.MEdge;
 import model.VEdge;
 import model.VGraph;
@@ -46,6 +45,7 @@ import model.VLoopEdge;
 import model.VNode;
 import model.VStraightLineEdge;
 import model.VSubSet;
+import model.Messages.GraphMessage;
 /**
  * This class provides an UI for modifying all selected Nodes and Edges (if they exist)
  * 
@@ -136,11 +136,11 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	{
 		vg = graph;
 		//If selected nodes exist and the tab should be shown
-		show_position = translate & vg.selectedNodeExists();
+		show_position = translate & vg.modifyNodes.selectedNodeExists();
 		//If selected nodes exist and the porperties should be shown
-		show_nodeprop = properties & vg.selectedNodeExists();
-		show_edgeprop = properties & vg.selectedEdgeExists();
-		show_subsets = subgraphs & (vg.selectedEdgeExists() || vg.selectedNodeExists())&&(vg.getMathGraph().SubSetCount() > 0);
+		show_nodeprop = properties & vg.modifyNodes.selectedNodeExists();
+		show_edgeprop = properties & vg.modifyEdges.selectedEdgeExists();
+		show_subsets = subgraphs & (vg.modifyEdges.selectedEdgeExists() || vg.modifyNodes.selectedNodeExists())&&(vg.getMathGraph().SubSetCount() > 0);
 		//None of the tabs should be shown, that would be quite wrong
 		setTitle(title);
 		tabs = new JTabbedPane();
@@ -443,7 +443,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	private void fillCommonNodeValues()
 	{
 		//Werte suchen fuer die Initialisierung/Gemeinsame werte der Auswahl
-		Iterator<VNode> nodeiter = vg.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
 		int preNodeSize=-1, preNodeTextSize=-1, preNodeTextDis=-1, preNodeTextRot=-1;
 		//ShowText ist der wert und given sagt, ob der allgemeingültig ist
 		boolean preNodeShowText=false, preNodeShowTextgiven=true,beginning = true;
@@ -588,7 +588,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			cArrow = new CEdgeArrowParameters(null,true); //std values, with checks
 			EdgeTabs.add("Pfeil", cArrow.getContent());
 		}
-		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
 		boolean loops=false;
 		while (edgeiter.hasNext())
 		{
@@ -611,7 +611,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	private void fillCommonEdgeValues()
 	{
 		//Werte suchen fuer die Initialisierung/Gemeinsame werte der Auswahl
-		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
 		VEdge pre = new VStraightLineEdge(0,0);
 		int preEdgeValue=0;
 		boolean preEdgeShowTextgiven=true,beginning = true, preEdgeTextShowValuegiven=true, preEdgeLineTypegiven=true;
@@ -803,14 +803,14 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		boolean preSubSetsequal = true;
 		Vector<Boolean> subsets = new Vector<Boolean>(vg.getMathGraph().getSetNames().size());
 		subsets.setSize(vg.getMathGraph().getSetNames().size());
-		Iterator<VNode> nodeiter = vg.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
 		boolean beginning = true;
 		while (nodeiter.hasNext())
 		{
 			VNode actual = nodeiter.next();
 			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
-				Iterator<VSubSet> subsetiter = vg.getSubSetIterator();
+				Iterator<VSubSet> subsetiter = vg.modifySubSets.getSubSetIterator();
 				while (subsetiter.hasNext())
 				{
 					VSubSet s = subsetiter.next();
@@ -825,13 +825,13 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				beginning = false;
 			}
 		}
-		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
 		while (edgeiter.hasNext())
 		{
 			VEdge actual = edgeiter.next();
 			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
-				Iterator<VSubSet> subsetiter = vg.getSubSetIterator();
+				Iterator<VSubSet> subsetiter = vg.modifySubSets.getSubSetIterator();
 				while (subsetiter.hasNext())
 				{
 					VSubSet s = subsetiter.next();
@@ -879,7 +879,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	{
 		x = Math.round(x/2);
 		y = Math.round(y/2);
-		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
 		while (edgeiter.hasNext())
 		{
 			VEdge e = edgeiter.next();
@@ -894,7 +894,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	 */
 	private void translate()
 	{
-		Iterator<VNode> nodeiter = vg.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
 		while (nodeiter.hasNext())
 		{
 			VNode t = nodeiter.next();
@@ -940,7 +940,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 
 		//Knoten zaehlen
 		int nodecount = 0;
-		Iterator<VNode> nodeiter = vg.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
 		while (nodeiter.hasNext())
 		{
 			if ((nodeiter.next().getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
@@ -955,7 +955,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		int my = iOriginY.getValue();
 		int mr = iCircleRadius.getValue();
 		double actualdeg = start;
-		nodeiter = vg.getNodeIterator();
+		nodeiter = vg.modifyNodes.getNodeIterator();
 		while (nodeiter.hasNext()) 
 		{
 			VNode temp = nodeiter.next();
@@ -983,7 +983,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	{ 
 		boolean changed = false;
 		//Set all nodes to the selected values, if they are selected
-		Iterator<VNode> nodeiter = vg.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
 		while (nodeiter.hasNext())
 		{
 			VNode actual = nodeiter.next();
@@ -992,7 +992,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				//Node Name
 				if (bChNodeName.isSelected())
 				{
-					vg.setNodeName(actual.getIndex(), GeneralPreferences.replace(sNodeName.getText(), "$ID",""+actual.getIndex()));
+					vg.modifyNodes.setNodeName(actual.getIndex(), GeneralPreferences.replace(sNodeName.getText(), "$ID",""+actual.getIndex()));
 					changed = true;
 				}
 				//Node Size
@@ -1014,7 +1014,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	private boolean modifyEdges()
 	{
 		boolean changed = false;
-		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
 		while (edgeiter.hasNext())
 		{
 			VEdge actual = edgeiter.next();
@@ -1027,7 +1027,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 					t = GeneralPreferences.replace(t,"$ID",actual.getIndex()+"");
 					t = GeneralPreferences.replace(t,"$SID",vg.getMathGraph().getEdge(actual.getIndex()).StartIndex+"");
 					t = GeneralPreferences.replace(t,"$EID",vg.getMathGraph().getEdge(actual.getIndex()).EndIndex+"");
-					vg.setEdgeName(actual.getIndex(), t);
+					vg.modifyEdges.setEdgeName(actual.getIndex(), t);
 					changed=true;
 				}
 				if (bChEdgeValue.isSelected())
@@ -1073,7 +1073,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	{
 		if (!bChSubSets.isSelected())
 			return false; //Don't do it if the user diesn't want to
-		Iterator<VNode> nodeiter = vg.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
 		while (nodeiter.hasNext())
 		{
 			VNode actual = nodeiter.next();
@@ -1086,16 +1086,16 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 					if (names.get(i)!=null) //SubSet with this index exists
 					{
 						if (bSubSet[position].isSelected())
-							vg.addNodetoSubSet(actual.getIndex(), i);
+							vg.modifySubSets.addNodetoSubSet(actual.getIndex(), i);
 						else
-							vg.removeNodefromSubSet(actual.getIndex(), i);
+							vg.modifySubSets.removeNodefromSubSet(vg, actual.getIndex(), i);
 						position++;
 					}
 				}
 			}
 		}
 		//And the same for the edges
-		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
 		while (edgeiter.hasNext())
 		{
 			VEdge actual = edgeiter.next();
@@ -1108,9 +1108,9 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 					if (names.get(i)!=null) //SubSet with this index exists
 					{
 						if (bSubSet[position].isSelected())
-							vg.addEdgetoSubSet(actual.getIndex(), i);
+							vg.modifySubSets.addEdgetoSubSet(vg, actual.getIndex(), i);
 						else
-							vg.removeEdgefromSubSet(actual.getIndex(), i);
+							vg.modifySubSets.removeEdgefromSubSet(actual.getIndex(), i);
 						position++;
 					}
 				}

@@ -1,4 +1,4 @@
-package model;
+package model.Messages;
 /**
  * This Class represents alls possible Updates and changes,
  * that may occur in a Graph and represents them
@@ -33,12 +33,13 @@ public class GraphMessage {
 	public static final int MULTIPLE = 64;
 	public static final int ALL = 0xffff;
 
-	//Status - Change that Happened
+	//Modification
 	public static final int UPDATE = 1;
 	public static final int ADDITION = 2;
 	public static final int REMOVAL = 4;
 	public static final int TRANSLATION = 8;
 	public static final int REPLACEMENT = 16;
+	public static final int INDEXCHANGED = 32;
 	//Special Stati for Block Updates
 	public static final int BLOCK_START = 512;
 	public static final int BLOCK_END = 1024;
@@ -92,7 +93,7 @@ public class GraphMessage {
 	 * UPDATED, ADDED, REMOVED
 	 * @return status
 	 */
-	public int getChangeStatus()
+	public int getModification()
 	{
 		return status;
 	}
@@ -100,7 +101,7 @@ public class GraphMessage {
 	 * Get the elements that where actually changed,
 	 * may not bet unique, because one action may have changed multiple types
 	 */
-	public int getAction()
+	public int getModifiedElementTypes()
 	{
 		return type;
 	}
@@ -116,7 +117,7 @@ public class GraphMessage {
 	 * Get the types of affected Types that need to be updated in other listening classes (e.g. drawing)
 	 * @return
 	 */
-	public int getAffectedTypes()
+	public int getAffectedElementTypes()
 	{
 		return affected;
 	}

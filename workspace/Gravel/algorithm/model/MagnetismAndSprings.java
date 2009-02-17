@@ -4,11 +4,11 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import model.GraphMessage;
 import model.MEdge;
 import model.VEdge;
 import model.VGraph;
 import model.VNode;
+import model.Messages.GraphMessage;
 
 public class MagnetismAndSprings implements VAlgorithmIF 
 {
@@ -26,7 +26,7 @@ public class MagnetismAndSprings implements VAlgorithmIF
 	//Direction ist ignored
 	public boolean GraphOkay() 
 	{
-		Iterator<VEdge> edgeiterator = vg.getEdgeIterator();
+		Iterator<VEdge> edgeiterator = vg.modifyEdges.getEdgeIterator();
 		while (edgeiterator.hasNext())
 		{
 			if (edgeiterator.next().getType()!=VEdge.STRAIGHTLINE)
@@ -77,12 +77,12 @@ public class MagnetismAndSprings implements VAlgorithmIF
 	{
 		movement = 0;
 		//Calulate for each node the Force indicated by all edges and nodes
-		Iterator <VNode> mainiterator = vg.getNodeIterator();
+		Iterator <VNode> mainiterator = vg.modifyNodes.getNodeIterator();
 		while (mainiterator.hasNext())
 		{
 			VNode v = mainiterator.next(); //Actual Node to be moved
 			double force_x=0, force_y=0; //Movement of the node
-			Iterator<VEdge> edgeiterator = vg.getEdgeIterator();
+			Iterator<VEdge> edgeiterator = vg.modifyEdges.getEdgeIterator();
 			while (edgeiterator.hasNext())
 			{
 				VEdge e = edgeiterator.next();
@@ -95,7 +95,7 @@ public class MagnetismAndSprings implements VAlgorithmIF
 					uindex=start;
 				if (uindex!=0) //Edge is connected with u and so a force is added
 				{
-					VNode u = vg.getNode(uindex);
+					VNode u = vg.modifyNodes.getNode(uindex);
 					double distance = v.getPosition().distance(u.getPosition());
 					double elength = edgelength; //length the edge wishes to have
 					if (useedgevalue)
@@ -104,7 +104,7 @@ public class MagnetismAndSprings implements VAlgorithmIF
 					force_y += edgestrength * (distance-elength) * (u.getPosition().y-v.getPosition().y)/distance;
 				}
 			}
-			Iterator<VNode> nodeiterator = vg.getNodeIterator();
+			Iterator<VNode> nodeiterator = vg.modifyNodes.getNodeIterator();
 			while (nodeiterator.hasNext())
 			{
 				VNode u = nodeiterator.next();

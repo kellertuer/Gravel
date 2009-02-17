@@ -74,7 +74,7 @@ public class LayeredTreeDraw implements VAlgorithmIF
 				erg = new VGraph(false,false,false);
 			else
 				erg = new VGraph(true,false,false);				
-			erg.addNode(new VNode(subtreeroot.index,gridX,gridY,gp.getIntValue("node.size"),gp.getIntValue("node.name_distance"),gp.getIntValue("node.name_rotation"),gp.getIntValue("node.name_size"),gp.getBoolValue("node.name_visible")),new MNode(subtreeroot.index,subtreeroot.name));
+			erg.modifyNodes.addNode(new VNode(subtreeroot.index,gridX,gridY,gp.getIntValue("node.size"),gp.getIntValue("node.name_distance"),gp.getIntValue("node.name_rotation"),gp.getIntValue("node.name_size"),gp.getBoolValue("node.name_visible")), new MNode(subtreeroot.index,subtreeroot.name));
 			return erg;
 		}
 		//Sonst beide Söhne herausfinden
@@ -106,37 +106,36 @@ public class LayeredTreeDraw implements VAlgorithmIF
 		//No Enviroment, so no Node-Text-Infos are given
 		rightsubtree.translate((1+(int)(leftsubtree.getMaxPoint(null).x/gridX))*gridX,gridY);
 		//Da jeder stets den eignen Index verwendet (s.o.) iteriere über right füge die zum andren hinzu
-		Iterator<VNode> copynodes = rightsubtree.getNodeIterator();
+		Iterator<VNode> copynodes = rightsubtree.modifyNodes.getNodeIterator();
 		while (copynodes.hasNext())
 		{
 			VNode shift = copynodes.next();
-			leftsubtree.addNode(shift,
-						new MNode(shift.getIndex(),rightsubtree.getMathGraph().getNode(shift.getIndex()).name));
+			leftsubtree.modifyNodes.addNode(shift, new MNode(shift.getIndex(),rightsubtree.getMathGraph().getNode(shift.getIndex()).name));
 		}	
-		Iterator<VEdge> copyedges = rightsubtree.getEdgeIterator();
+		Iterator<VEdge> copyedges = rightsubtree.modifyEdges.getEdgeIterator();
 		while (copyedges.hasNext())
 		{
 			VEdge shift = copyedges.next();
 			MEdge shiftm = rightsubtree.getMathGraph().getEdge(shift.getIndex());
-			leftsubtree.addEdge(shift,shiftm);
+			leftsubtree.modifyEdges.addEdge(shift, shiftm,null, null);
 		}
 		//Nun sind beide im left, also auf höhe 1 noch den neuen in der mitte zwischen left und right
-		int x = Math.round((leftsubtree.getNode(left.index).getPosition().x + leftsubtree.getNode(right.index).getPosition().x)/2);
+		int x = Math.round((leftsubtree.modifyNodes.getNode(left.index).getPosition().x + leftsubtree.modifyNodes.getNode(right.index).getPosition().x)/2);
 		VNode VSubTreeroot = new VNode(subtreeroot.index,x, gridY,gp.getIntValue("node.size"),gp.getIntValue("node.name_distance"),gp.getIntValue("node.name_rotation"),gp.getIntValue("node.name_size"),gp.getBoolValue("node.name_visible"));
-		leftsubtree.addNode(VSubTreeroot, new MNode(VSubTreeroot.getIndex(),subtreeroot.name));
+		leftsubtree.modifyNodes.addNode(VSubTreeroot, new MNode(VSubTreeroot.getIndex(),subtreeroot.name));
 		if ((type==UNDIR)||(type==DOWNTREE))
 		{
 			int l = mG.getEdgeIndices(subtreeroot.index, left.index).firstElement();
 			int r = mG.getEdgeIndices(subtreeroot.index, right.index).firstElement();
-			leftsubtree.addEdge(new VStraightLineEdge(l,gp.getIntValue("edge.width")), new MEdge(l,subtreeroot.index, left.index,1,""));
-			leftsubtree.addEdge(new VStraightLineEdge(r,gp.getIntValue("edge.width")), new MEdge(r,subtreeroot.index, right.index,1,""));
+			leftsubtree.modifyEdges.addEdge(new VStraightLineEdge(l,gp.getIntValue("edge.width")), new MEdge(l,subtreeroot.index, left.index,1,""), null, null);
+			leftsubtree.modifyEdges.addEdge(new VStraightLineEdge(r,gp.getIntValue("edge.width")), new MEdge(r,subtreeroot.index, right.index,1,""), null, null);
 		}
 		else
 		{
 			int l = mG.getEdgeIndices(left.index,subtreeroot.index).firstElement();
 			int r = mG.getEdgeIndices(right.index,subtreeroot.index).firstElement();
-			leftsubtree.addEdge(new VStraightLineEdge(l,gp.getIntValue("edge.width")),new MEdge(l,left.index, subtreeroot.index,1,""));
-			leftsubtree.addEdge(new VStraightLineEdge(r,gp.getIntValue("edge.width")), new MEdge(r,right.index, subtreeroot.index,1,""));			
+			leftsubtree.modifyEdges.addEdge(new VStraightLineEdge(l,gp.getIntValue("edge.width")), new MEdge(l,left.index, subtreeroot.index,1,""),null, null);
+			leftsubtree.modifyEdges.addEdge(new VStraightLineEdge(r,gp.getIntValue("edge.width")), new MEdge(r,right.index, subtreeroot.index,1,""), null, null);			
 		}
 		return leftsubtree;
 	}

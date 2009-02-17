@@ -293,7 +293,7 @@ public class GravelMLContentHandler implements ContentHandler
 			if (sb>255) sb%=256;
 			if ((sr!=0)||(sg!=0)||(sb!=0))
 			{
-				vG.setSubSetColor(id,new Color(sr,sg,sb));
+				vG.modifySubSets.setSubSetColor(id, new Color(sr,sg,sb));
 			}
 		}
 		data_key="";
@@ -391,7 +391,7 @@ public class GravelMLContentHandler implements ContentHandler
 					isValid=false; //kein Name => Fehler
 					return;
 				}
-				if (vG.getNode(id)!=null)
+				if (vG.modifyNodes.getNode(id)!=null)
 				{
 					System.err.println("DEBUG : Error Parsing File : Node Index already given another node.");
 					isValid=false;
@@ -403,7 +403,7 @@ public class GravelMLContentHandler implements ContentHandler
 					nr = gp.getIntValue("node.name_rotation");
 				if (nns==-1) //parse error or none found => std value
 					nns = gp.getIntValue("node.name_size");
-				vG.addNode(new VNode(id,nx,ny,ns,nd,nr,nns,nnv), new MNode(id,nn));
+				vG.modifyNodes.addNode(new VNode(id,nx,ny,ns,nd,nr,nns,nnv), new MNode(id,nn));
 				this.NodeIdtoIndex.put(idString, id);
 			}
 			else //im Mathgraph reicht der Name schon
@@ -540,13 +540,13 @@ public class GravelMLContentHandler implements ContentHandler
 			//Everythings okay, add the VEdge (puh, that was work!)
 			//For multiple edges - similar exist ? (non multiple : edge between start end end ?)
 			//Check for the visual Part
-			if (vG.similarPathEdgeIndex(toAdd, start, ende) > 0) //old : vG.getEdgeIndices(start, ende)!=-1) 
+			if (vG.modifyEdges.similarPathEdgeIndex(toAdd, start, ende) > 0) //old : vG.getEdgeIndices(start, ende)!=-1) 
 			{
 				isValid= false; 
 				System.err.println("DEBUG : Error Parsing File : An (similar) Edge already existst between the two Nodes"); 
 				return;
 			}
-			vG.addEdge(toAdd,new MEdge(toAdd.getIndex(),start,ende,ev,en));
+			vG.modifyEdges.addEdge(toAdd, new MEdge(toAdd.getIndex(),start,ende,ev,en),null, null);
 			this.EdgeIdtoIndex.put(idString,id);
 		}
 	}
@@ -574,7 +574,7 @@ public class GravelMLContentHandler implements ContentHandler
 			VSubSet vs = new VSubSet(id,Color.BLACK);
 			MSubSet ms = new MSubSet(id,gp.getSubSetName(id));
 			if (isVisual)
-				vG.addSubSet(vs,ms);
+				vG.modifySubSets.addSubSet(vs, ms);
 			else
 				mG.addSubSet(ms);
 		}
@@ -588,8 +588,8 @@ public class GravelMLContentHandler implements ContentHandler
 			
 			if (isVisual)
 			{
-				if (vG.getNode(nodeindex)!=null)
-					vG.addNodetoSubSet(nodeindex, id);
+				if (vG.modifyNodes.getNode(nodeindex)!=null)
+					vG.modifySubSets.addNodetoSubSet(nodeindex, id);
 				else
 					{isValid=false; System.err.println("The Node '"+nodeid+"' does not exist."); return;}
 			}
@@ -611,15 +611,15 @@ public class GravelMLContentHandler implements ContentHandler
 			
 			if (isVisual)
 			{
-				if (vG.getEdge(edgeindex)!=null)
-					vG.addEdgetoSubSet(edgeindex, id);
+				if (vG.modifyEdges.getEdge(edgeindex)!=null)
+					vG.modifySubSets.addEdgetoSubSet(vG, edgeindex, id);
 				else
 					{isValid=false; System.err.println("The Edge '"+edgeid+"' does not exist."); return;}
 			}
 			else
 			{
 				if (mG.getEdge(edgeindex).Value!=-1)
-					vG.addEdgetoSubSet(edgeindex, id);
+					vG.modifySubSets.addEdgetoSubSet(vG, edgeindex, id);
 				else
 					{isValid=false; System.err.println("The Node '"+edgeid+"' does not exist."); return;}
 			}
@@ -636,10 +636,10 @@ public class GravelMLContentHandler implements ContentHandler
 		{
 			if (isVisual)
 			{
-				if (vG.getSubSet(id).getColor()==Color.BLACK)
+				if (vG.modifySubSets.getSubSet(id).getColor()==Color.BLACK)
 				{
 					System.err.println("DEBUG : Error Parsing File : The SubSet has no Color!");
-					vG.removeSubSet(id);
+					vG.modifySubSets.removeSubSet(id);
 					isValid=false;
 					return;
 				}

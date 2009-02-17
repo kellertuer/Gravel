@@ -21,12 +21,12 @@ import control.OCMDragMouseHandler;
 import control.StandardClickMouseHandler;
 import control.StandardDragMouseHandler;
 
-import model.GraphMessage;
 import model.MEdge;
 import model.VEdge;
 import model.VGraph;
 import model.VItem;
 import model.VNode;
+import model.Messages.GraphMessage;
 
 import view.pieces.GridComponent;
 import view.pieces.ZoomComponent;
@@ -128,16 +128,16 @@ public class VGraphic extends Component implements 	Observer
 	private void paintEdges(Graphics g)
 	{
 		Graphics2D g2 = (Graphics2D) g;
-		Iterator<VEdge> ei = vG.getEdgeIterator();
+		Iterator<VEdge> ei = vG.modifyEdges.getEdgeIterator();
 		g2.setStroke(vEdgeStyle);
 		boolean directed = vG.getMathGraph().isDirected();
 		while (ei.hasNext()) // drawEdges
 		{
 			VEdge temp = ei.next(); //Grafischer Teil
 			MEdge tempm = vG.getMathGraph().getEdge(temp.getIndex());
-			Point p1 = vG.getNode(tempm.StartIndex).getPosition(); //Startkoordinaten
-			VNode EndNode = vG.getNode(tempm.EndIndex); //Endknoten
-			VNode StartNode = vG.getNode(tempm.StartIndex); //Endknoten
+			Point p1 = vG.modifyNodes.getNode(tempm.StartIndex).getPosition(); //Startkoordinaten
+			VNode EndNode = vG.modifyNodes.getNode(tempm.EndIndex); //Endknoten
+			VNode StartNode = vG.modifyNodes.getNode(tempm.StartIndex); //Endknoten
 			Point p2 = EndNode.getPosition();
 			if ((((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)||((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))&&((temp.getSelectedStatus()&VItem.SOFT_DESELECTED)!=VItem.SOFT_DESELECTED))
 			{
@@ -216,7 +216,7 @@ public class VGraphic extends Component implements 	Observer
 	private void paintNodes(Graphics g)
 	{
 		Graphics2D g2 = (Graphics2D) g;
-		Iterator<VNode> nodeiter = vG.getNodeIterator();
+		Iterator<VNode> nodeiter = vG.modifyNodes.getNodeIterator();
 		while (nodeiter.hasNext()) // drawNodes
 		{
 			VNode temp = nodeiter.next();
@@ -260,7 +260,7 @@ public class VGraphic extends Component implements 	Observer
 	 */
 	private void paintControllPoints(Graphics g)
 	{
-		Iterator<VEdge> edgeiter = vG.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vG.modifyEdges.getEdgeIterator();
 		while (edgeiter.hasNext()) // drawEdges
 		{
 			VEdge temp = edgeiter.next(); //Grafischer Teil
@@ -444,105 +444,108 @@ public class VGraphic extends Component implements 	Observer
 			zoomfactor = 1.0f;
 		}
 	}
-	
-	public void update(Observable o, Object arg) 
+	private void handleGraphUpdate(GraphMessage m)
 	{
-		if (o.equals(vG)&&(((GraphMessage)arg)!=null)) //Der Graph wurde aktualisiert und auch echt ein String gegeben
+		if ((m.getAffectedElementTypes()&(GraphMessage.ALL_ELEMENTS|GraphMessage.SELECTION)) > 0) //Anything in Elements or selections changed
 		{
-			GraphMessage m = (GraphMessage)arg;
-			if ((m.getAffectedTypes()&(GraphMessage.ALL_ELEMENTS|GraphMessage.SELECTION)) > 0) //Anything in Elements or selections changed
-			{
-				Point MouseOffSet = new Point(0,0);
-				if (Drag!=null)
-					MouseOffSet = Drag.getMouseOffSet(); //Bewegungspunkt
-				Point GraphSize = new Point(Math.round(vG.getMaxPoint(getGraphics()).x*zoomfactor),Math.round(vG.getMaxPoint(getGraphics()).y*zoomfactor));
-				int offset = gp.getIntValue("vgraphic.framedistance");
-				int x = Math.max(GraphSize.x+offset,vp.getViewRect().x+vp.getViewRect().width-offset);
-				int y = Math.max(GraphSize.y+offset,vp.getViewRect().y+vp.getViewRect().height-offset);
-				setPreferredSize(new Dimension(x,y));
-				setSize(new Dimension(x,y));
-				//Nun soll mitgescrollt werden, falls ein Knoten oder eine Kante (CP) in Bewegung ist 
-				//und die Maus theoretisch aus dem sichtbaren kram raus ist
-				Rectangle r = vp.getViewRect();
-				if ((Drag!=null)&&(Drag.dragged())&&(!r.contains(MouseOffSet)))	
-				{		
-					//System.err.print("Move Me : "+r+" and "+MouseOffSet);
-					int xdiff = MouseOffSet.x-r.x-r.width;
-					if (xdiff > 0) //Dann ist die Maus nach rechts rausgewandert
-						r.x += xdiff;
-					xdiff = r.x - MouseOffSet.x;
-					if (xdiff > 0) //nach Links rausgewandert
-						r.x -= xdiff;
-					int ydiff = MouseOffSet.y-r.y-r.height;
-					if (ydiff > 0) //nach unten rausgewandert
-						r.y += ydiff;
-					ydiff = r.y - MouseOffSet.y;
-					if (ydiff > 0) //nach oben rausgewandert
-						r.y -=ydiff;
-					if (r.y < 0) r.y = 0;
-					if (r.x < 0) r.x = 0;
-					vp.setViewPosition(new Point(r.x,r.y));
-					//wiederholen bis das nicht mehr der fall ist ?
-				}
-				vp.revalidate();
-				vp.getParent().validate();
-				repaint();	
-			}
-			else if ((m.getAction()&GraphMessage.SUBSET)==GraphMessage.SUBSET)
-			{
-				repaint();
-				if (Click!=null)
-					Click.updateSubSetList();
-			}
-		}
-		else if ((Controls.get((String)arg)!=null)&&(Controls.get((String)arg).equals(o))) //Der String entpsirhct dem eingetragenen Control
-		{
-			if (((String)arg).equals("Zoom"))
-			{
-				//reset zoomfactor
-				gp.setIntValue("vgraphic.zoom",((ZoomComponent)o).getZoom());
-			}
-			else if (((String)arg).equals("Grid"))
-			{
-				gridx = ((GridComponent)o).getGridX();
-				gridy = ((GridComponent)o).getGridY();
-				gridenabled = ((GridComponent)o).isEnabled();
-				gridorientated = ((GridComponent)o).isOrientated();
-				if (Drag!=null)
-				{
-					Drag.setGridOrientated(gridenabled&&gridorientated);
-					Drag.setGrid(gridx,gridy);
-				}
-				repaint();
-				//UpdateGrid
-			}
-		}
-		else if (o.equals(gp)) //Preferences geupdated
-		{
-			if (usezoom)
-			{
-				zoomfactor = (float)gp.getIntValue("vgraphic.zoom") / 100;
-				if (Controls.get("Zoom")!=null) //A Zoom Component is added to this 
-				{
-					if (((ZoomComponent)Controls.get("Zoom")).getZoom()!=gp.getIntValue("vgraphic.zoom")) //The Change was not set from the ZoomComponent
-					{ //Update the Component
-						((ZoomComponent)Controls.get("Zoom")).setZoom(gp.getIntValue("vgraphic.zoom"));
-					}
-				}
-			}
-			gridx = gp.getIntValue("grid.x");
-			gridy = gp.getIntValue("grid.y");
-			gridenabled = gp.getBoolValue("grid.enabled");
-			gridorientated = gp.getBoolValue("grid.orientated");
+			Point MouseOffSet = new Point(0,0);
 			if (Drag!=null)
-			{
-				Drag.setGridOrientated(gridenabled&&gridorientated);
-				Drag.setGrid(gridx,gridy);
+				MouseOffSet = Drag.getMouseOffSet(); //Bewegungspunkt
+			Point GraphSize = new Point(Math.round(vG.getMaxPoint(getGraphics()).x*zoomfactor),Math.round(vG.getMaxPoint(getGraphics()).y*zoomfactor));
+			int offset = gp.getIntValue("vgraphic.framedistance");
+			int x = Math.max(GraphSize.x+offset,vp.getViewRect().x+vp.getViewRect().width-offset);
+			int y = Math.max(GraphSize.y+offset,vp.getViewRect().y+vp.getViewRect().height-offset);
+			setPreferredSize(new Dimension(x,y));
+			setSize(new Dimension(x,y));
+			//Nun soll mitgescrollt werden, falls ein Knoten oder eine Kante (CP) in Bewegung ist 
+			//und die Maus theoretisch aus dem sichtbaren kram raus ist
+			Rectangle r = vp.getViewRect();
+			if ((Drag!=null)&&(Drag.dragged())&&(!r.contains(MouseOffSet)))	
+			{		
+				//System.err.print("Move Me : "+r+" and "+MouseOffSet);
+				int xdiff = MouseOffSet.x-r.x-r.width;
+				if (xdiff > 0) //Dann ist die Maus nach rechts rausgewandert
+					r.x += xdiff;
+				xdiff = r.x - MouseOffSet.x;
+				if (xdiff > 0) //nach Links rausgewandert
+					r.x -= xdiff;
+				int ydiff = MouseOffSet.y-r.y-r.height;
+				if (ydiff > 0) //nach unten rausgewandert
+					r.y += ydiff;
+				ydiff = r.y - MouseOffSet.y;
+				if (ydiff > 0) //nach oben rausgewandert
+					r.y -=ydiff;
+				if (r.y < 0) r.y = 0;
+				if (r.x < 0) r.x = 0;
+				vp.setViewPosition(new Point(r.x,r.y));
+				//wiederholen bis das nicht mehr der fall ist ?
 			}
-			selColor = new Color(gp.getIntValue("vgraphic.selcolr"),gp.getIntValue("vgraphic.selcolg"),gp.getIntValue("vgraphic.selcolb"));
-			selWidth = gp.getIntValue("vgraphic.selwidth");
-			vG.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE)); //Zoom and Selection stuff belong to the mark actions on a graph - they don't change the state to "not saved yet"
-			repaint();
+			vp.revalidate();
+			vp.getParent().validate();
+			repaint();	
 		}
+		else if ((m.getModifiedElementTypes()&GraphMessage.SUBSET)==GraphMessage.SUBSET)
+		{
+			repaint();
+			if (Click!=null)
+				Click.updateSubSetList();
+		}
+	}
+	public void handlePreferencesUpdate()
+	{
+		if (usezoom)
+		{
+			zoomfactor = (float)gp.getIntValue("vgraphic.zoom") / 100;
+			if (Controls.get("Zoom")!=null) //A Zoom Component is added to this 
+			{
+				if (((ZoomComponent)Controls.get("Zoom")).getZoom()!=gp.getIntValue("vgraphic.zoom")) //The Change was not set from the ZoomComponent
+				{ //Update the Component
+					((ZoomComponent)Controls.get("Zoom")).setZoom(gp.getIntValue("vgraphic.zoom"));
+				}
+			}
+		}
+		gridx = gp.getIntValue("grid.x");
+		gridy = gp.getIntValue("grid.y");
+		gridenabled = gp.getBoolValue("grid.enabled");
+		gridorientated = gp.getBoolValue("grid.orientated");
+		if (Drag!=null)
+		{
+			Drag.setGridOrientated(gridenabled&&gridorientated);
+			Drag.setGrid(gridx,gridy);
+		}
+		selColor = new Color(gp.getIntValue("vgraphic.selcolr"),gp.getIntValue("vgraphic.selcolg"),gp.getIntValue("vgraphic.selcolb"));
+		selWidth = gp.getIntValue("vgraphic.selwidth");
+		vG.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE)); //Zoom and Selection stuff belong to the mark actions on a graph - they don't change the state to "not saved yet"
+		repaint();
+	}
+	public void update(Observable o, Object arg)
+	{
+		if (arg instanceof GraphMessage)
+			handleGraphUpdate((GraphMessage)arg);
+		else if (o.equals(gp)) //We got news from gp
+			handlePreferencesUpdate();
+		else if ((Controls.get(arg)!=null)&&(Controls.get(arg).equals(o))) 
+			//We got a Message from an Control that has Subscribed itself
+			{
+				if (arg.equals("Zoom"))
+				{
+					//reset zoomfactor
+					gp.setIntValue("vgraphic.zoom",((ZoomComponent)o).getZoom());
+				}
+				else if (arg.equals("Grid"))
+				{
+					gridx = ((GridComponent)o).getGridX();
+					gridy = ((GridComponent)o).getGridY();
+					gridenabled = ((GridComponent)o).isEnabled();
+					gridorientated = ((GridComponent)o).isOrientated();
+					if (Drag!=null)
+					{
+						Drag.setGridOrientated(gridenabled&&gridorientated);
+						Drag.setGrid(gridx,gridy);
+					}
+					repaint();
+					//UpdateGrid
+				}
+			}
 	}
 }

@@ -158,7 +158,7 @@ public class GravelMLWriter {
 	private void writeVisualNodes(OutputStreamWriter s) throws IOException
 	{
 	    //Nodes
-	    Iterator<VNode> nodeiter = vg.getNodeIterator();
+	    Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
 	    while (nodeiter.hasNext())
 	    {
 	    	VNode actual = nodeiter.next();
@@ -192,7 +192,7 @@ public class GravelMLWriter {
 	private void writeVisualEdges(OutputStreamWriter s) throws IOException
 	{
 	       //Nodes
-	       Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+	       Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
 	       while (edgeiter.hasNext())
 	       {
 	    	   VEdge actual = edgeiter.next();
@@ -289,7 +289,7 @@ public class GravelMLWriter {
 	private void writeVisualSubSets(OutputStreamWriter s) throws IOException
 	{
 	       //SubSets
-	       Iterator<VSubSet> subsetiter = vg.getSubSetIterator();
+	       Iterator<VSubSet> subsetiter = vg.modifySubSets.getSubSetIterator();
 	       if (vg.getMathGraph().SubSetCount()!=0)
 	    	   s.write("<!-- == remove these lines to get a valid GraphML-FILE	-->"+nl);
 	       while (subsetiter.hasNext())
@@ -304,7 +304,7 @@ public class GravelMLWriter {
     		   s.write("\t\t\t<data key=\"sg\">"+actual.getColor().getGreen()+"</data>"+nl);
     		   s.write("\t\t\t<data key=\"sb\">"+actual.getColor().getBlue()+"</data>"+nl+nl);
 
-    		   Iterator<VNode> nodeiter = vg.getNodeIterator();
+    		   Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
     		   while (nodeiter.hasNext())
     		   {
     			   VNode n = nodeiter.next();
@@ -312,7 +312,7 @@ public class GravelMLWriter {
     				   s.write("\t\t\t<snode node=\"node"+n.getIndex()+"\" />"+nl);
     		   }
 
-    		   Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+    		   Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
     		   while (edgeiter.hasNext())
     		   {
     			   VEdge e = edgeiter.next();
@@ -436,7 +436,7 @@ public class GravelMLWriter {
 	    	   if (!actual.getName().equals(gp.getStringValue("subset.name")+actual.getIndex()))
 	    		   s.write("\t\t\t<data key=\"sn\">"+actual.getName()+"</data>");
 	    	   
-       		   Iterator<VNode> nodeiter = vg.getNodeIterator();
+       		   Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
     		   while (nodeiter.hasNext())
     		   {
     			   VNode n = nodeiter.next();
@@ -444,7 +444,7 @@ public class GravelMLWriter {
     				   s.write("\t\t\t<snode node=\"node"+n.getIndex()+"\" />"+nl);
     		   }
 
-    		   Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+    		   Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
     		   while (edgeiter.hasNext())
     		   {
     			   VEdge e = edgeiter.next();

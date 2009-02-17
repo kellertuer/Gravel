@@ -6,13 +6,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 
-import model.GraphMessage;
 import model.MEdge;
 import model.MGraph;
 import model.MNode;
 import model.VGraph;
 import model.VNode;
 import model.VStraightLineEdge;
+import model.Messages.GraphMessage;
 
 
 public class RandomVisualize implements VAlgorithmIF {
@@ -101,12 +101,12 @@ public class RandomVisualize implements VAlgorithmIF {
 				else
 					size = GeneralPreferences.getInstance().getIntValue("node.size");
 					
-				ErgebnisGraph.addNode(new VNode(actualNode.index,posx, posy,size,35,0,14,false), new MNode(actualNode.index,actualNode.name));
+				ErgebnisGraph.modifyNodes.addNode(new VNode(actualNode.index,posx, posy,size,35,0,14,false), new MNode(actualNode.index,actualNode.name));
 				Iterator<MEdge> edgeiter = mG.getEdgeIterator();
 				while (edgeiter.hasNext())
 				{
 					MEdge e = edgeiter.next();
-					if ((ErgebnisGraph.getNode(e.StartIndex)!=null)&&(ErgebnisGraph.getNode(e.EndIndex)!=null)&&(ErgebnisGraph.getEdge(e.index)==null))
+					if ((ErgebnisGraph.modifyNodes.getNode(e.StartIndex)!=null)&&(ErgebnisGraph.modifyNodes.getNode(e.EndIndex)!=null)&&(ErgebnisGraph.modifyEdges.getEdge(e.index)==null))
 					{ //Knoten sind drin aber die Kante noch nicht
 						int width;
 						if (randEdges)
@@ -117,7 +117,7 @@ public class RandomVisualize implements VAlgorithmIF {
 						}
 						else
 							width = GeneralPreferences.getInstance().getIntValue("edge.width");						
-						ErgebnisGraph.addEdge(new VStraightLineEdge(e.index,width),e);
+						ErgebnisGraph.modifyEdges.addEdge(new VStraightLineEdge(e.index,width), e,null, null);
 					}		
 				}
 				ErgebnisGraph.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATE));

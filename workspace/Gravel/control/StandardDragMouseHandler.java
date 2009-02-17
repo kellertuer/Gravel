@@ -8,12 +8,12 @@ import java.awt.event.MouseEvent;
 import java.util.Iterator;
 import java.util.Vector;
 
-import model.GraphMessage;
 import model.MEdge;
 import model.VEdge;
 import model.VGraph;
 import model.VItem;
 import model.VNode;
+import model.Messages.GraphMessage;
 /**
  * Standard Mouse Drag Hanlder extends the DragMouseHandler to the standard actions
  *
@@ -87,7 +87,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 	{
 		x = Math.round(x/2);
 		y = Math.round(y/2);
-		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
 		while (edgeiter.hasNext())
 		{
 			VEdge e = edgeiter.next();
@@ -115,7 +115,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 		//Das ist die Bewegung p
 		if ((((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))&&(movingNode!=null)) //shift n drag == Selection bewegen
 		{ //Move all Selected Nodes
-			Iterator<VNode> nodeiter = vg.getNodeIterator();
+			Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
 			while (nodeiter.hasNext()) // drawNodes
 			{
 				VNode temp = nodeiter.next();
@@ -210,10 +210,10 @@ public class StandardDragMouseHandler extends DragMouseHandler
 		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //Rausrechnen des zooms
 		if (!((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))
 		{
-			movingNode = vg.getNodeinRange(p); //kein Shift == moving Node merken, sonst werden alle selected Bewegt
+			movingNode = vg.modifyNodes.getNodeinRange(p); //kein Shift == moving Node merken, sonst werden alle selected Bewegt
 			if (gp.getBoolValue("vgraphic.cpshow")) 
 			{
-				Vector c = vg.getControlPointinRange(p,(new Integer(gp.getIntValue("vgraphic.cpsize"))).doubleValue());
+				Vector c = vg.modifyEdges.getControlPointinRange(p, (new Integer(gp.getIntValue("vgraphic.cpsize"))).doubleValue());
 				if (c!=null)
 				{
 					movingControlPointEdge = (VEdge) c.get(0);
@@ -223,7 +223,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 		}
 		else
 		{//Shift - only handle stuff that beginns on a selected Node
-			movingNode = vg.getNodeinRange(p);
+			movingNode = vg.modifyNodes.getNodeinRange(p);
 			if ((movingNode!=null)&&((movingNode.getSelectedStatus() & VItem.SELECTED) != VItem.SELECTED))
 			{
 				movingNode=null; //do not start anything
@@ -232,7 +232,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			VEdge selE = vg.getEdgeinRange(p, 2.0);
 			if ((selE!=null)&&((selE.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED))
 			{ //Selected Edge, we move the selection so set the node to one of the edge adjacent nodes
-				movingNode = vg.getNode(vg.getMathGraph().getEdge(selE.getIndex()).StartIndex); 
+				movingNode = vg.modifyNodes.getNode(vg.getMathGraph().getEdge(selE.getIndex()).StartIndex); 
 			}
 		}
 	}

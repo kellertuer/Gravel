@@ -36,14 +36,14 @@ public class OCMClickMouseHandler extends ClickMouseHandler {
 		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //rausrechnen
 		if (e.getModifiers()==MouseEvent.BUTTON1_MASK) // Button 1/Links
 		{
-			VNode r = vg.getNodeinRange(p);
+			VNode r = vg.modifyNodes.getNodeinRange(p);
 			if (r==null) 
 			{	//Kein Knoten in der Nähe, also einen erstellen
 				int i= vg.getMathGraph().getNextNodeIndex();
 				//TODO: Semantisch nochmal überlegen, ob die Auswahl entfertn werden soll, so ein neuer Knoten erstellt wird
-				if ((vg.selectedEdgeExists()||vg.selectedNodeExists()))
+				if ((vg.modifyEdges.selectedEdgeExists()||vg.modifyNodes.selectedNodeExists()))
 					vg.deselect();
-				vg.addNode(new VNode(i,p.x,p.y, gp.getIntValue("node.size"), gp.getIntValue("node.name_distance"), gp.getIntValue("node.name_rotation"), gp.getIntValue("node.name_size"), gp.getBoolValue("node.name_visible")),new MNode(i,gp.getNodeName(i)));
+				vg.modifyNodes.addNode(new VNode(i,p.x,p.y, gp.getIntValue("node.size"), gp.getIntValue("node.name_distance"), gp.getIntValue("node.name_rotation"), gp.getIntValue("node.name_size"), gp.getBoolValue("node.name_visible")), new MNode(i,gp.getNodeName(i)));
 			}	
 		}
 	}	

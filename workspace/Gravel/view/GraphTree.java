@@ -16,9 +16,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import model.GraphMessage;
 import model.MEdge;
 import model.VGraph;
+import model.Messages.GraphMessage;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -27,6 +27,8 @@ import dialogs.*;
 /**
  * Sidebar Containing a Tree with the elements of the actual graph
  * 
+ * This Sidebar may only subscribe itself (as Observer) to Classes that ONLY
+ * provide GraphMessage-Updates
  * @author ronny
  *
  */
@@ -119,7 +121,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	 */
 	public void updateEdges()
 	{
-		Vector<String> edges = vG.mG.getEdgeNames();
+		Vector<String> edges = vG.getMathGraph().getEdgeNames();
 		Kanten.removeAllChildren();
 		for (int i=0; i<edges.size(); i++)
 		{
@@ -223,9 +225,9 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		{
 			switch (ParentType) //Wo war das zuletzt
 			{
-				case USENODES : {new JNodeDialog(vG.getNode(StringPos2Index(ParentType,selectedPosition)),vG); break;}
-				case USEEDGES : {new JEdgeDialog(vG.getEdge(StringPos2Index(ParentType,selectedPosition)),vG); break;}
-				case USESETS : {new JSubSetDialog(vG.getSubSet(StringPos2Index(ParentType,selectedPosition)),vG); break;}
+				case USENODES : {new JNodeDialog(vG.modifyNodes.getNode(StringPos2Index(ParentType,selectedPosition)),vG); break;}
+				case USEEDGES : {new JEdgeDialog(vG.modifyEdges.getEdge(StringPos2Index(ParentType,selectedPosition)),vG); break;}
+				case USESETS : {new JSubSetDialog(vG.modifySubSets.getSubSet(StringPos2Index(ParentType,selectedPosition)),vG); break;}
 				default : {return;}
 			}
 		}
@@ -245,9 +247,9 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			   {
 				   switch (ParentType) //Wo war das zuletzt
 					{
-						case USENODES : {vG.removeNode(StringPos2Index(ParentType,selectedPosition)); updateNodes(); updateEdges(); break;}
-						case USEEDGES : {vG.removeEdge(StringPos2Index(ParentType,selectedPosition)); updateEdges(); break;}
-						case USESETS : {vG.removeSubSet(StringPos2Index(ParentType,selectedPosition)); updateSets(); break;}
+						case USENODES : {vG.modifyNodes.removeNode(StringPos2Index(ParentType,selectedPosition)); updateNodes(); updateEdges(); break;}
+						case USEEDGES : {vG.modifyEdges.removeEdge(StringPos2Index(ParentType,selectedPosition)); updateEdges(); break;}
+						case USESETS : {vG.modifySubSets.removeSubSet(StringPos2Index(ParentType,selectedPosition)); updateSets(); break;}
 						default : {return;}
 					}
 			   }
@@ -283,28 +285,32 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		return index;
 	}
 
-	public void update(Observable o, Object arg) 
+	public void update(Observable o, Object arg)
 	{
-		if (o.equals(vG)&&(((GraphMessage)arg)!=null)) //Der Graph wurde aktualisiert und auch echt ein String gegeben, der Auftr�ge enth�lt
+		GraphMessage m = (GraphMessage)arg;
+		if (m==null)
+			return;
+		if (o.equals(vG)) //Der Graph wurde aktualisiert und auch echt ein String gegeben, der Auftr�ge enth�lt
 		{
-			GraphMessage m = (GraphMessage)arg;
-			if ((m.getAffectedTypes()&GraphMessage.NODE)==GraphMessage.NODE) //Ein Knoten ist beteiligt
+			if ((m.getAffectedElementTypes()&GraphMessage.NODE)==GraphMessage.NODE) //Ein Knoten ist beteiligt
 			{
 				updateNodes();
 				updateEdges();
 			}
-			if ((m.getAffectedTypes()&GraphMessage.EDGE)==GraphMessage.EDGE) //Kanten beteiligt
+			if ((m.getAffectedElementTypes()&GraphMessage.EDGE)==GraphMessage.EDGE) //Kanten beteiligt
 			{
 				updateEdges();
 			}
-			if ((m.getAffectedTypes()&GraphMessage.SUBSET)==GraphMessage.SUBSET) //Sets beteiligt
+			if ((m.getAffectedElementTypes()&GraphMessage.SUBSET)==GraphMessage.SUBSET) //Sets beteiligt
 			{
 				updateSets();
 			}
-			if ((m.getAffectedTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION)
+			if ((m.getAffectedElementTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION)
 			{
 				//updateSelection();
 			}
 		}	
+
 	}
+
 }

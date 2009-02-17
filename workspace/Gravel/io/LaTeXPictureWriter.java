@@ -104,7 +104,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 	private void writeNodes(OutputStreamWriter s) throws IOException
 	{
 	    //Nodes
-	    Iterator<VNode> nodeiter = vg.getNodeIterator();
+	    Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
 	    while (nodeiter.hasNext())
 	    {
 	    	VNode actual = nodeiter.next();
@@ -156,7 +156,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 	private void writeEdges(OutputStreamWriter s) throws IOException
 	{
 	       //Nodes
-	    	Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+	    	Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();
@@ -194,8 +194,8 @@ public class LaTeXPictureWriter implements TeXWriter {
 						top = true;
 						part = ((double)pos)*2.0d/100.0d;
 					}
-					Point p = actual.getPointonEdge(vg.getNode(start).getPosition(),vg.getNode(ende).getPosition(), part);
-					Point2D.Double dir = actual.getDirectionatPointonEdge(vg.getNode(start).getPosition(),vg.getNode(ende).getPosition(), part);
+					Point p = actual.getPointonEdge(vg.modifyNodes.getNode(start).getPosition(),vg.modifyNodes.getNode(ende).getPosition(), part);
+					Point2D.Double dir = actual.getDirectionatPointonEdge(vg.modifyNodes.getNode(start).getPosition(),vg.modifyNodes.getNode(ende).getPosition(), part);
 					double l = dir.distance(0.0d,0.0d);
 					//and norm dir
 					dir.x = dir.x/l; dir.y = dir.y/l;
@@ -240,7 +240,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 		String s ="";
     	double[] coords = new double[2];
     	double x = 0.0, y = 0.0, lastx=0.0, lasty = 0.0;
-		GeneralPath p = actual.getDrawPath(vg.getNode(start).getPosition(),vg.getNode(ende).getPosition(),1.0f); //no zoom on check! But with line style
+		GeneralPath p = actual.getDrawPath(vg.modifyNodes.getNode(start).getPosition(),vg.modifyNodes.getNode(ende).getPosition(),1.0f); //no zoom on check! But with line style
 		PathIterator path = p.getPathIterator(null, 0.005d/sizeppt); 
 		// 0.005/sizeppt =  = the flatness; reduce if result is not accurate enough!
 		Point2D.Double dir, orth_n_h;
@@ -310,7 +310,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 			s += NL+"\\thinlines";
 		if (vg.getMathGraph().isDirected())
 		{
-		  	Shape arrow = actual.getArrowShape(vg.getNode(start).getPosition(),vg.getNode(ende).getPosition(),Math.round(vg.getNode(start).getSize()/2),Math.round(vg.getNode(ende).getSize()/2),1.0f);
+		  	Shape arrow = actual.getArrowShape(vg.modifyNodes.getNode(start).getPosition(),vg.modifyNodes.getNode(ende).getPosition(),Math.round(vg.modifyNodes.getNode(start).getSize()/2),Math.round(vg.modifyNodes.getNode(ende).getSize()/2),1.0f);
 		  	PathIterator path = arrow.getPathIterator(null, 0.001);
 		  	int i=0;
 		    while( !path.isDone() ) 

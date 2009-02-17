@@ -7,7 +7,6 @@ import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
-import model.GraphMessage;
 import model.MEdge;
 import model.MNode;
 import model.VGraph;
@@ -15,6 +14,7 @@ import model.VItem;
 import model.VLoopEdge;
 import model.VNode;
 import model.VStraightLineEdge;
+import model.Messages.GraphMessage;
 /**
  * OneClick Handling of Mouse Drag actions
  * 
@@ -86,12 +86,12 @@ public class OCMDragMouseHandler extends DragMouseHandler
 				{
 					int i = vg.getMathGraph().getNextEdgeIndex();
 					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_START|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
-					vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),new MEdge(i,StartNode.getIndex(),DragNode.getIndex(),gp.getIntValue("edge.value"),"\u22C6"));
+					vg.modifyEdges.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")), new MEdge(i,StartNode.getIndex(),DragNode.getIndex(),gp.getIntValue("edge.value"),"\u22C6"),null, null);
 				}
 				else
 				{
 					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_START|GraphMessage.ADDITION));
-					vg.addEdgesfromSelectedNodes(DragNode);
+					vg.addEdgesfromSelectedNodes(vg.modifyEdges, DragNode);
 				}
 			}
 			else
@@ -122,25 +122,25 @@ public class OCMDragMouseHandler extends DragMouseHandler
 			multiple = ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK);
 			if (!multiple)
 			{
-				StartNode = vg.getNodeinRange(p); //kein Shift == moving Node merken, sonst werden alle selected Bewegt
+				StartNode = vg.modifyNodes.getNodeinRange(p); //kein Shift == moving Node merken, sonst werden alle selected Bewegt
 				if (StartNode==null)
 					return;
 				DragNode = new VNode(0,p.x,p.y,3,0,0,0,false);
 				DragNode.addColor(Color.white);
-				vg.addNode(DragNode,new MNode(DragNode.getIndex(),"-"));
+				vg.modifyNodes.addNode(DragNode, new MNode(DragNode.getIndex(),"-"));
 			}
 			else
 			{
-				if (!vg.selectedNodeExists()) //Es müssen welche selektiert sein
+				if (!vg.modifyNodes.selectedNodeExists()) //Es müssen welche selektiert sein
 					return;
-				if (vg.getNodeinRange(p)==null) //Es muss auf einem Knoten sein, der...
+				if (vg.modifyNodes.getNodeinRange(p)==null) //Es muss auf einem Knoten sein, der...
 					return;
-				if (!((vg.getNodeinRange(p).getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)) //selektiert ist
+				if (!((vg.modifyNodes.getNodeinRange(p).getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)) //selektiert ist
 					return;
 				//Temp Node index #0 erstellen in weiß
 				DragNode = new VNode(0,p.x,p.y,1,0,0,0,false);
 				DragNode.addColor(Color.white);
-				vg.addNode(DragNode,new MNode(DragNode.getIndex(),"-"));
+				vg.modifyNodes.addNode(DragNode, new MNode(DragNode.getIndex(),"-"));
 			}
 			firstdrag=true;
 		}		
@@ -154,7 +154,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 		if (((e.getPoint().x==-1)&&(e.getPoint().y==-1))||(firstdrag==true)) //never dragged
 		{	
 			if (DragNode!=null)
-				vg.removeNode(DragNode.getIndex());
+				vg.modifyNodes.removeNode(DragNode.getIndex());
 			StartNode = null;
 			DragNode = null;
 			return;
@@ -162,10 +162,10 @@ public class OCMDragMouseHandler extends DragMouseHandler
 		mouseDragged(e); //Das gleiche wie als wenn man bewegt, nur ist danach kein Knoten mehr bewegter Knoten
 		if ((DragNode!=null))	
 		{	
-			if (vg.getNode(DragNode.getIndex())!=null)
-				vg.removeNode(DragNode.getIndex());
+			if (vg.modifyNodes.getNode(DragNode.getIndex())!=null)
+				vg.modifyNodes.removeNode(DragNode.getIndex());
 			
-			VNode EndNode = vg.getNodeinRange(p);
+			VNode EndNode = vg.modifyNodes.getNodeinRange(p);
 			if (EndNode!=null)
 			{
 				if (!multiple)
@@ -175,17 +175,17 @@ public class OCMDragMouseHandler extends DragMouseHandler
 					if ((StartNode.getIndex()==EndNode.getIndex())&&(vg.getMathGraph().isLoopAllowed()))
 					{
 						VLoopEdge t = new VLoopEdge(i,gp.getIntValue("edge.width"),gp.getIntValue("edge.looplength"),gp.getIntValue("edge.loopdirection"),(double)gp.getIntValue("edge.loopproportion")/100.0d,gp.getBoolValue("edge.loopclockwise"));
-						vg.addEdge(t,m);							
+						vg.modifyEdges.addEdge(t, m,null, null);							
 						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
 					}
 					else if (StartNode.getIndex()!=EndNode.getIndex())
-					{	vg.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")),m);
+					{	vg.modifyEdges.addEdge(new VStraightLineEdge(i,gp.getIntValue("edge.width")), m,null, null);
 						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
 					}
 				}
 				else if (DragNode!=null)
 				{	
-						vg.addEdgesfromSelectedNodes(EndNode);
+						vg.addEdgesfromSelectedNodes(vg.modifyEdges, EndNode);
 						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END|GraphMessage.ADDITION));
 				}
 			}

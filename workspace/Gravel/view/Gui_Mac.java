@@ -10,8 +10,8 @@ import java.util.TreeMap;
 
 import javax.swing.*;
 
-import model.GraphMessage;
 import model.VGraph;
+import model.Messages.GraphMessage;
 
 import dialogs.JPreferencesDialog;
 

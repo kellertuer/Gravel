@@ -8,6 +8,8 @@ import java.util.Observer;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import model.Messages.GraphMessage;
+
 import view.VGraphic;
 
 /**
@@ -16,6 +18,7 @@ import view.VGraphic;
  * This Class observes the Graph and reacts on Graph-Changes
  * and is observable, so that GUI-Classes who use this class can update their fields
  * 
+ * This Observer may only subscribe to GraphMessage-delivering Classes
  * @author Ronny Bergmann
  *
  */
@@ -52,12 +55,14 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 	private VGraphic vgc;
 	private VGraph vg;
 	private TreeMap<String,Double> atomvalues;
+	private int blockdepth;
 	/**
 	 * Init the Statistics as it corresponds always to a graph there must be a
 	 * @param g VGraph 
 	 */
 	public GraphStatisticAtoms(VGraphic g)
 	{
+		blockdepth=0;
 		atomvalues = new TreeMap<String, Double>();
 		vgc = g;
 		vg = vgc.getVGraph();
@@ -90,7 +95,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		kantenlaenge = new TreeMap<Integer,Double>();
 //		int compareCount = new Double(vg.NodeCount()*vg.NodeCount()/2 - vg.NodeCount()/2).intValue();
 		knotenabstand = new TreeMap<Integer,Double>();
-		Iterator<VEdge> edgeiter = vg.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
 		while (edgeiter.hasNext())
 		{
 			//Valenzen
@@ -110,8 +115,8 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 			outvalenz.put(start,outvalenz.get(start)+1);
 			invalenz.put(ende,invalenz.get(ende)+1);
 			//
-			Point startpoint = vg.getNode(start).getPosition();
-			Point endpoint = vg.getNode(ende).getPosition();
+			Point startpoint = vg.modifyNodes.getNode(start).getPosition();
+			Point endpoint = vg.modifyNodes.getNode(ende).getPosition();
 			switch(actual.getType())
 			{
 				case VEdge.ORTHOGONAL : {
@@ -172,7 +177,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		} //End While edgeiter.hasnext
 		//
 		//Knotenabstaende
-		Iterator<VNode> nodeiter = vg.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
 		int i=0;
 		while (nodeiter.hasNext())
 		{
@@ -185,7 +190,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 				outvalenz.put(actual.getIndex(),0);
 			
 			//Mit allen folgenden vergleichen
-			Iterator<VNode> rest = vg.getNodeIterator();
+			Iterator<VNode> rest = vg.modifyNodes.getNodeIterator();
 			while (!actual.equals(rest.next())&&rest.hasNext()){}
 			while (rest.hasNext())
 			{
@@ -299,6 +304,20 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 	
 	public void update(Observable arg0, Object arg1) 
 	{	
+		GraphMessage m = (GraphMessage)arg1;
+		if ((m.getModification()&GraphMessage.BLOCK_END)==GraphMessage.BLOCK_END) //Block ends with this Message
+		{
+			if (blockdepth > 0)
+				blockdepth--;
+		}
+		else if ((m.getModification()&GraphMessage.BLOCK_START)==GraphMessage.BLOCK_START)
+		{
+				blockdepth++;
+			return;
+		}
+		if (blockdepth>0)
+				return;
+
 		calculate();
 		atomvalues.put("$Graph.MaxX",(double)vg.getMaxPoint(vgc.getGraphics()).x);
 		atomvalues.put("$Graph.MaxY",(double)vg.getMaxPoint(vgc.getGraphics()).y);
