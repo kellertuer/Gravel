@@ -311,7 +311,7 @@ public class VGraph extends Observable implements Observer {
 			while (n1.hasNext())
 			{
 				VSubSet actualSet = n1.next();
-				if (mG.SubSetcontainsNode(nodeclone.getIndex(),actualSet.index))
+				if (mG.getSubSet(actualSet.index).containsNode(nodeclone.getIndex()))
 					clone.modifySubSets.addNodetoSubSet(nodeclone.getIndex(), actualSet.index); //In jedes Set setzen wo er war
 			}
 		}
@@ -321,13 +321,13 @@ public class VGraph extends Observable implements Observer {
 		{
 			VEdge cloneEdge = n3.next().clone();
 			MEdge me = mG.getEdge(cloneEdge.getIndex());
-			clone.modifyEdges.addEdge(cloneEdge, me,null, null);
+			clone.modifyEdges.addEdge(cloneEdge, me, modifyNodes.getNode(me.StartIndex).getPosition(), modifyNodes.getNode(me.EndIndex).getPosition());
 			//In alle Sets einfuegen
 			Iterator<VSubSet> n1 = modifySubSets.getSubSetIterator();
 			while (n1.hasNext())
 			{
 				VSubSet actualSet = n1.next();
-				if (mG.SubSetcontainsEdge(cloneEdge.getIndex(),actualSet.index))
+				if (mG.getSubSet(actualSet.index).containsEdge(cloneEdge.getIndex()))
 					clone.modifySubSets.addEdgetoSubSet(cloneEdge.getIndex(), actualSet.getIndex()); //Jedes Set kopieren
 			}
 		}
@@ -472,7 +472,7 @@ public class VGraph extends Observable implements Observer {
 					//if the graph is directed
 					if (((!mG.isDirected())&&(t2.getIndex()<=t.getIndex()))||(mG.isDirected())) //in the nondirected case only half the cases
 					{
-						if (mG.existsEdge(t.getIndex(),t2.getIndex())>1) //we have to delete
+						if (mG.EdgesBetween(t.getIndex(),t2.getIndex())>1) //we have to delete
 						{
 							Vector<Integer> multipleedges = mG.getEdgeIndices(t.getIndex(),t2.getIndex());
 							int value = mG.getEdge(multipleedges.firstElement()).Value;
@@ -600,7 +600,7 @@ public class VGraph extends Observable implements Observer {
 						me = new MEdge(i,temp.getIndex(),Ende.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),"\u22C6");
 					else
 						me = new MEdge(i,temp.getIndex(),Ende.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),GeneralPreferences.getInstance().getEdgeName(i, temp.getIndex(), Ende.getIndex()));					
-						modifyEdges.addEdge(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), me,null, null);
+						modifyEdges.addEdge(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), me,modifyNodes.getNode(temp.getIndex()).getPosition(), Ende.getPosition());
 				}
 		}
 		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END));
@@ -626,7 +626,11 @@ public class VGraph extends Observable implements Observer {
 					else
 						me = new MEdge(i,Start.getIndex(),temp.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),GeneralPreferences.getInstance().getEdgeName(i, Start.getIndex(), temp.getIndex()));
 					
-						modifyEdges.addEdge(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), me,null, null);
+						modifyEdges.addEdge(
+								new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), 
+								me,
+								Start.getPosition(),
+								temp.getPosition());
 				}
 		}
 		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END));

@@ -102,9 +102,8 @@ public class VEdgeModification extends Observable implements Observer {
 	 * 				the new VEdge
 	 * @param medge 
 	 * 				mathematical elements of the new edge, if its index differs, this index is ignored
-	 * @param startPoint TODO
-	 * @param endPoint TODO
-	 * @deprecated
+	 * @param startPoint
+	 * @param endPoint 
 	 */
 	public void addEdge(VEdge edge, MEdge medge, Point start, Point end) 
 	{
@@ -123,7 +122,7 @@ public class VEdgeModification extends Observable implements Observer {
 			try 
 			{
 				// In einem ungerichteten Graphen existiert eine Kante von e zu s und die ist StraightLine und die neue Kante ist dies auch	
-				if ((medge.StartIndex!=medge.EndIndex)&&(mG.isDirected())&&(mG.existsEdge(medge.EndIndex, medge.StartIndex)==1)&&(getEdge(mG.getEdgeIndices(medge.EndIndex, medge.StartIndex).firstElement()).getType()==VEdge.STRAIGHTLINE)&&(edge.getType()==VEdge.STRAIGHTLINE))
+				if ((medge.StartIndex!=medge.EndIndex)&&(mG.isDirected())&&(mG.EdgesBetween(medge.EndIndex, medge.StartIndex)==1)&&(getEdge(mG.getEdgeIndices(medge.EndIndex, medge.StartIndex).firstElement()).getType()==VEdge.STRAIGHTLINE)&&(edge.getType()==VEdge.STRAIGHTLINE))
 				{ //Dann würde diese Kante direkt auf der anderen liegen
 					Point dir = new Point(end.x-start.x,end.y-start.y);
 					double length = dir.distanceSq(new Point(0,0));
@@ -145,7 +144,7 @@ public class VEdgeModification extends Observable implements Observer {
 					vEdges.add(temp); //add modified edge in counter directtion
 				}
 				vEdges.add(edge); //add edge
-				mG.setEdgeName(edge.getIndex(), medge.name);
+				mG.replaceEdge(medge);
 			} 
 			finally {EdgeLock.unlock();}
 			setChanged();
@@ -246,9 +245,10 @@ public class VEdgeModification extends Observable implements Observer {
 	 * @param i
 	 * @param newname
 	 * @see MGraph.setNodeName()
+	 * @deprecated
 	 */
 	public void setEdgeName(int i, String newname) {
-		mG.setEdgeName(i, newname);
+		mG.getEdge(i).name = newname;
 		setChanged();
 		notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.UPDATE,GraphMessage.EDGE));	
 	}

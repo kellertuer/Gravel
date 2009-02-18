@@ -244,7 +244,7 @@ public class TreeFunctions implements Observer {
 		while (nodeiter.hasNext())
 		{
 			MNode next = nodeiter.next();
-			if ((direction)&&(mg.existsEdge(next.index,actual.index)>0)) //UP, then there must be an edge next->actual
+			if ((direction)&&(mg.EdgesBetween(next.index,actual.index)>0)) //UP, then there must be an edge next->actual
 			{	//Upward Child
 				if (order.get(next.index)!=null) //Circle
 					return false;
@@ -255,7 +255,7 @@ public class TreeFunctions implements Observer {
 				//still searching, and this child is valid 
 				childcount++;
 			}
-			if ((!direction)&&(mg.existsEdge(actual.index,next.index)>0)) //DOWN, then there must be an edge actual->next
+			if ((!direction)&&(mg.EdgesBetween(actual.index,next.index)>0)) //DOWN, then there must be an edge actual->next
 			{	//Downward Child
 				if (order.get(next.index)!=null) //Circle
 					return false;
@@ -292,7 +292,7 @@ public class TreeFunctions implements Observer {
 		while (nodeiter.hasNext()) //give every child an order index
 		{
 			MNode next = nodeiter.next();
-			if ((next!=parent)&&(mg.existsEdge(actual.index,next.index)>0)) //Child
+			if ((next!=parent)&&(mg.EdgesBetween(actual.index,next.index)>0)) //Child
 			{
 				if (order.get(next.index)!=null) //Child has an order already
 					return false;

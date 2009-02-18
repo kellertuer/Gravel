@@ -125,7 +125,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 		int count=0;
 		while (setiter.hasNext())
 		{
-			if (vg.getMathGraph().SubSetcontainsNode(nodeindex, setiter.next().getIndex()))
+			if (vg.getMathGraph().getSubSet(setiter.next().getIndex()).containsNode(nodeindex))
 					count++;
 		}
 		int part = Math.round(100.0f/(float)count);

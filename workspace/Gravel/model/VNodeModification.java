@@ -110,18 +110,6 @@ public class VNodeModification extends Observable implements Observer {
 		return null;
 	}
 	/**
-	 * sets the the name of a node with the index, if this node exists, else it does nothing
-	 * @param i
-	 * @param newname
-	 * @see MGraph.setNodeName()
-	 * @deprecated - use replaceNode instead
-	 */
-	public void setNodeName(int i, String newname) {
-		mG.setNodeName(i, newname);
-		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.UPDATE,GraphMessage.NODE));	
-	}
-	/**
 	 * Change the index of a node
 	 * each other value of a node can be changed by replaceNode
 	 * but an index update requires an modification of adjacent edges

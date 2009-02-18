@@ -146,8 +146,8 @@ public class GraphAction {
 			VSubSet s = si.next();
 			if (ItemType==NODE)
 			{
-				boolean wasfirst = first.getMathGraph().SubSetcontainsNode(itemindex, s.getIndex());
-				boolean wassecond = second.getMathGraph().SubSetcontainsNode(itemindex, s.getIndex());
+				boolean wasfirst = first.getMathGraph().getSubSet(s.getIndex()).containsNode(itemindex);
+				boolean wassecond = second.getMathGraph().getSubSet(s.getIndex()).containsNode(itemindex);
 				if (wasfirst)
 					second.modifySubSets.addNodetoSubSet(itemindex, s.getIndex());
 				else
@@ -159,8 +159,8 @@ public class GraphAction {
 			}
 			else if (ItemType==EDGE)
 			{
-				boolean wasfirst = first.getMathGraph().SubSetcontainsEdge(itemindex, s.getIndex());
-				boolean wassecond = second.getMathGraph().SubSetcontainsEdge(itemindex, s.getIndex());
+				boolean wasfirst = first.getMathGraph().getSubSet(s.getIndex()).containsEdge(itemindex);
+				boolean wassecond = second.getMathGraph().getSubSet(s.getIndex()).containsEdge(itemindex);
 				if (wasfirst)
 					second.modifySubSets.addEdgetoSubSet(itemindex, s.getIndex());
 				else
@@ -186,7 +186,7 @@ public class GraphAction {
 		while (si.hasNext())
 		{
 			VSubSet s = si.next();
-			if (env.getMathGraph().SubSetcontainsEdge(e.getIndex(), s.getIndex()))
+			if (env.getMathGraph().getSubSet(s.getIndex()).containsEdge(e.getIndex()))
 			{
 				if (g.modifySubSets.getSubSet(s.getIndex())==null)
 					throw new GraphActionException("Can't replace edge, replacements belongs to Subsets, that don't exists in given parameter graph");
@@ -259,7 +259,7 @@ public class GraphAction {
 				while (si.hasNext())
 				{
 					VSubSet s = si.next();
-					if (graph.getMathGraph().SubSetcontainsNode(n.getIndex(), s.getIndex()))
+					if (graph.getMathGraph().getSubSet(s.getIndex()).containsNode(n.getIndex()))
 						((VNode)ActionObject).addColor(s.getColor());
 				}
 				MNode tempmn = mn;
@@ -279,7 +279,7 @@ public class GraphAction {
 				while (esi.hasNext())
 				{
 					VSubSet s = esi.next();
-					if (graph.getMathGraph().SubSetcontainsEdge(e.getIndex(), s.getIndex()))
+					if (graph.getMathGraph().getSubSet(s.getIndex()).containsEdge(e.getIndex()))
 						((VEdge)ActionObject).addColor(s.getColor());
 				}
 				MEdge tempme = new MEdge(me.index, me.StartIndex, me.EndIndex, me.Value, me.name);
@@ -341,7 +341,7 @@ public class GraphAction {
 				while (si.hasNext())
 				{
 					VSubSet s = si.next();
-					if (env.getMathGraph().SubSetcontainsNode(n.getIndex(), s.getIndex()))
+					if (env.getMathGraph().getSubSet(s.getIndex()).containsNode(n.getIndex()))
 						graph.modifySubSets.addNodetoSubSet(n.getIndex(), s.getIndex());
 				}
 				//Recreate adjacent edges and their subsets
@@ -352,7 +352,7 @@ public class GraphAction {
 					MEdge me = env.getMathGraph().getEdge(e.getIndex());
 					if ((me.StartIndex==n.getIndex())||(me.EndIndex==n.getIndex()))
 					{ //Add all Adjacent Edges again and recreate theis color
-						graph.modifyEdges.addEdge(e, me, null, null);
+						graph.modifyEdges.addEdge(e, me, env.modifyNodes.getNode(me.StartIndex).getPosition(), env.modifyNodes.getNode(me.EndIndex).getPosition());
 						recreateEdgeColor(e,graph);
 					}
 				}
@@ -361,7 +361,7 @@ public class GraphAction {
 				VEdge e = (VEdge)ActionObject;
 				if ((graph.modifyEdges.getEdge(e.getIndex())!=null)||(graph.modifyNodes.getNode(me.StartIndex)==null)||(graph.modifyNodes.getNode(me.EndIndex)==null)) //edge exists or one of its Nodes does not
 					throw new GraphActionException("Can't create edge, it already exists or one of its Nodes does not.");
-				graph.modifyEdges.addEdge(e, me, null, null);
+				graph.modifyEdges.addEdge(e, me, env.modifyNodes.getNode(me.StartIndex).getPosition(),env.modifyNodes.getNode(me.EndIndex).getPosition());
 				recreateEdgeColor(e,graph);
 				graph.modifyEdges.getEdge(e.getIndex()).setSelectedStatus(env.modifyEdges.getEdge(e.getIndex()).getSelectedStatus());
 				break;

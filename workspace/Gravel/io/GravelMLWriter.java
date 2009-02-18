@@ -205,7 +205,7 @@ public class GravelMLWriter {
 	    		   s.write("\t\t\t<data key=\"ev\">"+value+"</data>"+nl);
 	    	   if (actual.getWidth()!=gp.getIntValue("edge.width")) //if width is not std
 	    		   s.write("\t\t\t<data key=\"ew\">"+actual.getWidth()+"</data>"+nl);
-	    	   s.write("\t\t\t<data key=\"en\">"+vg.getMathGraph().getEdgeName(actual.getIndex())+"</data>"+nl);
+	    	   s.write("\t\t\t<data key=\"en\">"+vg.getMathGraph().getEdge(actual.getIndex()).name+"</data>"+nl);
 	    	   if (actual.getArrow().getSize()!=((float)gp.getIntValue("edge.arrsize"))) //if arrpart is not std
 	    		   s.write("\t\t\t<data key=\"es\">"+actual.getArrow().getSize()+"</data>"+nl);
 	    	   if (actual.getArrow().getPart()!=((float)gp.getIntValue("edge.arrpart")/100)) //if arrpart is not std
@@ -297,8 +297,8 @@ public class GravelMLWriter {
 	    	   VSubSet actual = subsetiter.next();
 	    	   s.write(nl+"\t\t<subset id=\"subset"+actual.getIndex()+"\">"+nl);
 	    	   //if the name is not a standard name
-	    	   if (!vg.getMathGraph().getSubSetName(actual.getIndex()).equals(gp.getStringValue("subset.name")+actual.getIndex()))
-	    		   s.write("\t\t\t<data key=\"sn\">"+vg.getMathGraph().getSubSetName(actual.getIndex())+"</data>"+nl);
+	    	   if (!vg.getMathGraph().getSubSet(actual.getIndex()).getName().equals(gp.getStringValue("subset.name")+actual.getIndex()))
+	    		   s.write("\t\t\t<data key=\"sn\">"+vg.getMathGraph().getSubSet(actual.getIndex()).getName()+"</data>"+nl);
 	    	   
     		   s.write("\t\t\t<data key=\"sr\">"+actual.getColor().getRed()+"</data>"+nl);
     		   s.write("\t\t\t<data key=\"sg\">"+actual.getColor().getGreen()+"</data>"+nl);
@@ -308,7 +308,7 @@ public class GravelMLWriter {
     		   while (nodeiter.hasNext())
     		   {
     			   VNode n = nodeiter.next();
-    			   if (vg.getMathGraph().SubSetcontainsNode(n.getIndex(),actual.getIndex()))
+    			   if (vg.getMathGraph().getSubSet(actual.getIndex()).containsNode(n.getIndex()))
     				   s.write("\t\t\t<snode node=\"node"+n.getIndex()+"\" />"+nl);
     		   }
 
@@ -316,7 +316,7 @@ public class GravelMLWriter {
     		   while (edgeiter.hasNext())
     		   {
     			   VEdge e = edgeiter.next();
-    			   if (vg.getMathGraph().SubSetcontainsEdge(e.getIndex(),actual.getIndex()))
+    			   if (vg.getMathGraph().getSubSet(actual.getIndex()).containsEdge(e.getIndex()))
     				   s.write("\t\t\t<sedge edge=\"edge"+e.getIndex()+"\" />"+nl);
     		   }
     		   s.write("\t\t</subset>");
@@ -440,7 +440,7 @@ public class GravelMLWriter {
     		   while (nodeiter.hasNext())
     		   {
     			   VNode n = nodeiter.next();
-    			   if (vg.getMathGraph().SubSetcontainsNode(n.getIndex(),actual.getIndex()))
+    			   if (vg.getMathGraph().getSubSet(actual.getIndex()).containsNode(n.getIndex()))
     				   s.write("\t\t\t<snode node=\"node"+n.getIndex()+"\" />"+nl);
     		   }
 
@@ -448,7 +448,7 @@ public class GravelMLWriter {
     		   while (edgeiter.hasNext())
     		   {
     			   VEdge e = edgeiter.next();
-    			   if (vg.getMathGraph().SubSetcontainsEdge(e.getIndex(),actual.getIndex()))
+    			   if (actual.containsEdge(e.getIndex()))
     				   s.write("\t\t\t<sedge edge=\"edge"+e.getIndex()+"\" />"+nl);
     		   }
     		   s.write("\t\t</subset>"+nl);

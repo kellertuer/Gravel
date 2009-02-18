@@ -148,7 +148,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			oldwidth = e.getWidth();
 			oldText = e.getTextProperties().clone();
 			oldLinestyle = e.getLinestyle().clone(); 
-			this.setTitle("Eigenschaften der Kante '"+graphref.getMathGraph().getEdgeName(e.getIndex())+"' (#"+e.getIndex()+") von '"+graphref.getMathGraph().getNode(oldstart).name+"'->'"+graphref.getMathGraph().getNode(oldend).name+"'");	
+			this.setTitle("Eigenschaften der Kante '"+graphref.getMathGraph().getEdge(e.getIndex()).name+"' (#"+e.getIndex()+") von '"+graphref.getMathGraph().getNode(oldstart).name+"'->'"+graphref.getMathGraph().getNode(oldend).name+"'");	
 		}
 		
 		tabs = new JTabbedPane();
@@ -359,7 +359,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			EdgeName.setText("#"+oldstart+"->#"+oldend);
 		else
 		{
-			EdgeName.setText(graphref.getMathGraph().getEdgeName(oldindex));
+			EdgeName.setText(graphref.getMathGraph().getEdge(oldindex).name);
 		}	
 	}
 	/**
@@ -411,9 +411,9 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		{
 			if (subsetlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				SubSetChecks[temp] = new JCheckBox(graphref.getMathGraph().getSubSetName(i));
+				SubSetChecks[temp] = new JCheckBox(graphref.getMathGraph().getSubSet(i).getName());
 				if (chEdge!=null)
-					SubSetChecks[temp].setSelected(graphref.getMathGraph().SubSetcontainsEdge(chEdge.getIndex(),i));
+					SubSetChecks[temp].setSelected(graphref.getMathGraph().getSubSet(i).containsEdge(chEdge.getIndex()));
 				CiSubSets.add(SubSetChecks[temp],c);
 				SubSetChecks[temp].addItemListener(this);
 				c.gridy++;
@@ -781,7 +781,11 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		}
 		//hinzufuegen
 		VEdge addEdge = CheckType();
-		 graphref.modifyEdges.addEdge(addEdge, new MEdge(addEdge.getIndex(),startindex, endindex, iValue.getValue(),EdgeName.getText()), null, null);
+		 graphref.modifyEdges.addEdge(
+				 addEdge,
+				 new MEdge(addEdge.getIndex(),startindex, endindex, iValue.getValue(),EdgeName.getText()),
+				 graphref.modifyNodes.getNode(startindex).getPosition(),
+				 graphref.modifyNodes.getNode(endindex).getPosition());
 		//Gruppen einbauen
 		int temp = 0;
 		for (int i=0; i<subsetlist.size(); i++)

@@ -28,11 +28,7 @@ import model.Messages.GraphMessage;
  */
 
 public class MGraph extends Observable
-{
-	public static final int EDGESTARTINDEX = 0;
-	public static final int EDGEENDINDEX = 1;
-	public static final int EDGEVALUE = 2;
-	
+{	
 	private HashSet<MNode> mNodes;
 	private HashSet<MEdge> mEdges;
 	private HashSet<MSubSet> mSubSets;
@@ -81,7 +77,7 @@ public class MGraph extends Observable
 			while (n1.hasNext())
 			{
 				MSubSet actualSet = n1.next();
-				if (this.SubSetcontainsNode(actualNode.index, actualSet.getIndex()))
+				if (actualSet.containsNode(actualNode.index))
 					clone.addNodetoSubSet(actualNode.index,actualSet.getIndex()); //Jedes Set kopieren
 			}
 		}
@@ -97,7 +93,7 @@ public class MGraph extends Observable
 			while (n1.hasNext())
 			{
 				MSubSet actualSet = n1.next();
-				if (this.SubSetcontainsEdge(actualEdge.index, actualSet.getIndex()))
+				if (actualSet.containsEdge(actualEdge.index))
 					clone.addEdgetoSubSet(actualEdge.index,actualSet.getIndex()); //Jedes Set kopieren
 			}
 		}
@@ -252,7 +248,7 @@ public class MGraph extends Observable
 						//if the graph is directed
 						if (((!directed)&&(t2.index<=t.index))||(directed)) //in the nondirected case only half the cases
 						{
-							if (existsEdge(t.index,t2.index)>1) //we have to delete
+							if (EdgesBetween(t.index,t2.index)>1) //we have to delete
 							{
 								Vector<Integer> multipleedges = getEdgeIndices(t.index,t2.index);
 								int value = getEdge(multipleedges.firstElement()).Value;
@@ -279,8 +275,6 @@ public class MGraph extends Observable
 		notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE,GraphMessage.EDGE));	
 		return removed;
 	}
-
-	
 	/*
 	 * Knotenfunktionen
 	 */
@@ -308,22 +302,16 @@ public class MGraph extends Observable
 	 */
 	public void replaceNode(MNode node)
 	{
+		MNode oldnode = getNode(node.index);
+		if (oldnode==null)
+			return;
 		NodeLock.lock();
 		try 
 		{
-			Iterator<MNode> n = mNodes.iterator();
-			while (n.hasNext())
-			{
-				MNode t = n.next();
-				if (t.index==node.index)
-				{
-					mNodes.remove(t);
-					mNodes.add(node);
-					setChanged();
-					notifyObservers(new GraphMessage(GraphMessage.NODE,node.index,GraphMessage.UPDATE,GraphMessage.NODE));	
-					break;
-				}
-			}
+			mNodes.remove(oldnode);
+			mNodes.add(node);
+			setChanged();
+			notifyObservers(new GraphMessage(GraphMessage.NODE,node.index,GraphMessage.UPDATE,GraphMessage.NODE));	
 		} 
 		finally
 		{NodeLock.unlock();}		
@@ -339,20 +327,8 @@ public class MGraph extends Observable
 	{
 		if (oldi==newi)
 			return;
-		MNode oldn = null, newn=null;
-		NodeLock.lock(); //Knoten finden
-		try
-		{
-			Iterator<MNode> n = mNodes.iterator();
-			while (n.hasNext())
-			{
-				MNode t = n.next();
-				if (t.index==oldi)
-					oldn = t;
-				else if (t.index==newi)
-					newn = t;
-			}
-		} finally {NodeLock.unlock();}
+		MNode oldn = getNode(oldi);
+		MNode newn = getNode(newi);
 		if ((oldn==null)||(newn!=null))
 			return; //can't change
 		//Change adjacent edges
@@ -382,6 +358,7 @@ public class MGraph extends Observable
 		}
 		//And Change the oldnode aswell
 		oldn.index=newi;
+		replaceNode(newn);
 		setChanged();
 		notifyObservers(new GraphMessage(GraphMessage.NODE, GraphMessage.REPLACEMENT, GraphMessage.ALL_ELEMENTS));	
 	}
@@ -394,27 +371,13 @@ public class MGraph extends Observable
 	 */
 	public BitSet removeNode(int i)
 	{
-		MNode toDel = null;
+		MNode toDel = getNode(i);
 		BitSet ergebnis = new BitSet();
-		NodeLock.lock(); //Knoten finden
-		try
-		{
-			Iterator<MNode> n = mNodes.iterator();
-			while (n.hasNext())
-			{
-				MNode t = n.next();
-				if (t.index==i)
-				{
-					toDel = t;
-					break;
-				}
-			}
-		} finally {NodeLock.unlock();}
+		if (toDel==null)
+			return ergebnis; //Nothing to delete
 		EdgeLock.lock();
 		try
 		{ //Adjazente Kanten finden und
-			if (toDel!=null)
-			{
 				HashSet<MEdge> deledges = new HashSet<MEdge>();
 				Iterator<MEdge> n2 = mEdges.iterator();
 				while (n2.hasNext())
@@ -438,7 +401,6 @@ public class MGraph extends Observable
 				{
 					mNodes.remove(toDel); //und den Knoten loeschen
 				}finally {NodeLock.unlock();}
-			}
 		}
 		finally {EdgeLock.unlock();}
 		setChanged();
@@ -450,7 +412,6 @@ public class MGraph extends Observable
 	 */
 	public int getNextNodeIndex()
 	{
-
 		int index = 1;
 		NodeLock.lock();
 		try {
@@ -508,53 +469,6 @@ public class MGraph extends Observable
 		return ret;
 	}
 	/**
-	 * Set the node name of a node. If the node does not exist, nothing happens
-	 * @param i the node with index i
-	 * @param name to the new name
-	 */
-	public void setNodeName(int i, String name)
-	{
-		NodeLock.lock();
-		int index=0;
-		try
-		{
-			Iterator<MNode> n = mNodes.iterator();
-			while (n.hasNext())
-			{
-				MNode t = n.next();
-				if (t.index==i)
-				{
-					t.name=name;
-					index = i;
-				}
-			}
-		} finally {NodeLock.unlock();}
-		if (index!=0) //found the node, notify observers
-		{
-			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.NODE,index,GraphMessage.UPDATE,GraphMessage.NODE));	
-		}
-	}
-	/**
-	 * Check the existence of the node with index i
-	 * @param index node index
-	 * @return true, if a node with the index exists else false
-	 */
-	public boolean existsNode(int index)
-	{
-		NodeLock.lock();
-		try{
-				Iterator<MNode> n = mNodes.iterator();
-				while (n.hasNext())
-				{
-					MNode v = n.next();
-					if ( ( v.index==index) )
-						return true;
-				}
-			} finally {NodeLock.unlock();}
-		return false;
-	}
-	/**
 	 * Returns the number of nodes contained in the graph
 	 * @return 
 	 */
@@ -562,9 +476,6 @@ public class MGraph extends Observable
 	{
 		return mNodes.size();
 	}	
-	//
-	//Knoteniteration
-	//
 	/**
 	 * Returns an Iterator to iterate the nodes
 	 * @return a new iterator for the nodes
@@ -591,7 +502,7 @@ public class MGraph extends Observable
 	{
 		if ((e.StartIndex==e.EndIndex)&&(!allowloops)) //adding tries a loop but loops are not allowed
 			return false;
-		if ((existsEdge(e.StartIndex, e.EndIndex)>0)&&(!allowmultiple)) //adding tries a second edge between s and e and multiple edges are not allowed
+		if ((EdgesBetween(e.StartIndex, e.EndIndex)>0)&&(!allowmultiple)) //adding tries a second edge between s and e and multiple edges are not allowed
 			return false;
 		if (getEdge(e.index)!=null) //index already in use
 			return false;
@@ -641,17 +552,7 @@ public class MGraph extends Observable
 	 */
 	public void removeEdge(int i)
 	{
-		MEdge toDel = null;
-		Iterator<MEdge> n = mEdges.iterator();
-		while (n.hasNext())
-		{
-			MEdge e = n.next();
-			if (e.index==i)
-			{
-				toDel = e;
-				break;
-			}
-		}
+		MEdge toDel = getEdge(i);
 		if (toDel!=null)
 		{
 			mEdges.remove(toDel);
@@ -733,7 +634,7 @@ public class MGraph extends Observable
 	 * @param ende end node index
 	 * @return
 	 */
-	public int existsEdge(int start, int ende)
+	public int EdgesBetween(int start, int ende)
 	{
 		int count = 0;
 		EdgeLock.lock();
@@ -788,64 +689,6 @@ public class MGraph extends Observable
 		return mEdges.size();
 	}
 	/**
-	 * Set the name of an edge. If the edge does not exist, nothing is changed.
-	 * If the name is changed a notify is pushed
-	 * @param i edge given by index
-	 * @param name new name of the edge
-	 */
-	public void setEdgeName(int i, String name)
-	{
-		boolean change=false;
-		EdgeLock.lock();
-		try
-		{
-			Iterator<MEdge> e = mEdges.iterator();
-			while (e.hasNext())
-			{
-				MEdge t = e.next();
-				if (t.index==i)
-				{
-					if (!name.equals(t.name)) //the name must be changed
-					{
-						t.name=name;
-						change = true;
-					}
-				}
-			}
-		} finally {EdgeLock.unlock();}
-		if (change)
-		{
-			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.UPDATE,GraphMessage.EDGE));	
-		}
-	}
-	/**
-	 * Get the Name of an edge. If the edge does not exist, null is returned
-	 * @param i edge given by index
-	 * @return the name of the edge if it exists, else null
-	 */
-	public String getEdgeName(int i)
-	{
-		EdgeLock.lock();
-		try
-		{
-			Iterator<MEdge> e = mEdges.iterator();
-			while (e.hasNext())
-			{
-				MEdge t = e.next();
-				if (t.index==i)
-				{
-					return t.name;
-				}
-			}
-		} finally {EdgeLock.unlock();}
-		return null;
-	}
-
-	//
-	//Kanteniteration
-	//
-	/**
 	 * Get a new Iterator for the edges. Attention: Because this stuff is threadsafe and is used in many threads the edges might change
 	 */
 	public Iterator<MEdge> getEdgeIterator()
@@ -877,16 +720,7 @@ public class MGraph extends Observable
 	 */
 	public boolean removeSubSet(int index)
 	{
-		MSubSet toDelete = null;
-		Iterator<MSubSet> iter = mSubSets.iterator();
-		while (iter.hasNext())
-		{
-			MSubSet actual = iter.next();
-			if (actual.getIndex()==index)
-			{
-				toDelete = actual;
-			}
-		}
+		MSubSet toDelete = getSubSet(index);
 		if (toDelete!=null)
 		{
 			mSubSets.remove(toDelete);
@@ -919,7 +753,7 @@ public class MGraph extends Observable
 	 * Get a free subset index
 	 * @return max_subset_index + 1
 	 */
-	public int getNextSetIndex() {
+	public int getNextSubSetIndex() {
 		int index = 1;
 		Iterator<MSubSet> n = mSubSets.iterator();
 		while (n.hasNext()) {
@@ -932,49 +766,6 @@ public class MGraph extends Observable
 		return index;
 	}
 	/**
-	 * Get the name of a subset. returns null if the subset does not exist
-	 * @param index subset index, where the name is wanted
-	 * @return the name if the subset exists, else null
-	 */
-	public String getSubSetName(int index)
-	{
-		Iterator<MSubSet> iter = mSubSets.iterator();
-		while (iter.hasNext())
-		{
-			MSubSet actual = iter.next();
-			if (actual.getIndex()==index)
-			{
-				return actual.getName();
-			}
-		}
-		return null;
-	}
-	/**
-	 * Set the name of the subset.
-	 * If subset exists and the name is changed, there is a notify
-	 * @param index index of the subset where the name should be set to
-	 * @param newname a new name
-	 */
-	public void setSubSetName(int index, String newname)
-	{
-		boolean change = false;
-		Iterator<MSubSet> iter = mSubSets.iterator();
-		while (iter.hasNext())
-		{
-			MSubSet actual = iter.next();
-			if (actual.getIndex()==index)
-			{
-				change = !(actual.getName().equals(newname));
-				actual.setName(newname);
-			}
-		}
-		if (change)
-		{
-			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,index,GraphMessage.UPDATE,GraphMessage.SUBSET));	
-		}
-	}
-	/**
 	 * Add a Node to a Subset
 	 * If both node and subset exist
 	 * If the node is already in the subset, no notify is done
@@ -983,21 +774,14 @@ public class MGraph extends Observable
 	 */
 	public void addNodetoSubSet(int nodeindex, int SetIndex)
 	{
-		if (!existsNode(nodeindex))
+		if (getNode(nodeindex)==null)
 			return;
-		boolean change = false;
-		Iterator<MSubSet> iter = mSubSets.iterator();
-		while (iter.hasNext())
-		{
-			MSubSet actual = iter.next();
-			if (actual.getIndex()==SetIndex)
-			{
-				change = !actual.containsNode(nodeindex); //Change if it is not in the subset yet
-				actual.addNode(nodeindex);
-			}
-		}
-		if (change)
-		{
+		MSubSet s = getSubSet(SetIndex);
+		if (s==null)
+			return;
+		if (!s.containsNode(nodeindex)) //Change if it is not in the subset yet
+		{ 
+			s.addNode(nodeindex);
 			setChanged();
 			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.NODE));	
 		}
@@ -1007,48 +791,17 @@ public class MGraph extends Observable
 	 * @param nodeindex node that should be removed
 	 * @param SetIndex index of subset where the node should be removed
 	 */
-	public boolean removeNodefromSet(int nodeindex, int SetIndex)
+	public void removeNodefromSet(int nodeindex, int SetIndex)
 	{
-		boolean change = false;
-		if (!existsNode(nodeindex))
-			return false;
-		Iterator<MSubSet> iter = mSubSets.iterator();
-		while (iter.hasNext())
+		MSubSet s = getSubSet(SetIndex);
+		if ((getNode(nodeindex)==null)||(s==null))
+			return;
+		if (s.containsNode(nodeindex))
 		{
-			MSubSet actual = iter.next();
-			if (actual.getIndex()==SetIndex)
-			{
-				change = actual.containsNode(nodeindex);
-				actual.removeNode(nodeindex);
-			}
-		}
-		if (change)
-		{
+			s.removeNode(nodeindex);
 			setChanged();
 			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.NODE));	
 		}
-		return change;
-	}
-	/**
-	 * If both node and subset exist, there is a check whether the node is contained in the set
-	 * @param nodeindex 
-	 * @param SetIndex
-	 * @return true if node and subset exist and the node is in the subset
-	 */
-	public boolean SubSetcontainsNode(int nodeindex,int SetIndex)
-	{
-		if (!existsNode(nodeindex))
-			return false;
-		Iterator<MSubSet> iter = mSubSets.iterator();
-		while (iter.hasNext())
-		{
-			MSubSet actual = iter.next();
-			if (actual.getIndex()==SetIndex)
-			{
-				return actual.containsNode(nodeindex);
-			}
-		}
-		return false;
 	}
 	/**
 	 * Add an edge to a subset, if both edge and subset exist. If they don't nothing happens
@@ -1057,19 +810,16 @@ public class MGraph extends Observable
 	 */
 	public void addEdgetoSubSet(int edgeindex, int SetIndex)
 	{
-		if (getEdge(edgeindex)==null)
+		MEdge e = getEdge(edgeindex);
+		MSubSet s = getSubSet(SetIndex);
+		if ((e==null)||(s==null))
 			return;
-		Iterator<MSubSet> iter = mSubSets.iterator();
-		while (iter.hasNext())
+		if (!s.containsEdge(edgeindex))
 		{
-			MSubSet actual = iter.next();
-			if (actual.getIndex()==SetIndex)
-			{
-				actual.addEdge(edgeindex);
-			}
+			s.addEdge(edgeindex);
+			setChanged();
+			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.EDGE));	
 		}
-		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.EDGE));	
 	}
 	/**
 	 * Removes an edge from a subset, if both exist. If a change is done (edge is also contained in the subset). 
@@ -1080,48 +830,18 @@ public class MGraph extends Observable
 	 *
 	 * @return true if both edge and subset exist and the edge was in the subset, so it was removed
 	 */
-	public boolean removeEdgefromSet(int edgeindex, int SetIndex)
+	public void removeEdgefromSet(int edgeindex, int SetIndex)
 	{
-		boolean change = false;
-		if (getEdge(edgeindex)==null)
-			return false;
-		Iterator<MSubSet> iter = mSubSets.iterator();
-		while (iter.hasNext())
+		MEdge e = getEdge(edgeindex);
+		MSubSet s = getSubSet(SetIndex);
+		if ((e==null)||(s==null))
+			return;
+		if (s.containsEdge(edgeindex))
 		{
-			MSubSet actual = iter.next();
-			if (actual.getIndex()==SetIndex)
-			{
-				change = actual.containsEdge(edgeindex);
-				actual.removeEdge(edgeindex);
-			}
-		}
-		if (change)
-		{
+			s.removeEdge(edgeindex);
 			setChanged();
 			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.EDGE));	
 		}
-		return change;
-	}
-	/**
-	 * Indicator whether an edge belongs to a subset or not. If the edge does not exist, false is returned
-	 * @param edgeindex index of the edge that should be proved to be in a 
-	 * @param SetIndex subset with this index
-	 * @return true if edge and subset exist and the edge is in the subset
-	 */
-	public boolean SubSetcontainsEdge(int edgeindex,int SetIndex)
-	{
-		if (getEdge(edgeindex)==null)
-			return false;
-		Iterator<MSubSet> iter = mSubSets.iterator();
-		while (iter.hasNext())
-		{
-			MSubSet actual = iter.next();
-			if (actual.getIndex()==SetIndex)
-			{
-				return actual.containsEdge(edgeindex);
-			}
-		}
-		return false;
 	}
 	/**
 	 * get a new Subset Iterator.
@@ -1151,9 +871,8 @@ public class MGraph extends Observable
 			if ((actual.getIndex() + 1) > ret.size()) {
 				ret.setSize(actual.getIndex() + 1);
 			}
-			ret.set(actual.getIndex(), getSubSetName(actual.getIndex()));
+			ret.set(actual.getIndex(), getSubSet(actual.getIndex()).getName());
 		}
 		return ret;
 	}
 }
-

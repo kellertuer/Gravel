@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
@@ -58,8 +59,8 @@ public class CEdgeArrowPreview extends Container implements Observer{
 		ArrowTest.modifySubSets.addNodetoSubSet(1, 1);
 		ArrowTest.modifySubSets.addNodetoSubSet(2, 1);
 		ArrowEdge = new VStraightLineEdge(1,2);
-		ArrowTest.modifyEdges.addEdge(ArrowEdge, new MEdge(ArrowEdge.getIndex(),1,2,1,""), null, null);
-		ArrowTest.modifyEdges.setEdgeName(ArrowEdge.getIndex(), "e");
+		ArrowTest.modifyEdges.addEdge(ArrowEdge, new MEdge(ArrowEdge.getIndex(),1,2,1,""), new Point(30,15), new Point(170,15));
+		ArrowTest.getMathGraph().getEdge(ArrowEdge.getIndex()).name="e";
 		ArrowTest.modifyEdges.getEdge(ArrowTest.getMathGraph().getEdgeIndices(1,2).firstElement()).setTextProperties(new VEdgeText());
 		ArrowTest.modifyEdges.getEdge(ArrowTest.getMathGraph().getEdgeIndices(1,2).firstElement()).setLinestyle(new VEdgeLinestyle());
 		ArrowG = new VGraphic(new Dimension(200,60), ArrowTest);

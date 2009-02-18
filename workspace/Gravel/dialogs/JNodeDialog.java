@@ -312,9 +312,9 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 		{
 			if (subsetlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				SubSetChecks[temp] = new JCheckBox(graphref.getMathGraph().getSubSetName(i));
+				SubSetChecks[temp] = new JCheckBox(graphref.getMathGraph().getSubSet(i).getName());
 				if (chNode!=null)
-					SubSetChecks[temp].setSelected(graphref.getMathGraph().SubSetcontainsNode(chNode.getIndex(),i));
+					SubSetChecks[temp].setSelected(graphref.getMathGraph().getSubSet(i).containsNode(chNode.getIndex()));
 				CiSubSets.add(SubSetChecks[temp],c);
 				SubSetChecks[temp].addItemListener(this);
 				c.gridy++;
@@ -400,7 +400,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, iNodeIndex.getValue(), GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.NODE));
 				}
 				//Allgemeine Werte aktualisieren
-				graphref.modifyNodes.setNodeName(iNodeIndex.getValue(), sname.getText());
+				graphref.getMathGraph().getNode(iNodeIndex.getValue()).name = sname.getText();
 				VNode n = graphref.modifyNodes.getNode(iNodeIndex.getValue()); 
 				n.setPosition(new Point(ixPos.getValue(), iyPos.getValue()));
 				n.setSize(iSize.getValue());

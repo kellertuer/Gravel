@@ -164,7 +164,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 			if (t!=null) //Falls ein Eintrag leer ist, behandle ihn nicht.
 			{
 				//Sets fangen mit 1 an die Menüeinträge mit 0
-				if (!(vg.getMathGraph().SubSetcontainsNode(i,vSubSetNMenus.indexOf(t)))) // Knoten nicht enthalten -> hinzufügenMenü
+				if (!(vg.getMathGraph().getSubSet(vSubSetNMenus.indexOf(t)).containsNode(i))) // Knoten nicht enthalten -> hinzufügenMenü
 				{
 					NaddtoSet.setEnabled(true); //es gibt einen also gibts auch das Menü
 					NaddtoSet.add(t);
@@ -194,7 +194,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 			JMenuItem t = iter.next();
 			if (t!=null) //Falls ein Index nixht vergeben ist
 			{
-				if (!(vg.getMathGraph().SubSetcontainsEdge(i, vSubSetNMenus.indexOf(t)))) // Knoten nicht enthalten -> hinzufuegenMenue
+				if (!(vg.getMathGraph().getSubSet(vSubSetNMenus.indexOf(t)).containsEdge(i))) // Knoten nicht enthalten -> hinzufuegenMenue
 				{
 					EaddtoSet.setEnabled(true); //es gibt einen also gibts auch das Menue
 					EaddtoSet.add(t);
@@ -290,7 +290,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		while (subsetiter.hasNext())
 		{
 			VSubSet actual = subsetiter.next();
-			JMenuItem t = new JMenuItem(vg.getMathGraph().getSubSetName(actual.getIndex()));
+			JMenuItem t = new JMenuItem(vg.getMathGraph().getSubSet(actual.getIndex()).getName());
 			t.addActionListener(this);
 			if ((actual.getIndex()+1)>vSubSetNMenus.size())
 			{
@@ -339,7 +339,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 							colorgone = true;
 				}
 			} while(colorgone);
-			new JSubSetDialog(vg.getMathGraph().getNextSetIndex(),gp.getSubSetName(vg.getMathGraph().getNextSetIndex()),c,vg);
+			new JSubSetDialog(vg.getMathGraph().getNextSubSetIndex(),gp.getSubSetName(vg.getMathGraph().getNextSubSetIndex()),c,vg);
 		}
 		//KnotenMen� :  Hinzuf�gen zu und Entfernen von einem Set
 		//KantenMen� :  Hinzuf�gen zu und Entfernen von einem Set
@@ -350,7 +350,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 			//In diesem Fall wars ein Knotenmen� (selectedNode != null)
 			if (selectedNode!=null)
 			{
-				if (vg.getMathGraph().SubSetcontainsNode(selectedNode.getIndex(),vSubSetNMenus.indexOf(t))) // gew�hlt und enth�lt den Knoten => entfernen
+				if (vg.getMathGraph().getSubSet(vSubSetNMenus.indexOf(t)).containsNode(selectedNode.getIndex())) // gew�hlt und enth�lt den Knoten => entfernen
 				{
 					vg.modifySubSets.removeNodefromSubSet(selectedNode.getIndex(), vSubSetNMenus.indexOf(t));
 				} else {
@@ -360,7 +360,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 			//In diesem Fall wars eine Kante
 			if (selectedEdge!=null)
 			{
-				if (vg.getMathGraph().SubSetcontainsEdge(selectedEdge.getIndex(),vSubSetNMenus.indexOf(t))) // gew�hlt und enth�lt den Knoten => entfernen
+				if (vg.getMathGraph().getSubSet(vSubSetNMenus.indexOf(t)).containsEdge(selectedEdge.getIndex())) // gew�hlt und enth�lt den Knoten => entfernen
 				{
 					vg.modifySubSets.removeEdgefromSubSet(selectedEdge.getIndex(), vSubSetNMenus.indexOf(t));
 				} else {

@@ -117,7 +117,11 @@ public class RandomVisualize implements VAlgorithmIF {
 						}
 						else
 							width = GeneralPreferences.getInstance().getIntValue("edge.width");						
-						ErgebnisGraph.modifyEdges.addEdge(new VStraightLineEdge(e.index,width), e,null, null);
+						ErgebnisGraph.modifyEdges.addEdge(
+								new VStraightLineEdge(e.index,width), 
+								e,
+								ErgebnisGraph.modifyNodes.getNode(e.StartIndex).getPosition(),
+								ErgebnisGraph.modifyNodes.getNode(e.EndIndex).getPosition());
 					}		
 				}
 				ErgebnisGraph.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATE));

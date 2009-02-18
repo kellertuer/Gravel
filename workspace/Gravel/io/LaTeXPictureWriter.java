@@ -216,7 +216,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 				    if (t.isshowvalue())
 						text = ""+me.Value;
 				    else
-				    	text = vg.getMathGraph().getEdgeName(actual.getIndex());
+				    	text = vg.getMathGraph().getEdge(actual.getIndex()).name;
 				    double tsize = Math.round((double)t.getSize()*sizeppt*((double)1000))/1000;
 					s.write(NL+"\t\t\\put("+(m.x-offset.x)+","+(max.y-m.y)+"){\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(text)+"}}");
 				}

@@ -114,7 +114,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 		else
 		{
 			chSubSet = s;
-			oldname = graphref.getMathGraph().getSubSetName(s.getIndex());
+			oldname = graphref.getMathGraph().getSubSet(s.getIndex()).getName();
 			oldindex = s.getIndex();
 			oldcolor = s.getColor();
 			//Knoten finden
@@ -122,16 +122,16 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 			while (nodeiter.hasNext())
 			{
 				VNode n = nodeiter.next();
-				oldnodes.set(n.getIndex(),graphref.getMathGraph().SubSetcontainsNode(n.getIndex(), s.getIndex()));
+				oldnodes.set(n.getIndex(),graphref.getMathGraph().getSubSet(s.getIndex()).containsNode(n.getIndex()));
 			}
 			//Kanten finden
 			Iterator <VEdge> edgeiter = graphref.modifyEdges.getEdgeIterator();
 			while (edgeiter.hasNext())
 			{
 				VEdge e = edgeiter.next();
-				oldedges.set(e.getIndex(),graphref.getMathGraph().SubSetcontainsEdge(e.getIndex(), s.getIndex()));
+				oldedges.set(e.getIndex(),graphref.getMathGraph().getSubSet(s.getIndex()).containsEdge(e.getIndex()));
 			}
-			this.setTitle("Eigenschaften des Untergraphen '"+graphref.getMathGraph().getSubSetName(s.getIndex())+"'");	
+			this.setTitle("Eigenschaften des Untergraphen '"+graphref.getMathGraph().getSubSet(s.getIndex()).getName()+"'");	
 		}
 		
 		Container content = getContentPane();

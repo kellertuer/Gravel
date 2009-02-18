@@ -119,13 +119,13 @@ public class VSubSetModification extends Observable implements Observer {
 		Iterator<MNode> iterNode = mG.getNodeIterator();
 		while (iterNode.hasNext()) {
 			MNode actual = iterNode.next();
-			if (mG.SubSetcontainsNode(actual.index, SetIndex))
+			if (mG.getSubSet(SetIndex).containsNode(actual.index))
 				removeNodefromSubSet_(actual.index, SetIndex);
 		}
 		Iterator<MEdge> iterEdge = mG.getEdgeIterator();
 		while (iterEdge.hasNext()) {
 			MEdge actual = iterEdge.next();
-			if (mG.SubSetcontainsEdge(actual.index, SetIndex))
+			if (mG.getSubSet(SetIndex).containsEdge(actual.index))
 				removeEdgefromSubSet_(actual.index, SetIndex);
 		}
 		Iterator<VSubSet> iterSet = vSubSets.iterator();
@@ -159,7 +159,7 @@ public class VSubSetModification extends Observable implements Observer {
 		while (mni.hasNext())
 		{
 			MNode n = mni.next();
-			if (mG.SubSetcontainsNode(n.index, index))
+			if (mG.getSubSet(index).containsNode(n.index))
 			{
 				setChanged();
 				this.notifyObservers(new GraphColorMessage(GraphColorMessage.NODE,n.index,oldcolor,newcolor));
@@ -169,7 +169,7 @@ public class VSubSetModification extends Observable implements Observer {
 		while (mei.hasNext())
 		{
 			MEdge e = mei.next();
-			if (mG.SubSetcontainsEdge(e.index,index))
+			if (mG.getSubSet(index).containsEdge(e.index))
 			{
 				setChanged();
 				this.notifyObservers(new GraphColorMessage(GraphColorMessage.EDGE,e.index,oldcolor,newcolor));
@@ -191,7 +191,7 @@ public class VSubSetModification extends Observable implements Observer {
 		VSubSet actual = getSubSet(SetIndex);
 		if ((mG.getEdge(edgeindex) != null)
 				&& (actual!=null)
-				&& (!mG.SubSetcontainsEdge(edgeindex, SetIndex))) {
+				&& (!mG.getSubSet(SetIndex).containsEdge(edgeindex))) {
 			// Mathematisch hinzufuegen
 			mG.addEdgetoSubSet(edgeindex, SetIndex);
 			// Und der Kantenmenge Bescheid sagen
@@ -226,7 +226,7 @@ public class VSubSetModification extends Observable implements Observer {
 		VSubSet actual = getSubSet(SetIndex);
 		if (actual==null) //Not existent
 			return;
-		if (mG.SubSetcontainsEdge(edgeindex, SetIndex)) 
+		if (mG.getSubSet(SetIndex).containsEdge(edgeindex)) 
 		{
 			mG.removeEdgefromSet(edgeindex, SetIndex);
 			//Nodify Edge-Set internal about Change			
@@ -248,7 +248,7 @@ public class VSubSetModification extends Observable implements Observer {
 		VSubSet actual = getSubSet(SetIndex);
 		if ((mG.getNode(nodeindex) != null)
 				&& (actual!=null)
-				&& (!mG.SubSetcontainsNode(nodeindex, SetIndex))) {
+				&& (!mG.getSubSet(SetIndex).containsNode(nodeindex))) {
 			// Mathematisch hinzufuegen
 			mG.addNodetoSubSet(nodeindex, SetIndex);
 			// Und der Knotenmenge Bescheid sagen
@@ -283,7 +283,7 @@ public class VSubSetModification extends Observable implements Observer {
 		VSubSet actual = getSubSet(SetIndex);
 		if (actual==null) //Not existent
 			return;
-		if (mG.SubSetcontainsNode(nodeindex, SetIndex)) 
+		if (mG.getSubSet(SetIndex).containsNode(nodeindex))
 		{
 			mG.removeNodefromSet(nodeindex, SetIndex);
 			//Nodify Node-Set internal about Change			

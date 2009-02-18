@@ -276,9 +276,9 @@ public class GravelMLContentHandler implements ContentHandler
 			if (data_key.equals("sn")) //SubSetName
 			{
 				if (isVisual)
-					vG.getMathGraph().setSubSetName(id,CDATA);
+					vG.getMathGraph().getSubSet(id).setName(CDATA);
 				else
-					mG.setSubSetName(id,CDATA);
+					mG.getSubSet(id).setName(CDATA);
 			}
 			if (!isVisual)
 				return;
@@ -408,7 +408,7 @@ public class GravelMLContentHandler implements ContentHandler
 			}
 			else //im Mathgraph reicht der Name schon
 			{
-				if (mG.existsNode(id))
+				if (mG.getNode(id)!=null)
 				{
 					System.err.println("DEBUG : Error Parsing Node : Node Index already given another node.");
 					isValid=false;
@@ -546,7 +546,11 @@ public class GravelMLContentHandler implements ContentHandler
 				System.err.println("DEBUG : Error Parsing File : An (similar) Edge already existst between the two Nodes"); 
 				return;
 			}
-			vG.modifyEdges.addEdge(toAdd, new MEdge(toAdd.getIndex(),start,ende,ev,en),null, null);
+			vG.modifyEdges.addEdge(
+					toAdd,
+					new MEdge(toAdd.getIndex(),start,ende,ev,en),
+					vG.modifyNodes.getNode(start).getPosition(),
+					vG.modifyNodes.getNode(ende).getPosition());
 			this.EdgeIdtoIndex.put(idString,id);
 		}
 	}
@@ -564,9 +568,9 @@ public class GravelMLContentHandler implements ContentHandler
 			catch (Exception e)
 			{
 				if (isVisual)
-					id = vG.getMathGraph().getNextSetIndex();
+					id = vG.getMathGraph().getNextSubSetIndex();
 				else
-					id = mG.getNextSetIndex();
+					id = mG.getNextSubSetIndex();
 				System.err.println("DEBUG : Malformed ID - generating own ("+id+")");
 			}				
 			idString = atts.getValue("id");
@@ -595,7 +599,7 @@ public class GravelMLContentHandler implements ContentHandler
 			}
 			else
 			{
-				if (mG.existsNode(nodeindex))
+				if (mG.getNode(nodeindex)!=null)
 					mG.addNodetoSubSet(nodeindex, id);
 				else
 					{isValid=false; System.err.println("The Node '"+nodeid+"' does not exist."); return;}

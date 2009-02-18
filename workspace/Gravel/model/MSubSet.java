@@ -41,6 +41,24 @@ public class MSubSet
 		return c;
 	}
 	/**
+	 * Add the Node with Index i to the subset
+	 * @param i node index 
+	 */
+	public void addNode(int i)
+	{
+		setnodes.set(i);
+	}
+
+	/**
+	 * Remove node i from the subset
+	 * @param i node index
+	 */
+	public void removeNode(int i)
+	{
+		setnodes.clear(i);
+	}
+
+	/**
 	 * Indicates whether Node with index i belongs to this subset
 	 * @param i index of a node
 	 * @return true, if the node belongs to the subset else false
@@ -50,31 +68,6 @@ public class MSubSet
 		return setnodes.get(i);
 	}
 	/**
-	 * Indicates whether edge with index i belongs to this subset
-	 * @param i index of a edge
-	 * @return true, if the egde belongs to the subset else false
-	 */
-	public boolean containsEdge(int i)
-	{
-		return setedges.get(i);
-	}
-	/**
-	 * Add the Node with Index i to the subset
-	 * @param i node index 
-	 */
-	public void addNode(int i)
-	{
-		setnodes.set(i);
-	}
-	/**
-	 * Remove node i from the subset
-	 * @param i node index
-	 */
-	public void removeNode(int i)
-	{
-		setnodes.clear(i);
-	}
-	/**
 	 * Add an edge to this subset
 	 * @param i edge index
 	 */
@@ -82,6 +75,7 @@ public class MSubSet
 	{
 		setedges.set(i);
 	}
+
 	/**
 	 * Remove an edge from the subset
 	 * @param i edge index
@@ -89,6 +83,16 @@ public class MSubSet
 	public void removeEdge(int i)
 	{
 		setedges.clear(i);
+	}
+
+	/**
+	 * Indicates whether edge with index i belongs to this subset
+	 * @param i index of a edge
+	 * @return true, if the egde belongs to the subset else false
+	 */
+	public boolean containsEdge(int i)
+	{
+		return setedges.get(i);
 	}
 	/**
 	 * Get the Name of the Subset

@@ -83,14 +83,14 @@ public class LayeredTreeDraw implements VAlgorithmIF
 		while (nodeiter.hasNext())
 		{
 			MNode next = nodeiter.next();
-			if (((type==UNDIR)||(type==DOWNTREE))&&((next!=parent)&&(mG.existsEdge(subtreeroot.index,next.index)>0))) //Sohn, ungerichteter fall oder downtree
+			if (((type==UNDIR)||(type==DOWNTREE))&&((next!=parent)&&(mG.EdgesBetween(subtreeroot.index,next.index)>0))) //Sohn, ungerichteter fall oder downtree
 			{
 				if (left==null) 
 					left = next;
 				else 
 					right = next;
 			} //Und beide gibts, da der Graph okay war und subtreroot kein Blatt war
-			if ((type==UPTREE)&&((next!=parent)&&(mG.existsEdge(next.index,subtreeroot.index)>0))) //Sohn, uptree
+			if ((type==UPTREE)&&((next!=parent)&&(mG.EdgesBetween(next.index,subtreeroot.index)>0))) //Sohn, uptree
 			{
 				if (left==null) 
 					left = next;
