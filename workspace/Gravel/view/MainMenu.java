@@ -445,11 +445,11 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         			int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Wirklich umformen in einen Graphen ohne Schleifen ?<br>Dabei werdem alle existenten Schleifen gel"+main.CONST.html_oe+"scht.","Umformen bestätigen",JOptionPane.YES_NO_OPTION);
         	   		if (n==JOptionPane.YES_OPTION)
         	   		{
-        	   			graphpart.getVGraph().modifyEdges.setLoopsAllowed(graphpart.getVGraph(), false);
+        	   			graphpart.getVGraph().modifyEdges.setLoopsAllowed(false);
         	   		}
         	   	}
         	   	else
-        	   		graphpart.getVGraph().modifyEdges.setLoopsAllowed(graphpart.getVGraph(), true);
+        	   		graphpart.getVGraph().modifyEdges.setLoopsAllowed(true);
            	} else	
             if (item==mVGMultipleCh)
            	{

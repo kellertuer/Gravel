@@ -612,14 +612,14 @@ public class GravelMLContentHandler implements ContentHandler
 			if (isVisual)
 			{
 				if (vG.modifyEdges.getEdge(edgeindex)!=null)
-					vG.modifySubSets.addEdgetoSubSet(vG, edgeindex, id);
+					vG.modifySubSets.addEdgetoSubSet(edgeindex, id);
 				else
 					{isValid=false; System.err.println("The Edge '"+edgeid+"' does not exist."); return;}
 			}
 			else
 			{
 				if (mG.getEdge(edgeindex).Value!=-1)
-					vG.modifySubSets.addEdgetoSubSet(vG, edgeindex, id);
+					vG.modifySubSets.addEdgetoSubSet(edgeindex, id);
 				else
 					{isValid=false; System.err.println("The Node '"+edgeid+"' does not exist."); return;}
 			}

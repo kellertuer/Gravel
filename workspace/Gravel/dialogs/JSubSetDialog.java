@@ -422,7 +422,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 				if (edgelist.elementAt(i)!=null) //Eine Kante mit diesem Index existiert und sie ist selektiert
 				{
 					if (edgechecks[temp].isSelected())
-						graphref.modifySubSets.addEdgetoSubSet(graphref, i, SetIndex);
+						graphref.modifySubSets.addEdgetoSubSet(i, SetIndex);
 					temp ++; //Anzahl Kanten zaehlen
 				}	
 

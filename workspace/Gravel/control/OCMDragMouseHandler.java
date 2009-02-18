@@ -91,7 +91,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 				else
 				{
 					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_START|GraphMessage.ADDITION));
-					vg.addEdgesfromSelectedNodes(vg.modifyEdges, DragNode);
+					vg.addEdgesfromSelectedNodes(DragNode);
 				}
 			}
 			else
@@ -185,7 +185,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 				}
 				else if (DragNode!=null)
 				{	
-						vg.addEdgesfromSelectedNodes(vg.modifyEdges, EndNode);
+						vg.addEdgesfromSelectedNodes(EndNode);
 						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END|GraphMessage.ADDITION));
 				}
 			}

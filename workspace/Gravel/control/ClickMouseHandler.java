@@ -352,7 +352,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 			{
 				if (vg.getMathGraph().SubSetcontainsNode(selectedNode.getIndex(),vSubSetNMenus.indexOf(t))) // gew�hlt und enth�lt den Knoten => entfernen
 				{
-					vg.modifySubSets.removeNodefromSubSet(vg, selectedNode.getIndex(),vSubSetNMenus.indexOf(t));
+					vg.modifySubSets.removeNodefromSubSet(selectedNode.getIndex(), vSubSetNMenus.indexOf(t));
 				} else {
 					vg.modifySubSets.addNodetoSubSet(selectedNode.getIndex(), vSubSetNMenus.indexOf(t));
 				}
@@ -364,16 +364,16 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 				{
 					vg.modifySubSets.removeEdgefromSubSet(selectedEdge.getIndex(), vSubSetNMenus.indexOf(t));
 				} else {
-					vg.modifySubSets.addEdgetoSubSet(vg, selectedEdge.getIndex(),vSubSetNMenus.indexOf(t));
+					vg.modifySubSets.addEdgetoSubSet(selectedEdge.getIndex(), vSubSetNMenus.indexOf(t));
 				}
 			}
 		} 
 		//KnotenMen� : Kanten hinzuf�gen zu allen Selektierten Knoten
 		if (e.getSource() == NaddEdgesTo) { // Add Edges to alle selected Nodes
-			vg.addEdgestoSelectedNodes(vg.modifyEdges, selectedNode);
+			vg.addEdgestoSelectedNodes(selectedNode);
 		} 
 		if (e.getSource() == NaddEdgesFrom) { // Add Edges to alle selected Nodes
-			vg.addEdgesfromSelectedNodes(vg.modifyEdges, selectedNode);
+			vg.addEdgesfromSelectedNodes(selectedNode);
 		} 
 		//KNotenMen� : KnotenEigenschaftenDialog
 		if (e.getSource() == Nproperties) 

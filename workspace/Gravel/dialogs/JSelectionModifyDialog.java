@@ -1088,7 +1088,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 						if (bSubSet[position].isSelected())
 							vg.modifySubSets.addNodetoSubSet(actual.getIndex(), i);
 						else
-							vg.modifySubSets.removeNodefromSubSet(vg, actual.getIndex(), i);
+							vg.modifySubSets.removeNodefromSubSet(actual.getIndex(), i);
 						position++;
 					}
 				}
@@ -1108,7 +1108,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 					if (names.get(i)!=null) //SubSet with this index exists
 					{
 						if (bSubSet[position].isSelected())
-							vg.modifySubSets.addEdgetoSubSet(vg, actual.getIndex(), i);
+							vg.modifySubSets.addEdgetoSubSet(actual.getIndex(), i);
 						else
 							vg.modifySubSets.removeEdgefromSubSet(actual.getIndex(), i);
 						position++;

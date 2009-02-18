@@ -95,12 +95,11 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		kantenlaenge = new TreeMap<Integer,Double>();
 //		int compareCount = new Double(vg.NodeCount()*vg.NodeCount()/2 - vg.NodeCount()/2).intValue();
 		knotenabstand = new TreeMap<Integer,Double>();
-		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+		Iterator<MEdge> edgeiter = vg.getMathGraph().getEdgeIterator();
 		while (edgeiter.hasNext())
 		{
 			//Valenzen
-			VEdge actual = edgeiter.next();
-			MEdge me = vg.getMathGraph().getEdge(actual.getIndex());
+			MEdge me = edgeiter.next();
 			int start = me.StartIndex, ende = me.EndIndex;
 			if (valenz.get(start)==null)
 				valenz.put(start,0);
@@ -117,6 +116,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 			//
 			Point startpoint = vg.modifyNodes.getNode(start).getPosition();
 			Point endpoint = vg.modifyNodes.getNode(ende).getPosition();
+			VEdge actual = vg.modifyEdges.getEdge(me.index);
 			switch(actual.getType())
 			{
 				case VEdge.ORTHOGONAL : {
@@ -177,24 +177,24 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		} //End While edgeiter.hasnext
 		//
 		//Knotenabstaende
-		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+		Iterator<MNode> nodeiter = vg.getMathGraph().getNodeIterator();
 		int i=0;
 		while (nodeiter.hasNext())
 		{
-			VNode actual = nodeiter.next();
-			if (valenz.get(actual.getIndex())==null) //Oben nie dran gewesen ==> 0 setzen
-				valenz.put(actual.getIndex(),0);
-			if (invalenz.get(actual.getIndex())==null) //Oben nie dran gewesen ==> 0 setzen
-				invalenz.put(actual.getIndex(),0);
-			if (outvalenz.get(actual.getIndex())==null) //Oben nie dran gewesen ==> 0 setzen
-				outvalenz.put(actual.getIndex(),0);
+			MNode mn = nodeiter.next();
+			if (valenz.get(mn.index)==null) //Oben nie dran gewesen ==> 0 setzen
+				valenz.put(mn.index,0);
+			if (invalenz.get(mn.index)==null) //Oben nie dran gewesen ==> 0 setzen
+				invalenz.put(mn.index,0);
+			if (outvalenz.get(mn.index)==null) //Oben nie dran gewesen ==> 0 setzen
+				outvalenz.put(mn.index,0);
 			
 			//Mit allen folgenden vergleichen
-			Iterator<VNode> rest = vg.modifyNodes.getNodeIterator();
-			while (!actual.equals(rest.next())&&rest.hasNext()){}
+			Iterator<MNode> rest = vg.getMathGraph().getNodeIterator();
+			while (!mn.equals(rest.next())&&rest.hasNext()){}
 			while (rest.hasNext())
 			{
-				knotenabstand.put(i++,actual.getPosition().distance(rest.next().getPosition()));
+				knotenabstand.put(i++,vg.modifyNodes.getNode(mn.index).getPosition().distance(vg.modifyNodes.getNode(rest.next().index).getPosition()));
 			}
 		}
 		//Nun noch werte Setzen

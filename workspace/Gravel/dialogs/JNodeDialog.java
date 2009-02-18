@@ -418,7 +418,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 					if (SubSetChecks[temp].isSelected())
 						graphref.modifySubSets.addNodetoSubSet(iNodeIndex.getValue(), i);
 					else //Sonst entfernen, da das nur geupdated wird oben !
-						graphref.modifySubSets.removeNodefromSubSet(graphref, iNodeIndex.getValue(), i);
+						graphref.modifySubSets.removeNodefromSubSet(iNodeIndex.getValue(), i);
 					temp++; //Anzahl Knoten zaehlen
 				}
 			}

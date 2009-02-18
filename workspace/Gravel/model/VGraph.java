@@ -328,7 +328,7 @@ public class VGraph extends Observable implements Observer {
 			{
 				VSubSet actualSet = n1.next();
 				if (mG.SubSetcontainsEdge(cloneEdge.getIndex(),actualSet.index))
-					clone.modifySubSets.addEdgetoSubSet(clone, cloneEdge.getIndex(),actualSet.getIndex()); //Jedes Set kopieren
+					clone.modifySubSets.addEdgetoSubSet(cloneEdge.getIndex(), actualSet.getIndex()); //Jedes Set kopieren
 			}
 		}
 		//Untergraphen
@@ -582,12 +582,10 @@ public class VGraph extends Observable implements Observer {
 	}
 	/**
 	 * add edges from evey selected node to a given node
-	 * 
-	 * @param edgeModification TODO
 	 * @param Ende
 	 * 				the target of all new edges
 	 */
-	public void addEdgesfromSelectedNodes(VEdgeModification edgeModification, VNode Ende) {
+	public void addEdgesfromSelectedNodes(VNode Ende) {
 		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDITION|GraphMessage.BLOCK_START));
 		Iterator<VNode> iter = modifyNodes.getNodeIterator();
 		while (iter.hasNext()) 
@@ -609,12 +607,10 @@ public class VGraph extends Observable implements Observer {
 	}
 	/**
 	 * add edges from a given node to evey selected node
-	 * 
-	 * @param edgeModification TODO
 	 * @param Start 
 	 * 				the source of all new edges
 	 */
-	public void addEdgestoSelectedNodes(VEdgeModification edgeModification, VNode Start) {
+	public void addEdgestoSelectedNodes(VNode Start) {
 		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDITION|GraphMessage.BLOCK_START));
 		Iterator<VNode> iter = modifyNodes.getNodeIterator();
 		while (iter.hasNext()) 

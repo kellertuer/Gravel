@@ -53,11 +53,9 @@ public class VEdgeModification extends Observable implements Observer {
 	}
 	/**
 	 * Sets the Indicator for Loops in the graph to the parameter value
-	 *
-	 * @param graph TODO
 	 * @param b new Acceptance of Loops
 	 */
-	public BitSet setLoopsAllowed(VGraph graph, boolean b)
+	public BitSet setLoopsAllowed(boolean b)
 	{
 		BitSet removed = new BitSet();
 		if ((mG.isLoopAllowed())&&(!b)) //disbabling
@@ -94,7 +92,7 @@ public class VEdgeModification extends Observable implements Observer {
 			}
 			setChanged();
 			//Loops done, update Edges
-			graph.notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE,GraphMessage.EDGE));	
 		}
 		return removed;
 	}
@@ -106,6 +104,7 @@ public class VEdgeModification extends Observable implements Observer {
 	 * 				mathematical elements of the new edge, if its index differs, this index is ignored
 	 * @param startPoint TODO
 	 * @param endPoint TODO
+	 * @deprecated
 	 */
 	public void addEdge(VEdge edge, MEdge medge, Point start, Point end) 
 	{
@@ -405,9 +404,6 @@ public class VEdgeModification extends Observable implements Observer {
 				e.addColor(m.getColor());
 				break;
 		}
-	}
-	//Handle Updates of Nodes
-	public void update(VNodeModification o, GraphMessage m) {
 	}
 	public void update(Observable o, Object arg)
 	{

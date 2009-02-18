@@ -180,15 +180,14 @@ public class VSubSetModification extends Observable implements Observer {
 	}
 	/**
 	 * add an Edge to a set
-	 * 
-	 * @param graph TODO
 	 * @param edgeindex
 	 * 			edgeindex
 	 * @param SetIndex
 	 * 			setindex
+	 * 
 	 * @see MGraph.addEdgetoSet(edgeindex,setindex)
 	 */
-	public void addEdgetoSubSet(VGraph graph, int edgeindex, int SetIndex) {
+	public void addEdgetoSubSet(int edgeindex, int SetIndex) {
 		VSubSet actual = getSubSet(SetIndex);
 		if ((mG.getEdge(edgeindex) != null)
 				&& (actual!=null)
@@ -263,14 +262,12 @@ public class VSubSetModification extends Observable implements Observer {
 	/**
 	 * remove a node from a set
 	 * if the node or the set does not exist or the node is not in the set, nothing happens
-	 * 
-	 * @param graph TODO
 	 * @param nodeindex
 	 * 				the node index to be removed from the
 	 * @param SetIndex
 	 * 				set with this index
 	 */
-	public void removeNodefromSubSet(VGraph graph, int nodeindex, int SetIndex) {
+	public void removeNodefromSubSet(int nodeindex, int SetIndex) {
 		removeNodefromSubSet_(nodeindex, SetIndex);		
 		setChanged();
 		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.NODE));	

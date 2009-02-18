@@ -790,7 +790,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			{
 				if (SubSetChecks[temp].isSelected())
 				{
-					graphref.modifySubSets.addEdgetoSubSet(graphref, iEdgeIndex.getValue(), i);
+					graphref.modifySubSets.addEdgetoSubSet(iEdgeIndex.getValue(), i);
 				}
 				temp++; //Anzahl Knoten zaehlen
 			}

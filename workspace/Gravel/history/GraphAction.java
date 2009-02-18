@@ -151,22 +151,22 @@ public class GraphAction {
 				if (wasfirst)
 					second.modifySubSets.addNodetoSubSet(itemindex, s.getIndex());
 				else
-					second.modifySubSets.removeNodefromSubSet(second, itemindex, s.getIndex());
+					second.modifySubSets.removeNodefromSubSet(itemindex, s.getIndex());
 				if (wassecond)
 					first.modifySubSets.addNodetoSubSet(itemindex, s.getIndex());
 				else
-					first.modifySubSets.removeNodefromSubSet(first, itemindex, s.getIndex());
+					first.modifySubSets.removeNodefromSubSet(itemindex, s.getIndex());
 			}
 			else if (ItemType==EDGE)
 			{
 				boolean wasfirst = first.getMathGraph().SubSetcontainsEdge(itemindex, s.getIndex());
 				boolean wassecond = second.getMathGraph().SubSetcontainsEdge(itemindex, s.getIndex());
 				if (wasfirst)
-					second.modifySubSets.addEdgetoSubSet(second, itemindex, s.getIndex());
+					second.modifySubSets.addEdgetoSubSet(itemindex, s.getIndex());
 				else
 					second.modifySubSets.removeEdgefromSubSet(itemindex, s.getIndex());
 				if (wassecond)
-					first.modifySubSets.addEdgetoSubSet(first, itemindex, s.getIndex());
+					first.modifySubSets.addEdgetoSubSet(itemindex, s.getIndex());
 				else
 					first.modifySubSets.removeEdgefromSubSet(itemindex, s.getIndex());
 			}
@@ -190,7 +190,7 @@ public class GraphAction {
 			{
 				if (g.modifySubSets.getSubSet(s.getIndex())==null)
 					throw new GraphActionException("Can't replace edge, replacements belongs to Subsets, that don't exists in given parameter graph");
-				g.modifySubSets.addEdgetoSubSet(g, e.getIndex(), s.getIndex());
+				g.modifySubSets.addEdgetoSubSet(e.getIndex(), s.getIndex());
 			}
 		}
 	}
@@ -312,7 +312,7 @@ public class GraphAction {
 				{
 					VEdge e2 = ei.next();
 					if (tempms.containsEdge(e2.getIndex()))
-						graph.modifySubSets.addEdgetoSubSet(graph, e2.getIndex(), newSubSet.getIndex());
+						graph.modifySubSets.addEdgetoSubSet(e2.getIndex(), newSubSet.getIndex());
 				}
 				graph.pushNotify(new GraphMessage(GraphMessage.SUBSET,newSubSet.getIndex(),GraphMessage.BLOCK_END,GraphMessage.ALL_ELEMENTS));
 				ret = graph;
