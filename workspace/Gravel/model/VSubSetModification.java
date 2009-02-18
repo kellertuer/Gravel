@@ -6,8 +6,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.TreeSet;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+//import java.util.concurrent.locks.Lock;
+//import java.util.concurrent.locks.ReentrantLock;
 
 import model.Messages.GraphColorMessage;
 import model.Messages.GraphMessage;
@@ -27,7 +27,7 @@ import model.Messages.GraphMessage;
 public class VSubSetModification extends Observable implements Observer {
 
 	private TreeSet<VSubSet> vSubSets;
-	private Lock SubSetLock;
+//	private Lock SubSetLock; TODO: Think about the need of this lock
 	private MGraph mG;
 	
 	/**
@@ -37,7 +37,7 @@ public class VSubSetModification extends Observable implements Observer {
 	public VSubSetModification(MGraph g)
 	{
 		vSubSets = new TreeSet<VSubSet>(new VSubSet.SubSetIndexComparator());
-		SubSetLock = new ReentrantLock();
+//		SubSetLock = new ReentrantLock();
 		mG = g;
 	}
 
@@ -60,9 +60,7 @@ public class VSubSetModification extends Observable implements Observer {
 				return;
 		if (getSubSet(subset.getIndex())!=null) //SubSet exists?
 			return;
-		//Create an empty temporary SubSet for Math
-		MSubSet temp = new MSubSet(subset.getIndex(),msubset.getName());		
-		mG.addSubSet(temp);
+		mG.addSubSet(msubset); //Add the Subset mathematically - so the math graph is correct now
 		for (int i=0; i<mG.getNextEdgeIndex(); i++)
 		{
 			if ((mG.getEdge(i)!=null)&&(msubset.containsEdge(i)))
@@ -113,8 +111,8 @@ public class VSubSetModification extends Observable implements Observer {
 	 * 					Index of the set to be deleted
 	 */
 	public void removeSubSet(int SetIndex) {
-		VSubSet toDel = null;
-		if (getSubSet(SetIndex)==null)
+		VSubSet toDel = getSubSet(SetIndex);
+		if (toDel==null)
 			return;
 		Iterator<MNode> iterNode = mG.getNodeIterator();
 		while (iterNode.hasNext()) {
@@ -128,12 +126,7 @@ public class VSubSetModification extends Observable implements Observer {
 			if (mG.getSubSet(SetIndex).containsEdge(actual.index))
 				removeEdgefromSubSet_(actual.index, SetIndex);
 		}
-		Iterator<VSubSet> iterSet = vSubSets.iterator();
-		while (iterSet.hasNext()) {
-			VSubSet actual = iterSet.next();
-			if (actual.getIndex() == SetIndex)
-				toDel = actual;
-		}
+		toDel = getSubSet(SetIndex);
 		vSubSets.remove(toDel);
 		mG.removeSubSet(toDel.getIndex());
 		setChanged();

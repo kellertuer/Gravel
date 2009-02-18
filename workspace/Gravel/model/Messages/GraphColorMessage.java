@@ -1,7 +1,17 @@
 package model.Messages;
 
 import java.awt.Color;
-
+/**
+ * GraphColorMessage keeps changes of a Color.
+ * It belongs to the internal GraphMessages to keep other sets
+ * updated
+ * 
+ * No external Element should react on these
+ * They are filtered and kept inside VGraph
+ * 
+ * @author Ronny Bergmann
+ * @since 0.4
+ */
 public class GraphColorMessage {
 
 	//Modified Element
@@ -91,5 +101,4 @@ public class GraphColorMessage {
 	{
 		return oldcolor;
 	}
-	
 }

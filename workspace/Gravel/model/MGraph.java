@@ -61,10 +61,7 @@ public class MGraph extends Observable
 		//Untergraphen
 		Iterator<MSubSet> n1 = mSubSets.iterator();
 		while (n1.hasNext())
-		{
-			MSubSet actualSet = n1.next();
-			clone.addSubSet(actualSet.clone()); //Jedes Set kopieren
-		}
+			clone.addSubSet(n1.next().clone()); //Jedes Set kopieren
 		//Knoten
 		Iterator<MNode> n2 = mNodes.iterator();
 		while (n2.hasNext())
@@ -196,19 +193,13 @@ public class MGraph extends Observable
 				while (n2.hasNext())
 				{
 					MEdge e = n2.next();
-					if (e.EndIndex==e.StartIndex)
-					{
-						removed.set(e.index);
+					removed.set(e.index, e.EndIndex==e.StartIndex); //Set if Loop, clear else
+					if (removed.get(e.index)) //was is just set?
 						deledges.add(e);
-					}
-					else
-						removed.clear(e.index);
 				}
 				Iterator<MEdge> n3 = deledges.iterator();
 				while (n3.hasNext()) // Diese loeschen
-				{
 					mEdges.remove(n3.next());
-				}
 			} finally {EdgeLock.unlock();}
 		}	
 		this.allowloops = a;
@@ -704,6 +695,7 @@ public class MGraph extends Observable
 	 */
 	public void addSubSet(MSubSet s)
 	{
+		
 		if (getSubSet(s.getIndex())==null)
 		{
 			mSubSets.add(s.clone());

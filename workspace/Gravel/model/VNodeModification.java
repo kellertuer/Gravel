@@ -87,8 +87,8 @@ public class VNodeModification extends Observable implements Observer {
 		if (getNode(node.getIndex()) == null) {
 			if (mnode.index!=node.getIndex())
 				mnode.index = node.getIndex();
-			vNodes.add(node);
 			mG.addNode(mnode);
+			vNodes.add(node);
 			setChanged();
 			//Graph changed with an add, only nodes affected
 			notifyObservers(new GraphMessage(GraphMessage.NODE,node.getIndex(),GraphMessage.ADDITION,GraphMessage.NODE));	

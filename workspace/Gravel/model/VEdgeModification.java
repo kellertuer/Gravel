@@ -40,6 +40,7 @@ public class VEdgeModification extends Observable implements Observer {
 		vEdges = new TreeSet<VEdge>(new VEdge.EdgeIndexComparator());
 		EdgeLock = new ReentrantLock();
 		mG = g;
+		mG.addObserver(this); //mG is VGraph-internal so node deletions are signaled through this message
 	}
 	/**
 	 * Set all Edges to not selected
@@ -225,32 +226,22 @@ public class VEdgeModification extends Observable implements Observer {
 	/**
 	 * removes an Edge from the Graph without notifying the Observers
 	 * ATTENTION : Internal Use only, if you Use this method make sure you notify the Observers yourself!
+	 * An internal Notify is sent - but only other parts of VGraph are ment to react on that
 	 * @param i Index of the Edge to be removed
 	 * @return
 	 */
 	boolean removeEdge_(int i) {
-		if (getEdge(i) == null)
+		VEdge toDel = getEdge(i);
+		if (toDel == null)
 			return false;
 		EdgeLock.lock();
 		try
 		{
  			mG.removeEdge(i);
-			vEdges.remove(getEdge(i));
+			vEdges.remove(toDel);
 		} 
 		finally {EdgeLock.unlock();}
 		return true;
-	}
-	/**
-	 * sets the the name of a node with the index, if this node exists, else it does nothing
-	 * @param i
-	 * @param newname
-	 * @see MGraph.setNodeName()
-	 * @deprecated
-	 */
-	public void setEdgeName(int i, String newname) {
-		mG.getEdge(i).name = newname;
-		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.UPDATE,GraphMessage.EDGE));	
 	}
 	/**
 	 * Checks whether an similar edge exists between s and e
@@ -357,11 +348,16 @@ public class VEdgeModification extends Observable implements Observer {
 	 */
 	public boolean selectedEdgeExists() {
 		Iterator<VEdge> e = vEdges.iterator();
-		while (e.hasNext()) {
-			if ((e.next().getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
-				return true;
+		EdgeLock.lock();
+		boolean result = false;
+		try
+		{
+			while (e.hasNext())
+				if ((e.next().getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
+					result=true;
 		}
-		return false;
+		finally{EdgeLock.unlock();}	
+		return result;
 	}
 	//
 	//private Stuff for handling changes from other sets
@@ -375,20 +371,29 @@ public class VEdgeModification extends Observable implements Observer {
 	 */
 	private void updateRemoval()
 	{
-		Iterator<VEdge> e = vEdges.iterator();
-		HashSet<VEdge> adjacent = new HashSet<VEdge>();
-		while (e.hasNext()) {
-			VEdge edge = e.next();
-			if (mG.getEdge(edge.getIndex())==null) //This VEdge-Set is outdated
-					adjacent.add(edge);
-		}
-		e = adjacent.iterator();
-		while (e.hasNext())
+		EdgeLock.lock();
+		try
 		{
-			//So remove them silent
-			removeEdge_(e.next().getIndex());
+			Iterator<VEdge> e = vEdges.iterator();
+			HashSet<VEdge> adjacent = new HashSet<VEdge>();
+			while (e.hasNext()) {
+				VEdge edge = e.next();
+				if (mG.getEdge(edge.getIndex())==null)
+					adjacent.add(edge);
+			}
+			e = adjacent.iterator();
+			while (e.hasNext())
+			{
+				//So remove them silent
+				removeEdge_(e.next().getIndex());
+			}
 		}
+		finally {EdgeLock.unlock();}
 	}
+	/**
+	 * React on Color Change in an SubSet
+	 * @param m the message containing information about change
+	 */
 	private void Colorchange(GraphColorMessage m)
 	{
 		if (m.getModifiedElement()!=GraphColorMessage.EDGE)

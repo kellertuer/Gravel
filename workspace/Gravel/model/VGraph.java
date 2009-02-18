@@ -53,9 +53,8 @@ public class VGraph extends Observable implements Observer {
 		modifyNodes = new VNodeModification(mG);
 		modifyEdges = new VEdgeModification(mG);
 		modifySubSets = new VSubSetModification(mG);
-		modifyNodes.addObserver(modifyEdges); //Edges must react on NodeDeletions
-		modifySubSets.addObserver(modifyNodes); //Nodes must react on SubSetChanges
-		modifySubSets.addObserver(modifyEdges); //Edges must react on SubSetChanges
+		modifySubSets.addObserver(modifyNodes); //Nodes must react on SubSetChanges (Color)
+		modifySubSets.addObserver(modifyEdges); //Edges must react on SubSetChanges (Color)
 		//SubSet has not to react on anything, because the Membership is kept im mG and not in modifySubSets
 		modifyNodes.addObserver(this);
 		modifyEdges.addObserver(this);
