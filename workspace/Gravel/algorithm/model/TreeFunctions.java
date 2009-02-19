@@ -60,7 +60,7 @@ public class TreeFunctions implements Observer {
 	 */
 	public boolean isTree()
 	{	
-		if ((mg==null)||(mg.NodeCount()==0))
+		if ((mg==null)||(mg.modifyNodes.cardinality()==0))
 			return false; //An Empty Graph is no Tree
 		//This maps a number (order) to every node index
 		order = new TreeMap<Integer,Integer>();
@@ -73,7 +73,7 @@ public class TreeFunctions implements Observer {
 			//(a) there is exactely one node that has indeg 0, thats the root and the edges point "down the tree"
 			//(b) there is exactely one node that has outdeg 0, thats the root and the edges point "up the tree"
 			int acount=0, bcount=0, aindex=0, bindex=0;
-			Iterator<MNode> nodeiter = mg.getNodeIterator();
+			Iterator<MNode> nodeiter = mg.modifyNodes.getIterator();
 			while (nodeiter.hasNext())
 			{
 				int actualindex = nodeiter.next().index;
@@ -93,14 +93,14 @@ public class TreeFunctions implements Observer {
 			if (acount==1) //Case (a)
 			{
 				order.put(aindex,nextorderindex++);
-				startnode = new MNode(aindex, mg.getNode(aindex).name);
+				startnode = new MNode(aindex, mg.modifyNodes.get(aindex).name);
 				if (!isDirectedTreeRecursive(false,startnode))
 						return false; //No Tree
 			}
 			else if (bcount==1)
 			{
 				order.put(bindex,nextorderindex++);
-				startnode = new MNode(aindex, mg.getNode(aindex).name);
+				startnode = new MNode(aindex, mg.modifyNodes.get(aindex).name);
 				if (!isDirectedTreeRecursive(true,startnode))
 					return false; //No Tree
 			}
@@ -109,13 +109,13 @@ public class TreeFunctions implements Observer {
 		}
 		else
 		{
-			startnode = mg.getNodeIterator().next(); //Choose another one than arbitrary the first in the set ?
+			startnode = mg.modifyNodes.getIterator().next(); //Choose another one than arbitrary the first in the set ?
 			order.put(startnode.index, nextorderindex++); //Initiate this one with order 1
 			if (!isUndirectedTreeRecursive(startnode,null))
 				return false; //Denn dann existiert ein Kreis			
 		}
 		// Are all nodes in the tree ?
-		Iterator<MNode> iter = mg.getNodeIterator();
+		Iterator<MNode> iter = mg.modifyNodes.getIterator();
 		while(iter.hasNext())
 		{
 			if (order.get(iter.next().index)==null)
@@ -133,7 +133,7 @@ public class TreeFunctions implements Observer {
 	 */
 	public boolean isBTree(int b)
 	{	
-		if ((mg==null)||(mg.NodeCount()==0))
+		if ((mg==null)||(mg.modifyNodes.cardinality()==0))
 			return false; //An Empty Graph is no Tree
 		//This maps a number (order) to every node index
 		order = new TreeMap<Integer,Integer>();
@@ -148,7 +148,7 @@ public class TreeFunctions implements Observer {
 			//(a) there is exactely one node that has indeg 0, thats the root and the edges point "down the tree"
 			//(b) there is exactely one node that has outdeg 0, thats the root and the edges point "up the tree"
 			int acount=0, bcount=0, aindex=0, bindex=0;
-			Iterator<MNode> nodeiter = mg.getNodeIterator();
+			Iterator<MNode> nodeiter = mg.modifyNodes.getIterator();
 			while (nodeiter.hasNext())
 			{
 				int actualindex = nodeiter.next().index;
@@ -168,14 +168,14 @@ public class TreeFunctions implements Observer {
 			if (acount==1) //Case (a)
 			{
 				order.put(aindex,nextorderindex++);
-				startnode =  new MNode(aindex, mg.getNode(aindex).name);
+				startnode =  new MNode(aindex, mg.modifyNodes.get(aindex).name);
 				if (!isDirectedTreeRecursive(false,startnode))
 						return false; //No Tree
 			}
 			else if (bcount==1)
 			{
 				order.put(bindex,nextorderindex++);
-				startnode =  new MNode(aindex, mg.getNode(aindex).name);
+				startnode =  new MNode(aindex, mg.modifyNodes.get(aindex).name);
 				if (!isDirectedTreeRecursive(true,startnode))
 					return false; //No Tree
 			}
@@ -184,10 +184,10 @@ public class TreeFunctions implements Observer {
 		}
 		else //Non_directed Case
 		{
-			startnode = mg.getNodeIterator().next(); //Choose another one than arbitrary the first in the set ?
+			startnode = mg.modifyNodes.getIterator().next(); //Choose another one than arbitrary the first in the set ?
 			if (b!=0) //Chose one with b childs if existent
 			{
-				Iterator<MNode> iter = mg.getNodeIterator();
+				Iterator<MNode> iter = mg.modifyNodes.getIterator();
 				while (iter.hasNext())
 				{
 					MNode check = iter.next();
@@ -204,7 +204,7 @@ public class TreeFunctions implements Observer {
 				return false; //Denn dann existiert ein Kreis			
 		}
 		//In Both Cases (dir/undir) : Are all nodes in the tree ?
-		Iterator<MNode> iter = mg.getNodeIterator();
+		Iterator<MNode> iter = mg.modifyNodes.getIterator();
 		while(iter.hasNext())
 		{
 			if (order.get(iter.next().index)==null)
@@ -238,13 +238,13 @@ public class TreeFunctions implements Observer {
 			return true; //And a leave is a subtree
 		if ((direction)&&(indegree.get(actual.index)==0)) //Up pointing and actual has no incoming edges 
 			return true;
-		Iterator<MNode> nodeiter = mg.getNodeIterator();
+		Iterator<MNode> nodeiter = mg.modifyNodes.getIterator();
 		//Get all adjacent nodes with
 		int childcount=0;
 		while (nodeiter.hasNext())
 		{
 			MNode next = nodeiter.next();
-			if ((direction)&&(mg.EdgesBetween(next.index,actual.index)>0)) //UP, then there must be an edge next->actual
+			if ((direction)&&(mg.modifyEdges.cardinalityBetween(next.index, actual.index)>0)) //UP, then there must be an edge next->actual
 			{	//Upward Child
 				if (order.get(next.index)!=null) //Circle
 					return false;
@@ -255,7 +255,7 @@ public class TreeFunctions implements Observer {
 				//still searching, and this child is valid 
 				childcount++;
 			}
-			if ((!direction)&&(mg.EdgesBetween(actual.index,next.index)>0)) //DOWN, then there must be an edge actual->next
+			if ((!direction)&&(mg.modifyEdges.cardinalityBetween(actual.index, next.index)>0)) //DOWN, then there must be an edge actual->next
 			{	//Downward Child
 				if (order.get(next.index)!=null) //Circle
 					return false;
@@ -287,12 +287,12 @@ public class TreeFunctions implements Observer {
 	private boolean isUndirectedTreeRecursive(MNode actual, MNode parent)
 	{
 		//node already has an order. So check every adjacent node despite the parent
-		Iterator<MNode> nodeiter = mg.getNodeIterator();
+		Iterator<MNode> nodeiter = mg.modifyNodes.getIterator();
 		int childcount = 0;
 		while (nodeiter.hasNext()) //give every child an order index
 		{
 			MNode next = nodeiter.next();
-			if ((next!=parent)&&(mg.EdgesBetween(actual.index,next.index)>0)) //Child
+			if ((next!=parent)&&(mg.modifyEdges.cardinalityBetween(actual.index, next.index)>0)) //Child
 			{
 				if (order.get(next.index)!=null) //Child has an order already
 					return false;
@@ -325,7 +325,7 @@ public class TreeFunctions implements Observer {
 		degree = new TreeMap<Integer,Integer>();
 		indegree = new TreeMap<Integer,Integer>();
 		outdegree = new TreeMap<Integer,Integer>();
-		Iterator<MEdge> edgeiter = mg.getEdgeIterator();
+		Iterator<MEdge> edgeiter = mg.modifyEdges.getIterator();
 		while (edgeiter.hasNext())
 		{
 			MEdge actual = edgeiter.next();
@@ -343,7 +343,7 @@ public class TreeFunctions implements Observer {
 			outdegree.put(start,outdegree.get(start)+1);
 			indegree.put(ende,indegree.get(ende)+1);
 		} //End While edgeiter.hasnext
-		Iterator<MNode> nodeiter = mg.getNodeIterator();
+		Iterator<MNode> nodeiter = mg.modifyNodes.getIterator();
 		while (nodeiter.hasNext())
 		{
 			MNode n = nodeiter.next();

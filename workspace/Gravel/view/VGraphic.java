@@ -134,7 +134,7 @@ public class VGraphic extends Component implements 	Observer
 		while (ei.hasNext()) // drawEdges
 		{
 			VEdge temp = ei.next(); //Grafischer Teil
-			MEdge tempm = vG.getMathGraph().getEdge(temp.getIndex());
+			MEdge tempm = vG.getMathGraph().modifyEdges.get(temp.getIndex());
 			Point p1 = vG.modifyNodes.get(tempm.StartIndex).getPosition(); //Startkoordinaten
 			VNode EndNode = vG.modifyNodes.get(tempm.EndIndex); //Endknoten
 			VNode StartNode = vG.modifyNodes.get(tempm.StartIndex); //Endknoten
@@ -244,11 +244,11 @@ public class VGraphic extends Component implements 	Observer
 				//					+" and ("+temp.getPosition().y+"+"+Math.round((float)temp.getNameDistance()*(float)Math.sin(Math.toRadians((double)temp.getNameRotation())))+") = "+y);
 			    FontMetrics metrics = g2.getFontMetrics(f);
 			    int hgt = metrics.getAscent()-metrics.getLeading()-metrics.getDescent();
-			    int adv = metrics.stringWidth(vG.getMathGraph().getNode(temp.getIndex()).name);
+			    int adv = metrics.stringWidth(vG.getMathGraph().modifyNodes.get(temp.getIndex()).name);
 			    x = Math.round(x*zoomfactor);
 			    y = Math.round(y*zoomfactor);
 			    x -= Math.round(adv/2); y += Math.round(hgt/2);
-				g2.drawString(vG.getMathGraph().getNode(temp.getIndex()).name, x,y);
+				g2.drawString(vG.getMathGraph().modifyNodes.get(temp.getIndex()).name, x,y);
 				
 			}
 		}

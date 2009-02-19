@@ -103,7 +103,7 @@ public class GraphHistoryManager implements Observer
 		{
 			try { 
 				//TODO: Optimize Environment.
-				act = new GraphAction(tempG.modifySubgraphs.get(m.getElementID()),action, tempG.getMathGraph().getSubgraph(m.getElementID()));
+				act = new GraphAction(tempG.modifySubgraphs.get(m.getElementID()),action, tempG.getMathGraph().modifySubgraphs.get(m.getElementID()));
 			}
 			catch (GraphActionException e2)
 			{

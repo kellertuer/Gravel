@@ -145,7 +145,7 @@ public class GravelMLContentHandler implements ContentHandler
 		if (Status==PARSE_EDGES)
 		{
 			if (isVisual)
-			{	if ((vG==null)||(vG.getMathGraph().NodeCount()==0))
+			{	if ((vG==null)||(vG.getMathGraph().modifyNodes.cardinality()==0))
 						{isValid=false; System.err.println("No VGraph or no Nodes existent. Can't Parse Edges"); return;}
 			} 
 			else if (mG==null)
@@ -276,9 +276,9 @@ public class GravelMLContentHandler implements ContentHandler
 			if (data_key.equals("sn")) //SubgraphName
 			{
 				if (isVisual)
-					vG.getMathGraph().getSubgraph(id).setName(CDATA);
+					vG.getMathGraph().modifySubgraphs.get(id).setName(CDATA);
 				else
-					mG.getSubgraph(id).setName(CDATA);
+					mG.modifySubgraphs.get(id).setName(CDATA);
 			}
 			if (!isVisual)
 				return;
@@ -334,9 +334,9 @@ public class GravelMLContentHandler implements ContentHandler
 			catch (Exception e)
 			{
 				if (isVisual)
-					id = vG.getMathGraph().getNextNodeIndex();
+					id = vG.getMathGraph().modifyNodes.getNextIndex();
 				else
-					id = mG.getNextNodeIndex();
+					id = mG.modifyNodes.getNextIndex();
 				System.err.println("DEBUG : Malformed ID - generating own ("+id+")");
 			}				
 			idString = atts.getValue("id");
@@ -408,13 +408,13 @@ public class GravelMLContentHandler implements ContentHandler
 			}
 			else //im Mathgraph reicht der Name schon
 			{
-				if (mG.getNode(id)!=null)
+				if (mG.modifyNodes.get(id)!=null)
 				{
 					System.err.println("DEBUG : Error Parsing Node : Node Index already given another node.");
 					isValid=false;
 					return;
 				}
-				mG.addNode(new MNode(id,nn));
+				mG.modifyNodes.add(new MNode(id,nn));
 				this.NodeIdtoIndex.put(idString, id);					
 			}
 		}
@@ -442,9 +442,9 @@ public class GravelMLContentHandler implements ContentHandler
 			catch (Exception e)
 			{
 				if (isVisual)
-					id = vG.getMathGraph().getNextEdgeIndex();
+					id = vG.getMathGraph().modifyEdges.getNextIndex();
 				else
-					id = mG.getNextEdgeIndex();
+					id = mG.modifyEdges.getNextIndex();
 			}				
 			idString = atts.getValue("id");
 			edgepath = new Vector<Point>();
@@ -471,7 +471,7 @@ public class GravelMLContentHandler implements ContentHandler
 			if (!isVisual) //MathGraph
 			{
 				MEdge newedge = new MEdge(id,start,ende,ev,en);
-				isValid = mG.addEdge(newedge);
+				isValid = mG.modifyEdges.add(newedge);
 				if (!isValid)
 					return;
 			}
@@ -568,9 +568,9 @@ public class GravelMLContentHandler implements ContentHandler
 			catch (Exception e)
 			{
 				if (isVisual)
-					id = vG.getMathGraph().getNextSubgraphIndex();
+					id = vG.getMathGraph().modifySubgraphs.getNextIndex();
 				else
-					id = mG.getNextSubgraphIndex();
+					id = mG.modifySubgraphs.getNextIndex();
 				System.err.println("DEBUG : Malformed ID - generating own ("+id+")");
 			}				
 			idString = atts.getValue("id");
@@ -580,7 +580,7 @@ public class GravelMLContentHandler implements ContentHandler
 			if (isVisual)
 				vG.modifySubgraphs.add(vs, ms);
 			else
-				mG.addSubgraph(ms);
+				mG.modifySubgraphs.add(ms);
 		}
 		else if (position.equals("graphml.graph.subset.snode"))
 		{
@@ -599,8 +599,8 @@ public class GravelMLContentHandler implements ContentHandler
 			}
 			else
 			{
-				if (mG.getNode(nodeindex)!=null)
-					mG.addNodetoSubgraph(nodeindex, id);
+				if (mG.modifyNodes.get(nodeindex)!=null)
+					mG.modifySubgraphs.addNodetoSubgraph(nodeindex, id);
 				else
 					{isValid=false; System.err.println("The Node '"+nodeid+"' does not exist."); return;}
 			}
@@ -622,7 +622,7 @@ public class GravelMLContentHandler implements ContentHandler
 			}
 			else
 			{
-				if (mG.getEdge(edgeindex).Value!=-1)
+				if (mG.modifyEdges.get(edgeindex).Value!=-1)
 					vG.modifySubgraphs.addEdgetoSubgraph(edgeindex, id);
 				else
 					{isValid=false; System.err.println("The Node '"+edgeid+"' does not exist."); return;}

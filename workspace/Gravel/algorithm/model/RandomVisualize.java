@@ -76,7 +76,7 @@ public class RandomVisualize implements VAlgorithmIF {
 	public void start() 
 	{
 		ErgebnisGraph = new VGraph(mG.isDirected(),false,false);
-		nodeiter = mG.getNodeIterator();
+		nodeiter = mG.modifyNodes.getIterator();
 		generator = new Random();
 		stepsize = 1;
 	}
@@ -102,7 +102,7 @@ public class RandomVisualize implements VAlgorithmIF {
 					size = GeneralPreferences.getInstance().getIntValue("node.size");
 					
 				ErgebnisGraph.modifyNodes.add(new VNode(actualNode.index,posx, posy,size,35,0,14,false), new MNode(actualNode.index,actualNode.name));
-				Iterator<MEdge> edgeiter = mG.getEdgeIterator();
+				Iterator<MEdge> edgeiter = mG.modifyEdges.getIterator();
 				while (edgeiter.hasNext())
 				{
 					MEdge e = edgeiter.next();

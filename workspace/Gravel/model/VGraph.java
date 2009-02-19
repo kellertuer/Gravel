@@ -142,15 +142,15 @@ public class VGraph extends Observable implements Observer {
 							VNode t2 = n2.next();
 							if (t.getIndex() < t2.getIndex())
 							{
-								Vector<Integer> ttot2 = mG.getEdgeIndices(t.getIndex(),t2.getIndex());
-								Vector<Integer> t2tot = mG.getEdgeIndices(t2.getIndex(),t.getIndex());
+								Vector<Integer> ttot2 = mG.modifyEdges.indicesBetween(t.getIndex(), t2.getIndex());
+								Vector<Integer> t2tot = mG.modifyEdges.indicesBetween(t2.getIndex(), t.getIndex());
 								//In the nonmultiple case each Vector has exactely one or no edge in it
 								if ((!ttot2.isEmpty())&&(!t2tot.isEmpty()))
 								{
 									int e1 = ttot2.firstElement();
 									int e2 = t2tot.firstElement();
-									MEdge m = mG.getEdge(e2);
-									m.Value = mG.getEdge(e2).Value+mG.getEdge(e1).Value;
+									MEdge m = mG.modifyEdges.get(e2);
+									m.Value = mG.modifyEdges.get(e2).Value+mG.modifyEdges.get(e1).Value;
 								//	mG.replaceEdge(m); Notify is pushed for MGraph at the end of the method
 									modifyEdges.remove(e1);
 									removed.set(e1);
@@ -179,14 +179,14 @@ public class VGraph extends Observable implements Observer {
 					while (e.hasNext())
 					{
 						VEdge t = e.next();
-						int ts = mG.getEdge(t.getIndex()).StartIndex;
-						int te = mG.getEdge(t.getIndex()).StartIndex;
-						Vector<Integer> indices = mG.getEdgeIndices(ts,te);
+						int ts = mG.modifyEdges.get(t.getIndex()).StartIndex;
+						int te = mG.modifyEdges.get(t.getIndex()).StartIndex;
+						Vector<Integer> indices = mG.modifyEdges.indicesBetween(ts, te);
 						Iterator<Integer> iiter = indices.iterator();
 						while (iiter.hasNext())
 						{
 							VEdge act = modifyEdges.get(iiter.next());
-							if ((mG.getEdge(act.getIndex()).StartIndex==te)&&(!mG.isDirected())&&(act.getType()==VEdge.ORTHOGONAL)&&(t.getType()==VEdge.ORTHOGONAL)) 
+							if ((mG.modifyEdges.get(act.getIndex()).StartIndex==te)&&(!mG.isDirected())&&(act.getType()==VEdge.ORTHOGONAL)&&(t.getType()==VEdge.ORTHOGONAL)) 
 							//ungerichtet, beide orthogonal und entgegengesetz gespeichert
 							{
 								if ((((VOrthogonalEdge)act).getVerticalFirst()!=((VOrthogonalEdge)t).getVerticalFirst())&&(!removed.get(act.getIndex())))
@@ -303,13 +303,13 @@ public class VGraph extends Observable implements Observer {
 		while (n2.hasNext())
 		{
 			VNode nodeclone = n2.next().clone();
-			clone.modifyNodes.add(nodeclone, mG.getNode(nodeclone.getIndex()));
+			clone.modifyNodes.add(nodeclone, mG.modifyNodes.get(nodeclone.getIndex()));
 			//In alle Sets einfuegen
 			Iterator<VSubgraph>n1 = modifySubgraphs.getIterator();
 			while (n1.hasNext())
 			{
 				VSubgraph actualSet = n1.next();
-				if (mG.getSubgraph(actualSet.index).containsNode(nodeclone.getIndex()))
+				if (mG.modifySubgraphs.get(actualSet.index).containsNode(nodeclone.getIndex()))
 					clone.modifySubgraphs.addNodetoSubgraph(nodeclone.getIndex(), actualSet.index); //In jedes Set setzen wo er war
 			}
 		}
@@ -318,14 +318,14 @@ public class VGraph extends Observable implements Observer {
 		while (n3.hasNext())
 		{
 			VEdge cloneEdge = n3.next().clone();
-			MEdge me = mG.getEdge(cloneEdge.getIndex());
+			MEdge me = mG.modifyEdges.get(cloneEdge.getIndex());
 			clone.modifyEdges.add(cloneEdge, me, modifyNodes.get(me.StartIndex).getPosition(), modifyNodes.get(me.EndIndex).getPosition());
 			//In alle Sets einfuegen
 			Iterator<VSubgraph> n1 = modifySubgraphs.getIterator();
 			while (n1.hasNext())
 			{
 				VSubgraph actualSet = n1.next();
-				if (mG.getSubgraph(actualSet.index).containsEdge(cloneEdge.getIndex()))
+				if (mG.modifySubgraphs.get(actualSet.index).containsEdge(cloneEdge.getIndex()))
 					clone.modifySubgraphs.addEdgetoSubgraph(cloneEdge.getIndex(), actualSet.getIndex()); //Jedes Set kopieren
 			}
 		}
@@ -334,7 +334,7 @@ public class VGraph extends Observable implements Observer {
 		while (n1.hasNext())
 		{
 			VSubgraph actualSet = n1.next();
-			clone.modifySubgraphs.add(actualSet, mG.getSubgraph(actualSet.index)); //Jedes Set kopieren
+			clone.modifySubgraphs.add(actualSet, mG.modifySubgraphs.get(actualSet.index)); //Jedes Set kopieren
 		}
 		//und zurückgeben
 		return clone;
@@ -372,7 +372,7 @@ public class VGraph extends Observable implements Observer {
 			
 				FontMetrics metrics = g2.getFontMetrics(f);
 				int hgt = metrics.getAscent()-metrics.getLeading()+metrics.getDescent();
-				int adv = metrics.stringWidth(mG.getNode(actual.getIndex()).name);
+				int adv = metrics.stringWidth(mG.modifyNodes.get(actual.getIndex()).name);
 				x += new Double(Math.floor((double)adv/2.0d)).intValue(); y += new Double(Math.floor((double)hgt/2.0d)).intValue(); //Bottom Right Corner
 				if (x > maximum.x)
 					maximum.x = x;
@@ -427,7 +427,7 @@ public class VGraph extends Observable implements Observer {
 			
 				FontMetrics metrics = g2.getFontMetrics(f);
 				int hgt = metrics.getAscent()-metrics.getLeading()+metrics.getDescent();
-				int adv = metrics.stringWidth(mG.getNode(actual.getIndex()).name);
+				int adv = metrics.stringWidth(mG.modifyNodes.get(actual.getIndex()).name);
 				x -= new Double(Math.floor((double)adv/2.0d)).intValue(); y -= new Double(Math.floor((double)hgt/2.0d)).intValue(); //Top Left Corner
 				if (x < minimum.x)
 					minimum.x = x;
@@ -470,21 +470,21 @@ public class VGraph extends Observable implements Observer {
 					//if the graph is directed
 					if (((!mG.isDirected())&&(t2.getIndex()<=t.getIndex()))||(mG.isDirected())) //in the nondirected case only half the cases
 					{
-						if (mG.EdgesBetween(t.getIndex(),t2.getIndex())>1) //we have to delete
+						if (mG.modifyEdges.cardinalityBetween(t.getIndex(), t2.getIndex())>1) //we have to delete
 						{
-							Vector<Integer> multipleedges = mG.getEdgeIndices(t.getIndex(),t2.getIndex());
-							int value = mG.getEdge(multipleedges.firstElement()).Value;
+							Vector<Integer> multipleedges = mG.modifyEdges.indicesBetween(t.getIndex(), t2.getIndex());
+							int value = mG.modifyEdges.get(multipleedges.firstElement()).Value;
 							//Add up the values and remove the edges from the second to the last
 							Iterator<Integer> iter = multipleedges.iterator();
 							iter.next();
 							while(iter.hasNext())
 							{
 								int nextindex = iter.next();
-								value += mG.getEdge(nextindex).Value;
+								value += mG.modifyEdges.get(nextindex).Value;
 								modifyEdges.remove(nextindex);
 								removed.set(nextindex);
 							}
-							MEdge e = mG.getEdge(multipleedges.firstElement());
+							MEdge e = mG.modifyEdges.get(multipleedges.firstElement());
 							e.Value = value;
 							//mG.replaceEdge(e); Notify is pushed below
 						}
@@ -531,7 +531,7 @@ public class VGraph extends Observable implements Observer {
 		while (n.hasNext()) {
 			VEdge temp = n.next();
 			// naechste Kante
-			MEdge me = mG.getEdge(temp.getIndex());
+			MEdge me = mG.modifyEdges.get(temp.getIndex());
 			Point p1 = (Point)modifyNodes.get(me.StartIndex).getPosition().clone();
 			Point p2 = (Point)modifyNodes.get(me.EndIndex).getPosition().clone();
 			// getEdgeShape
@@ -591,7 +591,7 @@ public class VGraph extends Observable implements Observer {
 				VNode temp = iter.next();
 				if (((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED) && (temp != Ende)) 
 				{
-					int i = mG.getNextEdgeIndex();
+					int i = mG.modifyEdges.getNextIndex();
 					//Standard ist eine StraightLineEdge
 					MEdge me;
 					if (Ende.getIndex()==0)
@@ -616,7 +616,7 @@ public class VGraph extends Observable implements Observer {
 				VNode temp = iter.next();
 				if (((temp.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED) && (temp != Start)) 
 				{
-					int i = mG.getNextEdgeIndex();
+					int i = mG.modifyEdges.getNextIndex();
 					//Standard ist eine StraightLineEdge
 					MEdge me;
 					if (Start.getIndex()==0)

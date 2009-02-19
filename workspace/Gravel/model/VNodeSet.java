@@ -87,7 +87,7 @@ public class VNodeSet extends Observable implements Observer {
 		if (get(node.getIndex()) == null) {
 			if (mnode.index!=node.getIndex())
 				mnode.index = node.getIndex();
-			mG.addNode(mnode);
+			mG.modifyNodes.add(mnode);
 			vNodes.add(node);
 			setChanged();
 			//Graph changed with an add, only nodes affected
@@ -122,7 +122,7 @@ public class VNodeSet extends Observable implements Observer {
 			return;
 		if ((get(oldi)==null)||(get(newi)!=null)) //old not or new already in use
 			return;
-		mG.changeNodeIndex(oldi, newi); //Update Adjacent edges in MGraph, so there's no need to update VEdges
+		mG.modifyNodes.changeIndex(oldi, newi); //Update Adjacent edges in MGraph, so there's no need to update VEdges
 		get(oldi).setIndex(newi);
 		setChanged();
 		notifyObservers(new GraphMessage(GraphMessage.NODE,newi,GraphMessage.INDEXCHANGED, GraphMessage.ALL_ELEMENTS));	
@@ -139,7 +139,7 @@ public class VNodeSet extends Observable implements Observer {
 	{
 		if (get(i)==null)
 			return;
-		mG.removeNode(i);
+		mG.modifyNodes.remove(i);
 		vNodes.remove(get(i));
 		setChanged();
 		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
@@ -159,7 +159,7 @@ s	 *
 			return;
 		if (mnode.index!=node.getIndex())
 			mnode.index = node.getIndex();
-		mG.replaceNode(new MNode(node.getIndex(), mnode.name));
+		mG.modifyNodes.replace(new MNode(node.getIndex(), mnode.name));
 		node = node.clone(); //Clone node to lose color
 		NodeLock.lock(); //Knoten finden
 		try

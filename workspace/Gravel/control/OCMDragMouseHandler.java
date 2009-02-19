@@ -84,7 +84,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 				firstdrag=false;
 				if (!multiple)
 				{
-					int i = vg.getMathGraph().getNextEdgeIndex();
+					int i = vg.getMathGraph().modifyEdges.getNextIndex();
 					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_START|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
 					vg.modifyEdges.add(new VStraightLineEdge(i,gp.getIntValue("edge.width")), new MEdge(i,StartNode.getIndex(),DragNode.getIndex(),gp.getIntValue("edge.value"),"\u22C6"),StartNode.getPosition(), DragNode.getPosition());
 				}
@@ -170,7 +170,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 			{
 				if (!multiple)
 				{ //Only One Edge created
-					int i = vg.getMathGraph().getNextEdgeIndex();
+					int i = vg.getMathGraph().modifyEdges.getNextIndex();
 					MEdge m = new MEdge(i,StartNode.getIndex(),EndNode.getIndex(),gp.getIntValue("edge.value"),gp.getEdgeName(i,StartNode.getIndex(),EndNode.getIndex()));
 					if ((StartNode.getIndex()==EndNode.getIndex())&&(vg.getMathGraph().isLoopAllowed()))
 					{

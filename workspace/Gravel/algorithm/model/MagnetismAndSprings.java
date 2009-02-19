@@ -86,7 +86,7 @@ public class MagnetismAndSprings implements VAlgorithmIF
 			while (edgeiterator.hasNext())
 			{
 				VEdge e = edgeiterator.next();
-				MEdge me = vg.getMathGraph().getEdge(e.getIndex());
+				MEdge me = vg.getMathGraph().modifyEdges.get(e.getIndex());
 				int start = me.StartIndex, ende = me.EndIndex;
 				int uindex=0;
 				if (start==v.getIndex())

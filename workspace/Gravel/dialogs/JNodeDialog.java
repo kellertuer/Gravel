@@ -119,7 +119,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 			oldx = v.getPosition().x;
 			oldy = v.getPosition().y;
 			oldsize = v.getSize();
-			oldname = graphref.getMathGraph().getNode(oldindex).name;
+			oldname = graphref.getMathGraph().modifyNodes.get(oldindex).name;
 			this.setTitle("Eigenschaften des Knotens '"+oldname+"' (#"+v.getIndex()+")");	
 		}
 		
@@ -299,7 +299,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		subgraphlist = graphref.getMathGraph().getSubgraphNames();
+		subgraphlist = graphref.getMathGraph().modifySubgraphs.getNames();
 		int temp = 0;
 		for (int i=0; i<subgraphlist.size(); i++)
 		{
@@ -312,9 +312,9 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 		{
 			if (subgraphlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				SubgraphChecks[temp] = new JCheckBox(graphref.getMathGraph().getSubgraph(i).getName());
+				SubgraphChecks[temp] = new JCheckBox(graphref.getMathGraph().modifySubgraphs.get(i).getName());
 				if (chNode!=null)
-					SubgraphChecks[temp].setSelected(graphref.getMathGraph().getSubgraph(i).containsNode(chNode.getIndex()));
+					SubgraphChecks[temp].setSelected(graphref.getMathGraph().modifySubgraphs.get(i).containsNode(chNode.getIndex()));
 				CiSubgraphs.add(SubgraphChecks[temp],c);
 				SubgraphChecks[temp].addItemListener(this);
 				c.gridy++;
@@ -400,7 +400,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, iNodeIndex.getValue(), GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.NODE));
 				}
 				//Allgemeine Werte aktualisieren
-				graphref.getMathGraph().getNode(iNodeIndex.getValue()).name = sname.getText();
+				graphref.getMathGraph().modifyNodes.get(iNodeIndex.getValue()).name = sname.getText();
 				VNode n = graphref.modifyNodes.get(iNodeIndex.getValue()); 
 				n.setPosition(new Point(ixPos.getValue(), iyPos.getValue()));
 				n.setSize(iSize.getValue());

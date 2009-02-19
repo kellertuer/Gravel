@@ -69,7 +69,7 @@ public class VEdgeSet extends Observable implements Observer {
 				while (n2.hasNext())
 				{
 					VEdge e = n2.next();
-					MEdge me = mG.getEdge(e.getIndex());
+					MEdge me = mG.modifyEdges.get(e.getIndex());
 					if (me.StartIndex==me.EndIndex)
 					{
 						removed.set(e.getIndex());
@@ -117,13 +117,13 @@ public class VEdgeSet extends Observable implements Observer {
 			System.err.println("DEBUG : Similar Edge Exists, doing nothing");
 			return;
 		}
-		if (mG.addEdge(medge)) //succesfull added in MathGraph
+		if (mG.modifyEdges.add(medge)) //succesfull added in MathGraph
 		{
 			EdgeLock.lock();
 			try 
 			{
 				// In einem ungerichteten Graphen existiert eine Kante von e zu s und die ist StraightLine und die neue Kante ist dies auch	
-				if ((medge.StartIndex!=medge.EndIndex)&&(mG.isDirected())&&(mG.EdgesBetween(medge.EndIndex, medge.StartIndex)==1)&&(get(mG.getEdgeIndices(medge.EndIndex, medge.StartIndex).firstElement()).getType()==VEdge.STRAIGHTLINE)&&(edge.getType()==VEdge.STRAIGHTLINE))
+				if ((medge.StartIndex!=medge.EndIndex)&&(mG.isDirected())&&(mG.modifyEdges.cardinalityBetween(medge.EndIndex, medge.StartIndex)==1)&&(get(mG.modifyEdges.indicesBetween(medge.EndIndex, medge.StartIndex).firstElement()).getType()==VEdge.STRAIGHTLINE)&&(edge.getType()==VEdge.STRAIGHTLINE))
 				{ //Dann würde diese Kante direkt auf der anderen liegen
 					Point dir = new Point(end.x-start.x,end.y-start.y);
 					double length = dir.distanceSq(new Point(0,0));
@@ -135,7 +135,7 @@ public class VEdgeSet extends Observable implements Observer {
 					edge = new VQuadCurveEdge(edge.getIndex(),edge.width,bz1);
 					edge.setArrow(arr);
 					//Update the old edge
-					VEdge temp = get(mG.getEdgeIndices(medge.EndIndex, medge.StartIndex).firstElement());
+					VEdge temp = get(mG.modifyEdges.indicesBetween(medge.EndIndex, medge.StartIndex).firstElement());
 					arr = temp.getArrow().clone();
 					VEdge tempcolorEdge = temp.clone();
 					vEdges.remove(temp);
@@ -145,7 +145,7 @@ public class VEdgeSet extends Observable implements Observer {
 					vEdges.add(temp); //add modified edge in counter directtion
 				}
 				vEdges.add(edge); //add edge
-				mG.replaceEdge(medge);
+				mG.modifyEdges.replace(medge);
 			} 
 			finally {EdgeLock.unlock();}
 			setChanged();
@@ -183,7 +183,7 @@ public class VEdgeSet extends Observable implements Observer {
 		if (me.index!=e.getIndex())
 			me.index = e.getIndex();
 		
-		mG.replaceEdge(me);
+		mG.modifyEdges.replace(me);
 		e = e.clone(); //Lose color!
 		EdgeLock.lock(); //Find the edge to be replaced
 		try
@@ -237,7 +237,7 @@ public class VEdgeSet extends Observable implements Observer {
 		EdgeLock.lock();
 		try
 		{
- 			mG.removeEdge(i);
+ 			mG.modifyEdges.remove(i);
 			vEdges.remove(toDel);
 		} 
 		finally {EdgeLock.unlock();}
@@ -262,12 +262,12 @@ public class VEdgeSet extends Observable implements Observer {
 		//Check whether an edge is the same as this if multiples are allowed
 		if (mG.isMultipleAllowed())
 		{
-			Vector<Integer> indices = mG.getEdgeIndices(s,e);
+			Vector<Integer> indices = mG.modifyEdges.indicesBetween(s, e);
 			Iterator<Integer> iiter = indices.iterator();
 			while (iiter.hasNext())
 			{
 				VEdge act = get(iiter.next());
-				MEdge me = mG.getEdge(act.getIndex());
+				MEdge me = mG.modifyEdges.get(act.getIndex());
 				if ((me.StartIndex==e)&&(!mG.isDirected())&&(act.getType()==VEdge.ORTHOGONAL)&&(edge.getType()==VEdge.ORTHOGONAL)) 
 				//ungerichtet, beide orthogonal und entgegengesetz gespeichert
 				{
@@ -281,9 +281,9 @@ public class VEdgeSet extends Observable implements Observer {
 	
 			}
 		}
-		else if (mG.getEdgeIndices(s,e).size()>0)
+		else if (mG.modifyEdges.indicesBetween(s, e).size()>0)
 		{
-			return mG.getEdgeIndices(s,e).firstElement();
+			return mG.modifyEdges.indicesBetween(s, e).firstElement();
 		}
 		return 0;
 	}
@@ -378,7 +378,7 @@ public class VEdgeSet extends Observable implements Observer {
 			HashSet<VEdge> adjacent = new HashSet<VEdge>();
 			while (e.hasNext()) {
 				VEdge edge = e.next();
-				if (mG.getEdge(edge.getIndex())==null)
+				if (mG.modifyEdges.get(edge.getIndex())==null)
 					adjacent.add(edge);
 			}
 			e = adjacent.iterator();

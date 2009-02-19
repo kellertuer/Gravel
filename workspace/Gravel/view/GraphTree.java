@@ -100,7 +100,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	 */
 	public void updateNodes()
 	{
-		Vector<String> nodenames = vG.getMathGraph().getNodeNames();
+		Vector<String> nodenames = vG.getMathGraph().modifyNodes.getNames();
 		Knoten.removeAllChildren();
 		for (int i=0; i<nodenames.size(); i++)
 		{
@@ -121,7 +121,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	 */
 	public void updateEdges()
 	{
-		Vector<String> edges = vG.getMathGraph().getEdgeNames();
+		Vector<String> edges = vG.getMathGraph().modifyEdges.getNames();
 		Kanten.removeAllChildren();
 		for (int i=0; i<edges.size(); i++)
 		{
@@ -142,18 +142,18 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	 */
 	public void updateSubgraphs()
 	{
-		Vector<String> Sets = vG.getMathGraph().getSubgraphNames();
+		Vector<String> Subgraphs = vG.getMathGraph().modifySubgraphs.getNames();
 		Mengen.removeAllChildren();
-		for (int i=0; i<Sets.size(); i++)
+		for (int i=0; i<Subgraphs.size(); i++)
 		{
-			if (Sets.elementAt(i)!=null) //Ein set mit dem Index existiert
+			if (Subgraphs.elementAt(i)!=null) //Ein set mit dem Index existiert
 			{
-				DefaultMutableTreeNode t = new DefaultMutableTreeNode(Sets.elementAt(i));
+				DefaultMutableTreeNode t = new DefaultMutableTreeNode(Subgraphs.elementAt(i));
 				Mengen.add(t);
 			}
 		}
 		//Zur Ruecktransformation zum Index bei Auswahl
-		Mengennamen = Sets;
+		Mengennamen = Subgraphs;
 		this.updateUI();
 		this.revalidate();
 		this.validate();
@@ -194,12 +194,12 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		if (selectedNode.getParent().toString().equals("Knoten"))
 		{
 			ParentType = USENODES;
-			Text.setText(vG.getMathGraph().getNode(StringPos2Index(USENODES,selectedPosition)).name);
+			Text.setText(vG.getMathGraph().modifyNodes.get(StringPos2Index(USENODES,selectedPosition)).name);
 		}
 		else if (selectedNode.getParent().toString().equals("Kanten"))
 		{
 			ParentType = USEEDGES;
-			MEdge me = vG.getMathGraph().getEdge(StringPos2Index(USEEDGES,selectedPosition));
+			MEdge me = vG.getMathGraph().modifyEdges.get(StringPos2Index(USEEDGES,selectedPosition));
 			String t = me.StartIndex+" -";
 			if (vG.getMathGraph().isDirected()) t+="> "; 
 			t+=""+me.EndIndex;
@@ -209,7 +209,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		{
 			//System.err.println("")
 			ParentType = USESUBGRAPHS;
-			Text.setText(vG.getMathGraph().getSubgraphNames().elementAt(StringPos2Index(USESUBGRAPHS,selectedPosition)));
+			Text.setText(vG.getMathGraph().modifySubgraphs.getNames().elementAt(StringPos2Index(USESUBGRAPHS,selectedPosition)));
 		}
 		else if (true) //sonst kein menu anzeigen
 		{

@@ -39,7 +39,7 @@ public class OCMClickMouseHandler extends ClickMouseHandler {
 			VNode r = vg.modifyNodes.getFirstinRangeOf(p);
 			if (r==null) 
 			{	//Kein Knoten in der Nähe, also einen erstellen
-				int i= vg.getMathGraph().getNextNodeIndex();
+				int i= vg.getMathGraph().modifyNodes.getNextIndex();
 				//TODO: Semantisch nochmal überlegen, ob die Auswahl entfertn werden soll, so ein neuer Knoten erstellt wird
 				if ((vg.modifyEdges.hasSelection()||vg.modifyNodes.hasSelection()))
 					vg.deselect();

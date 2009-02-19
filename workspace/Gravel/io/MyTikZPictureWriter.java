@@ -125,7 +125,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 		int count=0;
 		while (setiter.hasNext())
 		{
-			if (vg.getMathGraph().getSubgraph(setiter.next().getIndex()).containsNode(nodeindex))
+			if (vg.getMathGraph().modifySubgraphs.get(setiter.next().getIndex()).containsNode(nodeindex))
 					count++;
 		}
 		int part = Math.round(100.0f/(float)count);
@@ -147,7 +147,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 					"(ID"+actual.getIndex()+") at ("+actual.getPosition().x+","+(max.y - actual.getPosition().y)+")");
 	    	if (actual.isNameVisible()) //draw name
 			{	
-				s.write("{$"+formname(vg.getMathGraph().getNode(actual.getIndex()).name)+"$};");
+				s.write("{$"+formname(vg.getMathGraph().modifyNodes.get(actual.getIndex()).name)+"$};");
 				//TODO Text
 				//{\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(vg.getNodeName(actual.index))+"}}");
 			}
@@ -196,7 +196,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();
-	    	   MEdge me = vg.getMathGraph().getEdge(actual.getIndex());
+	    	   MEdge me = vg.getMathGraph().modifyEdges.get(actual.getIndex());
 	    	   
 	    	   int start = me.StartIndex;
 	    	   int ende = me.EndIndex;

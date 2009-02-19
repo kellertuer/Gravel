@@ -95,7 +95,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		kantenlaenge = new TreeMap<Integer,Double>();
 //		int compareCount = new Double(vg.NodeCount()*vg.NodeCount()/2 - vg.NodeCount()/2).intValue();
 		knotenabstand = new TreeMap<Integer,Double>();
-		Iterator<MEdge> edgeiter = vg.getMathGraph().getEdgeIterator();
+		Iterator<MEdge> edgeiter = vg.getMathGraph().modifyEdges.getIterator();
 		while (edgeiter.hasNext())
 		{
 			//Valenzen
@@ -177,7 +177,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		} //End While edgeiter.hasnext
 		//
 		//Knotenabstaende
-		Iterator<MNode> nodeiter = vg.getMathGraph().getNodeIterator();
+		Iterator<MNode> nodeiter = vg.getMathGraph().modifyNodes.getIterator();
 		int i=0;
 		while (nodeiter.hasNext())
 		{
@@ -190,7 +190,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 				outvalenz.put(mn.index,0);
 			
 			//Mit allen folgenden vergleichen
-			Iterator<MNode> rest = vg.getMathGraph().getNodeIterator();
+			Iterator<MNode> rest = vg.getMathGraph().modifyNodes.getIterator();
 			while (!mn.equals(rest.next())&&rest.hasNext()){}
 			while (rest.hasNext())
 			{
@@ -324,8 +324,8 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		atomvalues.put("$Graph.MinX",(double)vg.getMinPoint(vgc.getGraphics()).x);
 		atomvalues.put("$Graph.MinY",(double)vg.getMinPoint(vgc.getGraphics()).y);
 		atomvalues.put("$Graph.Area",(double)0);
-		atomvalues.put("$Node.Count",(double)vg.getMathGraph().NodeCount()); 
-		atomvalues.put("$Edge.Count",(double)vg.getMathGraph().EdgeCount()); 
+		atomvalues.put("$Node.Count",(double)vg.getMathGraph().modifyNodes.cardinality()); 
+		atomvalues.put("$Edge.Count",(double)vg.getMathGraph().modifyEdges.cardinality()); 
 		setChanged();
 		notifyObservers("Atoms");
 	}

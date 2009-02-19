@@ -354,7 +354,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			//Fragen
 			if (GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
 			{
-				if (Gui.getInstance().getVGraph().getMathGraph().NodeCount()>0) //es gibt überhaupt was
+				if (Gui.getInstance().getVGraph().getMathGraph().modifyNodes.cardinality()>0) //es gibt überhaupt was
 				{
 					int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Der aktuelle Graph wurde nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie den Graph noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_OPTION);
 					if (n==JOptionPane.YES_OPTION)

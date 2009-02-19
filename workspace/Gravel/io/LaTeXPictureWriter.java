@@ -117,7 +117,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 				//Invert y
 				int y = drawpoint.y + Math.round((float)actual.getNameDistance()*(float)Math.sin(Math.toRadians((double)actual.getNameRotation())));
 				double tsize = Math.round((double)actual.getNameSize()*sizeppt*((double)1000))/1000;
-				s.write(NL+"\t\t\\put("+x+","+y+"){\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(vg.getMathGraph().getNode(actual.getIndex()).name)+"}}");
+				s.write(NL+"\t\t\\put("+x+","+y+"){\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(vg.getMathGraph().modifyNodes.get(actual.getIndex()).name)+"}}");
 			}
 		}
 	}
@@ -160,7 +160,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();
-	    	   MEdge me = vg.getMathGraph().getEdge(actual.getIndex());
+	    	   MEdge me = vg.getMathGraph().modifyEdges.get(actual.getIndex());
 //	    	   Vector<Integer> values = vg.getEdgeProperties(actual.getIndex());
 	    	   int start = me.StartIndex;
 	    	   int ende = me.EndIndex;
@@ -216,7 +216,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 				    if (t.isshowvalue())
 						text = ""+me.Value;
 				    else
-				    	text = vg.getMathGraph().getEdge(actual.getIndex()).name;
+				    	text = vg.getMathGraph().modifyEdges.get(actual.getIndex()).name;
 				    double tsize = Math.round((double)t.getSize()*sizeppt*((double)1000))/1000;
 					s.write(NL+"\t\t\\put("+(m.x-offset.x)+","+(max.y-m.y)+"){\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(text)+"}}");
 				}

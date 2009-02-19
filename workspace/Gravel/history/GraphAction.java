@@ -87,7 +87,7 @@ public class GraphAction {
 			throw new GraphActionException("Could not Create Action: Environment must contains at least the node itself.");			
 		ActionObject = o;
 		Action=action;
-		mn = environment.getMathGraph().getNode(o.getIndex());
+		mn = environment.getMathGraph().modifyNodes.get(o.getIndex());
 		env = environment;
 		Objecttype=NODE;
 	}
@@ -122,7 +122,7 @@ public class GraphAction {
 			throw new GraphActionException("Could not Create Action: Environment must contain edge");
 		ActionObject=o;
 		Action=action;
-		me = environment.getMathGraph().getEdge(o.getIndex());
+		me = environment.getMathGraph().modifyEdges.get(o.getIndex());
 		env = environment;
 		Objecttype=EDGE;
 	}
@@ -146,8 +146,8 @@ public class GraphAction {
 			VSubgraph s = si.next();
 			if (ItemType==NODE)
 			{
-				boolean wasfirst = first.getMathGraph().getSubgraph(s.getIndex()).containsNode(itemindex);
-				boolean wassecond = second.getMathGraph().getSubgraph(s.getIndex()).containsNode(itemindex);
+				boolean wasfirst = first.getMathGraph().modifySubgraphs.get(s.getIndex()).containsNode(itemindex);
+				boolean wassecond = second.getMathGraph().modifySubgraphs.get(s.getIndex()).containsNode(itemindex);
 				if (wasfirst)
 					second.modifySubgraphs.addNodetoSubgraph(itemindex, s.getIndex());
 				else
@@ -159,8 +159,8 @@ public class GraphAction {
 			}
 			else if (ItemType==EDGE)
 			{
-				boolean wasfirst = first.getMathGraph().getSubgraph(s.getIndex()).containsEdge(itemindex);
-				boolean wassecond = second.getMathGraph().getSubgraph(s.getIndex()).containsEdge(itemindex);
+				boolean wasfirst = first.getMathGraph().modifySubgraphs.get(s.getIndex()).containsEdge(itemindex);
+				boolean wassecond = second.getMathGraph().modifySubgraphs.get(s.getIndex()).containsEdge(itemindex);
 				if (wasfirst)
 					second.modifySubgraphs.addEdgetoSubgraph(itemindex, s.getIndex());
 				else
@@ -186,7 +186,7 @@ public class GraphAction {
 		while (si.hasNext())
 		{
 			VSubgraph s = si.next();
-			if (env.getMathGraph().getSubgraph(s.getIndex()).containsEdge(e.getIndex()))
+			if (env.getMathGraph().modifySubgraphs.get(s.getIndex()).containsEdge(e.getIndex()))
 			{
 				if (g.modifySubgraphs.get(s.getIndex())==null)
 					throw new GraphActionException("Can't replace edge, replacements belongs to Subgraphs, that don't exists in given parameter graph");
@@ -259,11 +259,11 @@ public class GraphAction {
 				while (si.hasNext())
 				{
 					VSubgraph s = si.next();
-					if (graph.getMathGraph().getSubgraph(s.getIndex()).containsNode(n.getIndex()))
+					if (graph.getMathGraph().modifySubgraphs.get(s.getIndex()).containsNode(n.getIndex()))
 						((VNode)ActionObject).addColor(s.getColor());
 				}
 				MNode tempmn = mn;
-				mn = new MNode(n.getIndex(), graph.getMathGraph().getNode(n.getIndex()).name);
+				mn = new MNode(n.getIndex(), graph.getMathGraph().modifyNodes.get(n.getIndex()).name);
 				graph.modifyNodes.replace(n, tempmn);
 				env.modifyNodes.replace((VNode)ActionObject, mn);
 				exchangeSubgraphMembership(NODE,n.getIndex(),env,graph);
@@ -279,11 +279,11 @@ public class GraphAction {
 				while (esi.hasNext())
 				{
 					VSubgraph s = esi.next();
-					if (graph.getMathGraph().getSubgraph(s.getIndex()).containsEdge(e.getIndex()))
+					if (graph.getMathGraph().modifySubgraphs.get(s.getIndex()).containsEdge(e.getIndex()))
 						((VEdge)ActionObject).addColor(s.getColor());
 				}
 				MEdge tempme = new MEdge(me.index, me.StartIndex, me.EndIndex, me.Value, me.name);
-				MEdge me = graph.getMathGraph().getEdge(e.getIndex());
+				MEdge me = graph.getMathGraph().modifyEdges.get(e.getIndex());
 				graph.modifyEdges.replace(e, tempme);
 				env.modifyEdges.replace((VEdge)ActionObject, me);
 				exchangeSubgraphMembership(EDGE,e.getIndex(),env,graph);
@@ -295,7 +295,7 @@ public class GraphAction {
 					throw new GraphActionException("Can't replace subgraph, none there.");
 				ActionObject = graph.modifySubgraphs.get(newSubgraph.getIndex()); //Save old one in action
 				MSubgraph tempms = ms.clone();				
-				ms = graph.getMathGraph().getSubgraph(newSubgraph.getIndex()).clone();
+				ms = graph.getMathGraph().modifySubgraphs.get(newSubgraph.getIndex()).clone();
 				graph.modifySubgraphs.remove(newSubgraph.getIndex()); //Remove old Subgraph.
 				graph.modifySubgraphs.add(newSubgraph, tempms);
 				graph.pushNotify(new GraphMessage(GraphMessage.SUBGRAPH,newSubgraph.getIndex(),GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.ALL_ELEMENTS));
@@ -341,7 +341,7 @@ public class GraphAction {
 				while (si.hasNext())
 				{
 					VSubgraph s = si.next();
-					if (env.getMathGraph().getSubgraph(s.getIndex()).containsNode(n.getIndex()))
+					if (env.getMathGraph().modifySubgraphs.get(s.getIndex()).containsNode(n.getIndex()))
 						graph.modifySubgraphs.addNodetoSubgraph(n.getIndex(), s.getIndex());
 				}
 				//Recreate adjacent edges and their subgraohs
@@ -349,7 +349,7 @@ public class GraphAction {
 				while (ei.hasNext())
 				{
 					VEdge e = ei.next();
-					MEdge me = env.getMathGraph().getEdge(e.getIndex());
+					MEdge me = env.getMathGraph().modifyEdges.get(e.getIndex());
 					if ((me.StartIndex==n.getIndex())||(me.EndIndex==n.getIndex()))
 					{ //Add all Adjacent Edges again and recreate theis color
 						graph.modifyEdges.add(e, me, env.modifyNodes.get(me.StartIndex).getPosition(), env.modifyNodes.get(me.EndIndex).getPosition());

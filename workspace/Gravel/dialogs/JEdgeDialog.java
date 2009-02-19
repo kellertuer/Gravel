@@ -141,14 +141,14 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		{
 			chEdge = e;
 			oldindex = e.getIndex();
-			MEdge me = graphref.getMathGraph().getEdge(e.getIndex());
+			MEdge me = graphref.getMathGraph().modifyEdges.get(e.getIndex());
 			oldstart = me.StartIndex;
 			oldend = me.EndIndex;
 			oldvalue = me.Value;
 			oldwidth = e.getWidth();
 			oldText = e.getTextProperties().clone();
 			oldLinestyle = e.getLinestyle().clone(); 
-			this.setTitle("Eigenschaften der Kante '"+graphref.getMathGraph().getEdge(e.getIndex()).name+"' (#"+e.getIndex()+") von '"+graphref.getMathGraph().getNode(oldstart).name+"'->'"+graphref.getMathGraph().getNode(oldend).name+"'");	
+			this.setTitle("Eigenschaften der Kante '"+graphref.getMathGraph().modifyEdges.get(e.getIndex()).name+"' (#"+e.getIndex()+") von '"+graphref.getMathGraph().modifyNodes.get(oldstart).name+"'->'"+graphref.getMathGraph().modifyNodes.get(oldend).name+"'");	
 		}
 		
 		tabs = new JTabbedPane();
@@ -359,7 +359,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			EdgeName.setText("#"+oldstart+"->#"+oldend);
 		else
 		{
-			EdgeName.setText(graphref.getMathGraph().getEdge(oldindex).name);
+			EdgeName.setText(graphref.getMathGraph().modifyEdges.get(oldindex).name);
 		}	
 	}
 	/**
@@ -368,7 +368,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 	 */
 	private void buildNodeList()
 	{
-		nodelist = graphref.getMathGraph().getNodeNames();
+		nodelist = graphref.getMathGraph().modifyNodes.getNames();
 		int temp = 0;
 		for (int i=0; i<nodelist.size(); i++)
 		{
@@ -381,7 +381,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		{
 			if (nodelist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				nodenames[temp] = graphref.getMathGraph().getNode(i).name+"   (#"+i+")";
+				nodenames[temp] = graphref.getMathGraph().modifyNodes.get(i).name+"   (#"+i+")";
 				temp++; //Anzahl Knoten zaehlen
 			}
 		}
@@ -398,7 +398,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		subgraphlist = graphref.getMathGraph().getSubgraphNames();
+		subgraphlist = graphref.getMathGraph().modifySubgraphs.getNames();
 		int temp = 0;
 		for (int i=0; i<subgraphlist.size(); i++)
 		{
@@ -411,9 +411,9 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		{
 			if (subgraphlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				SubgraphChecks[temp] = new JCheckBox(graphref.getMathGraph().getSubgraph(i).getName());
+				SubgraphChecks[temp] = new JCheckBox(graphref.getMathGraph().modifySubgraphs.get(i).getName());
 				if (chEdge!=null)
-					SubgraphChecks[temp].setSelected(graphref.getMathGraph().getSubgraph(i).containsEdge(chEdge.getIndex()));
+					SubgraphChecks[temp].setSelected(graphref.getMathGraph().modifySubgraphs.get(i).containsEdge(chEdge.getIndex()));
 				CiSubgraphs.add(SubgraphChecks[temp],c);
 				SubgraphChecks[temp].addItemListener(this);
 				c.gridy++;

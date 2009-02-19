@@ -103,7 +103,7 @@ public class SVGWriter
 					//mittelpunkt des Textes
 					int x = actual.getPosition().x + Math.round((float)actual.getNameDistance()*(float)Math.cos(Math.toRadians((double)actual.getNameRotation())));
 					int y = actual.getPosition().y - Math.round((float)actual.getNameDistance()*(float)Math.sin(Math.toRadians((double)actual.getNameRotation())));
-					s.write("\t\t\t<text x=\""+x+"\" y=\""+y+"\" style=\"font-size:"+actual.getNameSize()+"px; baseline-shift:-"+(actual.getNameSize()/2)+";\">"+formname(vg.getMathGraph().getNode(actual.getIndex()).name)+"</text>");
+					s.write("\t\t\t<text x=\""+x+"\" y=\""+y+"\" style=\"font-size:"+actual.getNameSize()+"px; baseline-shift:-"+(actual.getNameSize()/2)+";\">"+formname(vg.getMathGraph().modifyNodes.get(actual.getIndex()).name)+"</text>");
 				}
 			}
 		}
@@ -164,7 +164,7 @@ public class SVGWriter
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();
-	    	   MEdge me = vg.getMathGraph().getEdge(actual.getIndex());
+	    	   MEdge me = vg.getMathGraph().modifyEdges.get(actual.getIndex());
 	    	   int start = me.StartIndex;
 	    	   int ende = me.EndIndex;
 	    	   Point b = vg.modifyNodes.get(start).getPosition();

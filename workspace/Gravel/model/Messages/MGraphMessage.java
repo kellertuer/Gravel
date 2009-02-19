@@ -1,18 +1,18 @@
 package model.Messages;
 
-import java.awt.Color;
 /**
- * GraphColorMessage keeps changes of a Color.
+ * MGraphMessage keeps changes of the elements in an MGraph.
+ * 
  * It belongs to the internal GraphMessages to keep other sets
- * updated
+ * updated, because Edge/Node Deletions must trigger MSubgraph-Updates for example
  * 
  * No external Element should react on these
- * They are filtered and kept inside VGraph
+ * They are filtered and kept inside MGraph
  * 
  * @author Ronny Bergmann
  * @since 0.4
  */
-public class GraphColorMessage {
+public class MGraphMessage {
 
 	//Modified Element
 	public static final int NODE = 1; 
@@ -20,46 +20,59 @@ public class GraphColorMessage {
 	public static final int HYPEREDGE = 4;
 	public static final int SUBGRAPH = 8;
 	
+	public static final int LOOPS = 32;
+	public static final int MULTIPLE = 64;
+	public static final int DIRECTION = 128;
+	
 	//Modification
 	public static final int UPDATE = 1;
 	public static final int ADDITION = 2;
 	public static final int REMOVAL = 4;
+	public static final int INDEXCHANGED = 32;
 	
 	private int modElement=0;
 	private int modType=0;
-	int id=0;
-	private Color color=null;
-	private Color oldcolor=null;
-	
+	int id=0,old=0;	
 	/**
 	 * Create a new GraphColorMessage for Addition or Removal of a color
 	 * @param modified Element modified
 	 * @param id ID of the modified element
 	 * @param modification type of modification (Update not possible, because no old color given)
-	 * @param c Color that has been added or removed
 	 */
-	public GraphColorMessage(int modified, int id, int modification, Color c)
+	public MGraphMessage(int modified, int id, int modification)
 	{
 		modElement=modified;
 		modType = modification;
 		this.id=id;
-		color=c;
+		old = id;
 	}
 	/**
-	 * Create a new GraphColorMessage for Updated
-	 * @param modified Type of the Updated Element
-	 * @param id ID of the Updated Element
-	 * @param cold Old Color that was replaced
-	 * @param c New Color that was set
+	 * Create a new GraphColorMessage for Addition or Removal of a color
+	 * @param modified Element modified
+	 * @param id ID of the modified element
+	 * @param oldid ID the element had before the indexchange
+	 * @param modification type of modification (Update not possible, because no old color given)
 	 */
-	public GraphColorMessage(int modified, int id, Color cold, Color c)
+	public MGraphMessage(int modified, int id, int oldid, int modification)
 	{
 		modElement=modified;
-		modType=UPDATE;
+		modType = modification;
 		this.id=id;
-		oldcolor=cold;
-		color=c;
+		old = oldid;
 	}
+	/**
+	 * Create a Change in the Boolean Values of MGraph
+	 * @param modifiedboolean
+	 * @param newb
+	 */
+	public MGraphMessage(int modifiedboolean, boolean newb)
+	{
+		modElement=modifiedboolean;
+		id=0;
+		if (newb)
+			id++;
+	}
+	
 	/**
 	 * Return the Type of the modified Element
 	 * @return
@@ -85,20 +98,15 @@ public class GraphColorMessage {
 		return id;
 	}
 	/**
-	 * get Color that was added/removed or is New
+	 * Get old ID of modified Element
 	 * @return
 	 */
-	public Color getColor()
+	public int getOldElementID()
 	{
-		return color;
+		return old;
 	}
-	/**
-	 * get Old Color
-	 * Is NULL if a Color was added or removed.
-	 * @return
-	 */
-	public Color getOldColor()
+	public boolean getBoolean()
 	{
-		return oldcolor;
+		return (id > 0);
 	}
 }

@@ -79,18 +79,18 @@ public class LayeredTreeDraw implements VAlgorithmIF
 		}
 		//Sonst beide Söhne herausfinden
 		MNode left=null, right=null;
-		Iterator<MNode> nodeiter = mG.getNodeIterator();
+		Iterator<MNode> nodeiter = mG.modifyNodes.getIterator();
 		while (nodeiter.hasNext())
 		{
 			MNode next = nodeiter.next();
-			if (((type==UNDIR)||(type==DOWNTREE))&&((next!=parent)&&(mG.EdgesBetween(subtreeroot.index,next.index)>0))) //Sohn, ungerichteter fall oder downtree
+			if (((type==UNDIR)||(type==DOWNTREE))&&((next!=parent)&&(mG.modifyEdges.cardinalityBetween(subtreeroot.index, next.index)>0))) //Sohn, ungerichteter fall oder downtree
 			{
 				if (left==null) 
 					left = next;
 				else 
 					right = next;
 			} //Und beide gibts, da der Graph okay war und subtreroot kein Blatt war
-			if ((type==UPTREE)&&((next!=parent)&&(mG.EdgesBetween(next.index,subtreeroot.index)>0))) //Sohn, uptree
+			if ((type==UPTREE)&&((next!=parent)&&(mG.modifyEdges.cardinalityBetween(next.index, subtreeroot.index)>0))) //Sohn, uptree
 			{
 				if (left==null) 
 					left = next;
@@ -110,13 +110,13 @@ public class LayeredTreeDraw implements VAlgorithmIF
 		while (copynodes.hasNext())
 		{
 			VNode shift = copynodes.next();
-			leftsubtree.modifyNodes.add(shift, new MNode(shift.getIndex(),rightsubtree.getMathGraph().getNode(shift.getIndex()).name));
+			leftsubtree.modifyNodes.add(shift, new MNode(shift.getIndex(),rightsubtree.getMathGraph().modifyNodes.get(shift.getIndex()).name));
 		}	
 		Iterator<VEdge> copyedges = rightsubtree.modifyEdges.getIterator();
 		while (copyedges.hasNext())
 		{
 			VEdge shift = copyedges.next();
-			MEdge shiftm = rightsubtree.getMathGraph().getEdge(shift.getIndex());
+			MEdge shiftm = rightsubtree.getMathGraph().modifyEdges.get(shift.getIndex());
 			leftsubtree.modifyEdges.add(shift, shiftm,leftsubtree.modifyNodes.get(shiftm.StartIndex).getPosition(),leftsubtree.modifyNodes.get(shiftm.EndIndex).getPosition());
 		}
 		//Nun sind beide im left, also auf höhe 1 noch den neuen in der mitte zwischen left und right
@@ -125,15 +125,15 @@ public class LayeredTreeDraw implements VAlgorithmIF
 		leftsubtree.modifyNodes.add(VSubTreeroot, new MNode(VSubTreeroot.getIndex(),subtreeroot.name));
 		if ((type==UNDIR)||(type==DOWNTREE))
 		{
-			int l = mG.getEdgeIndices(subtreeroot.index, left.index).firstElement();
-			int r = mG.getEdgeIndices(subtreeroot.index, right.index).firstElement();
+			int l = mG.modifyEdges.indicesBetween(subtreeroot.index, left.index).firstElement();
+			int r = mG.modifyEdges.indicesBetween(subtreeroot.index, right.index).firstElement();
 			leftsubtree.modifyEdges.add(new VStraightLineEdge(l,gp.getIntValue("edge.width")), new MEdge(l,subtreeroot.index, left.index,1,""), VSubTreeroot.getPosition(),leftsubtree.modifyNodes.get(left.index).getPosition());
 			leftsubtree.modifyEdges.add(new VStraightLineEdge(r,gp.getIntValue("edge.width")), new MEdge(r,subtreeroot.index, right.index,1,""), VSubTreeroot.getPosition(),leftsubtree.modifyNodes.get(right.index).getPosition());
 		}
 		else
 		{
-			int l = mG.getEdgeIndices(left.index,subtreeroot.index).firstElement();
-			int r = mG.getEdgeIndices(right.index,subtreeroot.index).firstElement();
+			int l = mG.modifyEdges.indicesBetween(left.index, subtreeroot.index).firstElement();
+			int r = mG.modifyEdges.indicesBetween(right.index, subtreeroot.index).firstElement();
 			leftsubtree.modifyEdges.add(new VStraightLineEdge(l,gp.getIntValue("edge.width")), new MEdge(l,left.index, subtreeroot.index,1,""),leftsubtree.modifyNodes.get(left.index).getPosition(),VSubTreeroot.getPosition());
 			leftsubtree.modifyEdges.add(new VStraightLineEdge(r,gp.getIntValue("edge.width")), new MEdge(r,right.index, subtreeroot.index,1,""),leftsubtree.modifyNodes.get(right.index).getPosition(), VSubTreeroot.getPosition());
 		}

@@ -114,7 +114,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		else
 		{
 			chSubgraph = s;
-			oldname = graphref.getMathGraph().getSubgraph(s.getIndex()).getName();
+			oldname = graphref.getMathGraph().modifySubgraphs.get(s.getIndex()).getName();
 			oldindex = s.getIndex();
 			oldcolor = s.getColor();
 			//Knoten finden
@@ -122,16 +122,16 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 			while (nodeiter.hasNext())
 			{
 				VNode n = nodeiter.next();
-				oldnodes.set(n.getIndex(),graphref.getMathGraph().getSubgraph(s.getIndex()).containsNode(n.getIndex()));
+				oldnodes.set(n.getIndex(),graphref.getMathGraph().modifySubgraphs.get(s.getIndex()).containsNode(n.getIndex()));
 			}
 			//Kanten finden
 			Iterator <VEdge> edgeiter = graphref.modifyEdges.getIterator();
 			while (edgeiter.hasNext())
 			{
 				VEdge e = edgeiter.next();
-				oldedges.set(e.getIndex(),graphref.getMathGraph().getSubgraph(s.getIndex()).containsEdge(e.getIndex()));
+				oldedges.set(e.getIndex(),graphref.getMathGraph().modifySubgraphs.get(s.getIndex()).containsEdge(e.getIndex()));
 			}
-			this.setTitle("Eigenschaften des Untergraphen '"+graphref.getMathGraph().getSubgraph(s.getIndex()).getName()+"'");	
+			this.setTitle("Eigenschaften des Untergraphen '"+graphref.getMathGraph().modifySubgraphs.get(s.getIndex()).getName()+"'");	
 		}
 		
 		Container content = getContentPane();
@@ -252,7 +252,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		nodelist = graphref.getMathGraph().getNodeNames();
+		nodelist = graphref.getMathGraph().modifyNodes.getNames();
 		int temp = 0;
 		for (int i=0; i<nodelist.size(); i++)
 		{
@@ -265,7 +265,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		{
 			if (nodelist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				nodechecks[temp] = new JCheckBox(graphref.getMathGraph().getNode(i).name+"   (#"+i+")");
+				nodechecks[temp] = new JCheckBox(graphref.getMathGraph().modifyNodes.get(i).name+"   (#"+i+")");
 				nodechecks[temp].setSelected(oldnodes.get(i));
 				CiNodes.add(nodechecks[temp],c);
 				c.gridy++;
@@ -291,7 +291,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		edgelist = graphref.getMathGraph().getEdgeNames();
+		edgelist = graphref.getMathGraph().modifySubgraphs.getNames();
 		int temp = 0;
 		for (int i=0; i<edgelist.size(); i++)
 		{
@@ -304,7 +304,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		{
 			if (edgelist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				MEdge me = graphref.getMathGraph().getEdge(i);
+				MEdge me = graphref.getMathGraph().modifyEdges.get(i);
 				String actualname = "#"+me.StartIndex+" -";
 				if (graphref.getMathGraph().isDirected()) 
 					actualname+=">";
