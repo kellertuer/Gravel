@@ -25,7 +25,7 @@ public class GravelMLContentHandler implements ContentHandler
 {
 	public static final int PARSE_NODES = 1;
 	public static final int PARSE_EDGES = 2;
-	public static final int PARSE_SUBSETS = 3;
+	public static final int PARSE_SUBGRAPHS = 3;
 	public static final int PARSE_DONE = 4;
 	
 	private boolean isVisual; //VisualGraph ?
@@ -72,7 +72,7 @@ public class GravelMLContentHandler implements ContentHandler
 	}
 		
 	
-	//SubSet Values 
+	//Subgraph Values 
 	String sn="";
 	int sr=0,sg=0,sb=0; //Color Values
 	
@@ -130,9 +130,9 @@ public class GravelMLContentHandler implements ContentHandler
 		{
 			EndElementEdge(localName);
 		}
-		else if (Status==PARSE_SUBSETS)
+		else if (Status==PARSE_SUBGRAPHS)
 		{
-			EndElementSubSet(localName);
+			EndElementSubgraph(localName);
 		}
 	}
 	public void endPrefixMapping(String arg0) throws SAXException {}
@@ -151,14 +151,14 @@ public class GravelMLContentHandler implements ContentHandler
 			else if (mG==null)
 			{isValid=false; System.err.println("No MGraph existent. Can't Parse Edges"); return;}
 		}		
-		else if (Status==PARSE_SUBSETS)
+		else if (Status==PARSE_SUBGRAPHS)
 		{
 			if (isVisual)
 			{	if ((vG==null))
-						{isValid=false; System.err.println("No VGraph existent. Can't Parse Subsets"); return;}
+						{isValid=false; System.err.println("No VGraph existent. Can't Parse Subgraphs/SubSets"); return;}
 			} 
 			else if (mG==null)
-				{isValid=false; System.err.println("No MGraph existent. Can't Parse Subsets"); return;}
+				{isValid=false; System.err.println("No MGraph existent. Can't Parse Subgraphs/SubSets"); return;}
 		}
 		
 	}
@@ -181,9 +181,9 @@ public class GravelMLContentHandler implements ContentHandler
 		{
 			startElementEdge(atts);
 		}
-		else if (Status==PARSE_SUBSETS)
+		else if (Status==PARSE_SUBGRAPHS)
 		{
-			startElementSubSet(atts);
+			startElementSubgraph(atts);
 		}
 
 	}
@@ -270,15 +270,15 @@ public class GravelMLContentHandler implements ContentHandler
 					edgepath.add(new Point(ex,ey)); ex=-1; ey=-1;
 				}
 		}
-		else if (Status==PARSE_SUBSETS)
+		else if (Status==PARSE_SUBGRAPHS)
 		{
-			//SubSet-Felder
-			if (data_key.equals("sn")) //SubSetName
+			//Subgraph-Felder
+			if (data_key.equals("sn")) //SubgraphName
 			{
 				if (isVisual)
-					vG.getMathGraph().getSubSet(id).setName(CDATA);
+					vG.getMathGraph().getSubgraph(id).setName(CDATA);
 				else
-					mG.getSubSet(id).setName(CDATA);
+					mG.getSubgraph(id).setName(CDATA);
 			}
 			if (!isVisual)
 				return;
@@ -293,7 +293,7 @@ public class GravelMLContentHandler implements ContentHandler
 			if (sb>255) sb%=256;
 			if ((sr!=0)||(sg!=0)||(sb!=0))
 			{
-				vG.modifySubSets.setSubSetColor(id, new Color(sr,sg,sb));
+				vG.modifySubgraphs.setColor(id, new Color(sr,sg,sb));
 			}
 		}
 		data_key="";
@@ -351,7 +351,7 @@ public class GravelMLContentHandler implements ContentHandler
 		//		==KEY ENDED==
 		if ((localName.equals("key"))&&(!gpKey.equals("graph.type"))) // Key und es ist nicht der Type
 		{	
-			if (!def.equals("")) //ein Default existiert...setze diesen in gp ausnahmen subsetname nodename
+			if (!def.equals("")) //ein Default existiert...setze diesen in gp ausnahmen subgraphname nodename
 			{
 				if (type.equals("string"))
 					gp.setStringValue(gpKey,def);
@@ -391,7 +391,7 @@ public class GravelMLContentHandler implements ContentHandler
 					isValid=false; //kein Name => Fehler
 					return;
 				}
-				if (vG.modifyNodes.getNode(id)!=null)
+				if (vG.modifyNodes.get(id)!=null)
 				{
 					System.err.println("DEBUG : Error Parsing File : Node Index already given another node.");
 					isValid=false;
@@ -403,7 +403,7 @@ public class GravelMLContentHandler implements ContentHandler
 					nr = gp.getIntValue("node.name_rotation");
 				if (nns==-1) //parse error or none found => std value
 					nns = gp.getIntValue("node.name_size");
-				vG.modifyNodes.addNode(new VNode(id,nx,ny,ns,nd,nr,nns,nnv), new MNode(id,nn));
+				vG.modifyNodes.add(new VNode(id,nx,ny,ns,nd,nr,nns,nnv), new MNode(id,nn));
 				this.NodeIdtoIndex.put(idString, id);
 			}
 			else //im Mathgraph reicht der Name schon
@@ -540,25 +540,25 @@ public class GravelMLContentHandler implements ContentHandler
 			//Everythings okay, add the VEdge (puh, that was work!)
 			//For multiple edges - similar exist ? (non multiple : edge between start end end ?)
 			//Check for the visual Part
-			if (vG.modifyEdges.similarPathEdgeIndex(toAdd, start, ende) > 0) //old : vG.getEdgeIndices(start, ende)!=-1) 
+			if (vG.modifyEdges.getIndexWithSimilarEdgePath(toAdd, start, ende) > 0) //old : vG.getEdgeIndices(start, ende)!=-1) 
 			{
 				isValid= false; 
 				System.err.println("DEBUG : Error Parsing File : An (similar) Edge already existst between the two Nodes"); 
 				return;
 			}
-			vG.modifyEdges.addEdge(
+			vG.modifyEdges.add(
 					toAdd,
 					new MEdge(toAdd.getIndex(),start,ende,ev,en),
-					vG.modifyNodes.getNode(start).getPosition(),
-					vG.modifyNodes.getNode(ende).getPosition());
+					vG.modifyNodes.get(start).getPosition(),
+					vG.modifyNodes.get(ende).getPosition());
 			this.EdgeIdtoIndex.put(idString,id);
 		}
 	}
 	
 	
-	private void startElementSubSet(Attributes atts)
+	private void startElementSubgraph(Attributes atts)
 	{
-		if (position.equals("graphml.graph.subset")) //Top-Subset
+		if (position.equals("graphml.graph.subset")) //Top-Subgraph
 		{
 			//Reset Values
 			sn="";sr=0;sg=0;sb=0; //Color Values
@@ -568,39 +568,39 @@ public class GravelMLContentHandler implements ContentHandler
 			catch (Exception e)
 			{
 				if (isVisual)
-					id = vG.getMathGraph().getNextSubSetIndex();
+					id = vG.getMathGraph().getNextSubgraphIndex();
 				else
-					id = mG.getNextSubSetIndex();
+					id = mG.getNextSubgraphIndex();
 				System.err.println("DEBUG : Malformed ID - generating own ("+id+")");
 			}				
 			idString = atts.getValue("id");
-			//Sonderfall, hier mal zuerst erstellen, da kein andres SubSet schwarz ist...dies hier schwarz machen, bis eine Farbe eintrudelt
-			VSubSet vs = new VSubSet(id,Color.BLACK);
-			MSubSet ms = new MSubSet(id,gp.getSubSetName(id));
+			//Sonderfall, hier mal zuerst erstellen, da kein andres Subgraph schwarz ist...dies hier schwarz machen, bis eine Farbe eintrudelt
+			VSubgraph vs = new VSubgraph(id,Color.BLACK);
+			MSubgraph ms = new MSubgraph(id,gp.getSubgraphName(id));
 			if (isVisual)
-				vG.modifySubSets.addSubSet(vs, ms);
+				vG.modifySubgraphs.add(vs, ms);
 			else
-				mG.addSubSet(ms);
+				mG.addSubgraph(ms);
 		}
 		else if (position.equals("graphml.graph.subset.snode"))
 		{
 			String nodeid = atts.getValue("node");
 			int nodeindex = -1;
 			if (NodeIdtoIndex.get(nodeid)==null)
-				{isValid=false; System.err.println("The Subset has an non existent Edge '"+nodeid+"'."); return;}
+				{isValid=false; System.err.println("The Subgraph has an non existent Node #'"+nodeid+"'."); return;}
 			nodeindex = NodeIdtoIndex.get(nodeid);
 			
 			if (isVisual)
 			{
-				if (vG.modifyNodes.getNode(nodeindex)!=null)
-					vG.modifySubSets.addNodetoSubSet(nodeindex, id);
+				if (vG.modifyNodes.get(nodeindex)!=null)
+					vG.modifySubgraphs.addNodetoSubgraph(nodeindex, id);
 				else
 					{isValid=false; System.err.println("The Node '"+nodeid+"' does not exist."); return;}
 			}
 			else
 			{
 				if (mG.getNode(nodeindex)!=null)
-					mG.addNodetoSubSet(nodeindex, id);
+					mG.addNodetoSubgraph(nodeindex, id);
 				else
 					{isValid=false; System.err.println("The Node '"+nodeid+"' does not exist."); return;}
 			}
@@ -610,20 +610,20 @@ public class GravelMLContentHandler implements ContentHandler
 			String edgeid = atts.getValue("edge");
 			int edgeindex = -1;
 			if (EdgeIdtoIndex.get(edgeid)==null)
-			{isValid=false; System.err.println("The Subset has an non existent Edge '"+edgeid+"'."); return;}
+			{isValid=false; System.err.println("The Subgraph has an non existent Edge '"+edgeid+"'."); return;}
 			edgeindex = EdgeIdtoIndex.get(edgeid);
 			
 			if (isVisual)
 			{
-				if (vG.modifyEdges.getEdge(edgeindex)!=null)
-					vG.modifySubSets.addEdgetoSubSet(edgeindex, id);
+				if (vG.modifyEdges.get(edgeindex)!=null)
+					vG.modifySubgraphs.addEdgetoSubgraph(edgeindex, id);
 				else
 					{isValid=false; System.err.println("The Edge '"+edgeid+"' does not exist."); return;}
 			}
 			else
 			{
 				if (mG.getEdge(edgeindex).Value!=-1)
-					vG.modifySubSets.addEdgetoSubSet(edgeindex, id);
+					vG.modifySubgraphs.addEdgetoSubgraph(edgeindex, id);
 				else
 					{isValid=false; System.err.println("The Node '"+edgeid+"' does not exist."); return;}
 			}
@@ -633,17 +633,16 @@ public class GravelMLContentHandler implements ContentHandler
 			data_key = atts.getValue("key");
 		}
 	}
-	private void EndElementSubSet(String localName)
+	private void EndElementSubgraph(String localName)
 	{
-		//		==SUBSET ENDED==
 		if ((localName.equals("subset"))&&(position.equals("graphml.graph"))) //Top Level Node
 		{
 			if (isVisual)
 			{
-				if (vG.modifySubSets.getSubSet(id).getColor()==Color.BLACK)
+				if (vG.modifySubgraphs.get(id).getColor()==Color.BLACK)
 				{
-					System.err.println("DEBUG : Error Parsing File : The SubSet has no Color!");
-					vG.modifySubSets.removeSubSet(id);
+					System.err.println("DEBUG : Error Parsing File : The Subgraph has no Color!");
+					vG.modifySubgraphs.remove(id);
 					isValid=false;
 					return;
 				}

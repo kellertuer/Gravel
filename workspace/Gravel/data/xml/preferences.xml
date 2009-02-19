@@ -69,7 +69,7 @@
 	<group name="statistics">
 		<value name="y" type="Integer">200</value>
 	</group>
-	<group name="subset">
+	<group name="subgraph">
 		<value name="name" type="String">Untergraph #$ID</value>
 	</group>
 	<group name="vgraphic">

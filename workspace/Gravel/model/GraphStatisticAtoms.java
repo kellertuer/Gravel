@@ -114,9 +114,9 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 			outvalenz.put(start,outvalenz.get(start)+1);
 			invalenz.put(ende,invalenz.get(ende)+1);
 			//
-			Point startpoint = vg.modifyNodes.getNode(start).getPosition();
-			Point endpoint = vg.modifyNodes.getNode(ende).getPosition();
-			VEdge actual = vg.modifyEdges.getEdge(me.index);
+			Point startpoint = vg.modifyNodes.get(start).getPosition();
+			Point endpoint = vg.modifyNodes.get(ende).getPosition();
+			VEdge actual = vg.modifyEdges.get(me.index);
 			switch(actual.getType())
 			{
 				case VEdge.ORTHOGONAL : {
@@ -194,7 +194,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 			while (!mn.equals(rest.next())&&rest.hasNext()){}
 			while (rest.hasNext())
 			{
-				knotenabstand.put(i++,vg.modifyNodes.getNode(mn.index).getPosition().distance(vg.modifyNodes.getNode(rest.next().index).getPosition()));
+				knotenabstand.put(i++,vg.modifyNodes.get(mn.index).getPosition().distance(vg.modifyNodes.get(rest.next().index).getPosition()));
 			}
 		}
 		//Nun noch werte Setzen

@@ -43,7 +43,7 @@ import model.Messages.GraphMessage;
 /** JNodeDialog
  *  Dialog for creation and variation of nodes
  *  
- *  all values, the subsets the node belongs to and the visibility of the node name can be changed.
+ *  all values, the subgraphs the node belongs to and the visibility of the node name can be changed.
  */
 public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 {
@@ -57,9 +57,9 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 	private GeneralPreferences gp;
 	
 	private VNode chNode;
-	private Vector<String> subsetlist;
-	private JCheckBox[] SubSetChecks;
-	private JScrollPane iSubSets;
+	private Vector<String> subgraphlist;
+	private JCheckBox[] SubgraphChecks;
+	private JScrollPane iSubgraphs;
 	
 	private CNodeNameParameters cNodeName;
 	
@@ -255,7 +255,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 		content.add(Colorfield,c);
 		c.gridy++;
 		c.gridx = 0;
-		buildSubSetList();
+		buildSubgraphList();
 		c.gridy++;
 		c.gridx=0;
 		c.insets = new Insets(0,7,0,7);
@@ -264,7 +264,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 		content.add(new JLabel("Untergraphen"),c);
 		c.gridy++;
 		c.gridx=0;
-		content.add(iSubSets,c);
+		content.add(iSubgraphs,c);
 		c.gridy++;
 		if (gp.getBoolValue("grid.orientated")&&gp.getBoolValue("grid.enabled"))
 			content.add(new JLabel("<html><font size='-2'><br>Der Knoten wird beim Speichern am nächsten Gitterpunkt ausgerichtet.</font></html>"),c);
@@ -290,42 +290,42 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 	 * build the sub set lists for the node
 	 *
 	 */
-	private void buildSubSetList()
+	private void buildSubgraphList()
 	{
-		Container CiSubSets = new Container();
-		CiSubSets.setLayout(new GridBagLayout());
+		Container CiSubgraphs = new Container();
+		CiSubgraphs.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(0,0,0,0);
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		subsetlist = graphref.getMathGraph().getSetNames();
+		subgraphlist = graphref.getMathGraph().getSubgraphNames();
 		int temp = 0;
-		for (int i=0; i<subsetlist.size(); i++)
+		for (int i=0; i<subgraphlist.size(); i++)
 		{
-			if (subsetlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
+			if (subgraphlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			temp ++; //Anzahl Knoten zaehlen
 		}
-		SubSetChecks = new JCheckBox[temp];
+		SubgraphChecks = new JCheckBox[temp];
 		temp = 0;
-		for (int i=0; i<subsetlist.size(); i++)
+		for (int i=0; i<subgraphlist.size(); i++)
 		{
-			if (subsetlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
+			if (subgraphlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				SubSetChecks[temp] = new JCheckBox(graphref.getMathGraph().getSubSet(i).getName());
+				SubgraphChecks[temp] = new JCheckBox(graphref.getMathGraph().getSubgraph(i).getName());
 				if (chNode!=null)
-					SubSetChecks[temp].setSelected(graphref.getMathGraph().getSubSet(i).containsNode(chNode.getIndex()));
-				CiSubSets.add(SubSetChecks[temp],c);
-				SubSetChecks[temp].addItemListener(this);
+					SubgraphChecks[temp].setSelected(graphref.getMathGraph().getSubgraph(i).containsNode(chNode.getIndex()));
+				CiSubgraphs.add(SubgraphChecks[temp],c);
+				SubgraphChecks[temp].addItemListener(this);
 				c.gridy++;
 				temp++; //Anzahl Knoten zaehlen
 			}
 		}
-		iSubSets = new JScrollPane(CiSubSets);
-		iSubSets.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
-		iSubSets.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		iSubSets.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		iSubSets.setPreferredSize(new Dimension(200,100));
+		iSubgraphs = new JScrollPane(CiSubgraphs);
+		iSubgraphs.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
+		iSubgraphs.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		iSubgraphs.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		iSubgraphs.setPreferredSize(new Dimension(200,100));
 		
 	}
 	/**
@@ -359,7 +359,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 			}
 			if (chNode==null) //neuer Knoten, index testen
 			{
-				if (graphref.modifyNodes.getNode(iNodeIndex.getValue())!=null) //So einen gibt es schon
+				if (graphref.modifyNodes.get(iNodeIndex.getValue())!=null) //So einen gibt es schon
 				{
 					JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Knotens nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -375,14 +375,14 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 					//Neuen Knoten einfuegen
 					VNode newnode = new VNode(iNodeIndex.getValue(),ixPos.getValue(), iyPos.getValue(), iSize.getValue(),0,0,0,false);
 					newnode = cNodeName.modifyNode(newnode);
-					graphref.modifyNodes.addNode(newnode, new MNode(newnode.getIndex(),sname.getText()));
+					graphref.modifyNodes.add(newnode, new MNode(newnode.getIndex(),sname.getText()));
 				}
 			}
 			else //Knoten geaendert
 			{
 				if (oldindex != iNodeIndex.getValue()) //Der Benutzer hat den Index geaendert
 				{
-					if (graphref.modifyNodes.getNode(iNodeIndex.getValue())!=null) //So einen gibt es schon
+					if (graphref.modifyNodes.get(iNodeIndex.getValue())!=null) //So einen gibt es schon
 					{
 						JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -393,7 +393,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 						return;					
 					}
 					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS));
-					graphref.modifyNodes.changeNodeIndex(oldindex, iNodeIndex.getValue());
+					graphref.modifyNodes.changeIndex(oldindex, iNodeIndex.getValue());
 				}
 				else
 				{
@@ -401,30 +401,30 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 				}
 				//Allgemeine Werte aktualisieren
 				graphref.getMathGraph().getNode(iNodeIndex.getValue()).name = sname.getText();
-				VNode n = graphref.modifyNodes.getNode(iNodeIndex.getValue()); 
+				VNode n = graphref.modifyNodes.get(iNodeIndex.getValue()); 
 				n.setPosition(new Point(ixPos.getValue(), iyPos.getValue()));
 				n.setSize(iSize.getValue());
 				//Knotennamenanzeigewerte
-				cNodeName.modifyNode(graphref.modifyNodes.getNode(iNodeIndex.getValue()));
+				cNodeName.modifyNode(graphref.modifyNodes.get(iNodeIndex.getValue()));
 				
 
 			}
 			//Gruppen noch wieder aktualisieren
 			int temp = 0;
-			for (int i=0; i<subsetlist.size(); i++)
+			for (int i=0; i<subgraphlist.size(); i++)
 			{
-				if (subsetlist.elementAt(i)!=null) //Ein Untergraph mit dem Index existiert
+				if (subgraphlist.elementAt(i)!=null) //Ein Untergraph mit dem Index existiert
 				{
-					if (SubSetChecks[temp].isSelected())
-						graphref.modifySubSets.addNodetoSubSet(iNodeIndex.getValue(), i);
+					if (SubgraphChecks[temp].isSelected())
+						graphref.modifySubgraphs.addNodetoSubgraph(iNodeIndex.getValue(), i);
 					else //Sonst entfernen, da das nur geupdated wird oben !
-						graphref.modifySubSets.removeNodefromSubSet(iNodeIndex.getValue(), i);
+						graphref.modifySubgraphs.removeNodefromSubgraph(iNodeIndex.getValue(), i);
 					temp++; //Anzahl Knoten zaehlen
 				}
 			}
 			if (gp.getBoolValue("grid.orientated")&&gp.getBoolValue("grid.enabled"))
 			{ //Noch am Raster ausrichten, falls das aktiv ist
-				graphref.modifyNodes.getNode(iNodeIndex.getValue()).setPosition(gridsnap(iNodeIndex.getValue()));	
+				graphref.modifyNodes.get(iNodeIndex.getValue()).setPosition(gridsnap(iNodeIndex.getValue()));	
 			}
 			graphref.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.BLOCK_END));
 			this.dispose();
@@ -438,7 +438,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 	 */
 	private Point gridsnap(int nodeindex)
 	{
-		VNode movingNode = graphref.modifyNodes.getNode(iNodeIndex.getValue());
+		VNode movingNode = graphref.modifyNodes.get(iNodeIndex.getValue());
 		int gridx = gp.getIntValue("grid.x");
 		int gridy = gp.getIntValue("grid.y");
 		int xdistanceupper = movingNode.getPosition().x%gridx;
@@ -457,24 +457,24 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 		return newpos;
 	}
 	/**
-	 * react on changes in subset-things, vary the color
+	 * react on changes in subgraph-things, vary the color
 	 */
 	public void itemStateChanged(ItemEvent event) {
-		for (int i=0; i<SubSetChecks.length; i++)
+		for (int i=0; i<SubgraphChecks.length; i++)
 		{
-			if (event.getSource()==SubSetChecks[i])
+			if (event.getSource()==SubgraphChecks[i])
 			{
 				//Ein Zustand hat sich geändert, neue Farbe berechnen
 				Color colour = Color.BLACK;
 				int colourcount = 0;
 				int temp = 0; //zum mitzaehlen
-				for (int j=0; j<subsetlist.size();j++)
+				for (int j=0; j<subgraphlist.size();j++)
 				{
-					if (subsetlist.elementAt(j)!=null)
+					if (subgraphlist.elementAt(j)!=null)
 					{
-						if (SubSetChecks[temp].isSelected())
+						if (SubgraphChecks[temp].isSelected())
 						{
-							Color newc = graphref.modifySubSets.getSubSet(j).getColor();
+							Color newc = graphref.modifySubgraphs.get(j).getColor();
 							int b=colour.getBlue()*colourcount + newc.getBlue();
 							int a=colour.getAlpha()*colourcount + newc.getAlpha();
 							int g=colour.getGreen()*colourcount + newc.getGreen();

@@ -92,7 +92,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 	private void updateSelection(int status)
 	{
 		float zoom = ((float)gp.getIntValue("vgraphic.zoom")/100);
-		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
 		while (nodeiter.hasNext())
 		{
 			VNode act = nodeiter.next();
@@ -103,16 +103,16 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 			else
 				act.setSelectedStatus(act.getSelectedStatus() & (~status));
 		}
-		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 		while (edgeiter.hasNext())
 		{
 			VEdge e = edgeiter.next();
 			MEdge me = vg.getMathGraph().getEdge(e.getIndex());
 			int start = me.StartIndex;
 			int ende = me.EndIndex;
-			Point sp = (Point) vg.modifyNodes.getNode(start).getPosition().clone();
+			Point sp = (Point) vg.modifyNodes.get(start).getPosition().clone();
 			sp.x = Math.round((float)sp.x*zoom);sp.y = Math.round((float)sp.y*zoom);
-			Point ep = (Point) vg.modifyNodes.getNode(ende).getPosition().clone();
+			Point ep = (Point) vg.modifyNodes.get(ende).getPosition().clone();
 			ep.x = Math.round((float)ep.x*zoom);ep.y = Math.round((float)ep.y*zoom);
 			boolean intersects = false;
 			//Switch Type and check for intersection (special checks for some types)
@@ -146,7 +146,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 					intersects = (q.intersects(selrect));
 				}
 				default: { //e.g. Loops or any other new kind, where we don't know any optimization to compute the untersection 
-					GeneralPath p = e.getPath(vg.modifyNodes.getNode(start).getPosition(),vg.modifyNodes.getNode(ende).getPosition(), zoom);
+					GeneralPath p = e.getPath(vg.modifyNodes.get(start).getPosition(),vg.modifyNodes.get(ende).getPosition(), zoom);
 					intersects = p.intersects(selrect);
 				}
 			} //end switch
@@ -166,7 +166,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		
 		MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed
 		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //Rausrechnen des zooms
-		VNode inrangeN = vg.modifyNodes.getNodeinRange(p);
+		VNode inrangeN = vg.modifyNodes.getFirstinRangeOf(p);
 		
 		VEdge inrangeE;
 		if (vg.getMathGraph().isDirected())
@@ -176,7 +176,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		
 		boolean alt = ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK); // alt ?
 		boolean shift = ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK); //shift ?
-		boolean cpnonactive = ((vg.modifyEdges.getControlPointinRange(p, (new Integer(gp.getIntValue("vgraphic.cpsize"))).doubleValue())==null)||(!gp.getBoolValue("vgraphic.cpshow")));
+		boolean cpnonactive = ((vg.modifyEdges.firstCPinRageOf(p, (new Integer(gp.getIntValue("vgraphic.cpsize"))).doubleValue())==null)||(!gp.getBoolValue("vgraphic.cpshow")));
 		
 		if ((!alt)&&(!shift))
 		{// insgesamt auf dem Hintergrund ohne shift und ohne alt
@@ -316,7 +316,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 	 */
 	private void moveSelNodes(int x,int y)
 	{
-		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
 		while (nodeiter.hasNext()) // drawNodes
 		{
 			VNode temp = nodeiter.next();
@@ -342,7 +342,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 	 */
 	private void moveSelEdges(int x,int y)
 	{
-		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 		while (edgeiter.hasNext()) // drawNodes
 		{
 			VEdge temp = edgeiter.next();
@@ -369,7 +369,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 			mouseDragged(e); //Das gleiche wie als wenn man bewegt, nur ist danach kein Knoten mehr bewegter Knoten		
 		}
 		// Remove all Soft stuff and set them HARD
-		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
 		while (nodeiter.hasNext())
 		{
 			VNode act = nodeiter.next();
@@ -378,7 +378,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 			if ((act.getSelectedStatus() & VItem.SOFT_DESELECTED)==VItem.SOFT_DESELECTED)
 				act.setSelectedStatus(VItem.DESELECTED);
 		}
-		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 		while (edgeiter.hasNext())
 		{
 			VEdge act = edgeiter.next();

@@ -151,13 +151,13 @@ public class GeneralPreferences extends Observable
 		return replace(this.getStringValue("node.name"), "$ID",""+id);
 	}
 	/**
-	 * Creates the Subset name, where $ID is replaced by the id
-	 * @param id id of a subset
+	 * Creates the Subgraph name, where $ID is replaced by the id
+	 * @param id id of a MSubgraph, we need a name for
 	 * @return
 	 */
-	public String getSubSetName(int id)
+	public String getSubgraphName(int id)
 	{
-		return replace(this.getStringValue("subset.name"),"$ID",""+id);
+		return replace(this.getStringValue("subgraph.name"),"$ID",""+id);
 	}
 	/**
 	 * Create Edge name, where
@@ -338,7 +338,7 @@ public class GeneralPreferences extends Observable
 		
 		if (IntValues.get("statistics.y")==null) return false;
 		
-		if (StringValues.get("subset.name")==null) return false;
+		if (StringValues.get("subgraph.name")==null) return false;
 		
 		if (BoolValues.get("vgraphic.cpshow")==null) return false;
 		if (IntValues.get("vgraphic.cpsize")==null) return false;
@@ -432,7 +432,7 @@ public class GeneralPreferences extends Observable
 		StringValues.put("graph.lastfile","$NONE");
 		StringValues.put("graph.fileformat","visual");
 		StringValues.put("node.name", "v_{$ID}");
-		StringValues.put("subset.name","Untergraph #$ID");
+		StringValues.put("subgraph.name","Untergraph #$ID");
 	}
 	/**
 	 * Read the Preferences from the xml file

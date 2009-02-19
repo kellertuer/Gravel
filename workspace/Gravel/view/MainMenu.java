@@ -171,21 +171,21 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
             mEdDelSelection.setMnemonic(KeyEvent.VK_D);
     	}
     	mEdDelSelection.addActionListener(this);
-    	mEdDelSelection.setEnabled(graphpart.getVGraph().modifyEdges.selectedEdgeExists()||graphpart.getVGraph().modifyNodes.selectedNodeExists());
+    	mEdDelSelection.setEnabled(graphpart.getVGraph().modifyEdges.hasSelection()||graphpart.getVGraph().modifyNodes.hasSelection());
     	
     	mEdModifySelection = new JMenuItem("Auswahl bearbeiten...");
    		mEdModifySelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, MenuAccModifier));    		
        	if (!isMac)
            mEdModifySelection.setMnemonic(KeyEvent.VK_M);
     	mEdModifySelection.addActionListener(this);
-    	mEdModifySelection.setEnabled(graphpart.getVGraph().modifyEdges.selectedEdgeExists()||graphpart.getVGraph().modifyNodes.selectedNodeExists());
+    	mEdModifySelection.setEnabled(graphpart.getVGraph().modifyEdges.hasSelection()||graphpart.getVGraph().modifyNodes.hasSelection());
 
     	mEdArrangeSelection = new JMenuItem("Auswahl anordnen...");
    		//mEdArrangeSelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, MenuAccModifier));    		
        	if (!isMac)
            mEdArrangeSelection.setMnemonic(KeyEvent.VK_R);
     	mEdArrangeSelection.addActionListener(this);
-    	mEdArrangeSelection.setEnabled(graphpart.getVGraph().modifyNodes.selectedNodeExists());
+    	mEdArrangeSelection.setEnabled(graphpart.getVGraph().modifyNodes.hasSelection());
 
     	
     	if (!isMac) mEdit.setMnemonic(KeyEvent.VK_E);
@@ -519,9 +519,9 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 		//either Selection changed or was affected
 		if (((m.getAffectedElementTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION)||((m.getModifiedElementTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION))
 		{
-			mEdDelSelection.setEnabled(graphpart.getVGraph().modifyEdges.selectedEdgeExists()||graphpart.getVGraph().modifyNodes.selectedNodeExists());		
-			mEdModifySelection.setEnabled(graphpart.getVGraph().modifyEdges.selectedEdgeExists()||graphpart.getVGraph().modifyNodes.selectedNodeExists());		
-			mEdArrangeSelection.setEnabled(graphpart.getVGraph().modifyNodes.selectedNodeExists());
+			mEdDelSelection.setEnabled(graphpart.getVGraph().modifyEdges.hasSelection()||graphpart.getVGraph().modifyNodes.hasSelection());		
+			mEdModifySelection.setEnabled(graphpart.getVGraph().modifyEdges.hasSelection()||graphpart.getVGraph().modifyNodes.hasSelection());		
+			mEdArrangeSelection.setEnabled(graphpart.getVGraph().modifyNodes.hasSelection());
 		}
 		else if ((m.getModifiedElementTypes()&GraphMessage.DIRECTION)==GraphMessage.DIRECTION) //directed changed
 		{

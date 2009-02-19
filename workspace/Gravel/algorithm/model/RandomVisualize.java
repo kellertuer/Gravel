@@ -101,12 +101,12 @@ public class RandomVisualize implements VAlgorithmIF {
 				else
 					size = GeneralPreferences.getInstance().getIntValue("node.size");
 					
-				ErgebnisGraph.modifyNodes.addNode(new VNode(actualNode.index,posx, posy,size,35,0,14,false), new MNode(actualNode.index,actualNode.name));
+				ErgebnisGraph.modifyNodes.add(new VNode(actualNode.index,posx, posy,size,35,0,14,false), new MNode(actualNode.index,actualNode.name));
 				Iterator<MEdge> edgeiter = mG.getEdgeIterator();
 				while (edgeiter.hasNext())
 				{
 					MEdge e = edgeiter.next();
-					if ((ErgebnisGraph.modifyNodes.getNode(e.StartIndex)!=null)&&(ErgebnisGraph.modifyNodes.getNode(e.EndIndex)!=null)&&(ErgebnisGraph.modifyEdges.getEdge(e.index)==null))
+					if ((ErgebnisGraph.modifyNodes.get(e.StartIndex)!=null)&&(ErgebnisGraph.modifyNodes.get(e.EndIndex)!=null)&&(ErgebnisGraph.modifyEdges.get(e.index)==null))
 					{ //Knoten sind drin aber die Kante noch nicht
 						int width;
 						if (randEdges)
@@ -117,11 +117,11 @@ public class RandomVisualize implements VAlgorithmIF {
 						}
 						else
 							width = GeneralPreferences.getInstance().getIntValue("edge.width");						
-						ErgebnisGraph.modifyEdges.addEdge(
+						ErgebnisGraph.modifyEdges.add(
 								new VStraightLineEdge(e.index,width), 
 								e,
-								ErgebnisGraph.modifyNodes.getNode(e.StartIndex).getPosition(),
-								ErgebnisGraph.modifyNodes.getNode(e.EndIndex).getPosition());
+								ErgebnisGraph.modifyNodes.get(e.StartIndex).getPosition(),
+								ErgebnisGraph.modifyNodes.get(e.EndIndex).getPosition());
 					}		
 				}
 				ErgebnisGraph.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATE));

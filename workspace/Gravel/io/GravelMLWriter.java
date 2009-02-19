@@ -38,7 +38,7 @@ public class GravelMLWriter {
 		s.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+nl+"");
 		s.write("<!-- 	===GravelML - Format==="+nl);
 		s.write("\tGraph Export in an GraphML like format"+nl+"\t");
-		s.write("the variation to GraphML is an extra tag <subset> in a graph to save also the subsetgraphs"+nl+"\t");
+		s.write("the variation to GraphML is an extra tag <subset> in a graph to save also the subgraphs"+nl+"\t");
 		s.write(""+nl+"\tAnd some special Keys to store the data. These are GraphML valid and are checked on load of a graph"+nl+"\t");		
 		s.write("Any other program may be able to read this file by ignoring the graph.subset tag or removing the part before."+nl+"\t");
 		s.write(""+nl+"\t developed by"+nl+"\t\tRonny Bergmann"+nl+"\t adapted from GraphML and the GraphML.dtd (1.0rc) from http://graphml.graphdrawing.org -->"+nl+"");
@@ -63,8 +63,8 @@ public class GravelMLWriter {
 		s.write("\t\t<default>"+gp.getStringValue("edge.name")+"</default>"+nl);
 		s.write("\t<key id=\"nn\" for=\"node\" attr.name=\"name\" attr.type=\"string\"><!-- name of a Node -->"+nl);
 		s.write("\t\t<default>"+gp.getStringValue("node.name")+"</default>"+nl+"\t</key>"+nl);
-		s.write("\t<key id=\"sn\" for=\"subset\" attr.name=\"name\" attr.type=\"string\"><!-- std name of a subset-->"+nl);
-		s.write("\t\t<default>"+gp.getStringValue("subset.name")+"</default>"+nl+"\t</key>"+nl);
+		s.write("\t<key id=\"sn\" for=\"subset\" attr.name=\"name\" attr.type=\"string\"><!-- std name of a subgraph -->"+nl);
+		s.write("\t\t<default>"+gp.getStringValue("subgraph.name")+"</default>"+nl+"\t</key>"+nl);
 	}
 	/**
 	 *  Write the additional values needed for visual graphs
@@ -131,9 +131,9 @@ public class GravelMLWriter {
 		s.write("\t<key id=\"elt\" for=\"edge\" attr.name=\"line_type\" attr.type=\"integer\">    <!-- Standard Linientyp. Empfohlen wird 1 (solid) -->"+nl);
 		s.write("\t<default>"+gp.getIntValue("edge.line_type")+"</default>"+nl+"\t</key>"+nl);
 		
-		s.write("\t<key id=\"sr\" for=\"subset\" attr.name=\"color.r\" attr.type=\"integer\" />    <!-- SubSetColor - Red -->"+nl);
-		s.write("\t<key id=\"sg\" for=\"subset\" attr.name=\"color.g\" attr.type=\"integer\" />    <!-- SubSetColor - Green -->"+nl);
-		s.write("\t<key id=\"sb\" for=\"subset\" attr.name=\"color.b\" attr.type=\"integer\" />    <!-- SubSetColor - blue -->"+nl);
+		s.write("\t<key id=\"sr\" for=\"subset\" attr.name=\"color.r\" attr.type=\"integer\" />    <!-- SubgraphColor - Red -->"+nl);
+		s.write("\t<key id=\"sg\" for=\"subset\" attr.name=\"color.g\" attr.type=\"integer\" />    <!-- SubgraphColor - Green -->"+nl);
+		s.write("\t<key id=\"sb\" for=\"subset\" attr.name=\"color.b\" attr.type=\"integer\" />    <!-- SubgraphColor - blue -->"+nl);
 	}
 	/**
 	 * Write additional Stuff needed for visual graphs in the footer
@@ -158,7 +158,7 @@ public class GravelMLWriter {
 	private void writeVisualNodes(OutputStreamWriter s) throws IOException
 	{
 	    //Nodes
-	    Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+	    Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
 	    while (nodeiter.hasNext())
 	    {
 	    	VNode actual = nodeiter.next();
@@ -192,7 +192,7 @@ public class GravelMLWriter {
 	private void writeVisualEdges(OutputStreamWriter s) throws IOException
 	{
 	       //Nodes
-	       Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+	       Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 	       while (edgeiter.hasNext())
 	       {
 	    	   VEdge actual = edgeiter.next();
@@ -282,46 +282,46 @@ public class GravelMLWriter {
  		}
 	}
 	/**
-	 * Write visual SubSets to File
+	 * Write visual Subgraphs to File
 	 * @param s
 	 * @throws IOException
 	 */
-	private void writeVisualSubSets(OutputStreamWriter s) throws IOException
+	private void writeVisualSubgraphs(OutputStreamWriter s) throws IOException
 	{
-	       //SubSets
-	       Iterator<VSubSet> subsetiter = vg.modifySubSets.getSubSetIterator();
-	       if (vg.getMathGraph().SubSetCount()!=0)
+	       //Subgraphs
+	       Iterator<VSubgraph> ster = vg.modifySubgraphs.getIterator();
+	       if (vg.getMathGraph().SubgraphCount()!=0)
 	    	   s.write("<!-- == remove these lines to get a valid GraphML-FILE	-->"+nl);
-	       while (subsetiter.hasNext())
+	       while (ster.hasNext())
 	       {
-	    	   VSubSet actual = subsetiter.next();
+	    	   VSubgraph actual = ster.next();
 	    	   s.write(nl+"\t\t<subset id=\"subset"+actual.getIndex()+"\">"+nl);
 	    	   //if the name is not a standard name
-	    	   if (!vg.getMathGraph().getSubSet(actual.getIndex()).getName().equals(gp.getStringValue("subset.name")+actual.getIndex()))
-	    		   s.write("\t\t\t<data key=\"sn\">"+vg.getMathGraph().getSubSet(actual.getIndex()).getName()+"</data>"+nl);
+	    	   if (!vg.getMathGraph().getSubgraph(actual.getIndex()).getName().equals(gp.getSubgraphName(actual.getIndex())))
+	    		   s.write("\t\t\t<data key=\"sn\">"+vg.getMathGraph().getSubgraph(actual.getIndex()).getName()+"</data>"+nl);
 	    	   
     		   s.write("\t\t\t<data key=\"sr\">"+actual.getColor().getRed()+"</data>"+nl);
     		   s.write("\t\t\t<data key=\"sg\">"+actual.getColor().getGreen()+"</data>"+nl);
     		   s.write("\t\t\t<data key=\"sb\">"+actual.getColor().getBlue()+"</data>"+nl+nl);
 
-    		   Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+    		   Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
     		   while (nodeiter.hasNext())
     		   {
     			   VNode n = nodeiter.next();
-    			   if (vg.getMathGraph().getSubSet(actual.getIndex()).containsNode(n.getIndex()))
+    			   if (vg.getMathGraph().getSubgraph(actual.getIndex()).containsNode(n.getIndex()))
     				   s.write("\t\t\t<snode node=\"node"+n.getIndex()+"\" />"+nl);
     		   }
 
-    		   Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+    		   Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
     		   while (edgeiter.hasNext())
     		   {
     			   VEdge e = edgeiter.next();
-    			   if (vg.getMathGraph().getSubSet(actual.getIndex()).containsEdge(e.getIndex()))
+    			   if (vg.getMathGraph().getSubgraph(actual.getIndex()).containsEdge(e.getIndex()))
     				   s.write("\t\t\t<sedge edge=\"edge"+e.getIndex()+"\" />"+nl);
     		   }
     		   s.write("\t\t</subset>");
  		}
-	       if (vg.getMathGraph().SubSetCount()!=0)
+	       if (vg.getMathGraph().SubgraphCount()!=0)
     	       s.write("<!-- == END remove these lines to get a valid GraphML-FILE	-->"+nl);
 	}
 	/**
@@ -356,7 +356,7 @@ public class GravelMLWriter {
 	       //Nodes
 	       writeVisualNodes(out);
 	       writeVisualEdges(out);
-	       writeVisualSubSets(out);
+	       writeVisualSubgraphs(out);
 	       out.write("\t</graph>");
 	       writeVisualFooterAddon(out);
 	       writeFooter(out);
@@ -417,34 +417,33 @@ public class GravelMLWriter {
 
 	}
 	/**
-	 * Write mathematical Subsets to File
+	 * Write mathematical Subgraphs to File
 	 * @param s
 	 * @throws IOException
 	 */
-	private void writeMathSubSets(OutputStreamWriter s) throws IOException
+	private void writeMathSubgraphs(OutputStreamWriter s) throws IOException
 	{
-	       //SubSets
-	       Iterator<MSubSet> subsetiter = vg.getMathGraph().getSubSetIterator();
+	       Iterator<MSubgraph> siter = vg.getMathGraph().getSubgraphIterator();
 	       s.write(nl);
-	       if (vg.getMathGraph().SubSetCount()!=0)
+	       if (vg.getMathGraph().SubgraphCount()!=0)
 	    	   s.write(nl+"<!-- == remove these lines to get a valid GraphML-FILE	-->"+nl);
-	       while (subsetiter.hasNext())
+	       while (siter.hasNext())
 	       {
-	    	   MSubSet actual = subsetiter.next();
+	    	   MSubgraph actual = siter.next();
 	    	   s.write("\t\t<subset id=\"subset"+actual.getIndex()+"\">"+nl);
 	    	   //if the name is not a standard name
-	    	   if (!actual.getName().equals(gp.getStringValue("subset.name")+actual.getIndex()))
+	    	   if (!actual.getName().equals(gp.getSubgraphName(actual.getIndex())))
 	    		   s.write("\t\t\t<data key=\"sn\">"+actual.getName()+"</data>");
 	    	   
-       		   Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+       		   Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
     		   while (nodeiter.hasNext())
     		   {
     			   VNode n = nodeiter.next();
-    			   if (vg.getMathGraph().getSubSet(actual.getIndex()).containsNode(n.getIndex()))
+    			   if (vg.getMathGraph().getSubgraph(actual.getIndex()).containsNode(n.getIndex()))
     				   s.write("\t\t\t<snode node=\"node"+n.getIndex()+"\" />"+nl);
     		   }
 
-    		   Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+    		   Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
     		   while (edgeiter.hasNext())
     		   {
     			   VEdge e = edgeiter.next();
@@ -453,7 +452,7 @@ public class GravelMLWriter {
     		   }
     		   s.write("\t\t</subset>"+nl);
  		}
-	       if (vg.getMathGraph().SubSetCount()!=0)
+	       if (vg.getMathGraph().SubgraphCount()!=0)
     	       s.write("<!-- == END remove these lines to get a valid GraphML-FILE	-->"+nl);
 	}
 	/**
@@ -487,7 +486,7 @@ public class GravelMLWriter {
 	       //Nodes
 	       writeMathNodes(out);
 	       writeMathEdges(out);
-	       writeMathSubSets(out);
+	       writeMathSubgraphs(out);
 	       out.write(nl+"\t</graph>");
 	       writeFooter(out);
 	       out.flush();  // Don't forget to flush!

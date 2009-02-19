@@ -17,14 +17,14 @@ import view.VGraphic;
 
 import model.MEdge;
 import model.MNode;
-import model.MSubSet;
+import model.MSubgraph;
 import model.VEdge;
 import model.VEdgeLinestyle;
 import model.VEdgeText;
 import model.VGraph;
 import model.VNode;
 import model.VStraightLineEdge;
-import model.VSubSet;
+import model.VSubgraph;
 /**
  * This Class contains the Preview for an edge, that is edited. It is an Observer, 
  * so that it might react on Input Fields, for example the Input Fields of the Arrow Properties
@@ -53,16 +53,16 @@ public class CEdgeArrowPreview extends Container implements Observer{
 		c.anchor = GridBagConstraints.WEST;
 
 		VGraph ArrowTest = new VGraph(true,false,false); //directed without loops nor multiple
-		ArrowTest.modifyNodes.addNode(new VNode(1,30,15,20,0,0,0,false), new MNode(1,"T1"));
-		ArrowTest.modifyNodes.addNode(new VNode(2,170,15,20,0,0,0,false), new MNode(2,"T2"));
-		ArrowTest.modifySubSets.addSubSet(new VSubSet(1,new Color(0.5f,0.5f,0.5f,1f)), new MSubSet(1,"white"));
-		ArrowTest.modifySubSets.addNodetoSubSet(1, 1);
-		ArrowTest.modifySubSets.addNodetoSubSet(2, 1);
+		ArrowTest.modifyNodes.add(new VNode(1,30,15,20,0,0,0,false), new MNode(1,"T1"));
+		ArrowTest.modifyNodes.add(new VNode(2,170,15,20,0,0,0,false), new MNode(2,"T2"));
+		ArrowTest.modifySubgraphs.add(new VSubgraph(1,new Color(0.5f,0.5f,0.5f,1f)), new MSubgraph(1,"white"));
+		ArrowTest.modifySubgraphs.addNodetoSubgraph(1, 1);
+		ArrowTest.modifySubgraphs.addNodetoSubgraph(2, 1);
 		ArrowEdge = new VStraightLineEdge(1,2);
-		ArrowTest.modifyEdges.addEdge(ArrowEdge, new MEdge(ArrowEdge.getIndex(),1,2,1,""), new Point(30,15), new Point(170,15));
+		ArrowTest.modifyEdges.add(ArrowEdge, new MEdge(ArrowEdge.getIndex(),1,2,1,""), new Point(30,15), new Point(170,15));
 		ArrowTest.getMathGraph().getEdge(ArrowEdge.getIndex()).name="e";
-		ArrowTest.modifyEdges.getEdge(ArrowTest.getMathGraph().getEdgeIndices(1,2).firstElement()).setTextProperties(new VEdgeText());
-		ArrowTest.modifyEdges.getEdge(ArrowTest.getMathGraph().getEdgeIndices(1,2).firstElement()).setLinestyle(new VEdgeLinestyle());
+		ArrowTest.modifyEdges.get(ArrowTest.getMathGraph().getEdgeIndices(1,2).firstElement()).setTextProperties(new VEdgeText());
+		ArrowTest.modifyEdges.get(ArrowTest.getMathGraph().getEdgeIndices(1,2).firstElement()).setLinestyle(new VEdgeLinestyle());
 		ArrowG = new VGraphic(new Dimension(200,60), ArrowTest);
 		ArrowG.setMouseHandling(VGraphic.NO_MOUSEHANDLING);
 		ArrowG.setPreferredSize(new Dimension(200,62));
@@ -81,7 +81,7 @@ public class CEdgeArrowPreview extends Container implements Observer{
 	{
 		if (e!=null)
 		{
-			ArrowEdge = ArrowG.getVGraph().modifyEdges.getEdge(1);
+			ArrowEdge = ArrowG.getVGraph().modifyEdges.get(1);
 			ArrowEdge.getArrow().setAngle(e.getArrow().getAngle());
 			ArrowEdge.getArrow().setPart(e.getArrow().getPart());
 			ArrowEdge.getArrow().setSize(e.getArrow().getSize());

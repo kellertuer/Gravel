@@ -59,8 +59,8 @@ import view.pieces.GridComponent;
 	private static final long serialVersionUID = 42L;
 	private GeneralPreferences gp;
 	private IntegerTextField iNodeSize, iEdgeWidth, iEdgeValue, iControlPointSize, iUndoStacksize;
-	private JTextField tNodeName, tSubSetName, tEdgeName;
-	private JLabel tNodePreview, tSubSetPreview, tEdgePreview;
+	private JTextField tNodeName, tSubgraphName, tEdgeName;
+	private JLabel tNodePreview, tSubgraphPreview, tEdgePreview;
 	private JCheckBox bControlPoint,bSaveOnExit,bAllowLoops, bAllowMultiple, bLoadLastGraphOnStart, bUndotrackSelection;
 	private ButtonGroup GraphType;
 	private JRadioButton rDirected, rUndirected;
@@ -193,7 +193,7 @@ import view.pieces.GridComponent;
 		tNodeName.setText(gp.getStringValue("node.name"));
 		iNodeSize.setValue(gp.getIntValue("node.size"));	
 				
-		tSubSetName.setText(gp.getStringValue("subset.name"));
+		tSubgraphName.setText(gp.getStringValue("subgraph.name"));
 		
 		grid.reload();
 		
@@ -252,15 +252,15 @@ import view.pieces.GridComponent;
 		c.gridy++; c.gridx=0;
 		c.gridwidth=1;
 		content.add(new JLabel("Name"),c);
-		tSubSetName = new JTextField();
-		tSubSetName.addCaretListener(this);
+		tSubgraphName = new JTextField();
+		tSubgraphName.addCaretListener(this);
 		c.gridx++;
 		c.gridwidth=2;
-		content.add(tSubSetName,c);
-		tSubSetPreview = new JLabel();
+		content.add(tSubgraphName,c);
+		tSubgraphPreview = new JLabel();
 		c.insets = new Insets(0,14,7,0);
-		c.gridy++; content.add(tSubSetPreview,c);
-		tSubSetName.setPreferredSize(new Dimension(200, 20));
+		c.gridy++; content.add(tSubgraphPreview,c);
+		tSubgraphName.setPreferredSize(new Dimension(200, 20));
 		c.gridy++;
 		c.gridx=0;
 		c.insets = new Insets(7,7,7,7);
@@ -333,7 +333,7 @@ import view.pieces.GridComponent;
 		return content;
 	}
 	/**
-	 * Create the SubSet-Stanardvalues Parameter Tab
+	 * Create the Subgraph-Stanardvalues Parameter Tab
 	 * @return and return the JPanel
 	 */
 	/**
@@ -556,7 +556,7 @@ import view.pieces.GridComponent;
 		
 		gp.setBoolValue("pref.saveonexit", this.bSaveOnExit.isSelected());
 		gp.setBoolValue("graph.loadfileonstart",bLoadLastGraphOnStart.isSelected());			
-		gp.setStringValue("subset.name", tSubSetName.getText());
+		gp.setStringValue("subgraph.name", tSubgraphName.getText());
 		
 		gp.setBoolValue("vgraphic.cpshow", this.bControlPoint.isSelected());
 		gp.setIntValue("vgraphic.cpsize", this.iControlPointSize.getValue());
@@ -685,12 +685,12 @@ import view.pieces.GridComponent;
 			tEdgePreview.setText("<html><font size=-1>Vorschau: <i>"+t+"</i></font></html>");
 			tEdgePreview.validate();
 		}
-		else if (event.getSource()==tSubSetName)
+		else if (event.getSource()==tSubgraphName)
 		{
-			String t = GeneralPreferences.replace(tSubSetName.getText(),"$ID","4"); 
+			String t = GeneralPreferences.replace(tSubgraphName.getText(),"$ID","4"); 
 			if (t.length() > 15)
 				t = t.substring(0,15)+"...";
-			tSubSetPreview.setText("<html><font size=-1>Vorschau: <i>"+t+"</i> </font></html>");
+			tSubgraphPreview.setText("<html><font size=-1>Vorschau: <i>"+t+"</i> </font></html>");
 		} 
 	}
 	public void keyPressed(KeyEvent e) {}

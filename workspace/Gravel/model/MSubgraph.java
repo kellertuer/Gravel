@@ -1,12 +1,12 @@
 package model;
 import java.util.BitSet;
 /**
- * A Subset consits of two BitSets, an index and a name.
- * One Bitset represents the Edges the other one the nodes that belong to the subset
- * @author ronny
+ * A Subgraph consits of two BitSets, an index and a name.
+ * One Bitset represents the Edges the other one the nodes that belong to the Subgraph
+ * @author Ronny Bergmann
  *
  */
-public class MSubSet 
+public class MSubgraph 
 {
 	//Referenzen zu den Knoten und Kantenmengen des Urgraphen 
 	//BitSet, das angibt welche Knoten und Kanten in dieser Menge liegen
@@ -15,11 +15,11 @@ public class MSubSet
 	private String SetName;
 	private int index;
 	/**
-	 * Create a Subset with an
+	 * Create a Subgraph with an
 	 * @param i index
 	 * @param n and a name
 	 */
-	public MSubSet(int i,String n)
+	public MSubgraph(int i,String n)
 	{
 		SetName = n;
 		index = i;
@@ -29,9 +29,9 @@ public class MSubSet
 		setedges.clear();
 	}
 	
-	public MSubSet clone()
+	public MSubgraph clone()
 	{
-		MSubSet c = new MSubSet(index, SetName);
+		MSubgraph c = new MSubgraph(index, SetName);
 		for (int i=0; i < setnodes.size(); i++)
 			if (setnodes.get(i))
 				c.addNode(i);
@@ -41,7 +41,7 @@ public class MSubSet
 		return c;
 	}
 	/**
-	 * Add the Node with Index i to the subset
+	 * Add the Node with Index i to the MSubgraph
 	 * @param i node index 
 	 */
 	public void addNode(int i)
@@ -50,7 +50,7 @@ public class MSubSet
 	}
 
 	/**
-	 * Remove node i from the subset
+	 * Remove node i from the MSubgraph
 	 * @param i node index
 	 */
 	public void removeNode(int i)
@@ -59,16 +59,16 @@ public class MSubSet
 	}
 
 	/**
-	 * Indicates whether Node with index i belongs to this subset
+	 * Indicates whether Node with index i belongs to this MSubgraph
 	 * @param i index of a node
-	 * @return true, if the node belongs to the subset else false
+	 * @return true, if the node belongs to the MSubgraph else false
 	 */
 	public boolean containsNode(int i)
 	{
 		return setnodes.get(i);
 	}
 	/**
-	 * Add an edge to this subset
+	 * Add an edge to this MSubgraph
 	 * @param i edge index
 	 */
 	public void addEdge(int i)
@@ -77,7 +77,7 @@ public class MSubSet
 	}
 
 	/**
-	 * Remove an edge from the subset
+	 * Remove an edge from the MSubgraph
 	 * @param i edge index
 	 */
 	public void removeEdge(int i)
@@ -86,16 +86,16 @@ public class MSubSet
 	}
 
 	/**
-	 * Indicates whether edge with index i belongs to this subset
+	 * Indicates whether edge with index i belongs to this MSubgraph
 	 * @param i index of a edge
-	 * @return true, if the egde belongs to the subset else false
+	 * @return true, if the egde belongs to the MSubgraph else false
 	 */
 	public boolean containsEdge(int i)
 	{
 		return setedges.get(i);
 	}
 	/**
-	 * Get the Name of the Subset
+	 * Get the Name of the MSubgraph
 	 * @return the name
 	 */
 	public String getName()
@@ -103,7 +103,7 @@ public class MSubSet
 		return SetName;
 	}
 	/**
-	 * Set the Name of the Subset to
+	 * Set the Name of the MSubgraph to
 	 * @param s the specified string
 	 */
 	public void setName(String s)
@@ -111,8 +111,8 @@ public class MSubSet
 		SetName = s;
 	}
 	/**
-	 * Get the Index of the Subset
-	 * @return the index of the subset
+	 * Get the Index of the MSubgraph
+	 * @return the index of the MSubgraph
 	 */
 	public int getIndex()
 	{

@@ -45,7 +45,7 @@ public class StandardClickMouseHandler extends ClickMouseHandler {
 		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //rausrechnen
 		if (e.getModifiers()==MouseEvent.BUTTON1_MASK) // Button 1
 		{
-			VNode r = vg.modifyNodes.getNodeinRange(p);
+			VNode r = vg.modifyNodes.getFirstinRangeOf(p);
 			if (r != null) 
 			{	//Auf einen Knoten klicken bewirkt, dass dieser selektiert wird
 				if ((r.getSelectedStatus() & VItem.SELECTED) != VItem.SELECTED) {

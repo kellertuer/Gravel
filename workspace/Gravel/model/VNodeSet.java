@@ -26,13 +26,13 @@ import model.Messages.GraphMessage;
  * @since 0.4
  *
  */
-public class VNodeModification extends Observable implements Observer {
+public class VNodeSet extends Observable implements Observer {
 	private TreeSet<VNode> vNodes;
 	//Every Modifying Action should Lock.
 	private Lock NodeLock;
 	private MGraph mG;
 
-	public VNodeModification(MGraph g)
+	public VNodeSet(MGraph g)
 	{
 		mG = g;
 		vNodes = new TreeSet<VNode>(new VNode.NodeIndexComparator());
@@ -63,7 +63,7 @@ public class VNodeModification extends Observable implements Observer {
 		n = selected.iterator();
 		while (n.hasNext())
 		{
-			removeNode(n.next().getIndex());
+			remove(n.next().getIndex());
 		}
 		setChanged();
 		notifyObservers(
@@ -81,10 +81,10 @@ public class VNodeModification extends Observable implements Observer {
 	 * @param mnode
 	 *            the depending mnode. If its index differs from the VNode its set to the VNodes index
 	 */
-	public void addNode(VNode node, MNode mnode) {
+	public void add(VNode node, MNode mnode) {
 		if ((node==null)||(mnode==null))
 			return;
-		if (getNode(node.getIndex()) == null) {
+		if (get(node.getIndex()) == null) {
 			if (mnode.index!=node.getIndex())
 				mnode.index = node.getIndex();
 			mG.addNode(mnode);
@@ -99,7 +99,7 @@ public class VNodeModification extends Observable implements Observer {
 	 * @param i the index of the Node
 	 * @return if a node with the given index, if it doesn't exist, it returns null
 	 */
-	public VNode getNode(int i) {
+	public VNode get(int i) {
 		Iterator<VNode> n = vNodes.iterator();
 		while (n.hasNext()) {
 			VNode temp = n.next();
@@ -116,14 +116,14 @@ public class VNodeModification extends Observable implements Observer {
 	 * @param oldi
 	 * @param newi
 	 */
-	public void changeNodeIndex(int oldi, int newi)
+	public void changeIndex(int oldi, int newi)
 	{
 		if (oldi==newi) //booring
 			return;
-		if ((getNode(oldi)==null)||(getNode(newi)!=null)) //old not or new already in use
+		if ((get(oldi)==null)||(get(newi)!=null)) //old not or new already in use
 			return;
 		mG.changeNodeIndex(oldi, newi); //Update Adjacent edges in MGraph, so there's no need to update VEdges
-		getNode(oldi).setIndex(newi);
+		get(oldi).setIndex(newi);
 		setChanged();
 		notifyObservers(new GraphMessage(GraphMessage.NODE,newi,GraphMessage.INDEXCHANGED, GraphMessage.ALL_ELEMENTS));	
 	}
@@ -135,12 +135,12 @@ public class VNodeModification extends Observable implements Observer {
 	 * 
 	 * @see MGraph.removeNode(int i)
 	 */
-	public void removeNode(int i)
+	public void remove(int i)
 	{
-		if (getNode(i)==null)
+		if (get(i)==null)
 			return;
 		mG.removeNode(i);
-		vNodes.remove(getNode(i));
+		vNodes.remove(get(i));
 		setChanged();
 		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
 	}
@@ -148,12 +148,12 @@ public class VNodeModification extends Observable implements Observer {
 	 * Replace the node with index given by an copy of Node with the parameter,
 	 * if a node with same index as parameter exists, else do nothing
 s	 * 
-	 * Its SubSetStuff is not changed
+	 * Its SubgraphStuff is not changed
 	 * @param node - Node that is exchanged into the graph (if a node exists with same index)
 	 * @param mnode - mnode to change e.g. the name - if its index differs from the node-index, the node index is taken
 	 * 
 	 */
-	public void replaceNode(VNode node, MNode mnode)
+	public void replace(VNode node, MNode mnode)
 	{
 		if ((node==null)||(mnode==null))
 			return;
@@ -188,7 +188,7 @@ s	 *
 	 * 
 	 * @return the first node in range, if there is one, else null
 	 */
-	public VNode getNodeinRange(Point p) {
+	public VNode getFirstinRangeOf(Point p) {
 		Iterator<VNode> n = vNodes.iterator();
 		while (n.hasNext()) {
 			VNode temp = n.next();
@@ -202,7 +202,7 @@ s	 *
 	 * Check, whether at least one node is selected
 	 * @return true, if there is at least one selected node, else false
 	 */
-	public boolean selectedNodeExists() {
+	public boolean hasSelection() {
 		Iterator<VNode> n = vNodes.iterator();
 		while (n.hasNext()) {
 			if ((n.next().getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
@@ -215,12 +215,12 @@ s	 *
 	 * 
 	 * @return the Iterator typed with VNode
 	 */
-	public Iterator<VNode> getNodeIterator()
+	public Iterator<VNode> getIterator()
 	{
 		return vNodes.iterator();
 	}
 	/**
-	 * Handle internal Color Update. A SubSet has changed the color of a node
+	 * Handle internal Color Update. A Subgraph has changed the color of a node
 	 * so change that
 	 * @param m
 	 */
@@ -228,7 +228,7 @@ s	 *
 	{
 		if (m.getModifiedElement()!=GraphColorMessage.NODE)
 			return; //Does not affect us
-		VNode n = getNode(m.getElementID());
+		VNode n = get(m.getElementID());
 		switch(m.getModificationType()) {
 			case GraphColorMessage.REMOVAL:
 				n.removeColor(m.getColor());

@@ -38,7 +38,7 @@ import view.VGraphic;
  * 		PNG Export
  * 		LaTeX Picture Export
  * 		SVG		Export als Vektorgrafik
- * (	GraphML Export mit oder ohne visuelle Informationen, Subsets gehen verloren
+ * (	GraphML Export mit oder ohne visuelle Informationen
  * 		.dot	Export das Format von Graphviz 
  * 
  * 		GraphML Import eines mathematischen Graphen => Wizard starten

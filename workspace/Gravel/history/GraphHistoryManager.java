@@ -81,7 +81,7 @@ public class GraphHistoryManager implements Observer
 		{
 			try { 
 				//TODO: Optimize temp.clone();
-				act = new GraphAction(tempG.modifyNodes.getNode(m.getElementID()),action,tempG.clone()); 
+				act = new GraphAction(tempG.modifyNodes.get(m.getElementID()),action,tempG.clone()); 
 			}
 			catch (GraphActionException e)
 			{
@@ -92,18 +92,18 @@ public class GraphHistoryManager implements Observer
 		{
 			try { 
 				//TODO: Optimize Environment Graph
-				act = new GraphAction(tempG.modifyEdges.getEdge(m.getElementID()),action,tempG.clone());
+				act = new GraphAction(tempG.modifyEdges.get(m.getElementID()),action,tempG.clone());
 			}
 			catch (GraphActionException e2)
 			{
 				act=null; System.err.println("DEBUG: ¢added.GraphAction Creation Failed:"+e2.getMessage());
 			}
 		}
-		else if (m.getModifiedElementTypes()==GraphMessage.SUBSET)
+		else if (m.getModifiedElementTypes()==GraphMessage.SUBGRAPH)
 		{
 			try { 
 				//TODO: Optimize Environment.
-				act = new GraphAction(tempG.modifySubSets.getSubSet(m.getElementID()),action, tempG.getMathGraph().getSubSet(m.getElementID()));
+				act = new GraphAction(tempG.modifySubgraphs.get(m.getElementID()),action, tempG.getMathGraph().getSubgraph(m.getElementID()));
 			}
 			catch (GraphActionException e2)
 			{
@@ -118,19 +118,19 @@ public class GraphHistoryManager implements Observer
 	 */
 	private void updateLastSelection()
 	{
-		Iterator<VNode> ni = trackedGraph.modifyNodes.getNodeIterator();
+		Iterator<VNode> ni = trackedGraph.modifyNodes.getIterator();
 		while (ni.hasNext())
 		{
 			VNode n = ni.next();
-			VNode n2 = lastGraph.modifyNodes.getNode(n.getIndex());
+			VNode n2 = lastGraph.modifyNodes.get(n.getIndex());
 			if (n2!=null)
 				n2.setSelectedStatus(n.getSelectedStatus());
 		}
-		Iterator<VEdge> ei = trackedGraph.modifyEdges.getEdgeIterator();
+		Iterator<VEdge> ei = trackedGraph.modifyEdges.getIterator();
 		while (ei.hasNext())
 		{
 			VEdge e = ei.next();
-			VEdge e2 = lastGraph.modifyEdges.getEdge(e.getIndex());
+			VEdge e2 = lastGraph.modifyEdges.get(e.getIndex());
 			if (e2!=null)
 				e2.setSelectedStatus(e.getSelectedStatus());
 		}

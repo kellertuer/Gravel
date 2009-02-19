@@ -24,7 +24,7 @@ import model.VEdge;
 import model.VNode;
 import model.Messages.GraphMessage;
 /**
- * VGraph encapsulates an MGraph and keeps visual information about every node, edge and subset in the MGraph
+ * VGraph encapsulates an MGraph and keeps visual information about every node, edge and subgraphs in the MGraph
  * each manipulation on the VGraph is also given to the MGraph
  * The MGraph may the extracted and being used to generate another VGraph to the same MGraph
  *
@@ -37,9 +37,9 @@ import model.Messages.GraphMessage;
 public class VGraph extends Observable implements Observer {
 
 	private MGraph mG;
-	public VNodeModification modifyNodes;
-	public VEdgeModification modifyEdges;
-	public VSubSetModification modifySubSets;
+	public VNodeSet modifyNodes;
+	public VEdgeSet modifyEdges;
+	public VSubgraphSet modifySubgraphs;
 	/**
 	 * Constructor
 	 * 
@@ -50,15 +50,15 @@ public class VGraph extends Observable implements Observer {
 	public VGraph(boolean d, boolean l, boolean m)
 	{
 		mG = new MGraph(d,l,m);
-		modifyNodes = new VNodeModification(mG);
-		modifyEdges = new VEdgeModification(mG);
-		modifySubSets = new VSubSetModification(mG);
-		modifySubSets.addObserver(modifyNodes); //Nodes must react on SubSetChanges (Color)
-		modifySubSets.addObserver(modifyEdges); //Edges must react on SubSetChanges (Color)
-		//SubSet has not to react on anything, because the Membership is kept im mG and not in modifySubSets
+		modifyNodes = new VNodeSet(mG);
+		modifyEdges = new VEdgeSet(mG);
+		modifySubgraphs = new VSubgraphSet(mG);
+		modifySubgraphs.addObserver(modifyNodes); //Nodes must react on SubgraphChanges (Color)
+		modifySubgraphs.addObserver(modifyEdges); //Edges must react on SubgraphChanges (Color)
+		//Subgraph has not to react on anything, because the Membership is kept im mG and not in VSubgraphSet
 		modifyNodes.addObserver(this);
 		modifyEdges.addObserver(this);
-		modifySubSets.addObserver(this);
+		modifySubgraphs.addObserver(this);
 	}
 	/**
 	 * deselect all Nodes and Edges
@@ -81,7 +81,7 @@ public class VGraph extends Observable implements Observer {
 							GraphMessage.REMOVAL|GraphMessage.BLOCK_START, //Status 
 							GraphMessage.NODE|GraphMessage.EDGE|GraphMessage.SELECTION) //Affected		
 			);
-		Iterator<VNode> n = modifyNodes.getNodeIterator();
+		Iterator<VNode> n = modifyNodes.getIterator();
 		HashSet<VNode> selected = new HashSet<VNode>();
 		while (n.hasNext()) {
 			VNode node = n.next();
@@ -91,9 +91,9 @@ public class VGraph extends Observable implements Observer {
 		n = selected.iterator();
 		while (n.hasNext())
 		{
-			modifyNodes.removeNode(n.next().getIndex());
+			modifyNodes.remove(n.next().getIndex());
 		}
-		Iterator<VEdge> n2 = modifyEdges.getEdgeIterator();
+		Iterator<VEdge> n2 = modifyEdges.getIterator();
 		HashSet<VEdge> selected2 = new HashSet<VEdge>();
 		while (n2.hasNext()) {
 			VEdge edge = n2.next();
@@ -103,7 +103,7 @@ public class VGraph extends Observable implements Observer {
 		n2 = selected2.iterator();
 		while (n2.hasNext())
 		{
-			modifyEdges.removeEdge(n2.next().getIndex());
+			modifyEdges.remove(n2.next().getIndex());
 		}
 		setChanged();
 		notifyObservers(
@@ -132,11 +132,11 @@ public class VGraph extends Observable implements Observer {
 				//modifyNodes.NodeLock.lock(); //Knoten finden
 //				try
 //				{
-					Iterator<VNode> n = modifyNodes.getNodeIterator();
+					Iterator<VNode> n = modifyNodes.getIterator();
 					while (n.hasNext())
 					{
 						VNode t = n.next();
-						Iterator<VNode> n2 = modifyNodes.getNodeIterator();			//jeweils
+						Iterator<VNode> n2 = modifyNodes.getIterator();			//jeweils
 						while (n2.hasNext())
 						{
 							VNode t2 = n2.next();
@@ -152,7 +152,7 @@ public class VGraph extends Observable implements Observer {
 									MEdge m = mG.getEdge(e2);
 									m.Value = mG.getEdge(e2).Value+mG.getEdge(e1).Value;
 								//	mG.replaceEdge(m); Notify is pushed for MGraph at the end of the method
-									modifyEdges.removeEdge(e1);
+									modifyEdges.remove(e1);
 									removed.set(e1);
 								}
 							} //End no duplicate
@@ -175,7 +175,7 @@ public class VGraph extends Observable implements Observer {
 			//	try
 			//	{		
 					HashSet<VEdge> toDelete = new HashSet<VEdge>(); // zu entfernende Kanten
-					Iterator<VEdge> e = modifyEdges.getEdgeIterator();				
+					Iterator<VEdge> e = modifyEdges.getIterator();				
 					while (e.hasNext())
 					{
 						VEdge t = e.next();
@@ -185,7 +185,7 @@ public class VGraph extends Observable implements Observer {
 						Iterator<Integer> iiter = indices.iterator();
 						while (iiter.hasNext())
 						{
-							VEdge act = modifyEdges.getEdge(iiter.next());
+							VEdge act = modifyEdges.get(iiter.next());
 							if ((mG.getEdge(act.getIndex()).StartIndex==te)&&(!mG.isDirected())&&(act.getType()==VEdge.ORTHOGONAL)&&(t.getType()==VEdge.ORTHOGONAL)) 
 							//ungerichtet, beide orthogonal und entgegengesetz gespeichert
 							{
@@ -206,7 +206,7 @@ public class VGraph extends Observable implements Observer {
 					} //end outer while
 					Iterator<VEdge> e3 = toDelete.iterator();
 					while (e3.hasNext())
-						modifyEdges.removeEdge_(e3.next().getIndex());
+						modifyEdges.remove_(e3.next().getIndex());
 		//		} finally{modifyEdges..unlock();}
 			} //end of deleting similar edges in multiple directed graphs
 		}//end if !d
@@ -228,12 +228,12 @@ public class VGraph extends Observable implements Observer {
 	 */
 	public void translate(int x, int y)
 	{
-		Iterator<VNode> iter1 = modifyNodes.getNodeIterator();
+		Iterator<VNode> iter1 = modifyNodes.getIterator();
 		while (iter1.hasNext())
 		{
 			iter1.next().translate(x, y);
 		}
-		Iterator<VEdge> iter2 = modifyEdges.getEdgeIterator();
+		Iterator<VEdge> iter2 = modifyEdges.getIterator();
 		while(iter2.hasNext())
 		{
 			iter2.next().translate(x,y);
@@ -242,7 +242,7 @@ public class VGraph extends Observable implements Observer {
 		notifyObservers(
 				new GraphMessage(GraphMessage.NODE|GraphMessage.EDGE, //Type
 								GraphMessage.TRANSLATION, //Status 
-								GraphMessage.NODE|GraphMessage.EDGE|GraphMessage.SELECTION|GraphMessage.SUBSET) //Affected		
+								GraphMessage.NODE|GraphMessage.EDGE|GraphMessage.SELECTION|GraphMessage.SUBGRAPH) //Affected		
 			);
 	}
 	/**
@@ -263,21 +263,20 @@ public class VGraph extends Observable implements Observer {
 	public void replace(VGraph anotherone)
 	{
 		//Del Me
-		modifyNodes.deleteObserver(this); modifyEdges.deleteObserver(this); modifySubSets.deleteObserver(this);
+		modifyNodes.deleteObserver(this); modifyEdges.deleteObserver(this); modifySubgraphs.deleteObserver(this);
 		//But keep themselfs observed by each other
 		//Replacement
 		modifyNodes =anotherone.modifyNodes;
 		modifyEdges = anotherone.modifyEdges;
-		modifySubSets = anotherone.modifySubSets;
+		modifySubgraphs = anotherone.modifySubgraphs;
 
 		//Renew actual stuff
 		modifyNodes.addObserver(modifyEdges); //Edges must react on NodeDeletions
-		modifySubSets.addObserver(modifyNodes); //Nodes must react on SubSetChanges
-		modifySubSets.addObserver(modifyEdges); //Edges must react on SubSetChanges
-		//SubSet has not to react on anything, because the Membership is kept im mG and not in modifySubSets
+		modifySubgraphs.addObserver(modifyNodes); //Nodes must react on SubgraphChanges
+		modifySubgraphs.addObserver(modifyEdges); //Edges must react on SubgraphChanges
 		modifyNodes.addObserver(this);
 		modifyEdges.addObserver(this);
-		modifySubSets.addObserver(this);
+		modifySubgraphs.addObserver(this);
 
 		mG = anotherone.mG;
 		mG.pushNotify(
@@ -300,42 +299,42 @@ public class VGraph extends Observable implements Observer {
 	{
 		VGraph clone = new VGraph(mG.isDirected(),mG.isLoopAllowed(),mG.isMultipleAllowed());
 		//Knoten
-		Iterator<VNode> n2 = modifyNodes.getNodeIterator();
+		Iterator<VNode> n2 = modifyNodes.getIterator();
 		while (n2.hasNext())
 		{
 			VNode nodeclone = n2.next().clone();
-			clone.modifyNodes.addNode(nodeclone, mG.getNode(nodeclone.getIndex()));
+			clone.modifyNodes.add(nodeclone, mG.getNode(nodeclone.getIndex()));
 			//In alle Sets einfuegen
-			Iterator<VSubSet>n1 = modifySubSets.getSubSetIterator();
+			Iterator<VSubgraph>n1 = modifySubgraphs.getIterator();
 			while (n1.hasNext())
 			{
-				VSubSet actualSet = n1.next();
-				if (mG.getSubSet(actualSet.index).containsNode(nodeclone.getIndex()))
-					clone.modifySubSets.addNodetoSubSet(nodeclone.getIndex(), actualSet.index); //In jedes Set setzen wo er war
+				VSubgraph actualSet = n1.next();
+				if (mG.getSubgraph(actualSet.index).containsNode(nodeclone.getIndex()))
+					clone.modifySubgraphs.addNodetoSubgraph(nodeclone.getIndex(), actualSet.index); //In jedes Set setzen wo er war
 			}
 		}
 		//Analog Kanten
-		Iterator<VEdge> n3 = modifyEdges.getEdgeIterator();
+		Iterator<VEdge> n3 = modifyEdges.getIterator();
 		while (n3.hasNext())
 		{
 			VEdge cloneEdge = n3.next().clone();
 			MEdge me = mG.getEdge(cloneEdge.getIndex());
-			clone.modifyEdges.addEdge(cloneEdge, me, modifyNodes.getNode(me.StartIndex).getPosition(), modifyNodes.getNode(me.EndIndex).getPosition());
+			clone.modifyEdges.add(cloneEdge, me, modifyNodes.get(me.StartIndex).getPosition(), modifyNodes.get(me.EndIndex).getPosition());
 			//In alle Sets einfuegen
-			Iterator<VSubSet> n1 = modifySubSets.getSubSetIterator();
+			Iterator<VSubgraph> n1 = modifySubgraphs.getIterator();
 			while (n1.hasNext())
 			{
-				VSubSet actualSet = n1.next();
-				if (mG.getSubSet(actualSet.index).containsEdge(cloneEdge.getIndex()))
-					clone.modifySubSets.addEdgetoSubSet(cloneEdge.getIndex(), actualSet.getIndex()); //Jedes Set kopieren
+				VSubgraph actualSet = n1.next();
+				if (mG.getSubgraph(actualSet.index).containsEdge(cloneEdge.getIndex()))
+					clone.modifySubgraphs.addEdgetoSubgraph(cloneEdge.getIndex(), actualSet.getIndex()); //Jedes Set kopieren
 			}
 		}
 		//Untergraphen
-		Iterator<VSubSet> n1 = modifySubSets.getSubSetIterator();
+		Iterator<VSubgraph> n1 = modifySubgraphs.getIterator();
 		while (n1.hasNext())
 		{
-			VSubSet actualSet = n1.next();
-			clone.modifySubSets.addSubSet(actualSet, mG.getSubSet(actualSet.index)); //Jedes Set kopieren
+			VSubgraph actualSet = n1.next();
+			clone.modifySubgraphs.add(actualSet, mG.getSubgraph(actualSet.index)); //Jedes Set kopieren
 		}
 		//und zurückgeben
 		return clone;
@@ -351,7 +350,7 @@ public class VGraph extends Observable implements Observer {
 	{
 		Graphics2D g2 = (Graphics2D) g;
 		Point maximum = new Point(0,0);
-		Iterator<VNode> iter1 = modifyNodes.getNodeIterator();
+		Iterator<VNode> iter1 = modifyNodes.getIterator();
 		while (iter1.hasNext())
 		{
 			VNode actual = iter1.next();
@@ -381,7 +380,7 @@ public class VGraph extends Observable implements Observer {
 					maximum.y = y;
 			}
 		}
-		Iterator<VEdge> iter2 = modifyEdges.getEdgeIterator();
+		Iterator<VEdge> iter2 = modifyEdges.getIterator();
 		while(iter2.hasNext())
 		{
 			Point edgemax = iter2.next().getMax();
@@ -406,7 +405,7 @@ public class VGraph extends Observable implements Observer {
 	{
 		Graphics2D g2 = (Graphics2D)g; 
 		Point minimum = new Point(Integer.MAX_VALUE,Integer.MAX_VALUE);
-		Iterator<VNode> iter1 = modifyNodes.getNodeIterator();
+		Iterator<VNode> iter1 = modifyNodes.getIterator();
 		while (iter1.hasNext())
 		{
 			VNode actual = iter1.next();
@@ -436,7 +435,7 @@ public class VGraph extends Observable implements Observer {
 					minimum.y = y;
 			}
 		}
-		Iterator<VEdge> iter2 = modifyEdges.getEdgeIterator();
+		Iterator<VEdge> iter2 = modifyEdges.getIterator();
 		while(iter2.hasNext())
 		{
 			Point edgemax = iter2.next().getMin();
@@ -460,11 +459,11 @@ public class VGraph extends Observable implements Observer {
 			setChanged();
 			//Allowance Updated, affected the edges
 			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE,GraphMessage.EDGE));	
-			Iterator<VNode> n = modifyNodes.getNodeIterator();				
+			Iterator<VNode> n = modifyNodes.getIterator();				
 			while (n.hasNext())
 			{
 				VNode t = n.next();
-				Iterator<VNode> n2 = modifyNodes.getNodeIterator();
+				Iterator<VNode> n2 = modifyNodes.getIterator();
 				while (n2.hasNext())
 				{
 					VNode t2 = n2.next();
@@ -482,7 +481,7 @@ public class VGraph extends Observable implements Observer {
 							{
 								int nextindex = iter.next();
 								value += mG.getEdge(nextindex).Value;
-								modifyEdges.removeEdge(nextindex);
+								modifyEdges.remove(nextindex);
 								removed.set(nextindex);
 							}
 							MEdge e = mG.getEdge(multipleedges.firstElement());
@@ -528,13 +527,13 @@ public class VGraph extends Observable implements Observer {
 	 */
 	public VEdge getEdgeinRange(Point m, double variation) {
 		variation *=(float)GeneralPreferences.getInstance().getIntValue("vgraphic.zoom")/100; //jop is gut
-		Iterator<VEdge> n = modifyEdges.getEdgeIterator();
+		Iterator<VEdge> n = modifyEdges.getIterator();
 		while (n.hasNext()) {
 			VEdge temp = n.next();
 			// naechste Kante
 			MEdge me = mG.getEdge(temp.getIndex());
-			Point p1 = (Point)modifyNodes.getNode(me.StartIndex).getPosition().clone();
-			Point p2 = (Point)modifyNodes.getNode(me.EndIndex).getPosition().clone();
+			Point p1 = (Point)modifyNodes.get(me.StartIndex).getPosition().clone();
+			Point p2 = (Point)modifyNodes.get(me.EndIndex).getPosition().clone();
 			// getEdgeShape
 			GeneralPath p = temp.getPath(p1, p2,1.0f); //no zoom on check!
 		    PathIterator path = p.getPathIterator(null, 0.001); 
@@ -586,7 +585,7 @@ public class VGraph extends Observable implements Observer {
 	 */
 	public void addEdgesfromSelectedNodes(VNode Ende) {
 		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDITION|GraphMessage.BLOCK_START));
-		Iterator<VNode> iter = modifyNodes.getNodeIterator();
+		Iterator<VNode> iter = modifyNodes.getIterator();
 		while (iter.hasNext()) 
 		{
 				VNode temp = iter.next();
@@ -599,7 +598,7 @@ public class VGraph extends Observable implements Observer {
 						me = new MEdge(i,temp.getIndex(),Ende.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),"\u22C6");
 					else
 						me = new MEdge(i,temp.getIndex(),Ende.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),GeneralPreferences.getInstance().getEdgeName(i, temp.getIndex(), Ende.getIndex()));					
-						modifyEdges.addEdge(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), me,modifyNodes.getNode(temp.getIndex()).getPosition(), Ende.getPosition());
+						modifyEdges.add(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), me,modifyNodes.get(temp.getIndex()).getPosition(), Ende.getPosition());
 				}
 		}
 		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END));
@@ -611,7 +610,7 @@ public class VGraph extends Observable implements Observer {
 	 */
 	public void addEdgestoSelectedNodes(VNode Start) {
 		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDITION|GraphMessage.BLOCK_START));
-		Iterator<VNode> iter = modifyNodes.getNodeIterator();
+		Iterator<VNode> iter = modifyNodes.getIterator();
 		while (iter.hasNext()) 
 		{
 				VNode temp = iter.next();
@@ -625,7 +624,7 @@ public class VGraph extends Observable implements Observer {
 					else
 						me = new MEdge(i,Start.getIndex(),temp.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),GeneralPreferences.getInstance().getEdgeName(i, Start.getIndex(), temp.getIndex()));
 					
-						modifyEdges.addEdge(
+						modifyEdges.add(
 								new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), 
 								me,
 								Start.getPosition(),

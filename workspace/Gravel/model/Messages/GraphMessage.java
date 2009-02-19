@@ -8,7 +8,7 @@ package model.Messages;
  * <br>
  * <br>- Nodes
  * <br>- Edges 
- * <br>- Subsets
+ * <br>- Subgraphs
  * <br> - Selections
  * <br> - Changes in allowance of Loops, Multiple Edges
  * <br> - Change whether the Graph is directed or not
@@ -25,7 +25,7 @@ public class GraphMessage {
 	//Type of change (and affection)
 	public static final int NODE = 1;
 	public static final int EDGE = 2;
-	public static final int SUBSET = 4;
+	public static final int SUBGRAPH = 4;
 	public static final int ALL_ELEMENTS=7;
 	public static final int SELECTION = 8;
 	public static final int DIRECTION = 16;

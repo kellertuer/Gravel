@@ -102,13 +102,13 @@ public class MyTikZPictureWriter implements TeXWriter {
 	 */
 	private void writeColors(OutputStreamWriter s) throws IOException
 	{
-		Iterator<VSubSet> setiter = vg.modifySubSets.getSubSetIterator();
+		Iterator<VSubgraph> setiter = vg.modifySubgraphs.getIterator();
 		while (setiter.hasNext())
 		{
-			VSubSet actual = setiter.next();
+			VSubgraph actual = setiter.next();
 			Color c = actual.getColor();
 			
-			s.write("\\definecolor{SubSet"+actual.getIndex()+"}{rgb}{"+
+			s.write("\\definecolor{Subgraph"+actual.getIndex()+"}{rgb}{"+
 					((double)c.getRed())/255.0+","+
 					((double)c.getGreen())/255.0+","+
 					((double)c.getBlue())/255.0+"}");
@@ -116,30 +116,30 @@ public class MyTikZPictureWriter implements TeXWriter {
 	}
 	private String getNodeColorString(int nodeindex)
 	{
-		VNode v = vg.modifyNodes.getNode(nodeindex);
+		VNode v = vg.modifyNodes.get(nodeindex);
 		String c="";
 		if (v==null)
 			return c;
-		//Count Subsets
-		Iterator<VSubSet> setiter = vg.modifySubSets.getSubSetIterator();
+		//Count Subgraphs the node belongs to
+		Iterator<VSubgraph> setiter = vg.modifySubgraphs.getIterator();
 		int count=0;
 		while (setiter.hasNext())
 		{
-			if (vg.getMathGraph().getSubSet(setiter.next().getIndex()).containsNode(nodeindex))
+			if (vg.getMathGraph().getSubgraph(setiter.next().getIndex()).containsNode(nodeindex))
 					count++;
 		}
 		int part = Math.round(100.0f/(float)count);
-		setiter = vg.modifySubSets.getSubSetIterator();
+		setiter = vg.modifySubgraphs.getIterator();
 		while (setiter.hasNext())
-		{ //Add the Color of the subset with the part it takes in the color
-			c += "SubSet"+setiter.next().getIndex()+"!"+part;
+		{ //Add the Color of the subgraph with the part it takes in the color
+			c += "Subgraph"+setiter.next().getIndex()+"!"+part;
 		}
 		return c;
 	}
 	private void writeNodes(OutputStreamWriter s) throws IOException
 	{
 	    //Nodes
-	    Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+	    Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
 	    while (nodeiter.hasNext())
 	    {
 	    	VNode actual = nodeiter.next();
@@ -192,7 +192,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	private void writeEdges(OutputStreamWriter s) throws IOException
 	{
 	       //Nodes
-	    	Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+	    	Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();
@@ -257,9 +257,8 @@ public class MyTikZPictureWriter implements TeXWriter {
 	    		
 	}
 	
-	private void writeSubSets(OutputStreamWriter s) throws IOException
+	private void writeSubgraphs(OutputStreamWriter s) throws IOException
 	{
-	       //SubSets - Umrandungen hier einbauen
 	}
 	public String saveToFile(File f)
 	{
@@ -281,7 +280,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	       writeColors(out);
 	       writeNodes(out);
 	       writeEdges(out);
-	       writeSubSets(out);
+	       writeSubgraphs(out);
 	       writeFooter(out,"Gravel Graphen-Export '"+f.getName()+"'");
 	       out.flush();  // Don't forget to flush!
 	       out.close();

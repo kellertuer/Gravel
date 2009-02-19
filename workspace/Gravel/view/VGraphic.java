@@ -128,16 +128,16 @@ public class VGraphic extends Component implements 	Observer
 	private void paintEdges(Graphics g)
 	{
 		Graphics2D g2 = (Graphics2D) g;
-		Iterator<VEdge> ei = vG.modifyEdges.getEdgeIterator();
+		Iterator<VEdge> ei = vG.modifyEdges.getIterator();
 		g2.setStroke(vEdgeStyle);
 		boolean directed = vG.getMathGraph().isDirected();
 		while (ei.hasNext()) // drawEdges
 		{
 			VEdge temp = ei.next(); //Grafischer Teil
 			MEdge tempm = vG.getMathGraph().getEdge(temp.getIndex());
-			Point p1 = vG.modifyNodes.getNode(tempm.StartIndex).getPosition(); //Startkoordinaten
-			VNode EndNode = vG.modifyNodes.getNode(tempm.EndIndex); //Endknoten
-			VNode StartNode = vG.modifyNodes.getNode(tempm.StartIndex); //Endknoten
+			Point p1 = vG.modifyNodes.get(tempm.StartIndex).getPosition(); //Startkoordinaten
+			VNode EndNode = vG.modifyNodes.get(tempm.EndIndex); //Endknoten
+			VNode StartNode = vG.modifyNodes.get(tempm.StartIndex); //Endknoten
 			Point p2 = EndNode.getPosition();
 			if ((((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)||((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))&&((temp.getSelectedStatus()&VItem.SOFT_DESELECTED)!=VItem.SOFT_DESELECTED))
 			{
@@ -216,7 +216,7 @@ public class VGraphic extends Component implements 	Observer
 	private void paintNodes(Graphics g)
 	{
 		Graphics2D g2 = (Graphics2D) g;
-		Iterator<VNode> nodeiter = vG.modifyNodes.getNodeIterator();
+		Iterator<VNode> nodeiter = vG.modifyNodes.getIterator();
 		while (nodeiter.hasNext()) // drawNodes
 		{
 			VNode temp = nodeiter.next();
@@ -260,7 +260,7 @@ public class VGraphic extends Component implements 	Observer
 	 */
 	private void paintControllPoints(Graphics g)
 	{
-		Iterator<VEdge> edgeiter = vG.modifyEdges.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vG.modifyEdges.getIterator();
 		while (edgeiter.hasNext()) // drawEdges
 		{
 			VEdge temp = edgeiter.next(); //Grafischer Teil
@@ -484,11 +484,11 @@ public class VGraphic extends Component implements 	Observer
 			vp.getParent().validate();
 			repaint();	
 		}
-		else if ((m.getModifiedElementTypes()&GraphMessage.SUBSET)==GraphMessage.SUBSET)
+		else if ((m.getModifiedElementTypes()&GraphMessage.SUBGRAPH)==GraphMessage.SUBGRAPH)
 		{
 			repaint();
 			if (Click!=null)
-				Click.updateSubSetList();
+				Click.updateSubgraphList();
 		}
 	}
 	public void handlePreferencesUpdate()

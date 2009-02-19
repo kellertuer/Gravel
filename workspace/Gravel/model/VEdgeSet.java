@@ -29,13 +29,13 @@ import model.Messages.GraphMessage;
  * @author Ronny Bergmann
  * @since 0.4
  */
-public class VEdgeModification extends Observable implements Observer {
+public class VEdgeSet extends Observable implements Observer {
 
 	private Lock EdgeLock;
 	private MGraph mG;
 	private TreeSet<VEdge> vEdges;
 	
-	public VEdgeModification(MGraph g)
+	public VEdgeSet(MGraph g)
 	{
 		vEdges = new TreeSet<VEdge>(new VEdge.EdgeIndexComparator());
 		EdgeLock = new ReentrantLock();
@@ -81,7 +81,7 @@ public class VEdgeModification extends Observable implements Observer {
 				Iterator<VEdge> n3 = deledges.iterator();
 				while (n3.hasNext()) // Diese loeschen
 				{
-					removeEdge(n3.next().getIndex());
+					remove(n3.next().getIndex());
 				}
 			} finally {EdgeLock.unlock();}
 		}	
@@ -106,13 +106,13 @@ public class VEdgeModification extends Observable implements Observer {
 	 * @param startPoint
 	 * @param endPoint 
 	 */
-	public void addEdge(VEdge edge, MEdge medge, Point start, Point end) 
+	public void add(VEdge edge, MEdge medge, Point start, Point end) 
 	{
 		if ((edge==null)||(medge==null))
 				return;
 		if (medge.index!=edge.getIndex())
 			medge.index = edge.getIndex();
-		if (similarPathEdgeIndex(edge, medge.StartIndex,medge.EndIndex) > 0)
+		if (getIndexWithSimilarEdgePath(edge, medge.StartIndex,medge.EndIndex) > 0)
 		{
 			System.err.println("DEBUG : Similar Edge Exists, doing nothing");
 			return;
@@ -123,7 +123,7 @@ public class VEdgeModification extends Observable implements Observer {
 			try 
 			{
 				// In einem ungerichteten Graphen existiert eine Kante von e zu s und die ist StraightLine und die neue Kante ist dies auch	
-				if ((medge.StartIndex!=medge.EndIndex)&&(mG.isDirected())&&(mG.EdgesBetween(medge.EndIndex, medge.StartIndex)==1)&&(getEdge(mG.getEdgeIndices(medge.EndIndex, medge.StartIndex).firstElement()).getType()==VEdge.STRAIGHTLINE)&&(edge.getType()==VEdge.STRAIGHTLINE))
+				if ((medge.StartIndex!=medge.EndIndex)&&(mG.isDirected())&&(mG.EdgesBetween(medge.EndIndex, medge.StartIndex)==1)&&(get(mG.getEdgeIndices(medge.EndIndex, medge.StartIndex).firstElement()).getType()==VEdge.STRAIGHTLINE)&&(edge.getType()==VEdge.STRAIGHTLINE))
 				{ //Dann würde diese Kante direkt auf der anderen liegen
 					Point dir = new Point(end.x-start.x,end.y-start.y);
 					double length = dir.distanceSq(new Point(0,0));
@@ -135,7 +135,7 @@ public class VEdgeModification extends Observable implements Observer {
 					edge = new VQuadCurveEdge(edge.getIndex(),edge.width,bz1);
 					edge.setArrow(arr);
 					//Update the old edge
-					VEdge temp = getEdge(mG.getEdgeIndices(medge.EndIndex, medge.StartIndex).firstElement());
+					VEdge temp = get(mG.getEdgeIndices(medge.EndIndex, medge.StartIndex).firstElement());
 					arr = temp.getArrow().clone();
 					VEdge tempcolorEdge = temp.clone();
 					vEdges.remove(temp);
@@ -159,7 +159,7 @@ public class VEdgeModification extends Observable implements Observer {
 	 * 
 	 * @return the edge, if existens, else null 
 	 */
-	public VEdge getEdge(int i) {
+	public VEdge get(int i) {
 		Iterator<VEdge> n = vEdges.iterator();
 		while (n.hasNext()) {
 			VEdge temp = n.next();
@@ -173,12 +173,12 @@ public class VEdgeModification extends Observable implements Observer {
 	 * Replace the edge with index given by an copy of edge with the parameter,
 	 * if a node with same index as parameter exists, else do nothing
 	 * 
-	 * Its SubSetStuff is not changed
+	 * Its Subgraph-Properties are not changed
 	 * @param e VEdge to be replaced with its Edge with similar index in the graph
 	 * @param me Medge containing the mathematical stuff of the VEdge - index of his edge is ignored,
 	 * 			if it differs from first parameter index
 	 */
-	public void replaceEdge(VEdge e, MEdge me)
+	public void replace(VEdge e, MEdge me)
 	{
 		if (me.index!=e.getIndex())
 			me.index = e.getIndex();
@@ -196,7 +196,7 @@ public class VEdgeModification extends Observable implements Observer {
 				{
 					vEdges.remove(t);
 					//Clone Color Status of e from t
-					e.copyColorStatus(t);
+					t.copyColorStatus(e);
 					vEdges.add(e);
 					setChanged();
 					notifyObservers(new GraphMessage(GraphMessage.EDGE,e.getIndex(), GraphMessage.REPLACEMENT,GraphMessage.EDGE));	
@@ -213,12 +213,12 @@ public class VEdgeModification extends Observable implements Observer {
 	 * @return
 	 * 			true, if an edge was removed, false, if not
 	 */
-	public boolean removeEdge(int i)
+	public boolean remove(int i)
 	{
-			if (removeEdge_(i))
+			if (remove_(i))
 			{
 				setChanged();
-				notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.REMOVAL,GraphMessage.EDGE|GraphMessage.SUBSET|GraphMessage.SELECTION));	
+				notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.REMOVAL,GraphMessage.EDGE|GraphMessage.SUBGRAPH|GraphMessage.SELECTION));	
 				return true;
 			}
 			return false;
@@ -230,8 +230,8 @@ public class VEdgeModification extends Observable implements Observer {
 	 * @param i Index of the Edge to be removed
 	 * @return
 	 */
-	boolean removeEdge_(int i) {
-		VEdge toDel = getEdge(i);
+	boolean remove_(int i) {
+		VEdge toDel = get(i);
 		if (toDel == null)
 			return false;
 		EdgeLock.lock();
@@ -255,7 +255,7 @@ public class VEdgeModification extends Observable implements Observer {
 	 * 
 	 * @return the index of the similar edge, if it exists, else 0
 	 */
-	public int similarPathEdgeIndex(VEdge edge, int s, int e)
+	public int getIndexWithSimilarEdgePath(VEdge edge, int s, int e)
 	{
 		if (edge==null)
 			return 0;
@@ -266,7 +266,7 @@ public class VEdgeModification extends Observable implements Observer {
 			Iterator<Integer> iiter = indices.iterator();
 			while (iiter.hasNext())
 			{
-				VEdge act = getEdge(iiter.next());
+				VEdge act = get(iiter.next());
 				MEdge me = mG.getEdge(act.getIndex());
 				if ((me.StartIndex==e)&&(!mG.isDirected())&&(act.getType()==VEdge.ORTHOGONAL)&&(edge.getType()==VEdge.ORTHOGONAL)) 
 				//ungerichtet, beide orthogonal und entgegengesetz gespeichert
@@ -292,7 +292,7 @@ public class VEdgeModification extends Observable implements Observer {
 	 * @return
 	 * 			a Iterator of type VEdge
 	 */
-	public Iterator<VEdge> getEdgeIterator() {
+	public Iterator<VEdge> getIterator() {
 		return vEdges.iterator();
 	}
 	/**
@@ -306,7 +306,7 @@ public class VEdgeModification extends Observable implements Observer {
 	 * @return an Vector containing an edge and the number of its CP in Range if exists, else null
 	 */
 	@SuppressWarnings("unchecked")
-	public Vector getControlPointinRange(Point m, double variation) {
+	public Vector firstCPinRageOf(Point m, double variation) {
 		Iterator<VEdge> n = vEdges.iterator();
 		while (n.hasNext()) {
 			VEdge temp = n.next(); // naechste Kante
@@ -346,7 +346,7 @@ public class VEdgeModification extends Observable implements Observer {
 	 * Check, whether at least one node is selected
 	 * @return true, if there is at least one selected node, else false
 	 */
-	public boolean selectedEdgeExists() {
+	public boolean hasSelection() {
 		Iterator<VEdge> e = vEdges.iterator();
 		EdgeLock.lock();
 		boolean result = false;
@@ -365,7 +365,7 @@ public class VEdgeModification extends Observable implements Observer {
 	/**
 	 * Remove Adjacent Edges of a Node without sending a Message, because this is evoked by
 	 * Node Removement, so there is no need to inform anybody
-	 * (SubSet handles this delete itself
+	 * (VSubgraph handles this delete itself)
 	 * 
 	 * Up to now a little bit sad, because the mG is already updated at this point
 	 */
@@ -385,20 +385,20 @@ public class VEdgeModification extends Observable implements Observer {
 			while (e.hasNext())
 			{
 				//So remove them silent
-				removeEdge_(e.next().getIndex());
+				remove_(e.next().getIndex());
 			}
 		}
 		finally {EdgeLock.unlock();}
 	}
 	/**
-	 * React on Color Change in an SubSet
+	 * React on Color Change in an VSubGraph
 	 * @param m the message containing information about change
 	 */
 	private void Colorchange(GraphColorMessage m)
 	{
 		if (m.getModifiedElement()!=GraphColorMessage.EDGE)
 			return; //Does not affect us
-		VEdge e = getEdge(m.getElementID());
+		VEdge e = get(m.getElementID());
 		switch(m.getModificationType()) {
 			case GraphColorMessage.REMOVAL:
 				e.removeColor(m.getColor());
@@ -429,7 +429,7 @@ public class VEdgeModification extends Observable implements Observer {
 			//On Node removal - remove adjacent edges - every other case of node changes does not affect edges
 			if ((m.getModifiedElementTypes()==GraphMessage.NODE)||(m.getModification()==GraphMessage.REMOVAL)) //Node removement
 				updateRemoval();
-			//SubSetChanges don't affect edges, because ColorStuff is handles seperately
+			//SubGraphChanges don't affect edges, because ColorStuff is handles seperately
 		}
 	}
 }

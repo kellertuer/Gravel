@@ -41,7 +41,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	private static final long serialVersionUID = 1L;
 	private final int USENODES = 1;
 	private final int USEEDGES = 2;
-	private final int USESETS = 3;
+	private final int USESUBGRAPHS = 3;
 	private DefaultMutableTreeNode root, Kanten, Knoten,Mengen;
 	private Vector<String> Knotennamen, Kantennamen, Mengennamen;
 	private DefaultTreeModel Daten;
@@ -93,7 +93,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		
 		updateNodes();
 		updateEdges();
-		updateSets();
+		updateSubgraphs();
 	}
 	/**
 	 * Force an Update of the NodeList
@@ -138,11 +138,11 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		this.validate();
 	}
 	/**
-	 * Force an Update of the SubSet-List
+	 * Force an Update of the Subgraph-List
 	 */
-	public void updateSets()
+	public void updateSubgraphs()
 	{
-		Vector<String> Sets = vG.getMathGraph().getSetNames();
+		Vector<String> Sets = vG.getMathGraph().getSubgraphNames();
 		Mengen.removeAllChildren();
 		for (int i=0; i<Sets.size(); i++)
 		{
@@ -208,8 +208,8 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		else if (selectedNode.getParent().toString().equals("Untergraphen"))
 		{
 			//System.err.println("")
-			ParentType = USESETS;
-			Text.setText(vG.getMathGraph().getSetNames().elementAt(StringPos2Index(USESETS,selectedPosition)));
+			ParentType = USESUBGRAPHS;
+			Text.setText(vG.getMathGraph().getSubgraphNames().elementAt(StringPos2Index(USESUBGRAPHS,selectedPosition)));
 		}
 		else if (true) //sonst kein menu anzeigen
 		{
@@ -225,9 +225,9 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		{
 			switch (ParentType) //Wo war das zuletzt
 			{
-				case USENODES : {new JNodeDialog(vG.modifyNodes.getNode(StringPos2Index(ParentType,selectedPosition)),vG); break;}
-				case USEEDGES : {new JEdgeDialog(vG.modifyEdges.getEdge(StringPos2Index(ParentType,selectedPosition)),vG); break;}
-				case USESETS : {new JSubSetDialog(vG.modifySubSets.getSubSet(StringPos2Index(ParentType,selectedPosition)),vG); break;}
+				case USENODES : {new JNodeDialog(vG.modifyNodes.get(StringPos2Index(ParentType,selectedPosition)),vG); break;}
+				case USEEDGES : {new JEdgeDialog(vG.modifyEdges.get(StringPos2Index(ParentType,selectedPosition)),vG); break;}
+				case USESUBGRAPHS : {new JSubgraphDialog(vG.modifySubgraphs.get(StringPos2Index(ParentType,selectedPosition)),vG); break;}
 				default : {return;}
 			}
 		}
@@ -238,7 +238,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			{
 				case USENODES : {msg +="den Knoten <br> "+Knotennamen.elementAt(selectedPosition+1)+"<br>l"+main.CONST.html_oe+"schen ?"; break;}
 				case USEEDGES : {msg +="die Kante <br>"+Kantennamen.elementAt(selectedPosition+1)+"<br>l"+main.CONST.html_oe+"schen ?"; break;}
-				case USESETS : {msg +="den Untergraphen "+Mengennamen.elementAt(selectedPosition+1)+"<br>l"+main.CONST.html_oe+"schen ?<br>(Knoten und Kanten bleiben bestehen)"; break;}
+				case USESUBGRAPHS : {msg +="den Untergraphen "+Mengennamen.elementAt(selectedPosition+1)+"<br>l"+main.CONST.html_oe+"schen ?<br>(Knoten und Kanten bleiben bestehen)"; break;}
 				default : {return;}
 			}
 			msg +="</html>";
@@ -247,9 +247,9 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			   {
 				   switch (ParentType) //Wo war das zuletzt
 					{
-						case USENODES : {vG.modifyNodes.removeNode(StringPos2Index(ParentType,selectedPosition)); updateNodes(); updateEdges(); break;}
-						case USEEDGES : {vG.modifyEdges.removeEdge(StringPos2Index(ParentType,selectedPosition)); updateEdges(); break;}
-						case USESETS : {vG.modifySubSets.removeSubSet(StringPos2Index(ParentType,selectedPosition)); updateSets(); break;}
+						case USENODES : {vG.modifyNodes.remove(StringPos2Index(ParentType,selectedPosition)); updateNodes(); updateEdges(); break;}
+						case USEEDGES : {vG.modifyEdges.remove(StringPos2Index(ParentType,selectedPosition)); updateEdges(); break;}
+						case USESUBGRAPHS : {vG.modifySubgraphs.remove(StringPos2Index(ParentType,selectedPosition)); updateSubgraphs(); break;}
 						default : {return;}
 					}
 			   }
@@ -268,7 +268,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		{
 			case USENODES : {s = Knotennamen; break;}
 			case USEEDGES : {s = Kantennamen; break;}
-			case USESETS : {s = Mengennamen; break;}
+			case USESUBGRAPHS : {s = Mengennamen; break;}
 			default : {return 0;}
 		}
 		int index=0;
@@ -301,9 +301,9 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			{
 				updateEdges();
 			}
-			if ((m.getAffectedElementTypes()&GraphMessage.SUBSET)==GraphMessage.SUBSET) //Sets beteiligt
+			if ((m.getAffectedElementTypes()&GraphMessage.SUBGRAPH)==GraphMessage.SUBGRAPH) //Sets beteiligt
 			{
-				updateSets();
+				updateSubgraphs();
 			}
 			if ((m.getAffectedElementTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION)
 			{

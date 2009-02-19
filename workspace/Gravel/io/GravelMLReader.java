@@ -362,9 +362,9 @@ public class GravelMLReader
 			if (!ggMLCH.isValid())
 				return "Bei den Kanten ist ein Fehler aufgetreten";
 			else
-				ggMLCH.setStatus(GravelMLContentHandler.PARSE_SUBSETS);
+				ggMLCH.setStatus(GravelMLContentHandler.PARSE_SUBGRAPHS);
 
-			//Parse Subsets
+			//Parse Subgraphs
 			in = new FileInputStream(f);
 			input = new InputSource(in);
 			input.setSystemId(f.getAbsolutePath());

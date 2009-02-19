@@ -72,9 +72,9 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 	private JComboBox cStart, cEnd;
 	private Vector<String> nodelist; //Zum rueckwaerts nachschauen des Indexes
 	private String[] nodenames; //Array der Knotennamen
-	private Vector<String> subsetlist;
-	private JCheckBox[] SubSetChecks;
-	private JScrollPane iSubSets;
+	private Vector<String> subgraphlist;
+	private JCheckBox[] SubgraphChecks;
+	private JScrollPane iSubgraph;
 	private VGraph graphref;
 	private IntegerTextField iEdgeIndex, iWidth, iValue, iQCx,iQCy,iSegx,iSegy;
 	private JButton bSegAdd,bSegRem;
@@ -325,7 +325,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		MainContent.add(Colorfield,c);
 		c.gridy++;
 		c.gridx = 0;
-		buildSubSetList();
+		buildSubgraphList();
 		c.gridy++;
 		c.gridx=0;
 		c.insets = new Insets(0,7,0,7);
@@ -334,7 +334,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		MainContent.add(new JLabel("Untergraphen"),c);
 		c.gridy++;
 		c.gridx=0;
-		MainContent.add(iSubSets,c);		
+		MainContent.add(iSubgraph,c);		
 		c.gridy++;
 		c.gridx = 0;
 		c.insets = new Insets(7,7,7,7);
@@ -387,44 +387,44 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		}
 	}
 	/**
-	 * Build the list of subsets
+	 * Build the list of subgraphs
 	 */
-	private void buildSubSetList()
+	private void buildSubgraphList()
 	{
-		Container CiSubSets = new Container();
-		CiSubSets.setLayout(new GridBagLayout());
+		Container CiSubgraphs = new Container();
+		CiSubgraphs.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(0,0,0,0);
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		subsetlist = graphref.getMathGraph().getSetNames();
+		subgraphlist = graphref.getMathGraph().getSubgraphNames();
 		int temp = 0;
-		for (int i=0; i<subsetlist.size(); i++)
+		for (int i=0; i<subgraphlist.size(); i++)
 		{
-			if (subsetlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
+			if (subgraphlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			temp ++; //Anzahl Knoten zaehlen
 		}
-		SubSetChecks = new JCheckBox[temp];
+		SubgraphChecks = new JCheckBox[temp];
 		temp = 0;
-		for (int i=0; i<subsetlist.size(); i++)
+		for (int i=0; i<subgraphlist.size(); i++)
 		{
-			if (subsetlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
+			if (subgraphlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				SubSetChecks[temp] = new JCheckBox(graphref.getMathGraph().getSubSet(i).getName());
+				SubgraphChecks[temp] = new JCheckBox(graphref.getMathGraph().getSubgraph(i).getName());
 				if (chEdge!=null)
-					SubSetChecks[temp].setSelected(graphref.getMathGraph().getSubSet(i).containsEdge(chEdge.getIndex()));
-				CiSubSets.add(SubSetChecks[temp],c);
-				SubSetChecks[temp].addItemListener(this);
+					SubgraphChecks[temp].setSelected(graphref.getMathGraph().getSubgraph(i).containsEdge(chEdge.getIndex()));
+				CiSubgraphs.add(SubgraphChecks[temp],c);
+				SubgraphChecks[temp].addItemListener(this);
 				c.gridy++;
 				temp++; //Anzahl Knoten zaehlen
 			}
 		}
-		iSubSets = new JScrollPane(CiSubSets);
-		iSubSets.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
-		iSubSets.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		iSubSets.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		iSubSets.setPreferredSize(new Dimension(200,100));
+		iSubgraph = new JScrollPane(CiSubgraphs);
+		iSubgraph.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
+		iSubgraph.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		iSubgraph.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		iSubgraph.setPreferredSize(new Dimension(200,100));
 	}
 	/**
 	 * Build the Tab with values to the corresponding VEdgeTypes
@@ -703,7 +703,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		if (chEdge==null) //neuer Kante, index testen
 		{
 			//Index bereits vergeben ?
-			if (graphref.modifyEdges.getEdge(iEdgeIndex.getValue())!=null) //So einen gibt es schon
+			if (graphref.modifyEdges.get(iEdgeIndex.getValue())!=null) //So einen gibt es schon
 			{
 				JOptionPane.showMessageDialog(this, "<html><p>Erstellen der Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 				return;
@@ -714,7 +714,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 				return;
 			}
 			//Existiert schon eine Kante zwischen den beiden Knoten (ungerichtet) oder gar in die Richtung ?
-			if (graphref.modifyEdges.similarPathEdgeIndex(typeedge, startindex, endindex) > 0) //ähnliche Kante existiert schon Doppelkanten darf es nicht geben
+			if (graphref.modifyEdges.getIndexWithSimilarEdgePath(typeedge, startindex, endindex) > 0) //ähnliche Kante existiert schon Doppelkanten darf es nicht geben
 			{
 				JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Eine Kante zwischen den Knoten existiert bereits.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					
 				return;
@@ -738,7 +738,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		{
 //			Auswertung der neuen Daten, Pruefung auf Korrektheit
 			//Falls sich der Kantenindex geaendert hat darf dieser nicht vergeben sein
-			if ((graphref.modifyEdges.getEdge(iEdgeIndex.getValue())!=null)&&(iEdgeIndex.getValue()!=oldindex)) //So einen gibt es schon
+			if ((graphref.modifyEdges.get(iEdgeIndex.getValue())!=null)&&(iEdgeIndex.getValue()!=oldindex)) //So einen gibt es schon
 			{
 				JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung der Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);
 				return;
@@ -763,9 +763,9 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			}
 			if (CheckType()==null)
 				return;
-			if (graphref.modifyEdges.similarPathEdgeIndex(CheckType(), startindex,endindex) > 0) //do the actual input fields create an edge similar to an existing ?
+			if (graphref.modifyEdges.getIndexWithSimilarEdgePath(CheckType(), startindex,endindex) > 0) //do the actual input fields create an edge similar to an existing ?
 			{
-				if ((!graphref.getMathGraph().isMultipleAllowed())&&(graphref.modifyEdges.similarPathEdgeIndex(CheckType(), startindex,endindex) != oldindex)) //ist nicht die alte Kante
+				if ((!graphref.getMathGraph().isMultipleAllowed())&&(graphref.modifyEdges.getIndexWithSimilarEdgePath(CheckType(), startindex,endindex) != oldindex)) //ist nicht die alte Kante
 				{	
 					JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"ndern der Kante nicht m&ouml;glich.<br><br>Eine Kante zwischen den Knoten existiert bereits.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					
 					return;
@@ -777,30 +777,30 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 				graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,oldindex,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
 			else
 				graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
-			graphref.modifyEdges.removeEdge(oldindex);
+			graphref.modifyEdges.remove(oldindex);
 		}
 		//hinzufuegen
 		VEdge addEdge = CheckType();
-		 graphref.modifyEdges.addEdge(
+		 graphref.modifyEdges.add(
 				 addEdge,
 				 new MEdge(addEdge.getIndex(),startindex, endindex, iValue.getValue(),EdgeName.getText()),
-				 graphref.modifyNodes.getNode(startindex).getPosition(),
-				 graphref.modifyNodes.getNode(endindex).getPosition());
+				 graphref.modifyNodes.get(startindex).getPosition(),
+				 graphref.modifyNodes.get(endindex).getPosition());
 		//Gruppen einbauen
 		int temp = 0;
-		for (int i=0; i<subsetlist.size(); i++)
+		for (int i=0; i<subgraphlist.size(); i++)
 		{
-			if (subsetlist.elementAt(i)!=null) //Ein Untergraph mit dem Index existiert
+			if (subgraphlist.elementAt(i)!=null) //Ein Untergraph mit dem Index existiert
 			{
-				if (SubSetChecks[temp].isSelected())
+				if (SubgraphChecks[temp].isSelected())
 				{
-					graphref.modifySubSets.addEdgetoSubSet(iEdgeIndex.getValue(), i);
+					graphref.modifySubgraphs.addEdgetoSubgraph(iEdgeIndex.getValue(), i);
 				}
 				temp++; //Anzahl Knoten zaehlen
 			}
 		}
 		//Text bauen
-		VEdge e = graphref.modifyEdges.getEdge(iEdgeIndex.getValue());
+		VEdge e = graphref.modifyEdges.get(iEdgeIndex.getValue());
 		e = cText.modifyEdge(e);
 		e = cLine.modifyEdge(e);			
 		if (chEdge!=null)//Change edge, end block
@@ -972,21 +972,21 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 	
 	public void itemStateChanged(ItemEvent event) 
 	{		
-		for (int i=0; i<SubSetChecks.length; i++)
+		for (int i=0; i<SubgraphChecks.length; i++)
 		{
-			if (event.getSource()==SubSetChecks[i])
+			if (event.getSource()==SubgraphChecks[i])
 			{
 				//Ein Zustand hat sich geändert, neue Farbe berechnen
 				Color colour = Color.BLACK;
 				int colourcount = 0;
 				int temp = 0; //zum mitzaehlen
-				for (int j=0; j<subsetlist.size();j++)
+				for (int j=0; j<subgraphlist.size();j++)
 				{
-					if (subsetlist.elementAt(j)!=null)
+					if (subgraphlist.elementAt(j)!=null)
 					{
-						if (SubSetChecks[temp].isSelected())
+						if (SubgraphChecks[temp].isSelected())
 						{
-							Color newc = graphref.modifySubSets.getSubSet(j).getColor();
+							Color newc = graphref.modifySubgraphs.get(j).getColor();
 							int b=colour.getBlue()*colourcount + newc.getBlue();
 							int a=colour.getAlpha()*colourcount + newc.getAlpha();
 							int g=colour.getGreen()*colourcount + newc.getGreen();

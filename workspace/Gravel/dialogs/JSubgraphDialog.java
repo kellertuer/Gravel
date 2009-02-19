@@ -33,20 +33,20 @@ import javax.swing.KeyStroke;
 import view.Gui;
 
 import model.MEdge;
-import model.MSubSet;
+import model.MSubgraph;
 import model.VEdge;
 import model.VGraph;
 import model.VNode;
-import model.VSubSet;
+import model.VSubgraph;
 import model.Messages.GraphMessage;
 
 /**
- *  JSubSetDialog
- *  Dialog for creation an Variation of SubSets
+ *  JSubGraphDialog
+ *  Dialog for creation an Variation of Subgraphs
  *  
  * 	@author Ronny Bergmann 
  */
-public class JSubSetDialog extends JDialog implements ActionListener, ItemListener
+public class JSubgraphDialog extends JDialog implements ActionListener, ItemListener
 {
 	private static final long serialVersionUID = 426L;
 	//Alte Werte beim editieren
@@ -61,77 +61,77 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 	//Der Graph
 	private VGraph graphref;
 	//Die Einfgabefelder
-	private IntegerTextField iSubSetIndex;
-	private TextField iSubSetName, Colorfield;
+	private IntegerTextField iSubgraphIndex;
+	private TextField iSubgraphName, Colorfield;
 	//Beim Editieren zum testen der neuen Werte (im Vergleich zu den alten), Indikator fürs Editieren (==null falls erstellender Dialog)
-	private VSubSet chSubSet;
+	private VSubgraph chSubgraph;
 	//Die Buttons
 	private JButton bOK, bCancel, bChangeColor;
 	
 	/**
-	 * Init the Dialog with Values for creation of a new SubSet
+	 * Init the Dialog with Values for creation of a new VSubgraph
 	 * 
 	 * @param index its new index Index
 	 * @param name	its new Name
 	 * @param color	its color and the
 	 * @param vg	corresponding VGraph
 	 */
-	public JSubSetDialog(int index, String name, Color color, VGraph vg)
+	public JSubgraphDialog(int index, String name, Color color, VGraph vg)
 	{
-		chSubSet = null;
+		chSubgraph = null;
 		oldindex = index;
 		oldname = name;
 		oldcolor = color;
 		CreateDialog(null, vg);
 	}
 	/**
-	 * Init the Dialog for Variation of a Subset
+	 * Init the Dialog for Variation of a VSubgraph
 	 * 
-	 * @param s SubSet in the
+	 * @param s Subgraph in the
 	 * @param vg corresponding VGraph
 	 */
-	public JSubSetDialog(VSubSet s,VGraph vg)
+	public JSubgraphDialog(VSubgraph s,VGraph vg)
 	{
 		CreateDialog(s,vg);
 	}
 	/**
 	 * Create and init the Dialog for a 
-	 * @param s given SubSet
+	 * @param s given Subgraph
 	 * @param vG in a corresponding VGraph
 	 */
-	private void CreateDialog(VSubSet s, VGraph vG)
+	private void CreateDialog(VSubgraph s, VGraph vG)
 	{
 		graphref = vG;
 		oldedges = new BitSet();
 		oldnodes = new BitSet();
-		if ((s!=null)&&(!vG.modifySubSets.getSubSet(s.getIndex()).equals(s))) //In diesem Graphen ist s gar nicht drin
+		if ((s!=null)&&(!vG.modifySubgraphs.get(s.getIndex()).equals(s))) //In diesem Graphen ist s gar nicht drin
 			s = null;
 		if (s==null)
 		{
 			this.setTitle("Neuen Untergraphen erstellen");
-			chSubSet = null;
+			chSubgraph = null;
 		}
 		else
 		{
-			chSubSet = s;
-			oldname = graphref.getMathGraph().getSubSet(s.getIndex()).getName();
+			chSubgraph = s;
+			oldname = graphref.getMathGraph().getSubgraph(s.getIndex()).getName();
 			oldindex = s.getIndex();
 			oldcolor = s.getColor();
 			//Knoten finden
-			Iterator<VNode> nodeiter = graphref.modifyNodes.getNodeIterator();
+			Iterator<VNode> nodeiter = graphref.modifyNodes.getIterator();
 			while (nodeiter.hasNext())
 			{
 				VNode n = nodeiter.next();
-				oldnodes.set(n.getIndex(),graphref.getMathGraph().getSubSet(s.getIndex()).containsNode(n.getIndex()));
+				oldnodes.set(n.getIndex(),graphref.getMathGraph().getSubgraph(s.getIndex()).containsNode(n.getIndex()));
 			}
 			//Kanten finden
-			Iterator <VEdge> edgeiter = graphref.modifyEdges.getEdgeIterator();
+			Iterator <VEdge> edgeiter = graphref.modifyEdges.getIterator();
 			while (edgeiter.hasNext())
 			{
 				VEdge e = edgeiter.next();
-				oldedges.set(e.getIndex(),graphref.getMathGraph().getSubSet(s.getIndex()).containsEdge(e.getIndex()));
+				oldedges.set(e.getIndex(),graphref.getMathGraph().getSubgraph(s.getIndex()).containsEdge(e.getIndex()));
 			}
-			this.setTitle("Eigenschaften des Untergraphen '"+graphref.getMathGraph().getSubSet(s.getIndex()).getName()+"'");	
+			this.setTitle("Eigenschaften des Untergraphen '"+graphref.getMathGraph().getSubgraph(s.getIndex()).getName()+"'");	
 		}
 		
 		Container content = getContentPane();
@@ -144,19 +144,19 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 		c.gridx = 0;
 		content.add(new JLabel("Index"),c);
 		c.gridx = 1;
-		iSubSetIndex = new IntegerTextField();
-		iSubSetIndex.setPreferredSize(new Dimension(200, 20));
+		iSubgraphIndex = new IntegerTextField();
+		iSubgraphIndex.setPreferredSize(new Dimension(200, 20));
 
-		content.add(iSubSetIndex,c);
+		content.add(iSubgraphIndex,c);
 		
 		c.gridy++;
 		c.gridx = 0;
 		content.add(new JLabel("Name"),c);
 		c.gridx = 1;
-		iSubSetName = new TextField();
-		iSubSetName.setPreferredSize(new Dimension(200, 20));
+		iSubgraphName = new TextField();
+		iSubgraphName.setPreferredSize(new Dimension(200, 20));
 		
-		content.add(iSubSetName,c);
+		content.add(iSubgraphName,c);
 		
 		c.gridy++;
 		c.gridx = 0;
@@ -223,8 +223,8 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 		
 		Colorfield.setBackground(oldcolor);
 		//Werte einfuegen
-		iSubSetIndex.setValue(oldindex);
-		iSubSetName.setText(oldname);	
+		iSubgraphIndex.setValue(oldindex);
+		iSubgraphName.setText(oldname);	
 		
 		this.getRootPane().setDefaultButton(bOK);
 		setResizable(false);
@@ -340,10 +340,10 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 		if (event.getSource()==bOK)
 		{
 			//Test, ob die notwendigen Felder ausgefuellt sind, das umfasst einen INdex und einen Namen
-			if ((iSubSetIndex.getValue()==-1)||(iSubSetName.equals("")))
+			if ((iSubgraphIndex.getValue()==-1)||(iSubgraphName.equals("")))
 			{
 				String message = new String();
-				if (chSubSet ==null)
+				if (chSubgraph ==null)
 					message = "<html><p>Erstellen des Untergraphen nicht m"+main.CONST.html_oe+"glich.";
 				else
 					message = "<html><p>"+main.CONST.html_Ae+"ndern des Untergraphen nicht m"+main.CONST.html_oe+"glich.";
@@ -353,29 +353,29 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 			}
 			// Farbe bereits vergeben ?
 			boolean colorgone = false;
-			Iterator<VSubSet> subsetiter = graphref.modifySubSets.getSubSetIterator();
-			while (subsetiter.hasNext())
+			Iterator<VSubgraph> siter = graphref.modifySubgraphs.getIterator();
+			while (siter.hasNext())
 			{
-				if (subsetiter.next().getColor().equals(Colorfield.getBackground())) //Farbe vergeben!
+				if (siter.next().getColor().equals(Colorfield.getBackground())) //Farbe vergeben!
 						colorgone = true;
 			}
-			int SetIndex = iSubSetIndex.getValue();
+			int SetIndex = iSubgraphIndex.getValue();
 			GraphMessage startblock;
-			if (chSubSet==null)
-				startblock = new GraphMessage(GraphMessage.SUBSET, SetIndex, GraphMessage.ADDITION|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS);
+			if (chSubgraph==null)
+				startblock = new GraphMessage(GraphMessage.SUBGRAPH, SetIndex, GraphMessage.ADDITION|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS);
 			else
 			{
 				if (SetIndex!=oldindex) //Index modify
-					startblock = new GraphMessage(GraphMessage.SUBSET, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS);
+					startblock = new GraphMessage(GraphMessage.SUBGRAPH, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS);
 				else
-					startblock = new GraphMessage(GraphMessage.SUBSET, SetIndex, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS);
+					startblock = new GraphMessage(GraphMessage.SUBGRAPH, SetIndex, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS);
 			}	
 			//TESTS
 			//1. Falls der Graph neu ist
-			if (chSubSet==null) //neuer Untergraph, index testen
+			if (chSubgraph==null) //neuer Untergraph, index testen
 			{
 				//Index bereits vergeben ?
-				if (graphref.modifySubSets.getSubSet(SetIndex)!=null) //So einen gibt es schon
+				if (graphref.modifySubgraphs.get(SetIndex)!=null) //So einen gibt es schon
 				{
 					JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Untergraphen Nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index #"+SetIndex+" ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -393,7 +393,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 			{
 				//Auswertung der neuen Daten, Pruefung auf Korrektheit
 				//Falls sich der UGindex geaendert hat darf dieser nicht vergeben sein
-				if ((graphref.modifySubSets.getSubSet(SetIndex)!=null)&&(SetIndex!=oldindex)) //So einen gibt es schon
+				if ((graphref.modifySubgraphs.get(SetIndex)!=null)&&(SetIndex!=oldindex)) //So einen gibt es schon
 				{
 					JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung des Untergraphen nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -407,13 +407,13 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 				//Sonst läßt sich das alles ändern, also entfernen
 				startblock.setMessage("Untergraph #"+SetIndex+" verändert");
 				graphref.pushNotify(startblock);
-				graphref.modifySubSets.removeSubSet(oldindex);
+				graphref.modifySubgraphs.remove(oldindex);
 			}
 			//Und (im zweiten Fall neu, sonst allgemein) einfuegen
 			//Sonst geht alles seiner Wege und wir fuegen den Untergraphen ein
-			VSubSet vs = new VSubSet(SetIndex,Colorfield.getBackground());
-			MSubSet ms = new MSubSet(SetIndex,iSubSetName.getText());
-			graphref.modifySubSets.addSubSet(vs, ms);
+			VSubgraph vs = new VSubgraph(SetIndex,Colorfield.getBackground());
+			MSubgraph ms = new MSubgraph(SetIndex,iSubgraphName.getText());
+			graphref.modifySubgraphs.add(vs, ms);
 			//Einfuegen der Knoten und Kanten in den Untergraphen
 			//Kanten
 			int temp = 0;
@@ -422,7 +422,7 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 				if (edgelist.elementAt(i)!=null) //Eine Kante mit diesem Index existiert und sie ist selektiert
 				{
 					if (edgechecks[temp].isSelected())
-						graphref.modifySubSets.addEdgetoSubSet(i, SetIndex);
+						graphref.modifySubgraphs.addEdgetoSubgraph(i, SetIndex);
 					temp ++; //Anzahl Kanten zaehlen
 				}	
 
@@ -434,12 +434,12 @@ public class JSubSetDialog extends JDialog implements ActionListener, ItemListen
 				if (nodelist.elementAt(i)!=null) //Eine Knoten mit diesem Index existiert und sie ist selektiert
 				{
 					if (nodechecks[temp].isSelected())
-						graphref.modifySubSets.addNodetoSubSet(i, SetIndex);
+						graphref.modifySubgraphs.addNodetoSubgraph(i, SetIndex);
 					temp ++; //Anzahl Knoten zaehlen
 				}	
 				
 			}
-			graphref.pushNotify(new GraphMessage(GraphMessage.SUBSET,GraphMessage.BLOCK_END, GraphMessage.NODE|GraphMessage.EDGE));
+			graphref.pushNotify(new GraphMessage(GraphMessage.SUBGRAPH,GraphMessage.BLOCK_END, GraphMessage.NODE|GraphMessage.EDGE));
 			this.dispose();
 		}
 	}

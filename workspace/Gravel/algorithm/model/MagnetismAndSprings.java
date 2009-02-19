@@ -26,7 +26,7 @@ public class MagnetismAndSprings implements VAlgorithmIF
 	//Direction ist ignored
 	public boolean GraphOkay() 
 	{
-		Iterator<VEdge> edgeiterator = vg.modifyEdges.getEdgeIterator();
+		Iterator<VEdge> edgeiterator = vg.modifyEdges.getIterator();
 		while (edgeiterator.hasNext())
 		{
 			if (edgeiterator.next().getType()!=VEdge.STRAIGHTLINE)
@@ -77,12 +77,12 @@ public class MagnetismAndSprings implements VAlgorithmIF
 	{
 		movement = 0;
 		//Calulate for each node the Force indicated by all edges and nodes
-		Iterator <VNode> mainiterator = vg.modifyNodes.getNodeIterator();
+		Iterator <VNode> mainiterator = vg.modifyNodes.getIterator();
 		while (mainiterator.hasNext())
 		{
 			VNode v = mainiterator.next(); //Actual Node to be moved
 			double force_x=0, force_y=0; //Movement of the node
-			Iterator<VEdge> edgeiterator = vg.modifyEdges.getEdgeIterator();
+			Iterator<VEdge> edgeiterator = vg.modifyEdges.getIterator();
 			while (edgeiterator.hasNext())
 			{
 				VEdge e = edgeiterator.next();
@@ -95,7 +95,7 @@ public class MagnetismAndSprings implements VAlgorithmIF
 					uindex=start;
 				if (uindex!=0) //Edge is connected with u and so a force is added
 				{
-					VNode u = vg.modifyNodes.getNode(uindex);
+					VNode u = vg.modifyNodes.get(uindex);
 					double distance = v.getPosition().distance(u.getPosition());
 					double elength = edgelength; //length the edge wishes to have
 					if (useedgevalue)
@@ -104,7 +104,7 @@ public class MagnetismAndSprings implements VAlgorithmIF
 					force_y += edgestrength * (distance-elength) * (u.getPosition().y-v.getPosition().y)/distance;
 				}
 			}
-			Iterator<VNode> nodeiterator = vg.modifyNodes.getNodeIterator();
+			Iterator<VNode> nodeiterator = vg.modifyNodes.getIterator();
 			while (nodeiterator.hasNext())
 			{
 				VNode u = nodeiterator.next();

@@ -44,7 +44,7 @@ import model.VItem;
 import model.VLoopEdge;
 import model.VNode;
 import model.VStraightLineEdge;
-import model.VSubSet;
+import model.VSubgraph;
 import model.Messages.GraphMessage;
 /**
  * This class provides an UI for modifying all selected Nodes and Edges (if they exist)
@@ -56,7 +56,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 {
 	private static final long serialVersionUID = 1L;
 	VGraph vg;
-	boolean show_position, show_nodeprop, show_edgeprop, show_subsets;
+	boolean show_position, show_nodeprop, show_edgeprop, show_subgraphs;
 	
 	JTabbedPane tabs;
 	//
@@ -105,11 +105,11 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	
 	//viertes Tab - Untergraphen
 	@SuppressWarnings("unused")
-	private JLabel SubSet;
-	private Vector<String> subsetnames;
-	private JCheckBox[] bSubSet;
-	private JScrollPane iSubSets;
-	private JCheckBox bChSubSets;
+	private JLabel lSubgraph;
+	private Vector<String> subgraphnames;
+	private JCheckBox[] bSubgraph;
+	private JScrollPane iSubgraph;
+	private JCheckBox bChSubgraph;
 	
 	
 	private JButton bCancel, bOk;
@@ -136,11 +136,11 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	{
 		vg = graph;
 		//If selected nodes exist and the tab should be shown
-		show_position = translate & vg.modifyNodes.selectedNodeExists();
+		show_position = translate & vg.modifyNodes.hasSelection();
 		//If selected nodes exist and the porperties should be shown
-		show_nodeprop = properties & vg.modifyNodes.selectedNodeExists();
-		show_edgeprop = properties & vg.modifyEdges.selectedEdgeExists();
-		show_subsets = subgraphs & (vg.modifyEdges.selectedEdgeExists() || vg.modifyNodes.selectedNodeExists())&&(vg.getMathGraph().SubSetCount() > 0);
+		show_nodeprop = properties & vg.modifyNodes.hasSelection();
+		show_edgeprop = properties & vg.modifyEdges.hasSelection();
+		show_subgraphs = subgraphs & (vg.modifyEdges.hasSelection() || vg.modifyNodes.hasSelection())&&(vg.getMathGraph().SubgraphCount() > 0);
 		//None of the tabs should be shown, that would be quite wrong
 		setTitle(title);
 		tabs = new JTabbedPane();
@@ -150,8 +150,8 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			tabs.addTab("Knoten",buildNodePropContent());
 		if (show_edgeprop)
 			tabs.addTab("Kanten",buildEdgePropContent());
-		if (show_subsets)
-			tabs.addTab("Untergraphen",buildSubSetContent());
+		if (show_subgraphs)
+			tabs.addTab("Untergraphen",buildSubgraphContent());
 		
 		Container ContentPane = this.getContentPane();
 		ContentPane.removeAll();
@@ -239,8 +239,8 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			fillCommonNodeValues();
 		if (show_edgeprop)
 			fillCommonEdgeValues();
-		if (show_subsets)
-			fillCommonSubSets();
+		if (show_subgraphs)
+			fillCommonSubgraphValues();
 
 		setLocation(p.x,p.y);
 		this.setVisible(true);
@@ -443,7 +443,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	private void fillCommonNodeValues()
 	{
 		//Werte suchen fuer die Initialisierung/Gemeinsame werte der Auswahl
-		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
 		int preNodeSize=-1, preNodeTextSize=-1, preNodeTextDis=-1, preNodeTextRot=-1;
 		//ShowText ist der wert und given sagt, ob der allgemeingültig ist
 		boolean preNodeShowText=false, preNodeShowTextgiven=true,beginning = true;
@@ -588,7 +588,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			cArrow = new CEdgeArrowParameters(null,true); //std values, with checks
 			EdgeTabs.add("Pfeil", cArrow.getContent());
 		}
-		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 		boolean loops=false;
 		while (edgeiter.hasNext())
 		{
@@ -611,7 +611,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	private void fillCommonEdgeValues()
 	{
 		//Werte suchen fuer die Initialisierung/Gemeinsame werte der Auswahl
-		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 		VEdge pre = new VStraightLineEdge(0,0);
 		int preEdgeValue=0;
 		boolean preEdgeShowTextgiven=true,beginning = true, preEdgeTextShowValuegiven=true, preEdgeLineTypegiven=true;
@@ -753,119 +753,119 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	//
 	//
 	/**
-	 * Build the Tab for the Subsets
-	 * @return the subset Container
+	 * Build the Tab for the Subgraphs
+	 * @return the subgraph Container
 	 */
-	private Container buildSubSetContent()
+	private Container buildSubgraphContent()
 	{
-		Container SubSetContent = new Container();
-		SubSetContent.setLayout(new GridBagLayout());
-		Container SubSetList = new Container();
-		SubSetList.setLayout(new GridBagLayout());
+		Container SubgrephContent = new Container();
+		SubgrephContent.setLayout(new GridBagLayout());
+		Container SubgraphList = new Container();
+		SubgraphList.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(0,0,0,0);
 		c.anchor = GridBagConstraints.CENTER;
 		c.gridy = 0;
 		c.gridx = 0;
-		bChSubSets = new JCheckBox("<html><p>Auswahl den Untergraphen zuprdnen:</p></html>");
-		bChSubSets.addActionListener(this);
-		SubSetContent.add(bChSubSets,c);
-		subsetnames = vg.getMathGraph().getSetNames();
+		bChSubgraph = new JCheckBox("<html><p>Auswahl den Untergraphen zuprdnen:</p></html>");
+		bChSubgraph.addActionListener(this);
+		SubgrephContent.add(bChSubgraph,c);
+		subgraphnames = vg.getMathGraph().getSubgraphNames();
 		int temp = 0;
-		for (int i=0; i<subsetnames.size(); i++)
+		for (int i=0; i<subgraphnames.size(); i++)
 		{
-			if (subsetnames.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
+			if (subgraphnames.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			temp ++; //Anzahl Untergraphen zaehlen
 		}
-		this.bSubSet = new JCheckBox[temp];
+		this.bSubgraph = new JCheckBox[temp];
 		temp = 0;
-		for (int i=0; i<subsetnames.size(); i++)
+		for (int i=0; i<subgraphnames.size(); i++)
 		{
-			if (subsetnames.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
+			if (subgraphnames.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				bSubSet[temp] = new JCheckBox(vg.getMathGraph().getSubSet(i).getName());
-				SubSetList.add(bSubSet[temp],c);
+				bSubgraph[temp] = new JCheckBox(vg.getMathGraph().getSubgraph(i).getName());
+				SubgraphList.add(bSubgraph[temp],c);
 				c.gridy++;
 				temp++; //Anzahl Knoten zaehlen
 			}
 		}
 		c.gridy = 1;
-		iSubSets = new JScrollPane(SubSetList);
-		iSubSets.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
-		iSubSets.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		iSubSets.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		iSubSets.setPreferredSize(new Dimension(200,150));
-		SubSetContent.add(iSubSets,c);
-		return SubSetContent;
+		iSubgraph = new JScrollPane(SubgraphList);
+		iSubgraph.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
+		iSubgraph.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		iSubgraph.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		iSubgraph.setPreferredSize(new Dimension(200,150));
+		SubgrephContent.add(iSubgraph,c);
+		return SubgrephContent;
 	}
-	private void fillCommonSubSets()
+	private void fillCommonSubgraphValues()
 	{
-		boolean preSubSetsequal = true;
-		Vector<Boolean> subsets = new Vector<Boolean>(vg.getMathGraph().getSetNames().size());
-		subsets.setSize(vg.getMathGraph().getSetNames().size());
-		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+		boolean preSubgraphsequal = true;
+		Vector<Boolean> subgraphs = new Vector<Boolean>(vg.getMathGraph().getSubgraphNames().size());
+		subgraphs.setSize(vg.getMathGraph().getSubgraphNames().size());
+		Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
 		boolean beginning = true;
 		while (nodeiter.hasNext())
 		{
 			VNode actual = nodeiter.next();
 			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
-				Iterator<VSubSet> subsetiter = vg.modifySubSets.getSubSetIterator();
-				while (subsetiter.hasNext())
+				Iterator<VSubgraph> siter = vg.modifySubgraphs.getIterator();
+				while (siter.hasNext())
 				{
-					VSubSet s = subsetiter.next();
-					if (beginning) //Set the Subsets the first node belongs to...
-						subsets.set(s.getIndex(), new Boolean(vg.getMathGraph().getSubSet(s.getIndex()).containsNode(actual.getIndex())));
+					VSubgraph s = siter.next();
+					if (beginning) //Set the Subgraph the first node belongs to...
+						subgraphs.set(s.getIndex(), new Boolean(vg.getMathGraph().getSubgraph(s.getIndex()).containsNode(actual.getIndex())));
 					else
 					{
-						if (subsets.get(s.getIndex()).booleanValue()!=vg.getMathGraph().getSubSet(s.getIndex()).containsNode(actual.getIndex()))
-							preSubSetsequal = false;
+						if (subgraphs.get(s.getIndex()).booleanValue()!=vg.getMathGraph().getSubgraph(s.getIndex()).containsNode(actual.getIndex()))
+							preSubgraphsequal = false;
 					}
 				}
 				beginning = false;
 			}
 		}
-		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 		while (edgeiter.hasNext())
 		{
 			VEdge actual = edgeiter.next();
 			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
-				Iterator<VSubSet> subsetiter = vg.modifySubSets.getSubSetIterator();
-				while (subsetiter.hasNext())
+				Iterator<VSubgraph> siter = vg.modifySubgraphs.getIterator();
+				while (siter.hasNext())
 				{
-					VSubSet s = subsetiter.next();
-					if (beginning) //Set the Subsets the first edge belongs to (happens if no node selected) belongs to...
-						subsets.set(s.getIndex(), new Boolean(vg.getMathGraph().getSubSet(s.getIndex()).containsEdge(actual.getIndex())));
+					VSubgraph s = siter.next();
+					if (beginning) //Set the Subgraphs the first edge belongs to (happens if no node selected) belongs to...
+						subgraphs.set(s.getIndex(), new Boolean(vg.getMathGraph().getSubgraph(s.getIndex()).containsEdge(actual.getIndex())));
 					else
 					{
-						if (subsets.get(s.getIndex()).booleanValue()!=vg.getMathGraph().getSubSet(s.getIndex()).containsEdge(actual.getIndex()))
-							preSubSetsequal = false;
+						if (subgraphs.get(s.getIndex()).booleanValue()!=vg.getMathGraph().getSubgraph(s.getIndex()).containsEdge(actual.getIndex()))
+							preSubgraphsequal = false;
 					}
 				}
 				beginning = false;
 			}
 		}
-		this.bChSubSets.setSelected(preSubSetsequal);
-		if (preSubSetsequal) //All selected are in the same subsets
+		this.bChSubgraph.setSelected(preSubgraphsequal);
+		if (preSubgraphsequal) //All selected are in the same subgraphs
 		{
 			int position = 0;
-			for (int i=0; i<subsets.size(); i++)
+			for (int i=0; i<subgraphs.size(); i++)
 			{
-				if (subsets.get(i)!=null)
+				if (subgraphs.get(i)!=null)
 				{
-					this.bSubSet[position].setSelected(subsets.get(i).booleanValue());
+					this.bSubgraph[position].setSelected(subgraphs.get(i).booleanValue());
 					position++;
 				}
 			}
 		}
 		else
 		{
-			bChSubSets.setForeground(Color.GRAY);
-			iSubSets.setEnabled(false);
-			for (int i=0; i<bSubSet.length; i++)
+			bChSubgraph.setForeground(Color.GRAY);
+			iSubgraph.setEnabled(false);
+			for (int i=0; i<bSubgraph.length; i++)
 			{
-				bSubSet[i].setEnabled(false);
+				bSubgraph[i].setEnabled(false);
 			}
 		}
 	}
@@ -879,7 +879,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	{
 		x = Math.round(x/2);
 		y = Math.round(y/2);
-		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 		while (edgeiter.hasNext())
 		{
 			VEdge e = edgeiter.next();
@@ -894,7 +894,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	 */
 	private void translate()
 	{
-		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
 		while (nodeiter.hasNext())
 		{
 			VNode t = nodeiter.next();
@@ -940,7 +940,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 
 		//Knoten zaehlen
 		int nodecount = 0;
-		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
 		while (nodeiter.hasNext())
 		{
 			if ((nodeiter.next().getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
@@ -955,7 +955,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		int my = iOriginY.getValue();
 		int mr = iCircleRadius.getValue();
 		double actualdeg = start;
-		nodeiter = vg.modifyNodes.getNodeIterator();
+		nodeiter = vg.modifyNodes.getIterator();
 		while (nodeiter.hasNext()) 
 		{
 			VNode temp = nodeiter.next();
@@ -983,7 +983,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	{ 
 		boolean changed = false;
 		//Set all nodes to the selected values, if they are selected
-		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
 		while (nodeiter.hasNext())
 		{
 			VNode actual = nodeiter.next();
@@ -1014,7 +1014,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	private boolean modifyEdges()
 	{
 		boolean changed = false;
-		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 		while (edgeiter.hasNext())
 		{
 			VEdge actual = edgeiter.next();
@@ -1065,52 +1065,52 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 	//
 	//
 	/**
-	 * modify the selected Edges and Nodes in the SubSets they belong to
+	 * modify the selected Edges and Nodes in the Subgraphs they belong to
 	 * 
 	 * @return true if something was changed, else false
 	 */
-	private boolean modifySubSets()
+	private boolean modifySubgraphs()
 	{
-		if (!bChSubSets.isSelected())
+		if (!bChSubgraph.isSelected())
 			return false; //Don't do it if the user diesn't want to
-		Iterator<VNode> nodeiter = vg.modifyNodes.getNodeIterator();
+		Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
 		while (nodeiter.hasNext())
 		{
 			VNode actual = nodeiter.next();
 			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
-				Vector<String> names = vg.getMathGraph().getSetNames();
+				Vector<String> names = vg.getMathGraph().getSubgraphNames();
 				int position = 0;
 				for (int i=0; i<names.size(); i++)
 				{
-					if (names.get(i)!=null) //SubSet with this index exists
+					if (names.get(i)!=null) //Subgraph with this index exists
 					{
-						if (bSubSet[position].isSelected())
-							vg.modifySubSets.addNodetoSubSet(actual.getIndex(), i);
+						if (bSubgraph[position].isSelected())
+							vg.modifySubgraphs.addNodetoSubgraph(actual.getIndex(), i);
 						else
-							vg.modifySubSets.removeNodefromSubSet(actual.getIndex(), i);
+							vg.modifySubgraphs.removeNodefromSubgraph(actual.getIndex(), i);
 						position++;
 					}
 				}
 			}
 		}
 		//And the same for the edges
-		Iterator<VEdge> edgeiter = vg.modifyEdges.getEdgeIterator();
+		Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 		while (edgeiter.hasNext())
 		{
 			VEdge actual = edgeiter.next();
 			if ((actual.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED)
 			{
-				Vector<String> names = vg.getMathGraph().getSetNames();
+				Vector<String> names = vg.getMathGraph().getSubgraphNames();
 				int position = 0;
 				for (int i=0; i<names.size(); i++)
 				{
-					if (names.get(i)!=null) //SubSet with this index exists
+					if (names.get(i)!=null) //Subgraph with this index exists
 					{
-						if (bSubSet[position].isSelected())
-							vg.modifySubSets.addEdgetoSubSet(actual.getIndex(), i);
+						if (bSubgraph[position].isSelected())
+							vg.modifySubgraphs.addEdgetoSubgraph(actual.getIndex(), i);
 						else
-							vg.modifySubSets.removeEdgefromSubSet(actual.getIndex(), i);
+							vg.modifySubgraphs.removeEdgefromSubgraph(actual.getIndex(), i);
 						position++;
 					}
 				}
@@ -1245,7 +1245,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			if (!checkEdge())
 				return false;
 		}
-		//SubSets don't have to be checked ;) only checkboxes, so no user error possible
+		//Subgraphs don't have to be checked ;) only checkboxes, so no user error possible
 		
 		return true;
 	}
@@ -1274,8 +1274,8 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 				changed |= GraphMessage.NODE;
 		if (show_edgeprop)
 				changed |= GraphMessage.EDGE;
-		if (show_subsets)
-				changed |= GraphMessage.SUBSET;
+		if (show_subgraphs)
+				changed |= GraphMessage.SUBGRAPH;
 
 		GraphMessage startblock = new GraphMessage(changed,GraphMessage.BLOCK_START|GraphMessage.UPDATE);
 		startblock.setMessage("Auswahl verändert");
@@ -1284,8 +1284,8 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			modifyNodes();
 		if (show_edgeprop)
 			modifyEdges();
-		if (show_subsets)
-			modifySubSets();
+		if (show_subgraphs)
+			modifySubgraphs();
 		
 		vg.pushNotify(new GraphMessage(changed,GraphMessage.BLOCK_END));
 		return true;
@@ -1358,17 +1358,17 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			else
 				EdgeValue.setForeground(Color.GRAY);
 		}
-		//SubSet
-		else if (event.getSource()==bChSubSets)
+		//Subgraph elements
+		else if (event.getSource()==bChSubgraph)
 		{
-			if (bChSubSets.isSelected())
-				bChSubSets.setForeground(Color.BLACK);
+			if (bChSubgraph.isSelected())
+				bChSubgraph.setForeground(Color.BLACK);
 			else
-				bChSubSets.setForeground(Color.GRAY);
+				bChSubgraph.setForeground(Color.GRAY);
 			
-			for (int i=0; i<bSubSet.length; i++)
+			for (int i=0; i<bSubgraph.length; i++)
 			{
-				bSubSet[i].setEnabled(bChSubSets.isSelected());
+				bSubgraph[i].setEnabled(bChSubgraph.isSelected());
 			}
 
 		}

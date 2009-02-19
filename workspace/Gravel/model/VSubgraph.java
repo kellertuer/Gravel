@@ -4,14 +4,14 @@ import java.awt.Color;
 import java.util.Comparator;
 
 /**
- * A Visual SubSet contains the index for identification and the color 
+ * A Visual Subgraph contains the index for identification and the color 
  * @author Ronny Bergmannn
  */
-public class VSubSet {
+public class VSubgraph {
 	
-	public static class SubSetIndexComparator implements Comparator<VSubSet>
+	public static class SubgraphIndexComparator implements Comparator<VSubgraph>
 	{
-		public int compare(VSubSet a, VSubSet b) {
+		public int compare(VSubgraph a, VSubgraph b) {
 			if (a.getIndex() < b.getIndex())
 				return -1;
 			if (a.getIndex()==b.getIndex())
@@ -27,13 +27,13 @@ public class VSubSet {
 	//INdex
 	int index;
 	/**
-	 * Init the Subset
+	 * Init the Subgraph
 	 * 
 	 * @param i index
 	 * @param c color
 	 * @param v corresponding VGRaph that is needed for color changes
 	 */
-	public VSubSet(int i, Color c)
+	public VSubgraph(int i, Color c)
 	{
 		index = i;
 		colour = c;
@@ -48,14 +48,14 @@ public class VSubSet {
 		colour = n;
 	}
 	/**
-	 * Clone the actual VSubset, that is return a copy
+	 * Clone the actual VSubgraph, that is return a copy
 	 */
-	public VSubSet clone()
+	public VSubgraph clone()
 	{
-		return new VSubSet(index,colour);
+		return new VSubgraph(index,colour);
 	}
 	/**
-	 * Get actual Color of the Subset
+	 * Get actual Color of the VSubgraph
 	 * @return the color
 	 */
 	public Color getColor()
@@ -63,7 +63,7 @@ public class VSubSet {
 		return colour;
 	}
 	/**
-	 * get the index of the subset
+	 * get the index of the VSubgraph
 	 * @return index
 	 */
 	public int getIndex()

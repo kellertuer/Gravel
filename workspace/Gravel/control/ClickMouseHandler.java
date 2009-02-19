@@ -19,14 +19,14 @@ import javax.swing.JPopupMenu;
 
 import dialogs.JEdgeDialog;
 import dialogs.JNodeDialog;
-import dialogs.JSubSetDialog;
+import dialogs.JSubgraphDialog;
 
 import model.MEdge;
 import model.VEdge;
 import model.VGraph;
 import model.VItem;
 import model.VNode;
-import model.VSubSet;
+import model.VSubgraph;
 import model.Messages.GraphMessage;
 /**
  * Super class for the mouse handler for mouseclicks
@@ -41,7 +41,7 @@ import model.Messages.GraphMessage;
 public abstract class ClickMouseHandler implements MouseListener, ActionListener, Observer
 {
 	// MenüPunkte
-	private Vector<JMenuItem> vSubSetNMenus; // Ein JItem für jedes Set
+	private Vector<JMenuItem> vSubgraphNMenus; // Ein JItem für jedes Set
 	private JPopupMenu BgPopup; // HintergrundPopupMenu
 	private JMenuItem addNode, addSet; // HintergrundMenüpunkte
 	private JPopupMenu NodePopup; // KnotenPopupMenu
@@ -60,7 +60,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 	/**
 	 * Initializes the Mouse Click Handler to a specifig VGraph, where the mouse actions are involved
 	 * 
-	 * this Handler subscribes itself as an Observer of the VGraph to update the Subsetlists
+	 * this Handler subscribes itself as an Observer of the VGraph to update the Subgraphlist
 	 * 
 	 * @param g
 	 */
@@ -70,11 +70,11 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		gp = GeneralPreferences.getInstance();
 		g.addObserver(this);
 		initPopups();
-		updateSubSetList();
+		updateSubgraphList();
 	}
 	/**
 	 * Init all Popup Menus, for the background, the edges and the nodes. 
-	 * This involves the sets ob subsets a node/edge belongs and doesn't belong to
+	 * This involves the subgraphsets, a node/edge belongs and doesn't belong to
 	 *
 	 */
 	private void initPopups() {
@@ -84,7 +84,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		BgPopup.add(addNode);
 		addSet = new JMenuItem("Neuer Untergraph...");
 		addSet.addActionListener(this);
-		vSubSetNMenus = new Vector<JMenuItem>();
+		vSubgraphNMenus = new Vector<JMenuItem>();
 		BgPopup.add(addSet);
 
 		/* Build right mouseclick Node Menu (empty)*/
@@ -105,7 +105,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		NremfromSet.setEnabled(false);
 		NremfromSet.addActionListener(this);
 		NDelSelection = new JMenuItem("Auswahl löschen");
-		NDelSelection.setEnabled(vg.modifyNodes.selectedNodeExists()||vg.modifyEdges.selectedEdgeExists());
+		NDelSelection.setEnabled(vg.modifyNodes.hasSelection()||vg.modifyEdges.hasSelection());
 		NDelSelection.addActionListener(this);	
 		NodePopup = new JPopupMenu();
 		NodePopup.add(Nname);
@@ -133,7 +133,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		EremfromSet.setEnabled(false);
 		EremfromSet.addActionListener(this);
 		EDelSelection = new JMenuItem("Auswahl löschen");
-		EDelSelection.setEnabled(vg.modifyNodes.selectedNodeExists()||vg.modifyEdges.selectedEdgeExists());
+		EDelSelection.setEnabled(vg.modifyNodes.hasSelection()||vg.modifyEdges.hasSelection());
 		EDelSelection.addActionListener(this);	
 		EdgePopup = new JPopupMenu();
 		EdgePopup.add(Ename);
@@ -158,13 +158,13 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		NaddtoSet.setEnabled(false);
 		NremfromSet.removeAll();
 		NremfromSet.setEnabled(false);
-		Iterator<JMenuItem> iter = vSubSetNMenus.iterator(); // durchlaufe alle SetMenüeinträge
+		Iterator<JMenuItem> iter = vSubgraphNMenus.iterator(); // get all Subgraphs
 		while (iter.hasNext()) {
 			JMenuItem t = iter.next();
 			if (t!=null) //Falls ein Eintrag leer ist, behandle ihn nicht.
 			{
 				//Sets fangen mit 1 an die Menüeinträge mit 0
-				if (!(vg.getMathGraph().getSubSet(vSubSetNMenus.indexOf(t)).containsNode(i))) // Knoten nicht enthalten -> hinzufügenMenü
+				if (!(vg.getMathGraph().getSubgraph(vSubgraphNMenus.indexOf(t)).containsNode(i))) // Knoten nicht enthalten -> hinzufügenMenü
 				{
 					NaddtoSet.setEnabled(true); //es gibt einen also gibts auch das Menü
 					NaddtoSet.add(t);
@@ -189,12 +189,12 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		EaddtoSet.setEnabled(false);
 		EremfromSet.removeAll();
 		EremfromSet.setEnabled(false);
-		Iterator<JMenuItem> iter = vSubSetNMenus.iterator(); // durchlaufe alle SetMenueeintraege
+		Iterator<JMenuItem> iter = vSubgraphNMenus.iterator(); // durchlaufe alle SetMenueeintraege
 		while (iter.hasNext()) {
 			JMenuItem t = iter.next();
 			if (t!=null) //Falls ein Index nixht vergeben ist
 			{
-				if (!(vg.getMathGraph().getSubSet(vSubSetNMenus.indexOf(t)).containsEdge(i))) // Knoten nicht enthalten -> hinzufuegenMenue
+				if (!(vg.getMathGraph().getSubgraph(vSubgraphNMenus.indexOf(t)).containsEdge(i))) // Knoten nicht enthalten -> hinzufuegenMenue
 				{
 					EaddtoSet.setEnabled(true); //es gibt einen also gibts auch das Menue
 					EaddtoSet.add(t);
@@ -220,7 +220,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //rausrechnen
 		if ((e.getClickCount()==2)&&(e.getModifiers() == MouseEvent.BUTTON1_MASK))
 		{ //Double Click on Node
-			VNode dcn = vg.modifyNodes.getNodeinRange(p);
+			VNode dcn = vg.modifyNodes.getFirstinRangeOf(p);
 			if (dcn!=null) //Doubleclick really on Node
 			{
 				new JNodeDialog(dcn,vg);
@@ -228,14 +228,14 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		}
 		if ((e.getModifiers() == MouseEvent.BUTTON3_MASK) || (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.CTRL_MASK)) // mit rechts oder strg links
 		{
-			VNode r = vg.modifyNodes.getNodeinRange(p);
+			VNode r = vg.modifyNodes.getFirstinRangeOf(p);
 			VEdge s = vg.getEdgeinRange(p,2.0);
 			if (r != null) {
 				updateNodeSetList(r.getIndex());
 				Nname.setText(vg.getMathGraph().getNode(r.getIndex()).name + " - (#" + r.getIndex() + ")");
-				NaddEdgesTo.setEnabled(vg.modifyNodes.selectedNodeExists());
-				NaddEdgesFrom.setEnabled(vg.modifyNodes.selectedNodeExists());
-				NDelSelection.setEnabled(vg.modifyEdges.selectedEdgeExists()||vg.modifyNodes.selectedNodeExists());
+				NaddEdgesTo.setEnabled(vg.modifyNodes.hasSelection());
+				NaddEdgesFrom.setEnabled(vg.modifyNodes.hasSelection());
+				NDelSelection.setEnabled(vg.modifyEdges.hasSelection()||vg.modifyNodes.hasSelection());
 				selectedNode = r;
 				NodePopup.show(e.getComponent(), e.getX(), e.getY());
 			} 
@@ -245,7 +245,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 				updateEdgeSetList(s.getIndex());
 				MEdge me = vg.getMathGraph().getEdge(s.getIndex());
 				Ename.setText("Value : "+me.Value+" - Index : "+s.getIndex()+"");
-				EDelSelection.setEnabled(vg.modifyEdges.selectedEdgeExists()||vg.modifyNodes.selectedNodeExists());
+				EDelSelection.setEnabled(vg.modifyEdges.hasSelection()||vg.modifyNodes.hasSelection());
 				EdgePopup.show(e.getComponent(), e.getX(),e.getY());	
 			}
 			else //Weder Knoten noch Kante angeklickt -> Background popup
@@ -257,7 +257,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		}
 		if (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.SHIFT_MASK) // mit SHIFTlinks angeklickt, Auswahl erweitern
 		{
-			VNode r = vg.modifyNodes.getNodeinRange(p);
+			VNode r = vg.modifyNodes.getFirstinRangeOf(p);
 			if (r != null) //Clicked on a node -> Select it
 			{
 				if ((r.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED)
@@ -279,37 +279,37 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		}
 	}
 	/**
-	 * If the number of subsets in the VGraph has changed, the SubSetMenus must be updated, to keep all
-	 * known Subsets in here. so this method is evoked from the update method
+	 * If the number of VSubgraphs in the VGraph has changed, the SubgraphMenus must be updated, to keep all
+	 * known Subgraphs in here. so this method is evoked from the update method
 	 *
 	 */
-	public void updateSubSetList()
+	public void updateSubgraphList()
 	{
-		vSubSetNMenus.removeAllElements(); //Untergraphen-Menues aktualisieren
-		Iterator<VSubSet> subsetiter = vg.modifySubSets.getSubSetIterator();
-		while (subsetiter.hasNext())
+		vSubgraphNMenus.removeAllElements(); //Untergraphen-Menues aktualisieren
+		Iterator<VSubgraph> siter = vg.modifySubgraphs.getIterator();
+		while (siter.hasNext())
 		{
-			VSubSet actual = subsetiter.next();
-			JMenuItem t = new JMenuItem(vg.getMathGraph().getSubSet(actual.getIndex()).getName());
+			VSubgraph actual = siter.next();
+			JMenuItem t = new JMenuItem(vg.getMathGraph().getSubgraph(actual.getIndex()).getName());
 			t.addActionListener(this);
-			if ((actual.getIndex()+1)>vSubSetNMenus.size())
+			if ((actual.getIndex()+1)>vSubgraphNMenus.size())
 			{
-				vSubSetNMenus.setSize(actual.getIndex()+1);
+				vSubgraphNMenus.setSize(actual.getIndex()+1);
 			}
-			vSubSetNMenus.set(actual.getIndex(),t);
+			vSubgraphNMenus.set(actual.getIndex(),t);
 		}
 	}	
 	/**
 	 * update is inherited from the Observer Interface and is called if the Graph changes.
-	 * Then the subsetlist ist updated
+	 * Then the subgraphslist ist updated
 	 */
 	public void update(Observable o, Object arg)
 	{
 		GraphMessage m = (GraphMessage)arg;
 			if (m!=null)
-			{ //If we get an GraphMessage and a SUBSET is AFFECTED
-				if ((m.getAffectedElementTypes()&GraphMessage.SUBSET)==GraphMessage.SUBSET)
-					updateSubSetList();
+			{ //If we get an GraphMessage and a SUBGRAPH is AFFECTED
+				if ((m.getAffectedElementTypes()&GraphMessage.SUBGRAPH)==GraphMessage.SUBGRAPH)
+					updateSubgraphList();
 			}
 	}
 	/**
@@ -332,39 +332,37 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 			{
 				c = Color.getHSBColor((float)Math.random(), (float)Math.random(), (float)Math.random());
 				colorgone = false;
-				Iterator<VSubSet> subsetiter = vg.modifySubSets.getSubSetIterator();
-				while (subsetiter.hasNext())
+				Iterator<VSubgraph> siter = vg.modifySubgraphs.getIterator();
+				while (siter.hasNext())
 				{
-					if (subsetiter.next().getColor().equals(c)) //Farbe vergeben!
+					if (siter.next().getColor().equals(c)) //Farbe vergeben!
 							colorgone = true;
 				}
 			} while(colorgone);
-			new JSubSetDialog(vg.getMathGraph().getNextSubSetIndex(),gp.getSubSetName(vg.getMathGraph().getNextSubSetIndex()),c,vg);
+			new JSubgraphDialog(vg.getMathGraph().getNextSubgraphIndex(),gp.getSubgraphName(vg.getMathGraph().getNextSubgraphIndex()),c,vg);
 		}
 		//KnotenMen� :  Hinzuf�gen zu und Entfernen von einem Set
 		//KantenMen� :  Hinzuf�gen zu und Entfernen von einem Set
-		if (vSubSetNMenus.contains(e.getSource())) // dann wurde ein Mengenmen�punkt angew�hlt
+		if (vSubgraphNMenus.contains(e.getSource())) // dann wurde ein Mengenmen�punkt angew�hlt
 		{
 			JMenuItem t = (JMenuItem) (e.getSource()); // wenn der enthalten ist, l��t er sich auch casten
-			//VSubSet chosen = vG.getvSubSets.get(vSubSetNMenus.indexOf(t));
-			//In diesem Fall wars ein Knotenmen� (selectedNode != null)
 			if (selectedNode!=null)
 			{
-				if (vg.getMathGraph().getSubSet(vSubSetNMenus.indexOf(t)).containsNode(selectedNode.getIndex())) // gew�hlt und enth�lt den Knoten => entfernen
+				if (vg.getMathGraph().getSubgraph(vSubgraphNMenus.indexOf(t)).containsNode(selectedNode.getIndex())) // gew�hlt und enth�lt den Knoten => entfernen
 				{
-					vg.modifySubSets.removeNodefromSubSet(selectedNode.getIndex(), vSubSetNMenus.indexOf(t));
+					vg.modifySubgraphs.removeNodefromSubgraph(selectedNode.getIndex(), vSubgraphNMenus.indexOf(t));
 				} else {
-					vg.modifySubSets.addNodetoSubSet(selectedNode.getIndex(), vSubSetNMenus.indexOf(t));
+					vg.modifySubgraphs.addNodetoSubgraph(selectedNode.getIndex(), vSubgraphNMenus.indexOf(t));
 				}
 			}
 			//In diesem Fall wars eine Kante
 			if (selectedEdge!=null)
 			{
-				if (vg.getMathGraph().getSubSet(vSubSetNMenus.indexOf(t)).containsEdge(selectedEdge.getIndex())) // gew�hlt und enth�lt den Knoten => entfernen
+				if (vg.getMathGraph().getSubgraph(vSubgraphNMenus.indexOf(t)).containsEdge(selectedEdge.getIndex())) // gew�hlt und enth�lt den Knoten => entfernen
 				{
-					vg.modifySubSets.removeEdgefromSubSet(selectedEdge.getIndex(), vSubSetNMenus.indexOf(t));
+					vg.modifySubgraphs.removeEdgefromSubgraph(selectedEdge.getIndex(), vSubgraphNMenus.indexOf(t));
 				} else {
-					vg.modifySubSets.addEdgetoSubSet(selectedEdge.getIndex(), vSubSetNMenus.indexOf(t));
+					vg.modifySubgraphs.addEdgetoSubgraph(selectedEdge.getIndex(), vSubgraphNMenus.indexOf(t));
 				}
 			}
 		} 
@@ -382,12 +380,12 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		} 
 		//KnotenMen� : Knoten entfernen
 		if (e.getSource() == Ndelete) {
-			vg.modifyNodes.removeNode(selectedNode.getIndex());
+			vg.modifyNodes.remove(selectedNode.getIndex());
 		}
 		//KantenMen� : L�schen
 		if (e.getSource()==Edelete)
 		{
-			vg.modifyEdges.removeEdge(selectedEdge.getIndex());
+			vg.modifyEdges.remove(selectedEdge.getIndex());
 		}
 		//KantenMen� : Eigenschaften
 		if (e.getSource()==Eproperties)

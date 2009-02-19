@@ -31,7 +31,7 @@ public class MGraph extends Observable
 {	
 	private HashSet<MNode> mNodes;
 	private HashSet<MEdge> mEdges;
-	private HashSet<MSubSet> mSubSets;
+	private HashSet<MSubgraph> mSubgraphs;
 	private boolean directed, allowloops, allowmultiple = false;
 	Lock EdgeLock, NodeLock;
 	/**
@@ -44,7 +44,7 @@ public class MGraph extends Observable
 	{
 		mNodes = new HashSet<MNode>();
 		mEdges = new HashSet<MEdge>();
-		mSubSets = new HashSet<MSubSet>();
+		mSubgraphs = new HashSet<MSubgraph>();
 		EdgeLock = new ReentrantLock();
 		NodeLock = new ReentrantLock();
 		directed = d;
@@ -59,9 +59,9 @@ public class MGraph extends Observable
 	{
 		MGraph clone = new MGraph(directed,allowloops, allowmultiple);
 		//Untergraphen
-		Iterator<MSubSet> n1 = mSubSets.iterator();
+		Iterator<MSubgraph> n1 = mSubgraphs.iterator();
 		while (n1.hasNext())
-			clone.addSubSet(n1.next().clone()); //Jedes Set kopieren
+			clone.addSubgraph(n1.next().clone()); //Jedes Set kopieren
 		//Knoten
 		Iterator<MNode> n2 = mNodes.iterator();
 		while (n2.hasNext())
@@ -70,12 +70,12 @@ public class MGraph extends Observable
 			MNode Nodeclone = new MNode(actualNode.index, actualNode.name);
 			clone.addNode(Nodeclone);
 			//In alle Sets einfuegen
-			n1 = mSubSets.iterator();
+			n1 = mSubgraphs.iterator();
 			while (n1.hasNext())
 			{
-				MSubSet actualSet = n1.next();
+				MSubgraph actualSet = n1.next();
 				if (actualSet.containsNode(actualNode.index))
-					clone.addNodetoSubSet(actualNode.index,actualSet.getIndex()); //Jedes Set kopieren
+					clone.addNodetoSubgraph(actualNode.index,actualSet.getIndex()); //Jedes Set kopieren
 			}
 		}
 		//Analog Kanten
@@ -86,12 +86,12 @@ public class MGraph extends Observable
 			MEdge cEdge = new MEdge(actualEdge.index, actualEdge.StartIndex, actualEdge.EndIndex, actualEdge.Value, actualEdge.name);
 			clone.addEdge(cEdge);
 			//In alle Sets einfuegen
-			n1 = mSubSets.iterator();
+			n1 = mSubgraphs.iterator();
 			while (n1.hasNext())
 			{
-				MSubSet actualSet = n1.next();
+				MSubgraph actualSet = n1.next();
 				if (actualSet.containsEdge(actualEdge.index))
-					clone.addEdgetoSubSet(actualEdge.index,actualSet.getIndex()); //Jedes Set kopieren
+					clone.addEdgetoSubgraph(actualEdge.index,actualSet.getIndex()); //Jedes Set kopieren
 			}
 		}
 		//und zurückgeben
@@ -336,11 +336,11 @@ public class MGraph extends Observable
 				}
 		}
 		finally {EdgeLock.unlock();}
-		//Update Subsets
-		Iterator<MSubSet> iter = mSubSets.iterator();
+		//Update Subgraphs
+		Iterator<MSubgraph> iter = mSubgraphs.iterator();
 		while (iter.hasNext())
 		{
-			MSubSet actual = iter.next();
+			MSubgraph actual = iter.next();
 			if (actual.containsNode(oldi))
 			{
 				actual.removeNode(oldi);
@@ -366,9 +366,17 @@ public class MGraph extends Observable
 		BitSet ergebnis = new BitSet();
 		if (toDel==null)
 			return ergebnis; //Nothing to delete
+		//remove from all Subsets
+		Iterator<MSubgraph> iter = mSubgraphs.iterator();
+		while (iter.hasNext())
+		{
+			MSubgraph actual = iter.next();
+			if (actual.containsNode(i))
+				actual.removeNode(i);
+		}
 		EdgeLock.lock();
 		try
-		{ //Adjazente Kanten finden und
+		{ //Find adjacent edges and save them in the deledges Hashset
 				HashSet<MEdge> deledges = new HashSet<MEdge>();
 				Iterator<MEdge> n2 = mEdges.iterator();
 				while (n2.hasNext())
@@ -546,6 +554,14 @@ public class MGraph extends Observable
 		MEdge toDel = getEdge(i);
 		if (toDel!=null)
 		{
+			//remove from all Subsets
+			Iterator<MSubgraph> iter = mSubgraphs.iterator();
+			while (iter.hasNext())
+			{
+				MSubgraph actual = iter.next();
+				if (actual.containsEdge(i))
+					actual.removeEdge(i);
+			}
 			mEdges.remove(toDel);
 			setChanged();
 			notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.REMOVAL,GraphMessage.EDGE));	
@@ -690,50 +706,49 @@ public class MGraph extends Observable
 	 * Untergraphenmethoden
 	 */
 	/**
-	 * Add a new subset. if the index is already in use, nothing happens
-	 * @param s Mathematical Subset, which should be added, a clone of the parameter is added
+	 * Add a new subgraph. if the index is already in use, nothing happens
+	 * @param s Mathematical Subgraph, which should be added, a clone of the parameter is added
 	 */
-	public void addSubSet(MSubSet s)
+	public void addSubgraph(MSubgraph s)
 	{
 		
-		if (getSubSet(s.getIndex())==null)
+		if (getSubgraph(s.getIndex())==null)
 		{
-			mSubSets.add(s.clone());
+			mSubgraphs.add(s.clone());
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,s.getIndex(),GraphMessage.ADDITION,GraphMessage.SUBSET));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,s.getIndex(),GraphMessage.ADDITION,GraphMessage.SUBGRAPH));	
 
 		}
-		//TODO if Subsetindex already in use -> Exception ?
 	}
 	/**
-	 * Remove a subset from the graph. If it does not exist, nothing happens.
-	 * @param index subset given by id, that should be removed
-	 * @return true if a subset was removed
+	 * Remove a subgraph from the graph. If it does not exist, nothing happens.
+	 * @param index subgraph given by id, that should be removed
+	 * @return true if a subgraph was removed
 	 */
-	public boolean removeSubSet(int index)
+	public boolean removeSubgraph(int index)
 	{
-		MSubSet toDelete = getSubSet(index);
+		MSubgraph toDelete = getSubgraph(index);
 		if (toDelete!=null)
 		{
-			mSubSets.remove(toDelete);
+			mSubgraphs.remove(toDelete);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,index,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,index,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
 			notifyObservers("S"+index);
 			return true;
 		}
 		return false;
 	}
 	/**
-	 * Get the Subset specified by the index. If ist does not exists, the Method returns null
-	 * @param index Inddex of the Subset
-	 * @return the subset with the index, if exists, else null
+	 * Get the Subgraph specified by the index. If ist does not exists, the Method returns null
+	 * @param index Index of the Subgraph
+	 * @return the subgraph with the index, if exists, else null
 	 */
-	public MSubSet getSubSet(int index)
+	public MSubgraph getSubgraph(int index)
 	{
-		Iterator<MSubSet> iter = mSubSets.iterator();
+		Iterator<MSubgraph> iter = mSubgraphs.iterator();
 		while (iter.hasNext())
 		{
-			MSubSet actual = iter.next();
+			MSubgraph actual = iter.next();
 			if (actual.getIndex()==index)
 			{
 				return actual;
@@ -742,14 +757,14 @@ public class MGraph extends Observable
 		return null;
 	}
 	/**
-	 * Get a free subset index
-	 * @return max_subset_index + 1
+	 * Get a free subgraph index
+	 * @return max_subgraph_index + 1
 	 */
-	public int getNextSubSetIndex() {
+	public int getNextSubgraphIndex() {
 		int index = 1;
-		Iterator<MSubSet> n = mSubSets.iterator();
+		Iterator<MSubgraph> n = mSubgraphs.iterator();
 		while (n.hasNext()) {
-			MSubSet temp = n.next();
+			MSubgraph temp = n.next();
 			if (temp.getIndex() >= index) // index vergeben
 			{
 				index = temp.getIndex() + 1;
@@ -758,112 +773,112 @@ public class MGraph extends Observable
 		return index;
 	}
 	/**
-	 * Add a Node to a Subset
-	 * If both node and subset exist
-	 * If the node is already in the subset, no notify is done
+	 * Add a Node to a Subgraph
+	 * If both node and subgraph exist
+	 * If the node is already in the subgraph, no notification is pushed
 	 * @param nodeindex
-	 * @param SetIndex
+	 * @param subgraphindex
 	 */
-	public void addNodetoSubSet(int nodeindex, int SetIndex)
+	public void addNodetoSubgraph(int nodeindex, int subgraphindex)
 	{
 		if (getNode(nodeindex)==null)
 			return;
-		MSubSet s = getSubSet(SetIndex);
+		MSubgraph s = getSubgraph(subgraphindex);
 		if (s==null)
 			return;
-		if (!s.containsNode(nodeindex)) //Change if it is not in the subset yet
+		if (!s.containsNode(nodeindex)) //Change if it is not in the subgraph yet
 		{ 
 			s.addNode(nodeindex);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.NODE));	
 		}
 	}
 	/**
-	 * Removes a node from a subset. If there was a change in the subset (both node an subset exist and the node was in the subset) the return value is true, else false
+	 * Removes a node from a subgraph. If there was a change in the subgraph (both node an subgraph exist and the node was in the subgraph) the return value is true, else false
 	 * @param nodeindex node that should be removed
-	 * @param SetIndex index of subset where the node should be removed
+	 * @param subgraphindex index of subgraph where the node should be removed
 	 */
-	public void removeNodefromSet(int nodeindex, int SetIndex)
+	public void removeNodefromSubgraph(int nodeindex, int subgraphindex)
 	{
-		MSubSet s = getSubSet(SetIndex);
+		MSubgraph s = getSubgraph(subgraphindex);
 		if ((getNode(nodeindex)==null)||(s==null))
 			return;
 		if (s.containsNode(nodeindex))
 		{
 			s.removeNode(nodeindex);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.NODE));	
 		}
 	}
 	/**
-	 * Add an edge to a subset, if both edge and subset exist. If they don't nothing happens
+	 * Add an edge to a subgraph, if both edge and subgraph exist. If they don't nothing happens
 	 * @param edgeindex edge index that should be added
-	 * @param SetIndex subset index where the edge should be added
+	 * @param subgraphindex subgraph index where the edge should be added
 	 */
-	public void addEdgetoSubSet(int edgeindex, int SetIndex)
+	public void addEdgetoSubgraph(int edgeindex, int subgraphindex)
 	{
 		MEdge e = getEdge(edgeindex);
-		MSubSet s = getSubSet(SetIndex);
+		MSubgraph s = getSubgraph(subgraphindex);
 		if ((e==null)||(s==null))
 			return;
 		if (!s.containsEdge(edgeindex))
 		{
 			s.addEdge(edgeindex);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.EDGE));	
 		}
 	}
 	/**
-	 * Removes an edge from a subset, if both exist. If a change is done (edge is also contained in the subset). 
+	 * Removes an edge from a subgraph, if both exist. If a change is done (edge is also contained in the subgraph). 
 	 * If an edge is removed, so there was really a change, it returs true
 	 *
 	 * @param edgeindex Edge to be removed from
-	 * @param SetIndex subset with this index
+	 * @param subgraphindex subgraph with this index
 	 *
-	 * @return true if both edge and subset exist and the edge was in the subset, so it was removed
+	 * @return true if both edge and subgraph exist and the edge was in the subgraph, so it was removed
 	 */
-	public void removeEdgefromSet(int edgeindex, int SetIndex)
+	public void removeEdgefromSubgraph(int edgeindex, int subgraphindex)
 	{
 		MEdge e = getEdge(edgeindex);
-		MSubSet s = getSubSet(SetIndex);
+		MSubgraph s = getSubgraph(subgraphindex);
 		if ((e==null)||(s==null))
 			return;
 		if (s.containsEdge(edgeindex))
 		{
 			s.removeEdge(edgeindex);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.EDGE));	
 		}
 	}
 	/**
-	 * get a new Subset Iterator.
+	 * get a new Subgraph Iterator.
 	 * @return
 	 */
-	public Iterator<MSubSet> getSubSetIterator()
+	public Iterator<MSubgraph> getSubgraphIterator()
 	{
-		return mSubSets.iterator();
+		return mSubgraphs.iterator();
 	}
 	/**
-	 * Get the number of subsets in the mgraph
-	 * @return the number of subsets in the mgraph
+	 * Get the number of subgraphs in the mgraph
+	 * @return the number of subgraphs in the mgraph
 	 */
-	public int SubSetCount() {
-		return mSubSets.size();
+	public int SubgraphCount() {
+		return mSubgraphs.size();
 	}
 	/**
-	 * get a list of the subset names in a vector, where each subset name is stored at it's index
+	 * get a list of the subgraphs names in a vector, where each subgraph name is stored at it's index
 	 * every other component of the vector is null
-	 * @return a Vector of all subset names, 
+	 * @return a Vector of all subgraphs names, 
 	 */	
-	public Vector<String> getSetNames() {
+	public Vector<String> getSubgraphNames() {
 		Vector<String> ret = new Vector<String>();
-		Iterator<MSubSet> s = mSubSets.iterator();
+		Iterator<MSubgraph> s = mSubgraphs.iterator();
 		while (s.hasNext()) {
-			MSubSet actual = s.next();
+			MSubgraph actual = s.next();
 			if ((actual.getIndex() + 1) > ret.size()) {
 				ret.setSize(actual.getIndex() + 1);
 			}
-			ret.set(actual.getIndex(), getSubSet(actual.getIndex()).getName());
+			ret.set(actual.getIndex(), getSubgraph(actual.getIndex()).getName());
 		}
 		return ret;
 	}

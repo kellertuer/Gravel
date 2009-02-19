@@ -24,66 +24,66 @@ import model.Messages.GraphMessage;
  * @author Ronny Bergmann
  *
  */
-public class VSubSetModification extends Observable implements Observer {
+public class VSubgraphSet extends Observable implements Observer {
 
-	private TreeSet<VSubSet> vSubSets;
-//	private Lock SubSetLock; TODO: Think about the need of this lock
+	private TreeSet<VSubgraph> vSubgraphs;
+//	private Lock SubgraphLock; TODO: Think about the need of this lock
 	private MGraph mG;
 	
 	/**
 	 * Create a new Set depending on the MGraph beneath
 	 * @param g
 	 */
-	public VSubSetModification(MGraph g)
+	public VSubgraphSet(MGraph g)
 	{
-		vSubSets = new TreeSet<VSubSet>(new VSubSet.SubSetIndexComparator());
-//		SubSetLock = new ReentrantLock();
+		vSubgraphs = new TreeSet<VSubgraph>(new VSubgraph.SubgraphIndexComparator());
+//		SubgraphLock = new ReentrantLock();
 		mG = g;
 	}
 
 	/**
-	 * Add a new SubSet to the VGraph
-	 * The Index of the msubset is ignored (if differs from VSubSet-Index)
+	 * Add a new Subgraph to the VGraph
+	 * The Index of the MSubgraph is ignored (if differs from VSubgraph-Index)
 	 * 
-	 * The Mathematical SubSet may be used to introduce the new subset with already given stuff
+	 * The MSubgraph may be used to introduce the new subhraph with already given elements
 	 * So if a node in this VGraph exists, that is marked as belonging to the
-	 * MSubSet it gets by adding the new Color added, too
+	 * MSubgraph it gets by adding the new Color added, too
 	 * 
-	 * If a SubSet with same index as VSUbSet exists or one of the arguments in null
+	 * If a Subgraph with same index as VSubgraph exists or one of the arguments in null
 	 * nothing happens
-	 * @paran subset new VSubSet to be added here
-	 * @param msubset new MSubSet to be added in MGraph underneath and used for initialization of SubSet
+	 * @paran subgraph new VSubgraph to be added here
+	 * @param msubgraph new MSubgraph to be added in MGraph underneath and used for initialization of Subgraph
 	 */
-	public void addSubSet(VSubSet subset, MSubSet msubset)
+	public void add(VSubgraph subgraph, MSubgraph msubgraph)
 	{
-		if ((subset==null)||(msubset==null)) //Oneof them Null
+		if ((subgraph==null)||(msubgraph==null)) //Oneof them Null
 				return;
-		if (getSubSet(subset.getIndex())!=null) //SubSet exists?
+		if (get(subgraph.getIndex())!=null) //Subgraph exists?
 			return;
-		mG.addSubSet(msubset); //Add the Subset mathematically - so the math graph is correct now
+		mG.addSubgraph(msubgraph); //Add the Subgraph mathematically - so the math graph is correct now
 		for (int i=0; i<mG.getNextEdgeIndex(); i++)
 		{
-			if ((mG.getEdge(i)!=null)&&(msubset.containsEdge(i)))
+			if ((mG.getEdge(i)!=null)&&(msubgraph.containsEdge(i)))
 			{
 					//Notify Edge about Color Update
 						setChanged();
-						notifyObservers(new GraphColorMessage(GraphColorMessage.EDGE,i,GraphColorMessage.ADDITION,subset.getColor()));
+						notifyObservers(new GraphColorMessage(GraphColorMessage.EDGE,i,GraphColorMessage.ADDITION,subgraph.getColor()));
 			}
 			
 		}
 		for (int i=0; i<mG.getNextNodeIndex(); i++)
 		{
-			if ((mG.getNode(i)!=null)&&(msubset.containsNode(i)))
+			if ((mG.getNode(i)!=null)&&(msubgraph.containsNode(i)))
 			{
 					//Notify Node about Color Update
 						setChanged();
-						notifyObservers(new GraphColorMessage(GraphColorMessage.NODE,i,GraphColorMessage.ADDITION,subset.getColor()));
+						notifyObservers(new GraphColorMessage(GraphColorMessage.NODE,i,GraphColorMessage.ADDITION,subgraph.getColor()));
 			}
 			
 		}
-		vSubSets.add(subset.clone());
+		vSubgraphs.add(subgraph.clone());
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,subset.getIndex(),GraphMessage.ADDITION,GraphMessage.ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraph.getIndex(),GraphMessage.ADDITION,GraphMessage.ALL_ELEMENTS));	
 	}
 	/**
 	 * get the set with index i
@@ -92,10 +92,10 @@ public class VSubSetModification extends Observable implements Observer {
 	 * @return
 	 * 		null, if no set with index i exists, else the set
 	 */
-	public VSubSet getSubSet(int i) {
-		Iterator<VSubSet> s = vSubSets.iterator();
+	public VSubgraph get(int i) {
+		Iterator<VSubgraph> s = vSubgraphs.iterator();
 		while (s.hasNext()) {
-			VSubSet actual = s.next();
+			VSubgraph actual = s.next();
 			if (i == actual.getIndex()) {
 				return actual;
 			}
@@ -107,41 +107,41 @@ public class VSubSetModification extends Observable implements Observer {
 	 * remove a set from the VGraph and remove the Sets color from each node or edge contained in the set
 	 * <br><br>
 	 * if no set exists with given index SetIndex nothing happens
-	 * @param SetIndex
+	 * @param subgraphindex
 	 * 					Index of the set to be deleted
 	 */
-	public void removeSubSet(int SetIndex) {
-		VSubSet toDel = getSubSet(SetIndex);
+	public void remove(int subgraphindex) {
+		VSubgraph toDel = get(subgraphindex);
 		if (toDel==null)
 			return;
 		Iterator<MNode> iterNode = mG.getNodeIterator();
 		while (iterNode.hasNext()) {
 			MNode actual = iterNode.next();
-			if (mG.getSubSet(SetIndex).containsNode(actual.index))
-				removeNodefromSubSet_(actual.index, SetIndex);
+			if (mG.getSubgraph(subgraphindex).containsNode(actual.index))
+				removeNodefromSubgraph_(actual.index, subgraphindex);
 		}
 		Iterator<MEdge> iterEdge = mG.getEdgeIterator();
 		while (iterEdge.hasNext()) {
 			MEdge actual = iterEdge.next();
-			if (mG.getSubSet(SetIndex).containsEdge(actual.index))
-				removeEdgefromSubSet_(actual.index, SetIndex);
+			if (mG.getSubgraph(subgraphindex).containsEdge(actual.index))
+				removeEdgefromSubgraph_(actual.index, subgraphindex);
 		}
-		toDel = getSubSet(SetIndex);
-		vSubSets.remove(toDel);
-		mG.removeSubSet(toDel.getIndex());
+		toDel = get(subgraphindex);
+		vSubgraphs.remove(toDel);
+		mG.removeSubgraph(toDel.getIndex());
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
 	}
 
 	/**
-	 * Set the Color of a Subset to a new color. Returns true, if the color was changed, else false.
-	 * The color is not changed, if another Subset already got that color
-	 * @param index Index of the SubSet, whose color should be changed
+	 * Set the Color of a Subgraph to a new color. Returns true, if the color was changed, else false.
+	 * The color is not changed, if another Subgraph already got that color
+	 * @param index Index of the Subgraph, whose color should be changed
 	 * @param newcolor it should be changed to
 	 */
-	public void setSubSetColor(int index, Color newcolor)
+	public void setColor(int index, Color newcolor)
 	{
-		VSubSet actual=getSubSet(index);
+		VSubgraph actual=get(index);
 		if (actual==null)
 			return;
 		if (actual.getClass().equals(newcolor))
@@ -152,7 +152,7 @@ public class VSubSetModification extends Observable implements Observer {
 		while (mni.hasNext())
 		{
 			MNode n = mni.next();
-			if (mG.getSubSet(index).containsNode(n.index))
+			if (mG.getSubgraph(index).containsNode(n.index))
 			{
 				setChanged();
 				this.notifyObservers(new GraphColorMessage(GraphColorMessage.NODE,n.index,oldcolor,newcolor));
@@ -162,7 +162,7 @@ public class VSubSetModification extends Observable implements Observer {
 		while (mei.hasNext())
 		{
 			MEdge e = mei.next();
-			if (mG.getSubSet(index).containsEdge(e.index))
+			if (mG.getSubgraph(index).containsEdge(e.index))
 			{
 				setChanged();
 				this.notifyObservers(new GraphColorMessage(GraphColorMessage.EDGE,e.index,oldcolor,newcolor));
@@ -175,38 +175,38 @@ public class VSubSetModification extends Observable implements Observer {
 	 * add an Edge to a set
 	 * @param edgeindex
 	 * 			edgeindex
-	 * @param SetIndex
+	 * @param subgraphindex
 	 * 			setindex
 	 * 
-	 * @see MGraph.addEdgetoSet(edgeindex,setindex)
+	 * @see MGraph.addEdgetoSubgraph(edgeindex,setindex)
 	 */
-	public void addEdgetoSubSet(int edgeindex, int SetIndex) {
-		VSubSet actual = getSubSet(SetIndex);
+	public void addEdgetoSubgraph(int edgeindex, int subgraphindex) {
+		VSubgraph actual = get(subgraphindex);
 		if ((mG.getEdge(edgeindex) != null)
 				&& (actual!=null)
-				&& (!mG.getSubSet(SetIndex).containsEdge(edgeindex))) {
+				&& (!mG.getSubgraph(subgraphindex).containsEdge(edgeindex))) {
 			// Mathematisch hinzufuegen
-			mG.addEdgetoSubSet(edgeindex, SetIndex);
+			mG.addEdgetoSubgraph(edgeindex, subgraphindex);
 			// Und der Kantenmenge Bescheid sagen
 			setChanged();
 			notifyObservers(new GraphColorMessage(GraphColorMessage.EDGE,edgeindex,GraphColorMessage.ADDITION,actual.getColor()));
 		}
 		//global notify
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.EDGE));	
 	}
 	/**
 	 * remove an edge from a set
 	 * @param edgeindex
 	 * 				edge index of the edge to be removed 
-	 * @param SetIndex
+	 * @param subgraphindex
 	 * 				set index of the set
 	 */
-	public void removeEdgefromSubSet(int edgeindex, int SetIndex) {
-		removeEdgefromSubSet_(edgeindex,SetIndex);
+	public void removeEdgefromSubgraph(int edgeindex, int subgraphindex) {
+		removeEdgefromSubgraph_(edgeindex,subgraphindex);
 		//Notify Graph
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.EDGE));	
 	}
 	/**
 	 * remove an edge from a set without informing the external observers outside the graph 
@@ -214,14 +214,14 @@ public class VSubSetModification extends Observable implements Observer {
 	 * @param edgeindex
 	 * @param SetIndex
 	 */
-	private void removeEdgefromSubSet_(int edgeindex, int SetIndex)
+	private void removeEdgefromSubgraph_(int edgeindex, int SetIndex)
 	{	
-		VSubSet actual = getSubSet(SetIndex);
+		VSubgraph actual = get(SetIndex);
 		if (actual==null) //Not existent
 			return;
-		if (mG.getSubSet(SetIndex).containsEdge(edgeindex)) 
+		if (mG.getSubgraph(SetIndex).containsEdge(edgeindex)) 
 		{
-			mG.removeEdgefromSet(edgeindex, SetIndex);
+			mG.removeEdgefromSubgraph(edgeindex, SetIndex);
 			//Nodify Edge-Set internal about Change			
 			setChanged();
 			notifyObservers(new GraphColorMessage(GraphColorMessage.EDGE,edgeindex,GraphColorMessage.REMOVAL,actual.getColor()));
@@ -237,20 +237,20 @@ public class VSubSetModification extends Observable implements Observer {
 	 *
 	 * @see MGraph.addNodetoSet(nodeindex,setindex)
 	 */
-	public void addNodetoSubSet(int nodeindex, int SetIndex) {
-		VSubSet actual = getSubSet(SetIndex);
+	public void addNodetoSubgraph(int nodeindex, int SetIndex) {
+		VSubgraph actual = get(SetIndex);
 		if ((mG.getNode(nodeindex) != null)
 				&& (actual!=null)
-				&& (!mG.getSubSet(SetIndex).containsNode(nodeindex))) {
+				&& (!mG.getSubgraph(SetIndex).containsNode(nodeindex))) {
 			// Mathematisch hinzufuegen
-			mG.addNodetoSubSet(nodeindex, SetIndex);
+			mG.addNodetoSubgraph(nodeindex, SetIndex);
 			// Und der Knotenmenge Bescheid sagen
 			setChanged();
 			notifyObservers(new GraphColorMessage(GraphColorMessage.NODE,nodeindex,GraphColorMessage.ADDITION,actual.getColor()));
 		}
 		//global notify
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.NODE));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.NODE));	
 	}
 	/**
 	 * remove a node from a set
@@ -260,10 +260,10 @@ public class VSubSetModification extends Observable implements Observer {
 	 * @param SetIndex
 	 * 				set with this index
 	 */
-	public void removeNodefromSubSet(int nodeindex, int SetIndex) {
-		removeNodefromSubSet_(nodeindex, SetIndex);		
+	public void removeNodefromSubgraph(int nodeindex, int SetIndex) {
+		removeNodefromSubgraph_(nodeindex, SetIndex);		
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBSET,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBSET|GraphMessage.NODE));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.NODE));	
 	}
 	/**
 	 * remove Node from Sub set without informing the observsers
@@ -271,14 +271,14 @@ public class VSubSetModification extends Observable implements Observer {
 	 * @param nodeindex
 	 * @param SetIndex
 	 */
-	private void removeNodefromSubSet_(int nodeindex, int SetIndex)
+	private void removeNodefromSubgraph_(int nodeindex, int SetIndex)
 	{
-		VSubSet actual = getSubSet(SetIndex);
+		VSubgraph actual = get(SetIndex);
 		if (actual==null) //Not existent
 			return;
-		if (mG.getSubSet(SetIndex).containsNode(nodeindex))
+		if (mG.getSubgraph(SetIndex).containsNode(nodeindex))
 		{
-			mG.removeNodefromSet(nodeindex, SetIndex);
+			mG.removeNodefromSubgraph(nodeindex, SetIndex);
 			//Nodify Node-Set internal about Change			
 			setChanged();
 			notifyObservers(new GraphColorMessage(GraphColorMessage.NODE,nodeindex,GraphColorMessage.REMOVAL,actual.getColor()));
@@ -286,13 +286,16 @@ public class VSubSetModification extends Observable implements Observer {
 	}
 
 	/**
-	 * get a new Iterator for the subsets
+	 * get a new Iterator for the VSubgraphs
 	 * @return
-	 * 		an Iterator typed to VSubSet
+	 * 		an Iterator typed to VSubgraphs
 	 */	
-	public Iterator<VSubSet> getSubSetIterator() {
-		return vSubSets.iterator();
+	public Iterator<VSubgraph> getIterator() {
+		return vSubgraphs.iterator();
 	}
 
-	public void update(Observable o, Object arg) {}
+	public void update(Observable o, Object arg) {
+		//Handle node Deletions
+		//Handle Edge Deletions in VGraph
+	}
 }
