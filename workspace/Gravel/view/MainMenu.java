@@ -514,9 +514,9 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 	public void update(Observable arg0, Object arg1) 
 	{
 		GraphMessage m = (GraphMessage)arg1;
-		
 		if (m==null)
 			return;
+		
 		//either Selection changed or was affected
 		if (((m.getAffectedElementTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION)||((m.getModifiedElementTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION))
 		{
@@ -524,21 +524,21 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			mEdModifySelection.setEnabled(graphpart.getVGraph().modifyEdges.hasSelection()||graphpart.getVGraph().modifyNodes.hasSelection());		
 			mEdArrangeSelection.setEnabled(graphpart.getVGraph().modifyNodes.hasSelection());
 		}
-		else if ((m.getModifiedElementTypes()&GraphMessage.DIRECTION)==GraphMessage.DIRECTION) //directed changed
+		if ((m.getModifiedElementTypes()&GraphMessage.DIRECTION)==GraphMessage.DIRECTION) //directed changed
 		{
 	    	if (graphpart.getVGraph().getMathGraph().isDirected())
 	        	mVGDirCh.setText("ungerichtet");
 	        else
 	        	mVGDirCh.setText("gerichtet");        	
 		}
-		else if ((m.getModifiedElementTypes()&GraphMessage.LOOPS)==GraphMessage.LOOPS) //Loops changed
+		if ((m.getModifiedElementTypes()&GraphMessage.LOOPS)==GraphMessage.LOOPS) //Loops changed
 		{
 	    	if (graphpart.getVGraph().getMathGraph().isLoopAllowed())
 	        	mVGLoopCh.setText("entferne Schleifen");
 	        else
 	        	mVGLoopCh.setText("erlaube Schleifen");        	
 		}
-		else if ((m.getModifiedElementTypes()&GraphMessage.MULTIPLE)==GraphMessage.MULTIPLE) //Multiple Edges Changed
+		if ((m.getModifiedElementTypes()&GraphMessage.MULTIPLE)==GraphMessage.MULTIPLE) //Multiple Edges Changed
 		{
 	    	if (graphpart.getVGraph().getMathGraph().isMultipleAllowed())
 	        	mVGMultipleCh.setText("entferne Mehrfachkanten");
@@ -547,5 +547,6 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 		}
 		mEdUndo.setEnabled(GraphHistory.CanUndo());
 		mEdRedo.setEnabled(GraphHistory.CanRedo());
+		this.repaint();
 	}
 }
