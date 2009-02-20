@@ -229,7 +229,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		if ((e.getModifiers() == MouseEvent.BUTTON3_MASK) || (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.CTRL_MASK)) // mit rechts oder strg links
 		{
 			VNode r = vg.modifyNodes.getFirstinRangeOf(p);
-			VEdge s = vg.getEdgeinRange(p,2.0);
+			VEdge s = vg.getEdgeinRangeOf(p,2.0);
 			if (r != null) {
 				updateNodeSetList(r.getIndex());
 				Nname.setText(vg.getMathGraph().modifyNodes.get(r.getIndex()).name + " - (#" + r.getIndex() + ")");
@@ -266,7 +266,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 					r.deselect();
 				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE));
 			} else {
-				VEdge s = vg.getEdgeinRange(p,2.0);
+				VEdge s = vg.getEdgeinRangeOf(p,2.0);
 				if (s != null) 
 				{
 					if ((s.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED)

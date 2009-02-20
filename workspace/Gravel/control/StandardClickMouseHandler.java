@@ -55,7 +55,7 @@ public class StandardClickMouseHandler extends ClickMouseHandler {
 				} else
 					vg.deselect();
 			} else {
-				VEdge s = vg.getEdgeinRange(p,2.0);
+				VEdge s = vg.getEdgeinRangeOf(p,2.0);
 				if (s != null) 
 				{
 					if ((s.getSelectedStatus() & VItem.SELECTED) != VItem.SELECTED) 

@@ -514,6 +514,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 	public void update(Observable arg0, Object arg1) 
 	{
 		GraphMessage m = (GraphMessage)arg1;
+		
 		if (m==null)
 			return;
 		//either Selection changed or was affected

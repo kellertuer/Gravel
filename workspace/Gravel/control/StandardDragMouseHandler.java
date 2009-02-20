@@ -229,7 +229,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 				movingNode=null; //do not start anything
 				firstdrag = true;
 			}
-			VEdge selE = vg.getEdgeinRange(p, 2.0);
+			VEdge selE = vg.getEdgeinRangeOf(p, 2.0);
 			if ((selE!=null)&&((selE.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED))
 			{ //Selected Edge, we move the selection so set the node to one of the edge adjacent nodes
 				movingNode = vg.modifyNodes.get(vg.getMathGraph().modifyEdges.get(selE.getIndex()).StartIndex); 

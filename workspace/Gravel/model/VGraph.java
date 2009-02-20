@@ -280,15 +280,15 @@ public class VGraph extends Observable implements Observer {
 
 		mG = anotherone.mG;
 		mG.pushNotify(
-						new GraphMessage(GraphMessage.ALL_ELEMENTS, //Type
+						new GraphMessage(GraphMessage.ALL, //Type
 										GraphMessage.REPLACEMENT, //Status 
-										GraphMessage.ALL_ELEMENTS) //Affected		
+										GraphMessage.ALL) //Affected		
 		);
 		setChanged();
 		notifyObservers(
-				new GraphMessage(GraphMessage.ALL_ELEMENTS, //Type
+				new GraphMessage(GraphMessage.ALL, //Type
 						GraphMessage.REPLACEMENT, //Status 
-						GraphMessage.ALL_ELEMENTS) //Affected		
+						GraphMessage.ALL) //Affected		
 		);
 	}
 	/**
@@ -458,41 +458,24 @@ public class VGraph extends Observable implements Observer {
 		{	
 			setChanged();
 			//Allowance Updated, affected the edges
-			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE,GraphMessage.EDGE));	
-			Iterator<VNode> n = modifyNodes.getIterator();				
-			while (n.hasNext())
+			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));	
+			BitSet mGremoved = mG.setMultipleAllowed(b);
+			removed = (BitSet) mGremoved.clone();
+			int i = 1;
+			while (mGremoved.cardinality()>0) //Not all VEdges deleted
 			{
-				VNode t = n.next();
-				Iterator<VNode> n2 = modifyNodes.getIterator();
-				while (n2.hasNext())
+				if (mGremoved.get(i)) //Edge with Index i was deleted in mG, so delete in EdgeSet
 				{
-					VNode t2 = n2.next();
-					//if the graph is directed
-					if (((!mG.isDirected())&&(t2.getIndex()<=t.getIndex()))||(mG.isDirected())) //in the nondirected case only half the cases
-					{
-						if (mG.modifyEdges.cardinalityBetween(t.getIndex(), t2.getIndex())>1) //we have to delete
-						{
-							Vector<Integer> multipleedges = mG.modifyEdges.indicesBetween(t.getIndex(), t2.getIndex());
-							int value = mG.modifyEdges.get(multipleedges.firstElement()).Value;
-							//Add up the values and remove the edges from the second to the last
-							Iterator<Integer> iter = multipleedges.iterator();
-							iter.next();
-							while(iter.hasNext())
-							{
-								int nextindex = iter.next();
-								value += mG.modifyEdges.get(nextindex).Value;
-								modifyEdges.remove(nextindex);
-								removed.set(nextindex);
-							}
-							MEdge e = mG.modifyEdges.get(multipleedges.firstElement());
-							e.Value = value;
-							//mG.replaceEdge(e); Notify is pushed below
-						}
-					}					
+					modifyEdges.remove(i);
+					mGremoved.clear(i);
 				}
+				i++;
 			}
-		} //End complicated rebuild
-		if (b!=mG.isMultipleAllowed())
+			setChanged();
+			//Allowance Updated, affected the edges
+			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|GraphMessage.BLOCK_END,GraphMessage.EDGE));	
+		}
+		else if (b!=mG.isMultipleAllowed())
 		{
 			if (mG.setMultipleAllowed(b).cardinality() > 0)
 			{
@@ -500,21 +483,10 @@ public class VGraph extends Observable implements Observer {
 			}
 			setChanged();
 			//Allowance Updated, affected the edges
-			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|GraphMessage.BLOCK_END,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE,GraphMessage.EDGE));	
 		}
 		return removed;
 	}
-	/**
-	 * informs all subscribers about a change. This Method is used to push a notify from outside
-	 * mit dem Oject o als Parameter
-	 */
-	public void pushNotify(Object o) {
-		setChanged();
-		if (o == null)
-			notifyObservers();
-		else
-			notifyObservers(o);
-	}	
 	/**
 	 * get the edge in Range of a given point.
 	 * an edge is in Range, if the distance from the edge-line or line segments to the point p is smaller than the edge width
@@ -525,7 +497,7 @@ public class VGraph extends Observable implements Observer {
 	 * @param variation the variation m may be away from the edge
 	 * @return the first edge in range, if there is one, else null
 	 */
-	public VEdge getEdgeinRange(Point m, double variation) {
+	public VEdge getEdgeinRangeOf(Point m, double variation) {
 		variation *=(float)GeneralPreferences.getInstance().getIntValue("vgraphic.zoom")/100; //jop is gut
 		Iterator<VEdge> n = modifyEdges.getIterator();
 		while (n.hasNext()) {
@@ -624,14 +596,21 @@ public class VGraph extends Observable implements Observer {
 					else
 						me = new MEdge(i,Start.getIndex(),temp.getIndex(),GeneralPreferences.getInstance().getIntValue("edge.value"),GeneralPreferences.getInstance().getEdgeName(i, Start.getIndex(), temp.getIndex()));
 					
-						modifyEdges.add(
-								new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), 
-								me,
-								Start.getPosition(),
-								temp.getPosition());
+						modifyEdges.add(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), me,	Start.getPosition(), temp.getPosition());
 				}
 		}
 		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END));
+	}
+	/**
+	 * informs all subscribers about a change. This Method is used to push a notify from outside
+	 * mit dem Oject o als Parameter
+	 */
+	public void pushNotify(Object o) {
+		setChanged();
+		if (o == null)
+			notifyObservers();
+		else
+			notifyObservers(o);
 	}
 	public void update(Observable o, Object arg) 
 	{

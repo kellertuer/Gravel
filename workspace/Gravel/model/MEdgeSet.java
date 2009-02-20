@@ -266,7 +266,6 @@ public class MEdgeSet extends Observable implements Observer {
 	{
 		return mEdges.iterator();
 	}
-	
 	private void handleNodeUpdate(MGraphMessage mm)
 	{
 		int mod = mm.getModificationType();
@@ -302,7 +301,6 @@ public class MEdgeSet extends Observable implements Observer {
 	 * every other component of the vector is null
 	 * @return a Vector of all subgraphs names, 
 	 */	
-
 	public void update(Observable o, Object arg) {
 		if (!(arg instanceof MGraphMessage))
 			return; //Only handle internal Messages

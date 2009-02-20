@@ -170,7 +170,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		
 		VEdge inrangeE;
 		if (vg.getMathGraph().isDirected())
-			inrangeE = vg.getEdgeinRange(p,2.0d);
+			inrangeE = vg.getEdgeinRangeOf(p,2.0d);
 		else
 			inrangeE=null;
 		
@@ -180,7 +180,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		
 		if ((!alt)&&(!shift))
 		{// insgesamt auf dem Hintergrund ohne shift und ohne alt
-			if ((inrangeN==null)&&(vg.getEdgeinRange(p,2.0d)==null)&&(cpnonactive))
+			if ((inrangeN==null)&&(vg.getEdgeinRangeOf(p,2.0d)==null)&&(cpnonactive))
 					selstart = MouseOffSet;	
 		}
 		else if ((alt)&&(!shift))
@@ -189,13 +189,13 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 			movingEdge = inrangeE;
 			altwaspressed = true;
 			//Both Null and no Controllpoint ?
-			if ((inrangeN==null)&&(vg.getEdgeinRange(p,2.0d)==null)&&(cpnonactive))
+			if ((inrangeN==null)&&(vg.getEdgeinRangeOf(p,2.0d)==null)&&(cpnonactive))
 				selstart = MouseOffSet;	
 		}
 		else if ((!alt)&&(shift))
 		{
 			shiftwaspressed=true;
-			if ((inrangeN==null)&&(vg.getEdgeinRange(p,2.0d)==null)&&(cpnonactive))
+			if ((inrangeN==null)&&(vg.getEdgeinRangeOf(p,2.0d)==null)&&(cpnonactive))
 				selstart = MouseOffSet;				
 		}
 		else

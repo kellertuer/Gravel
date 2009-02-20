@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 
 import model.MEdge;
 import model.MNode;
+import model.VEdge;
 import model.VGraph;
 import model.VItem;
 import model.VLoopEdge;
@@ -175,12 +176,30 @@ public class OCMDragMouseHandler extends DragMouseHandler
 					if ((StartNode.getIndex()==EndNode.getIndex())&&(vg.getMathGraph().isLoopAllowed()))
 					{
 						VLoopEdge t = new VLoopEdge(i,gp.getIntValue("edge.width"),gp.getIntValue("edge.looplength"),gp.getIntValue("edge.loopdirection"),(double)gp.getIntValue("edge.loopproportion")/100.0d,gp.getBoolValue("edge.loopclockwise"));
-						vg.modifyEdges.add(t, m,StartNode.getPosition(), EndNode.getPosition());							
-						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
+						if (vg.modifyEdges.getIndexWithSimilarEdgePath(t, m.StartIndex,m.EndIndex)==0) //No Similar Edge existsmedge.StartIndex,medge.EndIndex))
+							{
+								vg.modifyEdges.add(t, m,StartNode.getPosition(), EndNode.getPosition());							
+								vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
+							}
+						else
+						{
+							System.err.println("OCMDrag.MouseReleased: Loop - Similar Edge exists, none added.");
+							vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_ABORT|GraphMessage.BLOCK_END,GraphMessage.EDGE|GraphMessage.NODE));							
+						}
 					}
 					else if (StartNode.getIndex()!=EndNode.getIndex())
-					{	vg.modifyEdges.add(new VStraightLineEdge(i,gp.getIntValue("edge.width")), m, StartNode.getPosition(), EndNode.getPosition());
-						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
+					{	
+						VEdge s = new VStraightLineEdge(i,gp.getIntValue("edge.width"));
+						if (vg.modifyEdges.getIndexWithSimilarEdgePath(s, m.StartIndex,m.EndIndex)==0) //No Similar Edge existsmedge.StartIndex,medge.EndIndex))
+						{
+							vg.modifyEdges.add(s, m, StartNode.getPosition(), EndNode.getPosition());
+							vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
+						}
+						else
+						{
+							System.err.println("OCMDrag.MouseReleased: Straight - Similar Edge exists, none added.");
+							vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_ABORT|GraphMessage.BLOCK_END,GraphMessage.EDGE|GraphMessage.NODE));							
+						}
 					}
 				}
 				else if (DragNode!=null)
