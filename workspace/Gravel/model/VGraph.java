@@ -36,7 +36,7 @@ import model.Messages.GraphMessage;
  */
 public class VGraph extends Observable implements Observer {
 
-	private MGraph mG;
+	MGraph mG;
 	public VNodeSet modifyNodes;
 	public VEdgeSet modifyEdges;
 	public VSubgraphSet modifySubgraphs;
@@ -123,15 +123,13 @@ public class VGraph extends Observable implements Observer {
 	{
 		BitSet removed = new BitSet();
 		if (d==mG.isDirected())
-			return removed; //nicht geändert
-		//Auf gerihctet umstellen ist kein Problem. 
+			return removed;
 		if (!d) //also falls auf ungerichtet umgestellt wird
 		{
+			setChanged();
+			notifyObservers(new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION,GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.EDGE));
 			if (!mG.isMultipleAllowed()) //Ist auch nur ein Problem, wenn keine Mehrfachkanten erlaubt sind
 			{
-				//modifyNodes.NodeLock.lock(); //Knoten finden
-//				try
-//				{
 					Iterator<VNode> n = modifyNodes.getIterator();
 					while (n.hasNext())
 					{
@@ -151,19 +149,14 @@ public class VGraph extends Observable implements Observer {
 									int e2 = t2tot.firstElement();
 									MEdge m = mG.modifyEdges.get(e2);
 									m.Value = mG.modifyEdges.get(e2).Value+mG.modifyEdges.get(e1).Value;
-								//	mG.replaceEdge(m); Notify is pushed for MGraph at the end of the method
 									modifyEdges.remove(e1);
 									removed.set(e1);
 								}
 							} //End no duplicate
 						}
 					}
-	//			}	
-	//			finally {modifyNodes.NodeLock.unlock();}
-				if (mG.setDirected(d).cardinality() > 0)
-				{
-					System.err.println("DEBUG ; Beim gerichtet Setzen läuft was falsch");
-				} 				
+					if (mG.setDirected(d).cardinality() > 0)
+						System.err.println("DEBUG ; Beim gerichtet Setzen läuft was falsch");
 			} //end of if !allowedmultiple
 			else //multiple allowed - the other way around
 			{
@@ -207,17 +200,19 @@ public class VGraph extends Observable implements Observer {
 					Iterator<VEdge> e3 = toDelete.iterator();
 					while (e3.hasNext())
 						modifyEdges.remove_(e3.next().getIndex());
-		//		} finally{modifyEdges..unlock();}
+					if (mG.setDirected(d).cardinality() > 0)
+						System.err.println("DEBUG ; Beim gerichtet Setzen läuft was falsch");
 			} //end of deleting similar edges in multiple directed graphs
+			setChanged();
+			notifyObservers(new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION,GraphMessage.UPDATE|GraphMessage.BLOCK_END, GraphMessage.EDGE));
 		}//end if !d
 		else //undirected
+		{
 			mG.setDirected(d); //change
 		//im MGraph auch noch
 		setChanged();
-		notifyObservers(
-				new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION, //Type
-								GraphMessage.UPDATE) //Status 
-			);
+		notifyObservers(new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION,GraphMessage.UPDATE, GraphMessage.EDGE));
+		}
 		return removed;
 	}
 	/**
@@ -445,47 +440,6 @@ public class VGraph extends Observable implements Observer {
 				minimum.y = edgemax.y;
 		}
 		return minimum;
-	}
-	/**
-	 * Set the possibility of multiple edges to the new value
-	 * If multiple edges are disabled, the multiple edges are removed and the edge values between two nodes are added
-	 * @param a
-	 */
-	public BitSet setMultipleAllowed(boolean b)
-	{
-		BitSet removed = new BitSet();
-		if ((mG.isMultipleAllowed())&&(!b)) //Changed from allowed to not allowed, so remove all multiple
-		{	
-			setChanged();
-			//Allowance Updated, affected the edges
-			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));	
-			BitSet mGremoved = mG.setMultipleAllowed(b);
-			removed = (BitSet) mGremoved.clone();
-			int i = 1;
-			while (mGremoved.cardinality()>0) //Not all VEdges deleted
-			{
-				if (mGremoved.get(i)) //Edge with Index i was deleted in mG, so delete in EdgeSet
-				{
-					modifyEdges.remove(i);
-					mGremoved.clear(i);
-				}
-				i++;
-			}
-			setChanged();
-			//Allowance Updated, affected the edges
-			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|GraphMessage.BLOCK_END,GraphMessage.EDGE));	
-		}
-		else if (b!=mG.isMultipleAllowed())
-		{
-			if (mG.setMultipleAllowed(b).cardinality() > 0)
-			{
-				System.err.println("DEBUG : AllowMultiple set to false ERROR on that");
-			}
-			setChanged();
-			//Allowance Updated, affected the edges
-			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE,GraphMessage.EDGE));	
-		}
-		return removed;
 	}
 	/**
 	 * get the edge in Range of a given point.

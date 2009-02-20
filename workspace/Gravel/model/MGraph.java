@@ -132,12 +132,16 @@ public class MGraph extends Observable implements Observer
 	public BitSet setDirected(boolean d)
 	{
 		BitSet removed = new BitSet();
+		int endstatus=0;
 		if (d==directed)
 			return removed; //nicht geändert
 		//Auf gerihctet umstellen ist kein Problem. 
 		if ((!d)&&(!allowmultiple)) //if multiple edges are allowed we don't need to delete them
 									//auf ungerichtet umstellen, existieren Kanten i->j und j->i so lösche eine
 		{
+			setChanged();
+			notifyObservers(new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
+			endstatus=GraphMessage.BLOCK_END;
 			Iterator<MNode> n = modifyNodes.getIterator();				
 			while (n.hasNext())
 			{
@@ -168,10 +172,7 @@ public class MGraph extends Observable implements Observer
 		setChanged();
 		notifyObservers( new MGraphMessage(MGraphMessage.DIRECTION,d));
 		setChanged();
-		notifyObservers(
-				new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION, //Type
-								GraphMessage.UPDATE) //Status 
-			);
+		notifyObservers(new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION,GraphMessage.UPDATE|endstatus,GraphMessage.EDGE));
 		return removed;
 	}
 	/**
@@ -189,8 +190,12 @@ public class MGraph extends Observable implements Observer
 	public BitSet setLoopsAllowed(boolean a) 
 	{
 		BitSet removed = new BitSet();
+		int endstatus=0; //Block end or not ?
 		if ((allowloops)&&(!a)) //disbabling
 		{
+			setChanged();
+			notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));	
+			endstatus=GraphMessage.BLOCK_END;
 			HashSet<MEdge> deledges = new HashSet<MEdge>();
 			Iterator<MEdge> n2 = modifyEdges.getIterator();
 			while (n2.hasNext())
@@ -208,7 +213,7 @@ public class MGraph extends Observable implements Observer
 		setChanged();
 		notifyObservers( new MGraphMessage(MGraphMessage.LOOPS,a));
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE,GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE|endstatus,GraphMessage.EDGE));	
 		return removed;
 	}
 	/**
@@ -227,8 +232,12 @@ public class MGraph extends Observable implements Observer
 	public BitSet setMultipleAllowed(boolean a) 
 	{
 		BitSet removed = new BitSet();
+		int endstatus=0; //No End_BlockMessage
 		if ((allowmultiple)&&(!a)) //Changed from allowed to not allowed, so remove all multiple
 		{	
+			setChanged();
+			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));	
+			endstatus=GraphMessage.BLOCK_END;
 			Iterator<MNode> n = modifyNodes.getIterator();				
 			while (n.hasNext())
 			{
@@ -264,7 +273,7 @@ public class MGraph extends Observable implements Observer
 		setChanged();
 		notifyObservers( new MGraphMessage(MGraphMessage.MULTIPLE,a));
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE,GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|endstatus,GraphMessage.EDGE));	
 		return removed;
 	}
 	public void update(Observable o, Object arg) {

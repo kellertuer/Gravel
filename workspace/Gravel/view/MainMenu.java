@@ -458,11 +458,11 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
             			int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Wirklich umformen in einen Graphen ohne Mehrfachkanten ?<br>Dabei werden alle Mehrfachkanten zwischen Knoten auf eine Kante reduziert.","Umformen bestätigen",JOptionPane.YES_NO_OPTION);
             	   		if (n==JOptionPane.YES_OPTION)
             	   		{
-            	   			graphpart.getVGraph().setMultipleAllowed(false);
+            	   			graphpart.getVGraph().modifyEdges.setMultipleAllowed(false);
             	   		}
             	   	}
             	   	else
-            	   		graphpart.getVGraph().setMultipleAllowed(true);
+            	   		graphpart.getVGraph().modifyEdges.setMultipleAllowed(true);
                	} else	
 
     	    if (item == mAVTest)

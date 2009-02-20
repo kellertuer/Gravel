@@ -59,8 +59,11 @@ public class VEdgeSet extends Observable implements Observer {
 	public BitSet setLoopsAllowed(boolean b)
 	{
 		BitSet removed = new BitSet();
-		if ((mG.isLoopAllowed())&&(!b)) //disbabling
+		if ((mG.isLoopAllowed())&&(!b)) //disbabling loops, so delete Doubles
 		{
+			setChanged();
+			//Loops deletion start
+			notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));	
 			EdgeLock.lock();
 			try
 			{
@@ -84,8 +87,11 @@ public class VEdgeSet extends Observable implements Observer {
 					remove(n3.next().getIndex());
 				}
 			} finally {EdgeLock.unlock();}
-		}	
-		if (b!=mG.isLoopAllowed())
+			setChanged();
+			//Loops deletion end
+			notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE|GraphMessage.BLOCK_END,GraphMessage.EDGE));	
+		}
+		else if (b!=mG.isLoopAllowed())
 		{
 			if (mG.setLoopsAllowed(b).cardinality() > 0)
 			{
@@ -94,6 +100,48 @@ public class VEdgeSet extends Observable implements Observer {
 			setChanged();
 			//Loops done, update Edges
 			notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE,GraphMessage.EDGE));	
+		}
+		return removed;
+	}
+	/**
+	 * Set the possibility of multiple edges to the new value
+	 * If multiple edges are disabled, the multiple edges are removed and the edge values between two nodes are added
+	 * @param b TODO
+	 * @param a
+	 */
+	public BitSet setMultipleAllowed(boolean b)
+	{
+		BitSet removed = new BitSet();
+		if ((mG.isMultipleAllowed())&&(!b)) //Changed from allowed to not allowed, so remove all multiple
+		{	
+			setChanged();
+			//Allowance Updated, affected the edges
+			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));	
+			BitSet mGremoved = mG.setMultipleAllowed(b);
+			removed = (BitSet) mGremoved.clone();
+			int i = 1;
+			while (mGremoved.cardinality()>0) //Not all VEdges deleted
+			{
+				if (mGremoved.get(i)) //Edge with Index i was deleted in mG, so delete in EdgeSet
+				{
+					remove(i);
+					mGremoved.clear(i);
+				}
+				i++;
+			}
+			setChanged();
+			//Allowance Updated, affected the edges
+			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|GraphMessage.BLOCK_END,GraphMessage.EDGE));	
+		}
+		else if (b!=mG.isMultipleAllowed())
+		{
+			if (mG.setMultipleAllowed(b).cardinality() > 0)
+			{
+				System.err.println("DEBUG : AllowMultiple set to false ERROR on that");
+			}
+			setChanged();
+			//Allowance Updated, affected the edges
+			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE,GraphMessage.EDGE));	
 		}
 		return removed;
 	}
