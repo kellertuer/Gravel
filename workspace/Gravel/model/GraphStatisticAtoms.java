@@ -8,6 +8,7 @@ import java.util.Observer;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 import view.VGraphic;
@@ -67,7 +68,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		vgc = g;
 		vg = vgc.getVGraph();
 		vg.addObserver(this);
-		update(vg,new GraphMessage(GraphMessage.GRAPH_ALL_ELEMENTS,GraphMessage.ADDITION,GraphMessage.GRAPH_ALL_ELEMENTS));
+		update(vg,new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.ADDITION,GraphConstraints.GRAPH_ALL_ELEMENTS));
 	}
 	/**
 	 * Get the Value of an Atom Value, if there is no Value with the given Name, NaN is returned
@@ -305,12 +306,12 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 	public void update(Observable arg0, Object arg1) 
 	{	
 		GraphMessage m = (GraphMessage)arg1;
-		if ((m.getModification()&GraphMessage.BLOCK_END)==GraphMessage.BLOCK_END) //Block ends with this Message
+		if ((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END) //Block ends with this Message
 		{
 			if (blockdepth > 0)
 				blockdepth--;
 		}
-		else if ((m.getModification()&GraphMessage.BLOCK_START)==GraphMessage.BLOCK_START)
+		else if ((m.getModification()&GraphConstraints.BLOCK_START)==GraphConstraints.BLOCK_START)
 		{
 				blockdepth++;
 			return;

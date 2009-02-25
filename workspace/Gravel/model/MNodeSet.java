@@ -8,6 +8,7 @@ import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 import model.Messages.MGraphMessage;
 
@@ -46,7 +47,7 @@ public class MNodeSet extends Observable implements Observer {
 			mNodes.add(m);
 			//No internal message
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.NODE,m.index,GraphMessage.ADDITION));	
+			notifyObservers(new GraphMessage(GraphConstraints.NODE,m.index,GraphConstraints.ADDITION));	
 		} 
 		finally {NodeLock.unlock();}
 	}
@@ -86,10 +87,10 @@ public class MNodeSet extends Observable implements Observer {
 		mNodes.remove(toDel);
 		//Notify all Edges and Subsets about removal - MGraph INternal
 		setChanged();
-		notifyObservers(new MGraphMessage(MGraphMessage.NODE,i,MGraphMessage.REMOVAL));
+		notifyObservers(new MGraphMessage(GraphConstraints.NODE,i,GraphConstraints.REMOVAL));
 		//global notify
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.REMOVAL,GraphMessage.GRAPH_ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphConstraints.NODE,i,GraphConstraints.REMOVAL,GraphConstraints.GRAPH_ALL_ELEMENTS));	
 		return;
 	}
 	/**
@@ -108,7 +109,7 @@ public class MNodeSet extends Observable implements Observer {
 			mNodes.add(node);
 			//Only External because the internal integrity is not affected
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.NODE,node.index,GraphMessage.UPDATE,GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphConstraints.NODE,node.index,GraphConstraints.UPDATE,GraphConstraints.NODE));	
 		} 
 		finally
 		{NodeLock.unlock();}		
@@ -129,12 +130,12 @@ public class MNodeSet extends Observable implements Observer {
 			return; //can't change
 		//Notify adjacent edges and Subsets
 		setChanged();
-		notifyObservers(new MGraphMessage(MGraphMessage.NODE, newi, oldi, MGraphMessage.INDEXCHANGED));
+		notifyObservers(new MGraphMessage(GraphConstraints.NODE, newi, oldi, GraphConstraints.INDEXCHANGED));
 		//And Change the oldnode aswell
 		oldn.index=newi;
 		replace(newn);
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE, GraphMessage.INDEXCHANGED, GraphMessage.GRAPH_ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphConstraints.NODE, GraphConstraints.INDEXCHANGED, GraphConstraints.GRAPH_ALL_ELEMENTS));	
 	}
 	/**
 	 * @return max node index +1

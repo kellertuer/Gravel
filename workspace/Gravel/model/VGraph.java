@@ -22,6 +22,7 @@ import java.util.Vector;
 
 import model.VEdge;
 import model.VNode;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 /**
  * VGraph encapsulates an MGraph and keeps visual information about every node, edge and subgraphs in the MGraph
@@ -67,7 +68,7 @@ public class VGraph extends Observable implements Observer {
 		modifyNodes.deselect();
 		modifyEdges.deselect();
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE));
+		notifyObservers(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
 	}
 	/**
 	 * deletes all selected Nodes and Edges. That means, that also all incident Edges of selected Nodes are deleted
@@ -77,9 +78,9 @@ public class VGraph extends Observable implements Observer {
 	{
 		setChanged();
 		notifyObservers(
-			new GraphMessage(GraphMessage.SELECTION|GraphMessage.NODE|GraphMessage.EDGE, //Changed
-							GraphMessage.REMOVAL|GraphMessage.BLOCK_START, //Status 
-							GraphMessage.NODE|GraphMessage.EDGE|GraphMessage.SELECTION) //Affected		
+			new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE, //Changed
+							GraphConstraints.REMOVAL|GraphConstraints.BLOCK_START, //Status 
+							GraphConstraints.NODE|GraphConstraints.EDGE|GraphConstraints.SELECTION) //Affected		
 			);
 		Iterator<VNode> n = modifyNodes.getIterator();
 		HashSet<VNode> selected = new HashSet<VNode>();
@@ -107,9 +108,9 @@ public class VGraph extends Observable implements Observer {
 		}
 		setChanged();
 		notifyObservers(
-			new GraphMessage(GraphMessage.SELECTION|GraphMessage.NODE|GraphMessage.EDGE, //Changed
-							GraphMessage.REMOVAL|GraphMessage.BLOCK_END, //Status 
-							GraphMessage.NODE|GraphMessage.EDGE|GraphMessage.SELECTION) //Affected		
+			new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE, //Changed
+							GraphConstraints.REMOVAL|GraphConstraints.BLOCK_END, //Status 
+							GraphConstraints.NODE|GraphConstraints.EDGE|GraphConstraints.SELECTION) //Affected		
 		);		
 	}
 	/**
@@ -127,7 +128,7 @@ public class VGraph extends Observable implements Observer {
 		if (!d) //also falls auf ungerichtet umgestellt wird
 		{
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION,GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.EDGE));
+			notifyObservers(new GraphMessage(GraphConstraints.EDGE|GraphConstraints.DIRECTION,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, GraphConstraints.EDGE));
 			if (!mG.isMultipleAllowed()) //Ist auch nur ein Problem, wenn keine Mehrfachkanten erlaubt sind
 			{
 					Iterator<VNode> n = modifyNodes.getIterator();
@@ -204,14 +205,14 @@ public class VGraph extends Observable implements Observer {
 						System.err.println("DEBUG ; Beim gerichtet Setzen läuft was falsch");
 			} //end of deleting similar edges in multiple directed graphs
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION,GraphMessage.UPDATE|GraphMessage.BLOCK_END, GraphMessage.EDGE));
+			notifyObservers(new GraphMessage(GraphConstraints.EDGE|GraphConstraints.DIRECTION,GraphConstraints.UPDATE|GraphConstraints.BLOCK_END, GraphConstraints.EDGE));
 		}//end if !d
 		else //undirected
 		{
 			mG.setDirected(d); //change
 		//im MGraph auch noch
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION,GraphMessage.UPDATE, GraphMessage.EDGE));
+		notifyObservers(new GraphMessage(GraphConstraints.EDGE|GraphConstraints.DIRECTION,GraphConstraints.UPDATE, GraphConstraints.EDGE));
 		}
 		return removed;
 	}
@@ -235,9 +236,9 @@ public class VGraph extends Observable implements Observer {
 		}
 		setChanged();
 		notifyObservers(
-				new GraphMessage(GraphMessage.NODE|GraphMessage.EDGE, //Type
-								GraphMessage.TRANSLATION, //Status 
-								GraphMessage.NODE|GraphMessage.EDGE|GraphMessage.SELECTION|GraphMessage.SUBGRAPH) //Affected		
+				new GraphMessage(GraphConstraints.NODE|GraphConstraints.EDGE, //Type
+								GraphConstraints.TRANSLATION, //Status 
+								GraphConstraints.NODE|GraphConstraints.EDGE|GraphConstraints.SELECTION|GraphConstraints.SUBGRAPH) //Affected		
 			);
 	}
 	/**
@@ -275,15 +276,15 @@ public class VGraph extends Observable implements Observer {
 
 		mG = anotherone.mG;
 		mG.pushNotify(
-						new GraphMessage(GraphMessage.ALL, //Type
-										GraphMessage.REPLACEMENT, //Status 
-										GraphMessage.ALL) //Affected		
+						new GraphMessage(GraphConstraints.ALL, //Type
+										GraphConstraints.REPLACEMENT, //Status 
+										GraphConstraints.ALL) //Affected		
 		);
 		setChanged();
 		notifyObservers(
-				new GraphMessage(GraphMessage.ALL, //Type
-						GraphMessage.REPLACEMENT, //Status 
-						GraphMessage.ALL) //Affected		
+				new GraphMessage(GraphConstraints.ALL, //Type
+						GraphConstraints.REPLACEMENT, //Status 
+						GraphConstraints.ALL) //Affected		
 		);
 	}
 	/**
@@ -510,7 +511,7 @@ public class VGraph extends Observable implements Observer {
 	 * 				the target of all new edges
 	 */
 	public void addEdgesfromSelectedNodes(VNode Ende) {
-		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDITION|GraphMessage.BLOCK_START));
+		pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.ADDITION|GraphConstraints.BLOCK_START));
 		Iterator<VNode> iter = modifyNodes.getIterator();
 		while (iter.hasNext()) 
 		{
@@ -527,7 +528,7 @@ public class VGraph extends Observable implements Observer {
 						modifyEdges.add(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), me,modifyNodes.get(temp.getIndex()).getPosition(), Ende.getPosition());
 				}
 		}
-		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END));
+		pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_END));
 	}
 	/**
 	 * add edges from a given node to evey selected node
@@ -535,7 +536,7 @@ public class VGraph extends Observable implements Observer {
 	 * 				the source of all new edges
 	 */
 	public void addEdgestoSelectedNodes(VNode Start) {
-		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.ADDITION|GraphMessage.BLOCK_START));
+		pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.ADDITION|GraphConstraints.BLOCK_START));
 		Iterator<VNode> iter = modifyNodes.getIterator();
 		while (iter.hasNext()) 
 		{
@@ -553,7 +554,7 @@ public class VGraph extends Observable implements Observer {
 						modifyEdges.add(new VStraightLineEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), me,	Start.getPosition(), temp.getPosition());
 				}
 		}
-		pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END));
+		pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_END));
 	}
 	/**
 	 * informs all subscribers about a change. This Method is used to push a notify from outside

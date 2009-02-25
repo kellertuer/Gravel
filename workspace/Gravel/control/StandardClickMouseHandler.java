@@ -9,6 +9,7 @@ import model.VEdge;
 import model.VGraph;
 import model.VItem;
 import model.VNode;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 /**
  * Standard Cick Mouse Handler
@@ -51,7 +52,7 @@ public class StandardClickMouseHandler extends ClickMouseHandler {
 				if ((r.getSelectedStatus() & VItem.SELECTED) != VItem.SELECTED) {
 					vg.deselect();
 					r.setSelectedStatus(VItem.SELECTED);
-					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION, GraphMessage.UPDATE, GraphMessage.SELECTION|GraphMessage.NODE));
+					vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION, GraphConstraints.UPDATE, GraphConstraints.SELECTION|GraphConstraints.NODE));
 				} else
 					vg.deselect();
 			} else {
@@ -62,7 +63,7 @@ public class StandardClickMouseHandler extends ClickMouseHandler {
 					{
 						vg.deselect();
 						s.setSelectedStatus(VItem.SELECTED);
-						vg.pushNotify(new GraphMessage(GraphMessage.SELECTION, GraphMessage.UPDATE, GraphMessage.SELECTION|GraphMessage.EDGE));
+						vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION, GraphConstraints.UPDATE, GraphConstraints.SELECTION|GraphConstraints.EDGE));
 					} else
 						vg.deselect();
 				} 

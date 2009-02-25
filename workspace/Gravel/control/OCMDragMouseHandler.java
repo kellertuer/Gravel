@@ -15,6 +15,7 @@ import model.VItem;
 import model.VLoopEdge;
 import model.VNode;
 import model.VStraightLineEdge;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 /**
  * OneClick Handling of Mouse Drag actions
@@ -86,17 +87,17 @@ public class OCMDragMouseHandler extends DragMouseHandler
 				if (!multiple)
 				{
 					int i = vg.getMathGraph().modifyEdges.getNextIndex();
-					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_START|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
+					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,i,GraphConstraints.BLOCK_START|GraphConstraints.ADDITION,GraphConstraints.EDGE|GraphConstraints.NODE));
 					vg.modifyEdges.add(new VStraightLineEdge(i,gp.getIntValue("edge.width")), new MEdge(i,StartNode.getIndex(),DragNode.getIndex(),gp.getIntValue("edge.value"),"\u22C6"),StartNode.getPosition(), DragNode.getPosition());
 				}
 				else
 				{
-					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_START|GraphMessage.ADDITION));
+					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_START|GraphConstraints.ADDITION));
 					vg.addEdgesfromSelectedNodes(DragNode);
 				}
 			}
 			else
-				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATE));
+				vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.UPDATE));
 		}
 	}
 
@@ -179,12 +180,12 @@ public class OCMDragMouseHandler extends DragMouseHandler
 						if (vg.modifyEdges.getIndexWithSimilarEdgePath(t, m.StartIndex,m.EndIndex)==0) //No Similar Edge existsmedge.StartIndex,medge.EndIndex))
 							{
 								vg.modifyEdges.add(t, m,StartNode.getPosition(), EndNode.getPosition());							
-								vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
+								vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,i,GraphConstraints.BLOCK_END|GraphConstraints.ADDITION,GraphConstraints.EDGE|GraphConstraints.NODE));
 							}
 						else
 						{
 							System.err.println("OCMDrag.MouseReleased: Loop - Similar Edge exists, none added.");
-							vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_ABORT|GraphMessage.BLOCK_END,GraphMessage.EDGE|GraphMessage.NODE));							
+							vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,i,GraphConstraints.BLOCK_ABORT|GraphConstraints.BLOCK_END,GraphConstraints.EDGE|GraphConstraints.NODE));							
 						}
 					}
 					else if (StartNode.getIndex()!=EndNode.getIndex())
@@ -193,24 +194,24 @@ public class OCMDragMouseHandler extends DragMouseHandler
 						if (vg.modifyEdges.getIndexWithSimilarEdgePath(s, m.StartIndex,m.EndIndex)==0) //No Similar Edge existsmedge.StartIndex,medge.EndIndex))
 						{
 							vg.modifyEdges.add(s, m, StartNode.getPosition(), EndNode.getPosition());
-							vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_END|GraphMessage.ADDITION,GraphMessage.EDGE|GraphMessage.NODE));
+							vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,i,GraphConstraints.BLOCK_END|GraphConstraints.ADDITION,GraphConstraints.EDGE|GraphConstraints.NODE));
 						}
 						else
 						{
 							System.err.println("OCMDrag.MouseReleased: Straight - Similar Edge exists, none added.");
-							vg.pushNotify(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.BLOCK_ABORT|GraphMessage.BLOCK_END,GraphMessage.EDGE|GraphMessage.NODE));							
+							vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,i,GraphConstraints.BLOCK_ABORT|GraphConstraints.BLOCK_END,GraphConstraints.EDGE|GraphConstraints.NODE));							
 						}
 					}
 				}
 				else if (DragNode!=null)
 				{	
 						vg.addEdgesfromSelectedNodes(EndNode);
-						vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END|GraphMessage.ADDITION));
+						vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_END|GraphConstraints.ADDITION));
 				}
 			}
 			else if ((DragNode!=null)&&(!firstdrag)) //We had a drag
 			{
-				vg.pushNotify(new GraphMessage(GraphMessage.GRAPH_ALL_ELEMENTS,GraphMessage.BLOCK_ABORT|GraphMessage.BLOCK_END));				
+				vg.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.BLOCK_ABORT|GraphConstraints.BLOCK_END));				
 			}
 			//End Drag Indication
 			DragNode = null;

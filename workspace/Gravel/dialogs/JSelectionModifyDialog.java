@@ -45,6 +45,7 @@ import model.VLoopEdge;
 import model.VNode;
 import model.VStraightLineEdge;
 import model.VSubgraph;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 /**
  * This class provides an UI for modifying all selected Nodes and Edges (if they exist)
@@ -1271,13 +1272,13 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		}
 		int changed = 0;
 		if (show_nodeprop)
-				changed |= GraphMessage.NODE;
+				changed |= GraphConstraints.NODE;
 		if (show_edgeprop)
-				changed |= GraphMessage.EDGE;
+				changed |= GraphConstraints.EDGE;
 		if (show_subgraphs)
-				changed |= GraphMessage.SUBGRAPH;
+				changed |= GraphConstraints.SUBGRAPH;
 
-		GraphMessage startblock = new GraphMessage(changed,GraphMessage.BLOCK_START|GraphMessage.UPDATE);
+		GraphMessage startblock = new GraphMessage(changed,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE);
 		startblock.setMessage("Auswahl verändert");
 		vg.pushNotify(startblock);
 		if (show_nodeprop)
@@ -1287,7 +1288,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		if (show_subgraphs)
 			modifySubgraphs();
 		
-		vg.pushNotify(new GraphMessage(changed,GraphMessage.BLOCK_END));
+		vg.pushNotify(new GraphMessage(changed,GraphConstraints.BLOCK_END));
 		return true;
 	}
 	public void actionPerformed(ActionEvent event) {

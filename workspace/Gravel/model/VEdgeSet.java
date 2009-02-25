@@ -14,6 +14,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import model.Messages.GraphColorMessage;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 /**
@@ -63,7 +64,7 @@ public class VEdgeSet extends Observable implements Observer {
 		{
 			setChanged();
 			//Loops deletion start
-			notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphConstraints.LOOPS,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.EDGE));	
 			EdgeLock.lock();
 			try
 			{
@@ -89,7 +90,7 @@ public class VEdgeSet extends Observable implements Observer {
 			} finally {EdgeLock.unlock();}
 			setChanged();
 			//Loops deletion end
-			notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE|GraphMessage.BLOCK_END,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphConstraints.LOOPS,GraphConstraints.UPDATE|GraphConstraints.BLOCK_END,GraphConstraints.EDGE));	
 		}
 		else if (b!=mG.isLoopAllowed())
 		{
@@ -99,7 +100,7 @@ public class VEdgeSet extends Observable implements Observer {
 			}
 			setChanged();
 			//Loops done, update Edges
-			notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphConstraints.LOOPS,GraphConstraints.UPDATE,GraphConstraints.EDGE));	
 		}
 		return removed;
 	}
@@ -116,7 +117,7 @@ public class VEdgeSet extends Observable implements Observer {
 		{	
 			setChanged();
 			//Allowance Updated, affected the edges
-			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphConstraints.MULTIPLE,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.EDGE));	
 			BitSet mGremoved = mG.setMultipleAllowed(b);
 			removed = (BitSet) mGremoved.clone();
 			int i = 1;
@@ -131,7 +132,7 @@ public class VEdgeSet extends Observable implements Observer {
 			}
 			setChanged();
 			//Allowance Updated, affected the edges
-			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|GraphMessage.BLOCK_END,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphConstraints.MULTIPLE,GraphConstraints.UPDATE|GraphConstraints.BLOCK_END,GraphConstraints.EDGE));	
 		}
 		else if (b!=mG.isMultipleAllowed())
 		{
@@ -141,7 +142,7 @@ public class VEdgeSet extends Observable implements Observer {
 			}
 			setChanged();
 			//Allowance Updated, affected the edges
-			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphConstraints.MULTIPLE,GraphConstraints.UPDATE,GraphConstraints.EDGE));	
 		}
 		return removed;
 	}
@@ -197,7 +198,7 @@ public class VEdgeSet extends Observable implements Observer {
 			} 
 			finally {EdgeLock.unlock();}
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.EDGE,edge.getIndex(),GraphMessage.ADDITION,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphConstraints.EDGE,edge.getIndex(),GraphConstraints.ADDITION,GraphConstraints.EDGE));	
 		}
 	}
 	/**
@@ -247,7 +248,7 @@ public class VEdgeSet extends Observable implements Observer {
 					t.copyColorStatus(e);
 					vEdges.add(e);
 					setChanged();
-					notifyObservers(new GraphMessage(GraphMessage.EDGE,e.getIndex(), GraphMessage.REPLACEMENT,GraphMessage.EDGE));	
+					notifyObservers(new GraphMessage(GraphConstraints.EDGE,e.getIndex(), GraphConstraints.REPLACEMENT,GraphConstraints.EDGE));	
 					break;
 				}
 			}
@@ -266,7 +267,7 @@ public class VEdgeSet extends Observable implements Observer {
 			if (remove_(i))
 			{
 				setChanged();
-				notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.REMOVAL,GraphMessage.EDGE|GraphMessage.SUBGRAPH|GraphMessage.SELECTION));	
+				notifyObservers(new GraphMessage(GraphConstraints.EDGE,i,GraphConstraints.REMOVAL,GraphConstraints.EDGE|GraphConstraints.SUBGRAPH|GraphConstraints.SELECTION));	
 				return true;
 			}
 			return false;
@@ -444,16 +445,16 @@ public class VEdgeSet extends Observable implements Observer {
 	 */
 	private void Colorchange(GraphColorMessage m)
 	{
-		if (m.getModifiedElement()!=GraphColorMessage.EDGE)
+		if (m.getModifiedElement()!=GraphConstraints.EDGE)
 			return; //Does not affect us
 		VEdge e = get(m.getElementID());
 		switch(m.getModificationType()) {
-			case GraphColorMessage.REMOVAL:
+			case GraphConstraints.REMOVAL:
 				e.removeColor(m.getColor());
 				break;
-			case GraphColorMessage.UPDATE:
+			case GraphConstraints.UPDATE:
 				e.removeColor(m.getOldColor()); //After this its equal to addition
-			case GraphColorMessage.ADDITION:
+			case GraphConstraints.ADDITION:
 				e.addColor(m.getColor());
 				break;
 		}
@@ -475,7 +476,7 @@ public class VEdgeSet extends Observable implements Observer {
 			if (m==null) //No News for us
 				return;
 			//On Node removal - remove adjacent edges - every other case of node changes does not affect edges
-			if ((m.getModifiedElementTypes()==GraphMessage.NODE)||(m.getModification()==GraphMessage.REMOVAL)) //Node removement
+			if ((m.getModifiedElementTypes()==GraphConstraints.NODE)||(m.getModification()==GraphConstraints.REMOVAL)) //Node removement
 				updateRemoval();
 			//SubGraphChanges don't affect edges, because ColorStuff is handles seperately
 		}

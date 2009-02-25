@@ -38,6 +38,7 @@ import view.Gui;
 import model.MNode;
 import model.VGraph;
 import model.VNode;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 /** JNodeDialog
@@ -371,7 +372,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 				}
 				else
 				{
-					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, iNodeIndex.getValue(), GraphMessage.ADDITION|GraphMessage.BLOCK_START, GraphMessage.NODE));
+					graphref.pushNotify(new GraphMessage(GraphConstraints.NODE, iNodeIndex.getValue(), GraphConstraints.ADDITION|GraphConstraints.BLOCK_START, GraphConstraints.NODE));
 					//Neuen Knoten einfuegen
 					VNode newnode = new VNode(iNodeIndex.getValue(),ixPos.getValue(), iyPos.getValue(), iSize.getValue(),0,0,0,false);
 					newnode = cNodeName.modifyNode(newnode);
@@ -392,12 +393,12 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 						JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Knotens nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index muss echt gr"+main.CONST.html_oe+""+main.CONST.html_sz+"er 0 sein.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 						return;					
 					}
-					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.GRAPH_ALL_ELEMENTS));
+					graphref.pushNotify(new GraphMessage(GraphConstraints.NODE, GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, GraphConstraints.GRAPH_ALL_ELEMENTS));
 					graphref.modifyNodes.changeIndex(oldindex, iNodeIndex.getValue());
 				}
 				else
 				{
-					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, iNodeIndex.getValue(), GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.NODE));
+					graphref.pushNotify(new GraphMessage(GraphConstraints.NODE, iNodeIndex.getValue(), GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, GraphConstraints.NODE));
 				}
 				//Allgemeine Werte aktualisieren
 				graphref.getMathGraph().modifyNodes.get(iNodeIndex.getValue()).name = sname.getText();
@@ -426,7 +427,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 			{ //Noch am Raster ausrichten, falls das aktiv ist
 				graphref.modifyNodes.get(iNodeIndex.getValue()).setPosition(gridsnap(iNodeIndex.getValue()));	
 			}
-			graphref.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.BLOCK_END));
+			graphref.pushNotify(new GraphMessage(GraphConstraints.NODE,GraphConstraints.BLOCK_END));
 			this.dispose();
 		}
 		

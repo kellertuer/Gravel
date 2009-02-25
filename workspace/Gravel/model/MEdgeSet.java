@@ -8,6 +8,7 @@ import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 import model.Messages.MGraphMessage;
 
@@ -60,7 +61,7 @@ public class MEdgeSet extends Observable implements Observer {
 		if (add_(e))
 		{
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.EDGE,e.index,GraphMessage.ADDITION,GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphConstraints.EDGE,e.index,GraphConstraints.ADDITION,GraphConstraints.EDGE));	
 			return true;
 		}
 		return false;
@@ -122,7 +123,7 @@ public class MEdgeSet extends Observable implements Observer {
 			if (changed) //New edge was adable
 			{
 					setChanged();
-					notifyObservers(new GraphMessage(GraphMessage.EDGE,edge.index,GraphMessage.UPDATE,GraphMessage.EDGE));	
+					notifyObservers(new GraphMessage(GraphConstraints.EDGE,edge.index,GraphConstraints.UPDATE,GraphConstraints.EDGE));	
 			}
 			else
 				mEdges.add(old); //Don't replace
@@ -145,10 +146,10 @@ public class MEdgeSet extends Observable implements Observer {
 			{
 				//Notify SubSets
 				setChanged();
-				notifyObservers(new MGraphMessage(MGraphMessage.EDGE,i,MGraphMessage.REMOVAL));
+				notifyObservers(new MGraphMessage(GraphConstraints.EDGE,i,GraphConstraints.REMOVAL));
 				mEdges.remove(toDel);
 				setChanged();
-				notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.REMOVAL,GraphMessage.EDGE));	
+				notifyObservers(new GraphMessage(GraphConstraints.EDGE,i,GraphConstraints.REMOVAL,GraphConstraints.EDGE));	
 			}
 		}
 		finally {EdgeLock.unlock();}
@@ -269,7 +270,7 @@ public class MEdgeSet extends Observable implements Observer {
 	private void handleNodeUpdate(MGraphMessage mm)
 	{
 		int mod = mm.getModificationType();
-		if ((mod!=MGraphMessage.INDEXCHANGED)&&(mod!=MGraphMessage.REMOVAL))
+		if ((mod!=GraphConstraints.INDEXCHANGED)&&(mod!=GraphConstraints.REMOVAL))
 				return;
 		EdgeLock.lock();
 		try
@@ -278,13 +279,13 @@ public class MEdgeSet extends Observable implements Observer {
 			HashSet<MEdge> adjacent = new HashSet<MEdge>();
 			while (e.hasNext()) {
 				MEdge edge = e.next();
-				if ((edge.EndIndex==mm.getElementID())&&(mod==MGraphMessage.REMOVAL))
+				if ((edge.EndIndex==mm.getElementID())&&(mod==GraphConstraints.REMOVAL))
 						adjacent.add(edge);
-				else if ((edge.StartIndex==mm.getElementID())&&(mod==MGraphMessage.REMOVAL))
+				else if ((edge.StartIndex==mm.getElementID())&&(mod==GraphConstraints.REMOVAL))
 					adjacent.add(edge);
-				else if ((edge.EndIndex==mm.getOldElementID())&&(mod==MGraphMessage.INDEXCHANGED))
+				else if ((edge.EndIndex==mm.getOldElementID())&&(mod==GraphConstraints.INDEXCHANGED))
 					edge.EndIndex = mm.getElementID();
-				else if ((edge.StartIndex==mm.getOldElementID())&&(mod==MGraphMessage.INDEXCHANGED))
+				else if ((edge.StartIndex==mm.getOldElementID())&&(mod==GraphConstraints.INDEXCHANGED))
 					edge.StartIndex = mm.getElementID();
 			}	
 			e = adjacent.iterator();
@@ -307,16 +308,16 @@ public class MEdgeSet extends Observable implements Observer {
 		MGraphMessage mm = (MGraphMessage)arg;
 		switch (mm.getModifiedElement())
 		{
-			case MGraphMessage.LOOPS:
+			case GraphConstraints.LOOPS:
 				allowloops = mm.getBoolean();
 				break;
-			case MGraphMessage.DIRECTION:
+			case GraphConstraints.DIRECTION:
 				directed = mm.getBoolean();
 				break;
-			case MGraphMessage.MULTIPLE:
+			case GraphConstraints.MULTIPLE:
 				allowmultiple = mm.getBoolean();
 				break;
-			case MGraphMessage.NODE:
+			case GraphConstraints.NODE:
 				handleNodeUpdate(mm);
 				break;
 		}

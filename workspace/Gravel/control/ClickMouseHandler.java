@@ -27,6 +27,7 @@ import model.VGraph;
 import model.VItem;
 import model.VNode;
 import model.VSubgraph;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 /**
  * Super class for the mouse handler for mouseclicks
@@ -264,7 +265,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 					r.setSelectedStatus(VItem.SELECTED);
 				else
 					r.deselect();
-				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE));
+				vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
 			} else {
 				VEdge s = vg.getEdgeinRangeOf(p,2.0);
 				if (s != null) 
@@ -273,7 +274,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 						s.setSelectedStatus(VItem.SELECTED);
 					else
 						s.deselect();
-					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE));
+					vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
 				}
 			}
 		}
@@ -308,7 +309,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		GraphMessage m = (GraphMessage)arg;
 			if (m!=null)
 			{ //If we get an GraphMessage and a SUBGRAPH is AFFECTED
-				if ((m.getAffectedElementTypes()&GraphMessage.SUBGRAPH)==GraphMessage.SUBGRAPH)
+				if ((m.getAffectedElementTypes()&GraphConstraints.SUBGRAPH)==GraphConstraints.SUBGRAPH)
 					updateSubgraphList();
 			}
 	}

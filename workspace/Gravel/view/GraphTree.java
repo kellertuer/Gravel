@@ -18,6 +18,7 @@ import javax.swing.tree.TreePath;
 
 import model.MEdge;
 import model.VGraph;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 import java.util.Observable;
@@ -292,20 +293,20 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			return;
 		if (o.equals(vG)) //Der Graph wurde aktualisiert und auch echt ein String gegeben, der Auftr�ge enth�lt
 		{
-			if ((m.getAffectedElementTypes()&GraphMessage.NODE)==GraphMessage.NODE) //Ein Knoten ist beteiligt
+			if ((m.getAffectedElementTypes()&GraphConstraints.NODE)==GraphConstraints.NODE) //Ein Knoten ist beteiligt
 			{
 				updateNodes();
 				updateEdges();
 			}
-			if ((m.getAffectedElementTypes()&GraphMessage.EDGE)==GraphMessage.EDGE) //Kanten beteiligt
+			if ((m.getAffectedElementTypes()&GraphConstraints.EDGE)==GraphConstraints.EDGE) //Kanten beteiligt
 			{
 				updateEdges();
 			}
-			if ((m.getAffectedElementTypes()&GraphMessage.SUBGRAPH)==GraphMessage.SUBGRAPH) //Sets beteiligt
+			if ((m.getAffectedElementTypes()&GraphConstraints.SUBGRAPH)==GraphConstraints.SUBGRAPH) //Sets beteiligt
 			{
 				updateSubgraphs();
 			}
-			if ((m.getAffectedElementTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION)
+			if ((m.getAffectedElementTypes()&GraphConstraints.SELECTION)==GraphConstraints.SELECTION)
 			{
 				//updateSelection();
 			}

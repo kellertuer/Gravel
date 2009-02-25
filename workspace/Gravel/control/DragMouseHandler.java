@@ -22,13 +22,14 @@ import model.VNode;
 import model.VSegmentedEdge;
 import model.VOrthogonalEdge;
 import model.VQuadCurveEdge;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 /**
  * General mouse drag handling for all mouse modes implemented in Gravel
  * this class is abstract, so this can't be an mouse mode itself.
  * Handles the general mouse movement actions such as shift-drag on background
- * @author ronny
+ * @author Ronny Bergmann
  *
  */
 public abstract class DragMouseHandler implements MouseListener, MouseMotionListener 
@@ -252,9 +253,9 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 				movingNode.setNameDistance(distance); //Y Richtung setzt Distance
 				movingNode.setNameRotation(rotation); //X Setzt Rotation
 				if (firstdrag) //Begin drag with a Block-Notification
-					vg.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.BLOCK_START|GraphMessage.UPDATE));
+					vg.pushNotify(new GraphMessage(GraphConstraints.NODE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
 				else		
-					vg.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.UPDATE));
+					vg.pushNotify(new GraphMessage(GraphConstraints.NODE,GraphConstraints.UPDATE));
 			}
 			else if (movingEdge!=null)
 			{//Single Edge moving
@@ -265,9 +266,9 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 					arrpos = 0.0f;
 				movingEdge.getArrow().setPos(arrpos);
 				if (firstdrag) //Begin Drag with a Block Start-Notification
-					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_START|GraphMessage.UPDATE));
+					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
 				else		
-					vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATE));
+					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.UPDATE));
 			}
 			else if (((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK)&&(multiplemoving))
 			{ //Shift + Alt + Multiple Moving multiple elements
@@ -276,9 +277,9 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 				else
 					moveSelEdges(x,y);
 				if (firstdrag) //Begin drag with a Block Start Notification
-					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.BLOCK_START|GraphMessage.UPDATE));
+					vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
 				else		
-					vg.pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.UPDATE));				
+					vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.UPDATE));				
 			}
 		} //End handling ALT
 		//Handling selection Rectangle
@@ -301,9 +302,9 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 			 //weder shift noch alt -> Selektiertes auf SELECTED
 				updateSelection(VItem.SELECTED);
 			if (firstdrag)
-				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.BLOCK_START|GraphMessage.UPDATE,GraphMessage.SELECTION));
+				vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE,GraphConstraints.SELECTION));
 			else		
-				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE,GraphMessage.SELECTION));
+				vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE,GraphConstraints.SELECTION));
 		}
 		MouseOffSet = e.getPoint();
 		firstdrag = false;
@@ -397,13 +398,13 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 	{
 		//Only if a Block was started: End it...
 		if (movingNode!=null) //Single Node Handled
-			vg.pushNotify(new GraphMessage(GraphMessage.NODE,GraphMessage.BLOCK_END));
+			vg.pushNotify(new GraphMessage(GraphConstraints.NODE,GraphConstraints.BLOCK_END));
 		else if (movingEdge!=null) //Single Edge Handled
-			vg.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END));
+			vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_END));
 		else if (multiplemoving&&(!firstdrag)) //Multiple (really!) Handled
-			vg.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.BLOCK_END));
+			vg.pushNotify(new GraphMessage(GraphConstraints.EDGE|GraphConstraints.NODE,GraphConstraints.BLOCK_END));
 		if (selrect!=null) //We had an rectangle, Houston, We had a rectangle
-			vg.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.BLOCK_END));
+			vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.BLOCK_END));
 		movingNode=null;
 		movingEdge=null;
 		altwaspressed=false;

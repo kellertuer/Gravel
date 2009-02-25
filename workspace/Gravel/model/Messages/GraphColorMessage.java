@@ -12,18 +12,7 @@ import java.awt.Color;
  * @author Ronny Bergmann
  * @since 0.4
  */
-public class GraphColorMessage {
-
-	//Modified Element
-	public static final int NODE = 1; 
-	public static final int EDGE = 2;
-	public static final int HYPEREDGE = 4;
-	public static final int SUBGRAPH = 8;
-	
-	//Modification
-	public static final int UPDATE = 1;
-	public static final int ADDITION = 2;
-	public static final int REMOVAL = 4;
+public class GraphColorMessage implements GraphConstraints {
 	
 	private int modElement=0;
 	private int modType=0;

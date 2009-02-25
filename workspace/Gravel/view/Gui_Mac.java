@@ -11,6 +11,7 @@ import java.util.TreeMap;
 import javax.swing.*;
 
 import model.VGraph;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 import dialogs.JPreferencesDialog;
@@ -114,7 +115,7 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
     public void handlePreferences(ApplicationEvent e)
     {
     	new JPreferencesDialog();
-    	normalgui.getVGraph().pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.GRAPH_ALL_ELEMENTS,GraphMessage.UPDATE));
+    	normalgui.getVGraph().pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));
     	//e.setHandled(true);
     }
 	public void handleQuit(ApplicationEvent e)

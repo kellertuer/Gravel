@@ -6,6 +6,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
 
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 import model.Messages.MGraphMessage;
 /**
@@ -33,7 +34,7 @@ public class MSubgraphSet extends Observable implements Observer {
 		{
 			mSubgraphs.add(s.clone());
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,s.getIndex(),GraphMessage.ADDITION,GraphMessage.SUBGRAPH));	
+			notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,s.getIndex(),GraphConstraints.ADDITION,GraphConstraints.SUBGRAPH));	
 	
 		}
 	}
@@ -49,7 +50,7 @@ public class MSubgraphSet extends Observable implements Observer {
 		{
 			mSubgraphs.remove(toDelete);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,index,GraphMessage.REMOVAL,GraphMessage.GRAPH_ALL_ELEMENTS));	
+			notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,index,GraphConstraints.REMOVAL,GraphConstraints.GRAPH_ALL_ELEMENTS));	
 			return true;
 		}
 		return false;
@@ -104,7 +105,7 @@ public class MSubgraphSet extends Observable implements Observer {
 		{ 
 			s.addNode(nodeindex);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraphindex,GraphConstraints.UPDATE,GraphConstraints.SUBGRAPH|GraphConstraints.NODE));	
 		}
 	}
 	/**
@@ -121,7 +122,7 @@ public class MSubgraphSet extends Observable implements Observer {
 		{
 			s.removeNode(nodeindex);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraphindex,GraphConstraints.UPDATE,GraphConstraints.SUBGRAPH|GraphConstraints.NODE));	
 		}
 	}
 	/**
@@ -138,7 +139,7 @@ public class MSubgraphSet extends Observable implements Observer {
 		{
 			s.addEdge(edgeindex);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraphindex,GraphConstraints.UPDATE,GraphConstraints.SUBGRAPH|GraphConstraints.EDGE));	
 		}
 	}
 	/**
@@ -158,7 +159,7 @@ public class MSubgraphSet extends Observable implements Observer {
 		{
 			s.removeEdge(edgeindex);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.EDGE));	
+			notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraphindex,GraphConstraints.UPDATE,GraphConstraints.SUBGRAPH|GraphConstraints.EDGE));	
 		}
 	}
 	/**
@@ -194,31 +195,31 @@ public class MSubgraphSet extends Observable implements Observer {
 			return; //Only handle internal Messages
 		MGraphMessage mm = (MGraphMessage)arg;
 		int mod = mm.getModificationType();
-		if ((mod!=MGraphMessage.INDEXCHANGED)&&(mod!=MGraphMessage.REMOVAL))
+		if ((mod!=GraphConstraints.INDEXCHANGED)&&(mod!=GraphConstraints.REMOVAL))
 			return;
 		Iterator<MSubgraph> si = mSubgraphs.iterator();
 		while (si.hasNext())
 		{
 			MSubgraph s = si.next();
 			//If removed or index changed, remove (old) index from each set and set new one if changed
-			if (mod==MGraphMessage.INDEXCHANGED)
+			if (mod==GraphConstraints.INDEXCHANGED)
 			{
-				if (mm.getModifiedElement()==MGraphMessage.NODE)
+				if (mm.getModifiedElement()==GraphConstraints.NODE)
 				{
 					s.removeNode(mm.getOldElementID());
 					s.addNode(mm.getElementID());
 				}
-				else if (mm.getModifiedElement()==GraphMessage.EDGE)
+				else if (mm.getModifiedElement()==GraphConstraints.EDGE)
 				{
 					s.removeEdge(mm.getOldElementID());
 					s.addEdge(mm.getElementID());
 				}
 			}
-			else if (mod==MGraphMessage.REMOVAL)
+			else if (mod==GraphConstraints.REMOVAL)
 			{
-				if (mm.getModifiedElement()==MGraphMessage.NODE)
+				if (mm.getModifiedElement()==GraphConstraints.NODE)
 					s.removeNode(mm.getElementID());
-				else if (mm.getModifiedElement()==GraphMessage.EDGE)
+				else if (mm.getModifiedElement()==GraphConstraints.EDGE)
 					s.removeEdge(mm.getElementID());
 			}
 		}//end while

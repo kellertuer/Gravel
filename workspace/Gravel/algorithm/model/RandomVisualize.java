@@ -12,6 +12,7 @@ import model.MNode;
 import model.VGraph;
 import model.VNode;
 import model.VStraightLineEdge;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 
@@ -124,7 +125,7 @@ public class RandomVisualize implements VAlgorithmIF {
 								ErgebnisGraph.modifyNodes.get(e.EndIndex).getPosition());
 					}		
 				}
-				ErgebnisGraph.pushNotify(new GraphMessage(GraphMessage.EDGE|GraphMessage.NODE,GraphMessage.UPDATE));
+				ErgebnisGraph.pushNotify(new GraphMessage(GraphConstraints.EDGE|GraphConstraints.NODE,GraphConstraints.UPDATE));
 			}
 			else
 				return;

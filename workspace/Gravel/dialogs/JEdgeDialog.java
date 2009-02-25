@@ -44,6 +44,7 @@ import model.VOrthogonalEdge;
 import model.VQuadCurveEdge;
 import model.VSegmentedEdge;
 import model.VStraightLineEdge;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 import view.Gui;
@@ -774,9 +775,9 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			//Alles in Ordnung, aendern also loeschen
 			//Als Block
 			if (oldindex==iEdgeIndex.getValue()) //Index not changed -> Just an EdgeReplace
-				graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,oldindex,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
+				graphref.pushNotify(new GraphMessage(GraphConstraints.EDGE,oldindex,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.EDGE));
 			else
-				graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
+				graphref.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.EDGE));
 			graphref.modifyEdges.remove(oldindex);
 		}
 		//hinzufuegen
@@ -806,9 +807,9 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		if (chEdge!=null)//Change edge, end block
 		{
 			if (oldindex==iEdgeIndex.getValue()) //Index not changed -> Just an EdgeReplace
-				graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,oldindex,GraphMessage.BLOCK_END,GraphMessage.EDGE));
+				graphref.pushNotify(new GraphMessage(GraphConstraints.EDGE,oldindex,GraphConstraints.BLOCK_END,GraphConstraints.EDGE));
 			else
-				graphref.pushNotify(new GraphMessage(GraphMessage.EDGE,GraphMessage.BLOCK_END,GraphMessage.EDGE));
+				graphref.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_END,GraphConstraints.EDGE));
 		}
 		this.dispose();
 	}

@@ -1,9 +1,11 @@
 package model;
 
+import model.Messages.GraphConstraints;
+
 public interface MGraphInterface {
 
-	public final int GRAPH = 1;
-	public final int HYPERGRAPH = 2;
+	public final int GRAPH = GraphConstraints.MATH|GraphConstraints.GRAPH;
+	public final int HYPERGRAPH = GraphConstraints.MATH|GraphConstraints.HYPERGRAPH;
 	
 	/**
 	 * get the Type of the 

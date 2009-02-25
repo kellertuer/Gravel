@@ -14,22 +14,6 @@ package model.Messages;
  */
 public class MGraphMessage {
 
-	//Modified Element
-	public static final int NODE = 1; 
-	public static final int EDGE = 2;
-	public static final int HYPEREDGE = 4;
-	public static final int SUBGRAPH = 8;
-	
-	public static final int LOOPS = 32;
-	public static final int MULTIPLE = 64;
-	public static final int DIRECTION = 128;
-	
-	//Modification
-	public static final int UPDATE = 1;
-	public static final int ADDITION = 2;
-	public static final int REMOVAL = 4;
-	public static final int INDEXCHANGED = 32;
-	
 	private int modElement=0;
 	private int modType=0;
 	int id=0,old=0;	

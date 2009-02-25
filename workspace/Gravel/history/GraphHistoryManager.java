@@ -1,6 +1,7 @@
 package history;
 
 import model.*;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 import io.GeneralPreferences;
@@ -58,26 +59,26 @@ public class GraphHistoryManager implements Observer
 	{
 		int action = 0;
 		VGraph tempG; //which Graph provides information for the action?
-		switch(m.getModification()&(~GraphMessage.BLOCK_ALL)) //Action must be spcific, therefore a switch but by ignoring Blocks (thats already handled)
-		{	case GraphMessage.ADDITION: //Node added, Create action and modify lastgraph
-				action = GraphAction.ADDITION;
+		switch(m.getModification()&(~GraphConstraints.BLOCK_ALL)) //Action must be spcific, therefore a switch but by ignoring Blocks (thats already handled)
+		{	case GraphConstraints.ADDITION: //Node added, Create action and modify lastgraph
+				action = GraphConstraints.ADDITION;
 				tempG = trackedGraph; //get Information from actual Graph;
 				break;
-			case GraphMessage.REMOVAL:
-				action = GraphAction.REMOVAL;
+			case GraphConstraints.REMOVAL:
+				action = GraphConstraints.REMOVAL;
 				tempG = lastGraph; //Information of the deleted Node must be taken from last status
 				break;
-			case GraphMessage.INDEXCHANGED:
-			case GraphMessage.UPDATE:
-			case GraphMessage.TRANSLATION:
-				action = GraphAction.UPDATE;
+			case GraphConstraints.INDEXCHANGED:
+			case GraphConstraints.UPDATE:
+			case GraphConstraints.TRANSLATION:
+				action = GraphConstraints.UPDATE;
 				tempG = lastGraph;
 				break;
 			default: //not suitable action
 				return null;
 		}		
 		GraphAction act = null;
-		if (m.getModifiedElementTypes()==GraphMessage.NODE) //Action on unique node
+		if (m.getModifiedElementTypes()==GraphConstraints.NODE) //Action on unique node
 		{
 			try { 
 				//TODO: Optimize temp.clone();
@@ -88,7 +89,7 @@ public class GraphHistoryManager implements Observer
 				act=null; System.err.println("DEBUG: Node (#"+m.getElementID()+") Action ("+action+") Failed:"+e.getMessage());
 			}
 		} //End Handling Node
-		else if (m.getModifiedElementTypes()==GraphMessage.EDGE) //Change on Unique Edge
+		else if (m.getModifiedElementTypes()==GraphConstraints.EDGE) //Change on Unique Edge
 		{
 			try { 
 				//TODO: Optimize Environment Graph
@@ -99,7 +100,7 @@ public class GraphHistoryManager implements Observer
 				act=null; System.err.println("DEBUG: ¢added.GraphAction Creation Failed:"+e2.getMessage());
 			}
 		}
-		else if (m.getModifiedElementTypes()==GraphMessage.SUBGRAPH)
+		else if (m.getModifiedElementTypes()==GraphConstraints.SUBGRAPH)
 		{
 			try { 
 				//TODO: Optimize Environment.
@@ -141,7 +142,7 @@ public class GraphHistoryManager implements Observer
 	 * @param m
 	 */
 	private void addAction(GraphMessage m)	{	
-		if ((m.getModification()&GraphMessage.BLOCK_ABORT)==GraphMessage.BLOCK_ABORT)
+		if ((m.getModification()&GraphConstraints.BLOCK_ABORT)==GraphConstraints.BLOCK_ABORT)
 			return; //Don't handle Block-Abort-Stuff
 		GraphAction act = null;
 		if (m.getElementID() > 0) //Message for single stuff thats not just selection
@@ -151,7 +152,7 @@ public class GraphHistoryManager implements Observer
 			//Last status in action - and yes there was an Change in the items
 			try {						
 				//New Action, that tracks the graph, or only the selection
-				act = new GraphAction(lastGraph, GraphAction.UPDATE, m.getModifiedElementTypes()!=GraphMessage.SELECTION); }
+				act = new GraphAction(lastGraph, GraphConstraints.UPDATE, m.getModifiedElementTypes()!=GraphConstraints.SELECTION); }
 			catch (GraphActionException e)
 			{
 				act=null; System.err.println("DEBUG: Edge.added.GraphAction Creation Failed:"+e.getMessage());				
@@ -201,7 +202,7 @@ public class GraphHistoryManager implements Observer
 		if (RedoStack.size()>=stacksize)
 			RedoStack.remove();
 		RedoStack.add(LastAction);
-		trackedGraph.pushNotify(new GraphMessage(GraphMessage.GRAPH_ALL_ELEMENTS,GraphMessage.UPDATE));
+		trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));
 		trackedGraph.addObserver(this); //Activate Tracking again
 	}
 	/**
@@ -237,7 +238,7 @@ public class GraphHistoryManager implements Observer
 			UndoStack.remove();
 		}
 		UndoStack.add(LastAction);
-		trackedGraph.pushNotify(new GraphMessage(GraphMessage.GRAPH_ALL_ELEMENTS,GraphMessage.UPDATE));
+		trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));
 		trackedGraph.addObserver(this); //Activate Tracking again
 	}
 	/**
@@ -258,7 +259,7 @@ public class GraphHistoryManager implements Observer
 		trackedGraph.deleteObserver(this);
 		SavedUndoStackSize=UndoStack.size();
 		//Notify everyone despite us.
-		trackedGraph.pushNotify(new GraphMessage(GraphMessage.GRAPH_ALL_ELEMENTS, GraphMessage.UPDATE));
+		trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS, GraphConstraints.UPDATE));
 		trackedGraph.addObserver(this);		
 	}
 	/**
@@ -289,7 +290,7 @@ public class GraphHistoryManager implements Observer
 		if (m==null)
 			return;
 		//Complete Replacement of Graph Handling
-		if ((m.getModifiedElementTypes()==GraphMessage.GRAPH_ALL_ELEMENTS)&&(m.getAffectedElementTypes()==GraphMessage.GRAPH_ALL_ELEMENTS)&&(m.getModification()==GraphMessage.REPLACEMENT))
+		if ((m.getModifiedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getAffectedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getModification()==GraphConstraints.REPLACEMENT))
 		{
 				lastGraph = trackedGraph.clone();
 				Blockstart=null;
@@ -303,14 +304,14 @@ public class GraphHistoryManager implements Observer
 				trackSelection=GeneralPreferences.getInstance().getBoolValue("history.trackSelection");
 				return;
 		}
-		if ((m.getModifiedElementTypes()==GraphMessage.SELECTION)&&(!trackSelection))
+		if ((m.getModifiedElementTypes()==GraphConstraints.SELECTION)&&(!trackSelection))
 		{ //Reine Selection Veränderung, aber wir verfolgen sowas nicht -> Update LastGraph
 			if (active) //not every update but on ends of blocks
 				updateLastSelection();
 		}
 		else //Sonst erst auf BlockEnde prüfen
 		{
-			if ((m.getModification()&GraphMessage.BLOCK_END)==GraphMessage.BLOCK_END) //Block endet with this Message
+			if ((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END) //Block endet with this Message
 			{
 				if (blockdepth > 0)
 					blockdepth--;
@@ -318,14 +319,14 @@ public class GraphHistoryManager implements Observer
 				if (blockdepth==0)
 				{ //Block_END & not Aborted, so we have a Message to handle
 					active = true;
-					if (((m.getModification() & GraphMessage.BLOCK_ABORT) != GraphMessage.BLOCK_ABORT) && (Blockstart!=null))
+					if (((m.getModification() & GraphConstraints.BLOCK_ABORT) != GraphConstraints.BLOCK_ABORT) && (Blockstart!=null))
 						addAction(Blockstart);
 					else if(Blockstart!=null)
 						Blockstart=null;					
 				}
 				return;
 			}
-			else if ((m.getModification()&GraphMessage.BLOCK_START)==GraphMessage.BLOCK_START)
+			else if ((m.getModification()&GraphConstraints.BLOCK_START)==GraphConstraints.BLOCK_START)
 			{
 					blockdepth++;
 				if (blockdepth==1)
@@ -337,11 +338,11 @@ public class GraphHistoryManager implements Observer
 			}
 			if ((blockdepth>0)&&(Blockstart!=null)) //we are in a block
 			{		//Node Translation or Edge Controlpoint Movement
-				if (((Blockstart.getModifiedElementTypes()==GraphMessage.NODE)&&((Blockstart.getModification()&GraphMessage.TRANSLATION) > 0))
-						|| ((Blockstart.getModifiedElementTypes()==GraphMessage.EDGE)&&((Blockstart.getModification()&GraphMessage.UPDATE) > 0)))
+				if (((Blockstart.getModifiedElementTypes()==GraphConstraints.NODE)&&((Blockstart.getModification()&GraphConstraints.TRANSLATION) > 0))
+						|| ((Blockstart.getModifiedElementTypes()==GraphConstraints.EDGE)&&((Blockstart.getModification()&GraphConstraints.UPDATE) > 0)))
 				{
-					if ((m.getModifiedElementTypes()==(GraphMessage.NODE|GraphMessage.EDGE)) //while that the whole graph
-					&&(m.getModification()==GraphMessage.TRANSLATION)) //is translated
+					if ((m.getModifiedElementTypes()==(GraphConstraints.NODE|GraphConstraints.EDGE)) //while that the whole graph
+					&&(m.getModification()==GraphConstraints.TRANSLATION)) //is translated
 					{ //Don't do Node/Edge-Update anymore but graph replacement
 						System.err.println("Switching from Node replacement to graph replacement.");
 						Blockstart = m;

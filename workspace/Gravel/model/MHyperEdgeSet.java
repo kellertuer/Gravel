@@ -9,6 +9,7 @@ import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 import model.Messages.MGraphMessage;
 
@@ -49,7 +50,7 @@ public class MHyperEdgeSet extends Observable implements Observer {
 		if (add_(e))
 		{
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.HYPEREDGE,e.index,GraphMessage.ADDITION,GraphMessage.HYPEREDGE));	
+			notifyObservers(new GraphMessage(GraphConstraints.HYPEREDGE,e.index,GraphConstraints.ADDITION,GraphConstraints.HYPEREDGE));	
 			return true;
 		}
 		return false;
@@ -129,7 +130,7 @@ public class MHyperEdgeSet extends Observable implements Observer {
 			if (changed) //New edge was adable
 			{
 					setChanged();
-					notifyObservers(new GraphMessage(GraphMessage.HYPEREDGE,he.index,GraphMessage.UPDATE,GraphMessage.HYPEREDGE));	
+					notifyObservers(new GraphMessage(GraphConstraints.HYPEREDGE,he.index,GraphConstraints.UPDATE,GraphConstraints.HYPEREDGE));	
 			}
 			else
 				mHyperEdges.add(old); //Don't replace, add again
@@ -152,10 +153,10 @@ public class MHyperEdgeSet extends Observable implements Observer {
 			{
 				//Notify SubSets
 				setChanged();
-				notifyObservers(new MGraphMessage(MGraphMessage.EDGE,i,MGraphMessage.REMOVAL));
+				notifyObservers(new MGraphMessage(GraphConstraints.EDGE,i,GraphConstraints.REMOVAL));
 				mHyperEdges.remove(toDel);
 				setChanged();
-				notifyObservers(new GraphMessage(GraphMessage.EDGE,i,GraphMessage.REMOVAL,GraphMessage.EDGE));	
+				notifyObservers(new GraphMessage(GraphConstraints.EDGE,i,GraphConstraints.REMOVAL,GraphConstraints.EDGE));	
 			}
 		}
 		finally {HyperEdgeLock.unlock();}
@@ -176,7 +177,7 @@ public class MHyperEdgeSet extends Observable implements Observer {
 		{ 
 			he.addNode(nodeindex);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.HYPEREDGE,hyperedgeindex,GraphMessage.UPDATE,GraphMessage.HYPEREDGE|GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.UPDATE,GraphConstraints.HYPEREDGE|GraphConstraints.NODE));	
 		}
 	}
 	/**
@@ -195,7 +196,7 @@ public class MHyperEdgeSet extends Observable implements Observer {
 		{
 			he.removeNode(nodeindex);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.HYPEREDGE,hyperedgeindex,GraphMessage.UPDATE,GraphMessage.HYPEREDGE|GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.UPDATE,GraphConstraints.HYPEREDGE|GraphConstraints.NODE));	
 		}
 	}
 	/**
@@ -303,7 +304,7 @@ public class MHyperEdgeSet extends Observable implements Observer {
 	private void handleNodeUpdate(MGraphMessage mm)
 	{
 		int mod = mm.getModificationType();
-		if ((mod!=MGraphMessage.INDEXCHANGED)&&(mod!=MGraphMessage.REMOVAL))
+		if ((mod!=GraphConstraints.INDEXCHANGED)&&(mod!=GraphConstraints.REMOVAL))
 				return;
 		HyperEdgeLock.lock();
 		try
@@ -312,9 +313,9 @@ public class MHyperEdgeSet extends Observable implements Observer {
 			HashSet<MHyperEdge> incident = new HashSet<MHyperEdge>();
 			while (e.hasNext()) {
 				MHyperEdge edge = e.next();
-				if ((edge.containsNode(mm.getElementID()))&&(mod==MGraphMessage.REMOVAL))
+				if ((edge.containsNode(mm.getElementID()))&&(mod==GraphConstraints.REMOVAL))
 						incident.add(edge);
-				else if ((edge.containsNode(mm.getOldElementID()))&&(mod==MGraphMessage.INDEXCHANGED))
+				else if ((edge.containsNode(mm.getOldElementID()))&&(mod==GraphConstraints.INDEXCHANGED))
 				{
 					edge.removeNode(mm.getOldElementID());
 					edge.addNode(mm.getElementID());
@@ -340,7 +341,7 @@ public class MHyperEdgeSet extends Observable implements Observer {
 		MGraphMessage mm = (MGraphMessage)arg;
 		switch (mm.getModifiedElement())
 		{
-			case MGraphMessage.NODE:
+			case GraphConstraints.NODE:
 				handleNodeUpdate(mm);
 				break;
 		}

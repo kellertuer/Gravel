@@ -10,6 +10,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import model.Messages.GraphColorMessage;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 /**
@@ -67,9 +68,9 @@ public class VNodeSet extends Observable implements Observer {
 		}
 		setChanged();
 		notifyObservers(
-			new GraphMessage(GraphMessage.SELECTION|GraphMessage.NODE, //Changed
-							GraphMessage.REMOVAL, //Status 
-							GraphMessage.NODE|GraphMessage.EDGE|GraphMessage.SELECTION) //Affected		
+			new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE, //Changed
+							GraphConstraints.REMOVAL, //Status 
+							GraphConstraints.NODE|GraphConstraints.EDGE|GraphConstraints.SELECTION) //Affected		
 		);		
 	}
 	/**
@@ -91,7 +92,7 @@ public class VNodeSet extends Observable implements Observer {
 			vNodes.add(node);
 			setChanged();
 			//Graph changed with an add, only nodes affected
-			notifyObservers(new GraphMessage(GraphMessage.NODE,node.getIndex(),GraphMessage.ADDITION,GraphMessage.NODE));	
+			notifyObservers(new GraphMessage(GraphConstraints.NODE,node.getIndex(),GraphConstraints.ADDITION,GraphConstraints.NODE));	
 		}
 	}
 	/**
@@ -125,7 +126,7 @@ public class VNodeSet extends Observable implements Observer {
 		mG.modifyNodes.changeIndex(oldi, newi); //Update Adjacent edges in MGraph, so there's no need to update VEdges
 		get(oldi).setIndex(newi);
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,newi,GraphMessage.INDEXCHANGED, GraphMessage.GRAPH_ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphConstraints.NODE,newi,GraphConstraints.INDEXCHANGED, GraphConstraints.GRAPH_ALL_ELEMENTS));	
 	}
 	/**
 	 * Removes a node and push an Message that should be handled by other
@@ -142,7 +143,7 @@ public class VNodeSet extends Observable implements Observer {
 		mG.modifyNodes.remove(i);
 		vNodes.remove(get(i));
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.REMOVAL,GraphMessage.GRAPH_ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphConstraints.NODE,i,GraphConstraints.REMOVAL,GraphConstraints.GRAPH_ALL_ELEMENTS));	
 	}
 	/**
 	 * Replace the node with index given by an copy of Node with the parameter,
@@ -174,7 +175,7 @@ s	 *
 					t.copyColorStatus(node);
 					vNodes.add(node);
 					setChanged();
-					notifyObservers(new GraphMessage(GraphMessage.NODE,node.getIndex(), GraphMessage.REPLACEMENT,GraphMessage.NODE));	
+					notifyObservers(new GraphMessage(GraphConstraints.NODE,node.getIndex(), GraphConstraints.REPLACEMENT,GraphConstraints.NODE));	
 					break;
 				}
 			}
@@ -226,16 +227,16 @@ s	 *
 	 */
 	private void Colorchange(GraphColorMessage m)
 	{
-		if (m.getModifiedElement()!=GraphColorMessage.NODE)
+		if (m.getModifiedElement()!=GraphConstraints.NODE)
 			return; //Does not affect us
 		VNode n = get(m.getElementID());
 		switch(m.getModificationType()) {
-			case GraphColorMessage.REMOVAL:
+			case GraphConstraints.REMOVAL:
 				n.removeColor(m.getColor());
 				break;
-			case GraphColorMessage.UPDATE:
+			case GraphConstraints.UPDATE:
 				n.removeColor(m.getOldColor()); //After this its equal to addition
-			case GraphColorMessage.ADDITION:
+			case GraphConstraints.ADDITION:
 				n.addColor(m.getColor());
 				break;
 		}

@@ -22,32 +22,6 @@ package model.Messages;
  */
 public class GraphMessage {
 	
-	//Type of change (and affection)
-	public static final int NODE = 1;
-	public static final int EDGE = 2;
-	public static final int HYPEREDGE = 4;
-	public static final int SUBGRAPH = 8;
-	public static final int GRAPH_ALL_ELEMENTS=NODE|EDGE|SUBGRAPH;
-	public static final int HYPERGRAPH_ALL_ELEMENTS=NODE|HYPEREDGE|SUBGRAPH;
-	public static final int SELECTION = 16;
-	public static final int DIRECTION = 32;
-	public static final int LOOPS = 64;
-	public static final int MULTIPLE = 128;
-	public static final int ALL = 0xffff;
-
-	//Modification
-	public static final int UPDATE = 1;
-	public static final int ADDITION = 2;
-	public static final int REMOVAL = 4;
-	public static final int TRANSLATION = 8;
-	public static final int REPLACEMENT = 16;
-	public static final int INDEXCHANGED = 32;
-	//Special Stati for Block Updates
-	public static final int BLOCK_START = 512;
-	public static final int BLOCK_END = 1024;
-	public static final int BLOCK_ABORT = 2048;
-	public static final int BLOCK_ALL = 0xE00; //All 3 Block-Stati
-	
 	private int id, status, type, affected;
 	private String message="";
 	

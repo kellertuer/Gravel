@@ -13,6 +13,7 @@ import model.VEdge;
 import model.VGraph;
 import model.VItem;
 import model.VNode;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 /**
  * Standard Mouse Drag Hanlder extends the DragMouseHandler to the standard actions
@@ -139,9 +140,9 @@ public class StandardDragMouseHandler extends DragMouseHandler
 				}
 			}
 			if (firstdrag) //First Drag: Start a Block for the Movement else just update
-				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.UPDATE|GraphMessage.BLOCK_START));
+				vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START));
 			else
-				vg.pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.NODE|GraphMessage.EDGE,GraphMessage.UPDATE));
+				vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.UPDATE));
 		} //End Shift
 		else if (movingNode!=null) //ohne Shift ohne alt - gibt es einen Knoten r auf dem Mausposition, der nicht selektiert ist ?
 		{
@@ -160,9 +161,9 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			translateAdjacentEdges(movingNode.getIndex(),Gtransx,Gtransy);	
 			movingNode.setPosition(GPos);
 			if (firstdrag) //Start Block for Node Movement else just update graphic
-				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.getIndex(),GraphMessage.TRANSLATION|GraphMessage.BLOCK_START,GraphMessage.NODE|GraphMessage.EDGE));
+				vg.pushNotify(new GraphMessage(GraphConstraints.NODE,movingNode.getIndex(),GraphConstraints.TRANSLATION|GraphConstraints.BLOCK_START,GraphConstraints.NODE|GraphConstraints.EDGE));
 			else
-				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.getIndex(),GraphMessage.TRANSLATION,GraphMessage.NODE|GraphMessage.EDGE)); //Kanten aktualisiert
+				vg.pushNotify(new GraphMessage(GraphConstraints.NODE,movingNode.getIndex(),GraphConstraints.TRANSLATION,GraphConstraints.NODE|GraphConstraints.EDGE)); //Kanten aktualisiert
 		}
 		else if (movingControlPointEdge!=null)
 		{
@@ -183,9 +184,9 @@ public class StandardDragMouseHandler extends DragMouseHandler
 			points.set(movingControlPointIndex, GPos);
 			movingControlPointEdge.setControlPoints(points);
 			if (firstdrag) //On First Drag Movement start a Block for CP-Movement else just update it
-				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,movingControlPointEdge.getIndex(),GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE)); //Kanten aktualisiert
+				vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,movingControlPointEdge.getIndex(),GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.EDGE)); //Kanten aktualisiert
 			else
-				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,movingControlPointEdge.getIndex(),GraphMessage.UPDATE,GraphMessage.EDGE)); //Kanten aktualisiert
+				vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,movingControlPointEdge.getIndex(),GraphConstraints.UPDATE,GraphConstraints.EDGE)); //Kanten aktualisiert
 		}
 		MouseOffSet = e.getPoint();
 		if (firstdrag)
@@ -266,15 +267,15 @@ public class StandardDragMouseHandler extends DragMouseHandler
 				movingNode.setPosition(newpos);	
 			}
 			if (movingNode!=null) //End Nove Movement-Block
-				vg.pushNotify(new GraphMessage(GraphMessage.NODE,movingNode.getIndex(),GraphMessage.UPDATE|GraphMessage.BLOCK_END,GraphMessage.NODE|GraphMessage.EDGE));
+				vg.pushNotify(new GraphMessage(GraphConstraints.NODE,movingNode.getIndex(),GraphConstraints.UPDATE|GraphConstraints.BLOCK_END,GraphConstraints.NODE|GraphConstraints.EDGE));
 			else if (movingControlPointEdge!=null) //End Edge-CP Movement-Block
-				vg.pushNotify(new GraphMessage(GraphMessage.EDGE,movingControlPointEdge.getIndex(),GraphMessage.UPDATE|GraphMessage.BLOCK_END,GraphMessage.EDGE)); //Kanten aktualisiert
+				vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,movingControlPointEdge.getIndex(),GraphConstraints.UPDATE|GraphConstraints.BLOCK_END,GraphConstraints.EDGE)); //Kanten aktualisiert
 			movingNode=null;
 			movingControlPointEdge=null;
 			movingControlPointIndex = -1;
 		}
 		else if (!firstdrag) //With Shift and a real drag
-			vg.pushNotify(new GraphMessage(GraphMessage.NODE|GraphMessage.EDGE|GraphMessage.SELECTION,GraphMessage.BLOCK_END));
+			vg.pushNotify(new GraphMessage(GraphConstraints.NODE|GraphConstraints.EDGE|GraphConstraints.SELECTION,GraphConstraints.BLOCK_END));
 
 		firstdrag = true;
 	}

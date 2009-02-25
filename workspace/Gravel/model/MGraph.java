@@ -7,6 +7,7 @@ import java.util.Observer;
 import java.util.Vector;
 import java.util.Observable;
 
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 import model.Messages.MGraphMessage;
 /**
@@ -138,8 +139,8 @@ public class MGraph extends Observable implements Observer, MGraphInterface
 									//auf ungerichtet umstellen, existieren Kanten i->j und j->i so lösche eine
 		{
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));
-			endstatus=GraphMessage.BLOCK_END;
+			notifyObservers(new GraphMessage(GraphConstraints.EDGE|GraphConstraints.DIRECTION,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.EDGE));
+			endstatus=GraphConstraints.BLOCK_END;
 			Iterator<MNode> n = modifyNodes.getIterator();				
 			while (n.hasNext())
 			{
@@ -168,9 +169,9 @@ public class MGraph extends Observable implements Observer, MGraphInterface
 		}
 		directed = d;
 		setChanged();
-		notifyObservers( new MGraphMessage(MGraphMessage.DIRECTION,d));
+		notifyObservers( new MGraphMessage(GraphConstraints.DIRECTION,d));
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.EDGE|GraphMessage.DIRECTION,GraphMessage.UPDATE|endstatus,GraphMessage.EDGE));
+		notifyObservers(new GraphMessage(GraphConstraints.EDGE|GraphConstraints.DIRECTION,GraphConstraints.UPDATE|endstatus,GraphConstraints.EDGE));
 		return removed;
 	}
 	/**
@@ -192,8 +193,8 @@ public class MGraph extends Observable implements Observer, MGraphInterface
 		if ((allowloops)&&(!a)) //disbabling
 		{
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));	
-			endstatus=GraphMessage.BLOCK_END;
+			notifyObservers(new GraphMessage(GraphConstraints.LOOPS,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.EDGE));	
+			endstatus=GraphConstraints.BLOCK_END;
 			HashSet<MEdge> deledges = new HashSet<MEdge>();
 			Iterator<MEdge> n2 = modifyEdges.getIterator();
 			while (n2.hasNext())
@@ -209,9 +210,9 @@ public class MGraph extends Observable implements Observer, MGraphInterface
 		}	
 		this.allowloops = a;
 		setChanged();
-		notifyObservers( new MGraphMessage(MGraphMessage.LOOPS,a));
+		notifyObservers( new MGraphMessage(GraphConstraints.LOOPS,a));
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.LOOPS,GraphMessage.UPDATE|endstatus,GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphConstraints.LOOPS,GraphConstraints.UPDATE|endstatus,GraphConstraints.EDGE));	
 		return removed;
 	}
 	/**
@@ -234,8 +235,8 @@ public class MGraph extends Observable implements Observer, MGraphInterface
 		if ((allowmultiple)&&(!a)) //Changed from allowed to not allowed, so remove all multiple
 		{	
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.EDGE));	
-			endstatus=GraphMessage.BLOCK_END;
+			notifyObservers(new GraphMessage(GraphConstraints.MULTIPLE,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.EDGE));	
+			endstatus=GraphConstraints.BLOCK_END;
 			Iterator<MNode> n = modifyNodes.getIterator();				
 			while (n.hasNext())
 			{
@@ -269,9 +270,9 @@ public class MGraph extends Observable implements Observer, MGraphInterface
 		}
 		this.allowmultiple = a;
 		setChanged();
-		notifyObservers( new MGraphMessage(MGraphMessage.MULTIPLE,a));
+		notifyObservers( new MGraphMessage(GraphConstraints.MULTIPLE,a));
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|endstatus,GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphConstraints.MULTIPLE,GraphConstraints.UPDATE|endstatus,GraphConstraints.EDGE));	
 		return removed;
 	}
 	public int getType()

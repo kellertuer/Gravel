@@ -10,6 +10,7 @@ import java.util.TreeSet;
 //import java.util.concurrent.locks.ReentrantLock;
 
 import model.Messages.GraphColorMessage;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 /**
@@ -67,7 +68,7 @@ public class VSubgraphSet extends Observable implements Observer {
 			{
 					//Notify Edge about Color Update
 						setChanged();
-						notifyObservers(new GraphColorMessage(GraphColorMessage.EDGE,i,GraphColorMessage.ADDITION,subgraph.getColor()));
+						notifyObservers(new GraphColorMessage(GraphConstraints.EDGE,i,GraphConstraints.ADDITION,subgraph.getColor()));
 			}
 			
 		}
@@ -77,13 +78,13 @@ public class VSubgraphSet extends Observable implements Observer {
 			{
 					//Notify Node about Color Update
 						setChanged();
-						notifyObservers(new GraphColorMessage(GraphColorMessage.NODE,i,GraphColorMessage.ADDITION,subgraph.getColor()));
+						notifyObservers(new GraphColorMessage(GraphConstraints.NODE,i,GraphConstraints.ADDITION,subgraph.getColor()));
 			}
 			
 		}
 		vSubgraphs.add(subgraph.clone());
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraph.getIndex(),GraphMessage.ADDITION,GraphMessage.GRAPH_ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraph.getIndex(),GraphConstraints.ADDITION,GraphConstraints.GRAPH_ALL_ELEMENTS));	
 	}
 	/**
 	 * get the set with index i
@@ -130,7 +131,7 @@ public class VSubgraphSet extends Observable implements Observer {
 		vSubgraphs.remove(toDel);
 		mG.modifySubgraphs.remove(toDel.getIndex());
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.REMOVAL,GraphMessage.GRAPH_ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraphindex,GraphConstraints.REMOVAL,GraphConstraints.GRAPH_ALL_ELEMENTS));	
 	}
 
 	/**
@@ -155,7 +156,7 @@ public class VSubgraphSet extends Observable implements Observer {
 			if (mG.modifySubgraphs.get(index).containsNode(n.index))
 			{
 				setChanged();
-				this.notifyObservers(new GraphColorMessage(GraphColorMessage.NODE,n.index,oldcolor,newcolor));
+				this.notifyObservers(new GraphColorMessage(GraphConstraints.NODE,n.index,oldcolor,newcolor));
 			}
 		}
 		Iterator<MEdge> mei = mG.modifyEdges.getIterator();
@@ -165,7 +166,7 @@ public class VSubgraphSet extends Observable implements Observer {
 			if (mG.modifySubgraphs.get(index).containsEdge(e.index))
 			{
 				setChanged();
-				this.notifyObservers(new GraphColorMessage(GraphColorMessage.EDGE,e.index,oldcolor,newcolor));
+				this.notifyObservers(new GraphColorMessage(GraphConstraints.EDGE,e.index,oldcolor,newcolor));
 			}
 		}
 		actual.setColor(newcolor);
@@ -189,11 +190,11 @@ public class VSubgraphSet extends Observable implements Observer {
 			mG.modifySubgraphs.addEdgetoSubgraph(edgeindex, subgraphindex);
 			// Und der Kantenmenge Bescheid sagen
 			setChanged();
-			notifyObservers(new GraphColorMessage(GraphColorMessage.EDGE,edgeindex,GraphColorMessage.ADDITION,actual.getColor()));
+			notifyObservers(new GraphColorMessage(GraphConstraints.EDGE,edgeindex,GraphConstraints.ADDITION,actual.getColor()));
 		}
 		//global notify
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraphindex,GraphConstraints.UPDATE,GraphConstraints.SUBGRAPH|GraphConstraints.EDGE));	
 	}
 	/**
 	 * remove an edge from a set
@@ -206,7 +207,7 @@ public class VSubgraphSet extends Observable implements Observer {
 		removeEdgefromSubgraph_(edgeindex,subgraphindex);
 		//Notify Graph
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.EDGE));	
+		notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraphindex,GraphConstraints.UPDATE,GraphConstraints.SUBGRAPH|GraphConstraints.EDGE));	
 	}
 	/**
 	 * remove an edge from a set without informing the external observers outside the graph 
@@ -222,9 +223,9 @@ public class VSubgraphSet extends Observable implements Observer {
 		if (mG.modifySubgraphs.get(SetIndex).containsEdge(edgeindex)) 
 		{
 			mG.modifySubgraphs.removeEdgefromSubgraph(edgeindex, SetIndex);
-			//Nodify Edge-Set internal about Change			
+			//Notify Edge-Set internal about Change			
 			setChanged();
-			notifyObservers(new GraphColorMessage(GraphColorMessage.EDGE,edgeindex,GraphColorMessage.REMOVAL,actual.getColor()));
+			notifyObservers(new GraphColorMessage(GraphConstraints.EDGE,edgeindex,GraphConstraints.REMOVAL,actual.getColor()));
 		}
 	}
 	/**
@@ -246,11 +247,11 @@ public class VSubgraphSet extends Observable implements Observer {
 			mG.modifySubgraphs.addNodetoSubgraph(nodeindex, SetIndex);
 			// Und der Knotenmenge Bescheid sagen
 			setChanged();
-			notifyObservers(new GraphColorMessage(GraphColorMessage.NODE,nodeindex,GraphColorMessage.ADDITION,actual.getColor()));
+			notifyObservers(new GraphColorMessage(GraphConstraints.NODE,nodeindex,GraphConstraints.ADDITION,actual.getColor()));
 		}
 		//global notify
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.NODE));	
+		notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,SetIndex,GraphConstraints.UPDATE,GraphConstraints.SUBGRAPH|GraphConstraints.NODE));	
 	}
 	/**
 	 * remove a node from a set
@@ -263,7 +264,7 @@ public class VSubgraphSet extends Observable implements Observer {
 	public void removeNodefromSubgraph(int nodeindex, int SetIndex) {
 		removeNodefromSubgraph_(nodeindex, SetIndex);		
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,SetIndex,GraphMessage.UPDATE,GraphMessage.SUBGRAPH|GraphMessage.NODE));	
+		notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,SetIndex,GraphConstraints.UPDATE,GraphConstraints.SUBGRAPH|GraphConstraints.NODE));	
 	}
 	/**
 	 * remove Node from Sub set without informing the observsers
@@ -281,7 +282,7 @@ public class VSubgraphSet extends Observable implements Observer {
 			mG.modifySubgraphs.removeNodefromSubgraph(nodeindex, SetIndex);
 			//Nodify Node-Set internal about Change			
 			setChanged();
-			notifyObservers(new GraphColorMessage(GraphColorMessage.NODE,nodeindex,GraphColorMessage.REMOVAL,actual.getColor()));
+			notifyObservers(new GraphColorMessage(GraphConstraints.NODE,nodeindex,GraphConstraints.REMOVAL,actual.getColor()));
 		}
 	}
 

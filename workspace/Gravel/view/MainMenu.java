@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 import dialogs.JFileDialogs;
@@ -391,7 +392,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			else if (item == mFWinPrefs)
 			{
 		    	new JPreferencesDialog();
-		    	Gui.getInstance().getVGraph().pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.GRAPH_ALL_ELEMENTS,GraphMessage.UPDATE));
+		    	Gui.getInstance().getVGraph().pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));
 			}
 			else if (item == mFExport)
     			fileDialogs.Export();
@@ -518,27 +519,27 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			return;
 		
 		//either Selection changed or was affected
-		if (((m.getAffectedElementTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION)||((m.getModifiedElementTypes()&GraphMessage.SELECTION)==GraphMessage.SELECTION))
+		if (((m.getAffectedElementTypes()&GraphConstraints.SELECTION)==GraphConstraints.SELECTION)||((m.getModifiedElementTypes()&GraphConstraints.SELECTION)==GraphConstraints.SELECTION))
 		{
 			mEdDelSelection.setEnabled(graphpart.getVGraph().modifyEdges.hasSelection()||graphpart.getVGraph().modifyNodes.hasSelection());		
 			mEdModifySelection.setEnabled(graphpart.getVGraph().modifyEdges.hasSelection()||graphpart.getVGraph().modifyNodes.hasSelection());		
 			mEdArrangeSelection.setEnabled(graphpart.getVGraph().modifyNodes.hasSelection());
 		}
-		if ((m.getModifiedElementTypes()&GraphMessage.DIRECTION)==GraphMessage.DIRECTION) //directed changed
+		if ((m.getModifiedElementTypes()&GraphConstraints.DIRECTION)==GraphConstraints.DIRECTION) //directed changed
 		{
 	    	if (graphpart.getVGraph().getMathGraph().isDirected())
 	        	mVGDirCh.setText("ungerichtet");
 	        else
 	        	mVGDirCh.setText("gerichtet");        	
 		}
-		if ((m.getModifiedElementTypes()&GraphMessage.LOOPS)==GraphMessage.LOOPS) //Loops changed
+		if ((m.getModifiedElementTypes()&GraphConstraints.LOOPS)==GraphConstraints.LOOPS) //Loops changed
 		{
 	    	if (graphpart.getVGraph().getMathGraph().isLoopAllowed())
 	        	mVGLoopCh.setText("entferne Schleifen");
 	        else
 	        	mVGLoopCh.setText("erlaube Schleifen");        	
 		}
-		if ((m.getModifiedElementTypes()&GraphMessage.MULTIPLE)==GraphMessage.MULTIPLE) //Multiple Edges Changed
+		if ((m.getModifiedElementTypes()&GraphConstraints.MULTIPLE)==GraphConstraints.MULTIPLE) //Multiple Edges Changed
 		{
 	    	if (graphpart.getVGraph().getMathGraph().isMultipleAllowed())
 	        	mVGMultipleCh.setText("entferne Mehrfachkanten");

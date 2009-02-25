@@ -26,6 +26,7 @@ import model.VEdge;
 import model.VGraph;
 import model.VItem;
 import model.VNode;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 import view.pieces.GridComponent;
@@ -446,7 +447,7 @@ public class VGraphic extends Component implements 	Observer
 	}
 	private void handleGraphUpdate(GraphMessage m)
 	{
-		if ((m.getAffectedElementTypes()&(GraphMessage.GRAPH_ALL_ELEMENTS|GraphMessage.SELECTION)) > 0) //Anything in Elements or selections changed
+		if ((m.getAffectedElementTypes()&(GraphConstraints.GRAPH_ALL_ELEMENTS|GraphConstraints.SELECTION)) > 0) //Anything in Elements or selections changed
 		{
 			Point MouseOffSet = new Point(0,0);
 			if (Drag!=null)
@@ -484,7 +485,7 @@ public class VGraphic extends Component implements 	Observer
 			vp.getParent().validate();
 			repaint();	
 		}
-		else if ((m.getModifiedElementTypes()&GraphMessage.SUBGRAPH)==GraphMessage.SUBGRAPH)
+		else if ((m.getModifiedElementTypes()&GraphConstraints.SUBGRAPH)==GraphConstraints.SUBGRAPH)
 		{
 			repaint();
 			if (Click!=null)
@@ -515,7 +516,7 @@ public class VGraphic extends Component implements 	Observer
 		}
 		selColor = new Color(gp.getIntValue("vgraphic.selcolr"),gp.getIntValue("vgraphic.selcolg"),gp.getIntValue("vgraphic.selcolb"));
 		selWidth = gp.getIntValue("vgraphic.selwidth");
-		vG.pushNotify(new GraphMessage(GraphMessage.SELECTION,GraphMessage.UPDATE)); //Zoom and Selection stuff belong to the mark actions on a graph - they don't change the state to "not saved yet"
+		vG.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE)); //Zoom and Selection stuff belong to the mark actions on a graph - they don't change the state to "not saved yet"
 		repaint();
 	}
 	public void update(Observable o, Object arg)

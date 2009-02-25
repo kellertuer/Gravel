@@ -38,6 +38,7 @@ import model.VEdge;
 import model.VGraph;
 import model.VNode;
 import model.VSubgraph;
+import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 /**
@@ -362,13 +363,13 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 			int SetIndex = iSubgraphIndex.getValue();
 			GraphMessage startblock;
 			if (chSubgraph==null)
-				startblock = new GraphMessage(GraphMessage.SUBGRAPH, SetIndex, GraphMessage.ADDITION|GraphMessage.BLOCK_START, GraphMessage.GRAPH_ALL_ELEMENTS);
+				startblock = new GraphMessage(GraphConstraints.SUBGRAPH, SetIndex, GraphConstraints.ADDITION|GraphConstraints.BLOCK_START, GraphConstraints.GRAPH_ALL_ELEMENTS);
 			else
 			{
 				if (SetIndex!=oldindex) //Index modify
-					startblock = new GraphMessage(GraphMessage.SUBGRAPH, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.GRAPH_ALL_ELEMENTS);
+					startblock = new GraphMessage(GraphConstraints.SUBGRAPH, GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, GraphConstraints.GRAPH_ALL_ELEMENTS);
 				else
-					startblock = new GraphMessage(GraphMessage.SUBGRAPH, SetIndex, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.GRAPH_ALL_ELEMENTS);
+					startblock = new GraphMessage(GraphConstraints.SUBGRAPH, SetIndex, GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, GraphConstraints.GRAPH_ALL_ELEMENTS);
 			}	
 			//TESTS
 			//1. Falls der Graph neu ist
@@ -439,7 +440,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 				}	
 				
 			}
-			graphref.pushNotify(new GraphMessage(GraphMessage.SUBGRAPH,GraphMessage.BLOCK_END, GraphMessage.NODE|GraphMessage.EDGE));
+			graphref.pushNotify(new GraphMessage(GraphConstraints.SUBGRAPH,GraphConstraints.BLOCK_END, GraphConstraints.NODE|GraphConstraints.EDGE));
 			this.dispose();
 		}
 	}
