@@ -210,7 +210,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 			}
 			else if ((DragNode!=null)&&(!firstdrag)) //We had a drag
 			{
-				vg.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.BLOCK_ABORT|GraphMessage.BLOCK_END));				
+				vg.pushNotify(new GraphMessage(GraphMessage.GRAPH_ALL_ELEMENTS,GraphMessage.BLOCK_ABORT|GraphMessage.BLOCK_END));				
 			}
 			//End Drag Indication
 			DragNode = null;

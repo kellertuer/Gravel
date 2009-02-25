@@ -47,7 +47,7 @@ public class MSubgraphSet extends Observable implements Observer {
 		{
 			mSubgraphs.remove(toDelete);
 			setChanged();
-			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,index,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
+			notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,index,GraphMessage.REMOVAL,GraphMessage.GRAPH_ALL_ELEMENTS));	
 			return true;
 		}
 		return false;

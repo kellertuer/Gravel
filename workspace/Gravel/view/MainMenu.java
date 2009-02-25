@@ -391,7 +391,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			else if (item == mFWinPrefs)
 			{
 		    	new JPreferencesDialog();
-		    	Gui.getInstance().getVGraph().pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.ALL_ELEMENTS,GraphMessage.UPDATE));
+		    	Gui.getInstance().getVGraph().pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.GRAPH_ALL_ELEMENTS,GraphMessage.UPDATE));
 			}
 			else if (item == mFExport)
     			fileDialogs.Export();

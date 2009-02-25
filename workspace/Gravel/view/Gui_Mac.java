@@ -114,7 +114,7 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
     public void handlePreferences(ApplicationEvent e)
     {
     	new JPreferencesDialog();
-    	normalgui.getVGraph().pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.ALL_ELEMENTS,GraphMessage.UPDATE));
+    	normalgui.getVGraph().pushNotify(new GraphMessage(GraphMessage.SELECTION|GraphMessage.GRAPH_ALL_ELEMENTS,GraphMessage.UPDATE));
     	//e.setHandled(true);
     }
 	public void handleQuit(ApplicationEvent e)

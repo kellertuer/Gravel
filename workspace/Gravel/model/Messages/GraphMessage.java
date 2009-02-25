@@ -25,12 +25,14 @@ public class GraphMessage {
 	//Type of change (and affection)
 	public static final int NODE = 1;
 	public static final int EDGE = 2;
-	public static final int SUBGRAPH = 4;
-	public static final int ALL_ELEMENTS=7;
-	public static final int SELECTION = 8;
-	public static final int DIRECTION = 16;
-	public static final int LOOPS = 32;
-	public static final int MULTIPLE = 64;
+	public static final int HYPEREDGE = 4;
+	public static final int SUBGRAPH = 8;
+	public static final int GRAPH_ALL_ELEMENTS=NODE|EDGE|SUBGRAPH;
+	public static final int HYPERGRAPH_ALL_ELEMENTS=NODE|HYPEREDGE|SUBGRAPH;
+	public static final int SELECTION = 16;
+	public static final int DIRECTION = 32;
+	public static final int LOOPS = 64;
+	public static final int MULTIPLE = 128;
 	public static final int ALL = 0xffff;
 
 	//Modification

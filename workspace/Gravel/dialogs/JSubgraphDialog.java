@@ -362,13 +362,13 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 			int SetIndex = iSubgraphIndex.getValue();
 			GraphMessage startblock;
 			if (chSubgraph==null)
-				startblock = new GraphMessage(GraphMessage.SUBGRAPH, SetIndex, GraphMessage.ADDITION|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS);
+				startblock = new GraphMessage(GraphMessage.SUBGRAPH, SetIndex, GraphMessage.ADDITION|GraphMessage.BLOCK_START, GraphMessage.GRAPH_ALL_ELEMENTS);
 			else
 			{
 				if (SetIndex!=oldindex) //Index modify
-					startblock = new GraphMessage(GraphMessage.SUBGRAPH, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS);
+					startblock = new GraphMessage(GraphMessage.SUBGRAPH, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.GRAPH_ALL_ELEMENTS);
 				else
-					startblock = new GraphMessage(GraphMessage.SUBGRAPH, SetIndex, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS);
+					startblock = new GraphMessage(GraphMessage.SUBGRAPH, SetIndex, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.GRAPH_ALL_ELEMENTS);
 			}	
 			//TESTS
 			//1. Falls der Graph neu ist

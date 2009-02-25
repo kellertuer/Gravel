@@ -298,7 +298,7 @@ public class GraphAction {
 				ms = graph.getMathGraph().modifySubgraphs.get(newSubgraph.getIndex()).clone();
 				graph.modifySubgraphs.remove(newSubgraph.getIndex()); //Remove old Subgraph.
 				graph.modifySubgraphs.add(newSubgraph, tempms);
-				graph.pushNotify(new GraphMessage(GraphMessage.SUBGRAPH,newSubgraph.getIndex(),GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.ALL_ELEMENTS));
+				graph.pushNotify(new GraphMessage(GraphMessage.SUBGRAPH,newSubgraph.getIndex(),GraphMessage.UPDATE|GraphMessage.BLOCK_START,GraphMessage.GRAPH_ALL_ELEMENTS));
 				//Reintroduce all Nodes/Edges
 				Iterator<VNode> ni = graph.modifyNodes.getIterator();
 				while (ni.hasNext())
@@ -314,7 +314,7 @@ public class GraphAction {
 					if (tempms.containsEdge(e2.getIndex()))
 						graph.modifySubgraphs.addEdgetoSubgraph(e2.getIndex(), newSubgraph.getIndex());
 				}
-				graph.pushNotify(new GraphMessage(GraphMessage.SUBGRAPH,newSubgraph.getIndex(),GraphMessage.BLOCK_END,GraphMessage.ALL_ELEMENTS));
+				graph.pushNotify(new GraphMessage(GraphMessage.SUBGRAPH,newSubgraph.getIndex(),GraphMessage.BLOCK_END,GraphMessage.GRAPH_ALL_ELEMENTS));
 				ret = graph;
 				break;
 			default: throw new GraphActionException("GraphAction::doReplace(); Unknown ActionObject");

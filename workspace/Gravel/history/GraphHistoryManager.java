@@ -201,7 +201,7 @@ public class GraphHistoryManager implements Observer
 		if (RedoStack.size()>=stacksize)
 			RedoStack.remove();
 		RedoStack.add(LastAction);
-		trackedGraph.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.UPDATE));
+		trackedGraph.pushNotify(new GraphMessage(GraphMessage.GRAPH_ALL_ELEMENTS,GraphMessage.UPDATE));
 		trackedGraph.addObserver(this); //Activate Tracking again
 	}
 	/**
@@ -237,7 +237,7 @@ public class GraphHistoryManager implements Observer
 			UndoStack.remove();
 		}
 		UndoStack.add(LastAction);
-		trackedGraph.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS,GraphMessage.UPDATE));
+		trackedGraph.pushNotify(new GraphMessage(GraphMessage.GRAPH_ALL_ELEMENTS,GraphMessage.UPDATE));
 		trackedGraph.addObserver(this); //Activate Tracking again
 	}
 	/**
@@ -258,7 +258,7 @@ public class GraphHistoryManager implements Observer
 		trackedGraph.deleteObserver(this);
 		SavedUndoStackSize=UndoStack.size();
 		//Notify everyone despite us.
-		trackedGraph.pushNotify(new GraphMessage(GraphMessage.ALL_ELEMENTS, GraphMessage.UPDATE));
+		trackedGraph.pushNotify(new GraphMessage(GraphMessage.GRAPH_ALL_ELEMENTS, GraphMessage.UPDATE));
 		trackedGraph.addObserver(this);		
 	}
 	/**
@@ -289,7 +289,7 @@ public class GraphHistoryManager implements Observer
 		if (m==null)
 			return;
 		//Complete Replacement of Graph Handling
-		if ((m.getModifiedElementTypes()==GraphMessage.ALL_ELEMENTS)&&(m.getAffectedElementTypes()==GraphMessage.ALL_ELEMENTS)&&(m.getModification()==GraphMessage.REPLACEMENT))
+		if ((m.getModifiedElementTypes()==GraphMessage.GRAPH_ALL_ELEMENTS)&&(m.getAffectedElementTypes()==GraphMessage.GRAPH_ALL_ELEMENTS)&&(m.getModification()==GraphMessage.REPLACEMENT))
 		{
 				lastGraph = trackedGraph.clone();
 				Blockstart=null;

@@ -125,7 +125,7 @@ public class VNodeSet extends Observable implements Observer {
 		mG.modifyNodes.changeIndex(oldi, newi); //Update Adjacent edges in MGraph, so there's no need to update VEdges
 		get(oldi).setIndex(newi);
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,newi,GraphMessage.INDEXCHANGED, GraphMessage.ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphMessage.NODE,newi,GraphMessage.INDEXCHANGED, GraphMessage.GRAPH_ALL_ELEMENTS));	
 	}
 	/**
 	 * Removes a node and push an Message that should be handled by other
@@ -142,7 +142,7 @@ public class VNodeSet extends Observable implements Observer {
 		mG.modifyNodes.remove(i);
 		vNodes.remove(get(i));
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.REMOVAL,GraphMessage.GRAPH_ALL_ELEMENTS));	
 	}
 	/**
 	 * Replace the node with index given by an copy of Node with the parameter,

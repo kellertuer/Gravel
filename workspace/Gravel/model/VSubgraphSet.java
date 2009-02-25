@@ -83,7 +83,7 @@ public class VSubgraphSet extends Observable implements Observer {
 		}
 		vSubgraphs.add(subgraph.clone());
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraph.getIndex(),GraphMessage.ADDITION,GraphMessage.ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraph.getIndex(),GraphMessage.ADDITION,GraphMessage.GRAPH_ALL_ELEMENTS));	
 	}
 	/**
 	 * get the set with index i
@@ -130,7 +130,7 @@ public class VSubgraphSet extends Observable implements Observer {
 		vSubgraphs.remove(toDel);
 		mG.modifySubgraphs.remove(toDel.getIndex());
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphMessage.SUBGRAPH,subgraphindex,GraphMessage.REMOVAL,GraphMessage.GRAPH_ALL_ELEMENTS));	
 	}
 
 	/**

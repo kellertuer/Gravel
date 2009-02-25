@@ -89,7 +89,7 @@ public class MNodeSet extends Observable implements Observer {
 		notifyObservers(new MGraphMessage(MGraphMessage.NODE,i,MGraphMessage.REMOVAL));
 		//global notify
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.REMOVAL,GraphMessage.ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphMessage.NODE,i,GraphMessage.REMOVAL,GraphMessage.GRAPH_ALL_ELEMENTS));	
 		return;
 	}
 	/**
@@ -134,7 +134,7 @@ public class MNodeSet extends Observable implements Observer {
 		oldn.index=newi;
 		replace(newn);
 		setChanged();
-		notifyObservers(new GraphMessage(GraphMessage.NODE, GraphMessage.INDEXCHANGED, GraphMessage.ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphMessage.NODE, GraphMessage.INDEXCHANGED, GraphMessage.GRAPH_ALL_ELEMENTS));	
 	}
 	/**
 	 * @return max node index +1

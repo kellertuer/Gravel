@@ -392,7 +392,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 						JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Knotens nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index muss echt gr"+main.CONST.html_oe+""+main.CONST.html_sz+"er 0 sein.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 						return;					
 					}
-					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.ALL_ELEMENTS));
+					graphref.pushNotify(new GraphMessage(GraphMessage.NODE, GraphMessage.UPDATE|GraphMessage.BLOCK_START, GraphMessage.GRAPH_ALL_ELEMENTS));
 					graphref.modifyNodes.changeIndex(oldindex, iNodeIndex.getValue());
 				}
 				else

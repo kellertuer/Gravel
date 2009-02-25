@@ -446,7 +446,7 @@ public class VGraphic extends Component implements 	Observer
 	}
 	private void handleGraphUpdate(GraphMessage m)
 	{
-		if ((m.getAffectedElementTypes()&(GraphMessage.ALL_ELEMENTS|GraphMessage.SELECTION)) > 0) //Anything in Elements or selections changed
+		if ((m.getAffectedElementTypes()&(GraphMessage.GRAPH_ALL_ELEMENTS|GraphMessage.SELECTION)) > 0) //Anything in Elements or selections changed
 		{
 			Point MouseOffSet = new Point(0,0);
 			if (Drag!=null)
