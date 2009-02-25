@@ -26,6 +26,7 @@ import model.VEdge;
 import model.VGraph;
 import model.VItem;
 import model.VNode;
+import model.nurbscurve;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
@@ -121,6 +122,22 @@ public class VGraphic extends Component implements 	Observer
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
+		Vector<Double> t= new Vector<Double>();
+		t.add(0d); t.add(0d); t.add(0d); t.add(0.25d); t.add(0.5d); t.add(0.5d); t.add(0.75);
+		t.add(1d); t.add(1d); t.add(1d);
+		Vector<Point2D> b = new Vector<Point2D>();
+		b.add(new Point2D.Double(140d,100d)); b.add(new Point2D.Double(140d,80d));
+		b.add(new Point2D.Double(60d,80d)); b.add(new Point2D.Double(60d,100d));
+		b.add(new Point2D.Double(60d,120d)); b.add(new Point2D.Double(140d,120d));
+		b.add(new Point2D.Double(140d,100d));
+		Vector<Double> w = new Vector<Double>();
+		w.add(1d); w.add(0.5d); w.add(0.5d);  
+		w.add(1d); w.add(0.5d); w.add(0.5d);  
+		w.add(1d);
+		nurbscurve nc = new nurbscurve(t,b,w,2);
+		g2.setColor(Color.black);
+		g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		g2.draw(nc.getCurve(0.002d));
 	}
 	/**
 	 * Paint Edges in the graphic

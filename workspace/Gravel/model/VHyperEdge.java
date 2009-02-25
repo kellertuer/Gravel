@@ -142,6 +142,10 @@ public class VHyperEdge extends VItem {
 	{
 		return null;
 	}
+	public boolean containsPoint(Point p)
+	{
+		return false;
+	}
 	/**
 	 * Get the Width of the edge
 	 * @return width of the edge
@@ -185,7 +189,7 @@ public class VHyperEdge extends VItem {
 	/**
 	 * @return the arrow
 	 */
-//	public VHyperEdgeForm geForm() {
+//	public VHyperEdgeForm getForm() {
 //		return form;
 //	}
 }
