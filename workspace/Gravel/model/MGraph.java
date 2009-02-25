@@ -27,12 +27,11 @@ import model.Messages.MGraphMessage;
  *
  */
 
-public class MGraph extends Observable implements Observer
+public class MGraph extends Observable implements Observer, MGraphInterface
 {	
 	public MNodeSet modifyNodes;
 	public MEdgeSet modifyEdges;
 	public MSubgraphSet modifySubgraphs;
-	HashSet<MSubgraph> mSubgraphs;
 	boolean directed;
 	boolean allowloops;
 	boolean allowmultiple;
@@ -56,7 +55,6 @@ public class MGraph extends Observable implements Observer
 		
 		modifySubgraphs.addObserver(this); //to advance change Messages
 		addObserver(modifyEdges); //for changes of the Booleans
-		mSubgraphs = new HashSet<MSubgraph>();
 		directed = d;
 		allowloops =l;
 		allowmultiple = m;
@@ -69,7 +67,7 @@ public class MGraph extends Observable implements Observer
 	{
 		MGraph clone = new MGraph(directed,allowloops, allowmultiple);
 		//Untergraphen
-		Iterator<MSubgraph> n1 = mSubgraphs.iterator();
+		Iterator<MSubgraph> n1 = modifySubgraphs.getIterator();
 		while (n1.hasNext())
 			clone.modifySubgraphs.add(n1.next().clone()); //Jedes Set kopieren
 		//Knoten
@@ -80,7 +78,7 @@ public class MGraph extends Observable implements Observer
 			MNode Nodeclone = new MNode(actualNode.index, actualNode.name);
 			clone.modifyNodes.add(Nodeclone);
 			//In alle Sets einfuegen
-			n1 = mSubgraphs.iterator();
+			n1 = modifySubgraphs.getIterator();
 			while (n1.hasNext())
 			{
 				MSubgraph actualSet = n1.next();
@@ -96,7 +94,7 @@ public class MGraph extends Observable implements Observer
 			MEdge cEdge = new MEdge(actualEdge.index, actualEdge.StartIndex, actualEdge.EndIndex, actualEdge.Value, actualEdge.name);
 			clone.modifyEdges.add(cEdge);
 			//In alle Sets einfuegen
-			n1 = mSubgraphs.iterator();
+			n1 = modifySubgraphs.getIterator();
 			while (n1.hasNext())
 			{
 				MSubgraph actualSet = n1.next();
@@ -275,6 +273,10 @@ public class MGraph extends Observable implements Observer
 		setChanged();
 		notifyObservers(new GraphMessage(GraphMessage.MULTIPLE,GraphMessage.UPDATE|endstatus,GraphMessage.EDGE));	
 		return removed;
+	}
+	public int getType()
+	{
+		return MGraphInterface.GRAPH;
 	}
 	public void update(Observable o, Object arg) {
 		if (arg instanceof GraphMessage) //Send graphmessages to external listeners

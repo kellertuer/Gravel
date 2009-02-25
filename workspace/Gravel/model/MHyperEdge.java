@@ -1,7 +1,18 @@
 package model;
 
 import java.util.BitSet;
-
+/**
+ * This Class models the mathematical stuff of an Hyperedge
+ * 
+ * An Hyperedge e consists of
+ *  - A Set of endnodes
+ *  - an index
+ *  - a value (what ever that is needed to)
+ *  - a name
+ *  
+ * @author Ronny Bergmann
+ * @since 0.4
+ */
 public class MHyperEdge {
 	public int index;
 	private BitSet EndNodes;

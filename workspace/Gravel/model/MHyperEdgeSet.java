@@ -13,7 +13,7 @@ import model.Messages.GraphMessage;
 import model.Messages.MGraphMessage;
 
 /**
- * Represents a Set of mathamtical Edges to encapsulate its modifications
+ * Represents a Set of mathamtical HyperEdges to encapsulate its modifications
  * Can be tracked to react (MHyperGraph INternal) on Hyperedge Deletions, but sends
  * messages in global format that are advanced by the MHyperGraph
  * 

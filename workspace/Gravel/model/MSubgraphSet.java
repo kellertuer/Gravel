@@ -10,6 +10,8 @@ import model.Messages.GraphMessage;
 import model.Messages.MGraphMessage;
 /**
  * Class for handling the mathematical Stuff of Subgraphs
+ * 
+ * May contain edges/hyperedges and nodes
  * @author ronny
  *
  */
