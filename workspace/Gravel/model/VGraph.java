@@ -35,7 +35,7 @@ import model.Messages.GraphMessage;
  *
  * @author Ronny Bergmann 
  */
-public class VGraph extends Observable implements Observer {
+public class VGraph extends Observable implements Observer, VGraphInterface {
 
 	MGraph mG;
 	public VNodeSet modifyNodes;
@@ -566,6 +566,9 @@ public class VGraph extends Observable implements Observer {
 			notifyObservers();
 		else
 			notifyObservers(o);
+	}
+	public int getType() {
+		return VGraphInterface.GRAPH;
 	}
 	public void update(Observable o, Object arg) 
 	{
