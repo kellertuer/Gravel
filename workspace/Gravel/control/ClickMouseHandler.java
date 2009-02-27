@@ -17,6 +17,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import view.VGraphic;
+
 import dialogs.JEdgeDialog;
 import dialogs.JNodeDialog;
 import dialogs.JSubgraphDialog;
@@ -57,6 +59,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 	
 	private GeneralPreferences gp;
 	private Point CreationPoint;
+	VGraphic vgc;
 	VGraph vg;
 	/**
 	 * Initializes the Mouse Click Handler to a specifig VGraph, where the mouse actions are involved
@@ -65,11 +68,12 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 	 * 
 	 * @param g
 	 */
-	public ClickMouseHandler(VGraph g)
+	public ClickMouseHandler(VGraphic g)
 	{
-		vg = g;
+		vgc= g;
 		gp = GeneralPreferences.getInstance();
-		g.addObserver(this);
+		vg = vgc.getVGraph();
+		vg.addObserver(this); //Sub
 		initPopups();
 		updateSubgraphList();
 	}
@@ -218,7 +222,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 	 */
 	public void mouseClicked(MouseEvent e)
 	{
-		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //rausrechnen
+		Point p = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //rausrechnen
 		if ((e.getClickCount()==2)&&(e.getModifiers() == MouseEvent.BUTTON1_MASK))
 		{ //Double Click on Node
 			VNode dcn = vg.modifyNodes.getFirstinRangeOf(p);
@@ -230,7 +234,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 		if ((e.getModifiers() == MouseEvent.BUTTON3_MASK) || (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.CTRL_MASK)) // mit rechts oder strg links
 		{
 			VNode r = vg.modifyNodes.getFirstinRangeOf(p);
-			VEdge s = vg.getEdgeinRangeOf(p,2.0);
+			VEdge s = vg.getEdgeinRangeOf(p,2.0*((float)vgc.getZoom()/100));
 			if (r != null) {
 				updateNodeSetList(r.getIndex());
 				Nname.setText(vg.getMathGraph().modifyNodes.get(r.getIndex()).name + " - (#" + r.getIndex() + ")");
@@ -267,7 +271,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 					r.deselect();
 				vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
 			} else {
-				VEdge s = vg.getEdgeinRangeOf(p,2.0);
+				VEdge s = vg.getEdgeinRangeOf(p,2.0*((float)vgc.getZoom()/100));
 				if (s != null) 
 				{
 					if ((s.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED)

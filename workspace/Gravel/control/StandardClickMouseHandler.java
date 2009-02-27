@@ -1,9 +1,9 @@
 package control;
 
-import io.GeneralPreferences;
-
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+
+import view.VGraphic;
 
 import model.VEdge;
 import model.VGraph;
@@ -22,16 +22,16 @@ import model.Messages.GraphMessage;
 public class StandardClickMouseHandler extends ClickMouseHandler {
 	
 	private VGraph vg;
-	private GeneralPreferences gp;
+	private VGraphic vgc;
 	/**
 	 * Initialize the given Standard Mode with an graph it is bound to 
 	 * @param g
 	 */
-	public StandardClickMouseHandler(VGraph g)
+	public StandardClickMouseHandler(VGraphic g)
 	{
 		super(g);
-		vg = g;
-		gp = GeneralPreferences.getInstance();
+		vgc = g;
+		vg = g.getVGraph();
 	}
 	
 	public void mousePressed(MouseEvent e) {}
@@ -43,7 +43,7 @@ public class StandardClickMouseHandler extends ClickMouseHandler {
 	public void mouseClicked(MouseEvent e) 
 	{
 		super.mouseClicked(e);
-		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //rausrechnen
+		Point p = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //rausrechnen
 		if (e.getModifiers()==MouseEvent.BUTTON1_MASK) // Button 1
 		{
 			VNode r = vg.modifyNodes.getFirstinRangeOf(p);
@@ -56,7 +56,7 @@ public class StandardClickMouseHandler extends ClickMouseHandler {
 				} else
 					vg.deselect();
 			} else {
-				VEdge s = vg.getEdgeinRangeOf(p,2.0);
+				VEdge s = vg.getEdgeinRangeOf(p,2.0*((float)vgc.getZoom()/100));
 				if (s != null) 
 				{
 					if ((s.getSelectedStatus() & VItem.SELECTED) != VItem.SELECTED) 

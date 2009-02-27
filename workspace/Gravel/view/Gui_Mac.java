@@ -137,8 +137,6 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
 		//sonst speichern, aber vorher noch den letzten File löschen, wenn nichts geladen werden soll
 		if (!gp.getBoolValue("graph.loadfileonstart")) 
 			gp.setStringValue("graph.lastfile","$NONE");
-		//Zoom auch nich speichern
-		gp.setIntValue("vgraphic.zoom",100);
 		//evtl neue daten Speichern wenn nicht oben geladen worden ist
 			gp.writetoXML();
 		System.exit(0);

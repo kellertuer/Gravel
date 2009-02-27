@@ -370,7 +370,6 @@ public class LaTeXPictureWriter implements TeXWriter {
 			}
 		
 		try {        
-		vgc.setZoomEnabled(false);
 	       OutputStream fout= new FileOutputStream(f);
 	       OutputStream bout= new BufferedOutputStream(fout);
 	       OutputStreamWriter out = new OutputStreamWriter(bout, "UTF8");
@@ -381,7 +380,6 @@ public class LaTeXPictureWriter implements TeXWriter {
 	       writeFooter(out,"Gravel Graphen-Export '"+f.getName()+"'");
 	       out.flush();  // Don't forget to flush!
 	       out.close();
-	       vgc.setZoomEnabled(true);
 		}
 		catch (Exception e)
 		{

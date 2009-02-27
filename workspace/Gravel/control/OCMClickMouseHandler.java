@@ -5,6 +5,8 @@ import io.GeneralPreferences;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
+import view.VGraphic;
+
 import model.MNode;
 import model.VGraph;
 import model.VNode;
@@ -17,12 +19,14 @@ import model.VNode;
 public class OCMClickMouseHandler extends ClickMouseHandler {
 	
 	private VGraph vg;
+	private VGraphic vgc;
 	private GeneralPreferences gp;
 		
-	public OCMClickMouseHandler(VGraph g)
+	public OCMClickMouseHandler(VGraphic g)
 	{
 		super(g);
-		vg = g;
+		vgc = g;
+		vg = g.getVGraph();
 		gp = GeneralPreferences.getInstance();
 	}
 	
@@ -33,7 +37,7 @@ public class OCMClickMouseHandler extends ClickMouseHandler {
 	public void mouseClicked(MouseEvent e) 
 	{
 		super.mouseClicked(e);
-		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //rausrechnen
+		Point p = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //rausrechnen
 		if (e.getModifiers()==MouseEvent.BUTTON1_MASK) // Button 1/Links
 		{
 			VNode r = vg.modifyNodes.getFirstinRangeOf(p);

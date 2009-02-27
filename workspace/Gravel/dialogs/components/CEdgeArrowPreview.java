@@ -66,7 +66,6 @@ public class CEdgeArrowPreview extends Container implements Observer{
 		ArrowG = new VGraphic(new Dimension(200,60), ArrowTest);
 		ArrowG.setMouseHandling(VGraphic.NO_MOUSEHANDLING);
 		ArrowG.setPreferredSize(new Dimension(200,62));
-		ArrowG.setZoomEnabled(false);
 		GeneralPreferences.getInstance().deleteObserver(ArrowG);
 		add(ArrowG,c);
 		InitValues(e);

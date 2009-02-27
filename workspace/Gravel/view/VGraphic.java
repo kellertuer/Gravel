@@ -83,8 +83,8 @@ public class VGraphic extends Component implements 	Observer
 		gp.addObserver(this);
 		this.setSize(d);
 		this.setBounds(0, 0, d.width, d.height);
-		
-		//zoomfactor = (float)gp.getIntValue("vgraphic.zoom") / 100;
+
+		zoomfactor = 1.0f; usezoom = true;
 		this.setZoomEnabled(true);
 		gridx = gp.getIntValue("grid.x");
 		gridy = gp.getIntValue("grid.y");
@@ -126,10 +126,10 @@ public class VGraphic extends Component implements 	Observer
 		t.add(0d); t.add(0d); t.add(0d); t.add(0.25d); t.add(0.5d); t.add(0.5d); t.add(0.75);
 		t.add(1d); t.add(1d); t.add(1d);
 		Vector<Point2D> b = new Vector<Point2D>();
-		b.add(new Point2D.Double(140d,100d)); b.add(new Point2D.Double(140d,80d));
-		b.add(new Point2D.Double(60d,80d)); b.add(new Point2D.Double(60d,100d));
-		b.add(new Point2D.Double(60d,120d)); b.add(new Point2D.Double(140d,120d));
-		b.add(new Point2D.Double(140d,100d));
+		b.add(new Point2D.Double(240d,200d)); b.add(new Point2D.Double(240d,160d));
+		b.add(new Point2D.Double(160d,160d)); b.add(new Point2D.Double(160d,200d));
+		b.add(new Point2D.Double(160d,240d)); b.add(new Point2D.Double(240d,240d));
+		b.add(new Point2D.Double(240d,200d));
 		Vector<Double> w = new Vector<Double>();
 		w.add(1d); w.add(0.5d); w.add(0.5d);  
 		w.add(1d); w.add(0.5d); w.add(0.5d);  
@@ -137,7 +137,7 @@ public class VGraphic extends Component implements 	Observer
 		nurbscurve nc = new nurbscurve(t,b,w,2);
 		g2.setColor(Color.black);
 		g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		g2.draw(nc.getCurve(0.002d));
+		g2.draw(nc.getCurve(0.03d));
 	}
 	/**
 	 * Paint Edges in the graphic
@@ -412,8 +412,8 @@ public class VGraphic extends Component implements 	Observer
 			break;
 			case OCM_MOUSEHANDLING:
 				resetMouseHandling();
-				Click = new OCMClickMouseHandler(vG);
-				Drag = new OCMDragMouseHandler(vG);
+				Click = new OCMClickMouseHandler(this);
+				Drag = new OCMDragMouseHandler(this);
 				this.addMouseListener(Drag);
 				this.addMouseMotionListener(Drag);
 				this.addMouseListener(Click);
@@ -421,8 +421,8 @@ public class VGraphic extends Component implements 	Observer
 			case STD_MOUSEHANDLING:
 			default:
 				resetMouseHandling();
-				Click = new StandardClickMouseHandler(vG);
-				Drag = new StandardDragMouseHandler(vG);
+				Click = new StandardClickMouseHandler(this);
+				Drag = new StandardDragMouseHandler(this);
 				this.addMouseListener(Drag);
 				this.addMouseMotionListener(Drag);
 				this.addMouseListener(Click);
@@ -448,19 +448,36 @@ public class VGraphic extends Component implements 	Observer
 	}
 	/**
 	 * Set The possibility to Zoom to a new value
-	 * @param activity ture, if zoom should be able, else false
+	 * @param activity trre, if zoom should be able, else false
+	 * @deprecated
 	 */
 	public void setZoomEnabled(boolean activity)
 	{
+		if (usezoom==activity) //nothing changed
+			return;
 		usezoom = activity;
-		if (usezoom)
-		{
-			zoomfactor = (float)gp.getIntValue("vgraphic.zoom") / 100;
-		}
-		else
-		{
+		if (!usezoom) //changed to in active-> set to 100%
 			zoomfactor = 1.0f;
+	}
+	/**
+	 * Set Zoom to a specific value - if a Component named „Zoom“ (ZoomComponent) exists, ist value is set, too
+	 * @param percent new Zoom in percent
+	 */
+	public void setZoom(int percent)
+	{
+		zoomfactor = ((float)percent)/100.0f;
+		if (this.Controls.get("Zoom")!=null)
+		{
+			((ZoomComponent)Controls.get("Zoom")).setZoom(percent);
 		}
+	}
+	/**
+	 * Get the actual Zoom-Factor in percent.
+	 * @return an int representing the zoom in percent.
+	 */
+	public int getZoom()
+	{
+		return (new Float(zoomfactor*100.0f)).intValue();
 	}
 	private void handleGraphUpdate(GraphMessage m)
 	{
@@ -511,17 +528,6 @@ public class VGraphic extends Component implements 	Observer
 	}
 	public void handlePreferencesUpdate()
 	{
-		if (usezoom)
-		{
-			zoomfactor = (float)gp.getIntValue("vgraphic.zoom") / 100;
-			if (Controls.get("Zoom")!=null) //A Zoom Component is added to this 
-			{
-				if (((ZoomComponent)Controls.get("Zoom")).getZoom()!=gp.getIntValue("vgraphic.zoom")) //The Change was not set from the ZoomComponent
-				{ //Update the Component
-					((ZoomComponent)Controls.get("Zoom")).setZoom(gp.getIntValue("vgraphic.zoom"));
-				}
-			}
-		}
 		gridx = gp.getIntValue("grid.x");
 		gridy = gp.getIntValue("grid.y");
 		gridenabled = gp.getBoolValue("grid.enabled");
@@ -547,8 +553,11 @@ public class VGraphic extends Component implements 	Observer
 			{
 				if (arg.equals("Zoom"))
 				{
-					//reset zoomfactor
-					gp.setIntValue("vgraphic.zoom",((ZoomComponent)o).getZoom());
+					ZoomComponent myZoom = ((ZoomComponent)o);
+					if (myZoom.getZoom()!=getZoom()) //Zoom really changed externally - update here
+						zoomfactor = ((float)myZoom.getZoom())/100.0f;
+					//internally update scrolls
+					handleGraphUpdate(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
 				}
 				else if (arg.equals("Grid"))
 				{

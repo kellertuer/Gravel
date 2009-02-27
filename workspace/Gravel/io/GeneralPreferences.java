@@ -349,7 +349,6 @@ public class GeneralPreferences extends Observable
 		if (IntValues.get("vgraphic.selwidth")==null) return false;
 		if (IntValues.get("vgraphic.x")==null) return false;
 		if (IntValues.get("vgraphic.y")==null) return false;
-		if (IntValues.get("vgraphic.zoom")==null) return false;
 
 		if (IntValues.get("window.x")==null) return false;
 		if (IntValues.get("window.y")==null) return false;
@@ -404,7 +403,6 @@ public class GeneralPreferences extends Observable
 		IntValues.put("vgraphic.selcolr",115);
 		IntValues.put("vgraphic.selcolg",169);
 		IntValues.put("vgraphic.selcolb",225);
-		IntValues.put("vgraphic.zoom",100);
 		IntValues.put("vgraphic.x",500);
 		IntValues.put("vgraphic.y",500);
 		IntValues.put("window.x",600);

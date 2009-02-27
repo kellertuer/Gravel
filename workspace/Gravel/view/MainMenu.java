@@ -413,11 +413,11 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     	    if (item == mVModusOCM)
         	  	graphpart.setMouseHandling(VGraphic.OCM_MOUSEHANDLING);
         	else if (item == mVZoom1)
-     	       GeneralPreferences.getInstance().setIntValue("vgraphic.zoom",50);
+        		graphpart.setZoom(50);
         	else if (item == mVZoom2)
-        		GeneralPreferences.getInstance().setIntValue("vgraphic.zoom",100);
+        		graphpart.setZoom(100);
         	else if (item == mVZoom3)
-        		GeneralPreferences.getInstance().setIntValue("vgraphic.zoom",200);
+        		graphpart.setZoom(200);
         	else if (item == mVGrid)
     	    {
     	    	GridComponent g = new GridComponent();

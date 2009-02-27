@@ -8,6 +8,8 @@ import java.awt.event.MouseEvent;
 import java.util.Iterator;
 import java.util.Vector;
 
+import view.VGraphic;
+
 import model.MEdge;
 import model.VEdge;
 import model.VGraph;
@@ -26,6 +28,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 {
 
 	private VGraph vg;
+	private VGraphic vgc;
 	private Point MouseOffSet;
 	private GeneralPreferences gp;
 	private VNode movingNode;
@@ -37,10 +40,11 @@ public class StandardDragMouseHandler extends DragMouseHandler
 	 * 
 	 * @param g the VGraph
 	 */
-	public StandardDragMouseHandler(VGraph g)
+	public StandardDragMouseHandler(VGraphic g)
 	{
 		super(g);
-		vg = g;
+		vgc = g;
+		vg = g.getVGraph();
 		gp = GeneralPreferences.getInstance();
 		MouseOffSet = new Point(0,0);
 		firstdrag = true; //Not dragged up to now
@@ -109,10 +113,10 @@ public class StandardDragMouseHandler extends DragMouseHandler
 		//Get Movement since begin of Drag
 		Point p = new Point(e.getPoint().x-MouseOffSet.x, e.getPoint().y-MouseOffSet.y);
 		//Actual Movement in the graph (without Zoom)
-		int Gtransx = Math.round(p.x/((float)gp.getIntValue("vgraphic.zoom")/100));
-		int Gtransy = Math.round(p.y/((float)gp.getIntValue("vgraphic.zoom")/100));
+		int Gtransx = Math.round(p.x/((float)vgc.getZoom()/100));
+		int Gtransy = Math.round(p.y/((float)vgc.getZoom()/100));
 		//Position im Graphen (ohne Zoom)
-		Point GPos = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100)));
+		Point GPos = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100)));
 		//Das ist die Bewegung p
 		if ((((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))&&(movingNode!=null)) //shift n drag == Selection bewegen
 		{ //Move all Selected Nodes
@@ -208,7 +212,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 		super.mousePressed(e);
 		firstdrag = true;
 		MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed Zoom included
-		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //Rausrechnen des zooms
+		Point p = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //Rausrechnen des zooms
 		if (!((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))
 		{
 			movingNode = vg.modifyNodes.getFirstinRangeOf(p); //kein Shift == moving Node merken, sonst werden alle selected Bewegt
@@ -230,7 +234,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 				movingNode=null; //do not start anything
 				firstdrag = true;
 			}
-			VEdge selE = vg.getEdgeinRangeOf(p, 2.0);
+			VEdge selE = vg.getEdgeinRangeOf(p, 2.0*((float)vgc.getZoom()/100));
 			if ((selE!=null)&&((selE.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED))
 			{ //Selected Edge, we move the selection so set the node to one of the edge adjacent nodes
 				movingNode = vg.modifyNodes.get(vg.getMathGraph().modifyEdges.get(selE.getIndex()).StartIndex); 

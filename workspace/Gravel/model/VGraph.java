@@ -453,7 +453,6 @@ public class VGraph extends Observable implements Observer, VGraphInterface {
 	 * @return the first edge in range, if there is one, else null
 	 */
 	public VEdge getEdgeinRangeOf(Point m, double variation) {
-		variation *=(float)GeneralPreferences.getInstance().getIntValue("vgraphic.zoom")/100; //jop is gut
 		Iterator<VEdge> n = modifyEdges.getIterator();
 		while (n.hasNext()) {
 			VEdge temp = n.next();

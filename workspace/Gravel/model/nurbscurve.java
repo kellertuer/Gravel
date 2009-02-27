@@ -40,6 +40,7 @@ public class nurbscurve {
 			System.err.println(actual+" - ("+f.x+","+f.y+")");
 			actual+=stepsize;
 		}
+		path.closePath();
 		
 		return path;
 	}

@@ -41,10 +41,10 @@ public class PNGWriter
 		String type="png";
 		Point min =  vGc.getVGraph().getMinPoint(vGc.getGraphics());
 		Point max =  vGc.getVGraph().getMaxPoint(vGc.getGraphics());
-		int oldz = GeneralPreferences.getInstance().getIntValue("vgraphic.zoom");
+		int oldz = vGc.getZoom();
 		int origx = (max.x-min.x);
 		float z2 = (float)x/(float)origx;
-		GeneralPreferences.getInstance().setIntValue("vgraphic.zoom",Math.round(z2*100));
+		vGc.setZoom(Math.round(z2*100));
 		img = new BufferedImage(Math.round((float)max.x*z2)+1,Math.round((float)max.y*z2)+1, BufferedImage.TYPE_INT_ARGB );
 		
 		Graphics2D g = img.createGraphics();
@@ -65,6 +65,6 @@ public class PNGWriter
 		} catch (IOException e) {
 			System.err.println("DEBUG : PNG Writing failed : "+e.getMessage());
 		}
-		GeneralPreferences.getInstance().setIntValue("vgraphic.zoom",oldz);
+		vGc.setZoom(oldz);
 	}
 }

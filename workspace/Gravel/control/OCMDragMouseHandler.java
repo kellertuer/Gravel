@@ -7,6 +7,8 @@ import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
+import view.VGraphic;
+
 import model.MEdge;
 import model.MNode;
 import model.VEdge;
@@ -29,6 +31,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 {
 
 	private VGraph vg;
+	private VGraphic vgc;
 	private Point MouseOffSet;
 	private GeneralPreferences gp;
 	private VNode StartNode,DragNode;
@@ -39,10 +42,11 @@ public class OCMDragMouseHandler extends DragMouseHandler
 	 * 
 	 * @param g the vgraph
 	 */
-	public OCMDragMouseHandler(VGraph g)
+	public OCMDragMouseHandler(VGraphic g)
 	{
 		super(g);
-		vg = g;
+		vgc = g;
+		vg = g.getVGraph();
 		gp = GeneralPreferences.getInstance();
 		DragNode = null;
 		MouseOffSet = new Point(0,0);
@@ -77,7 +81,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 		if ( ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK) )
 			return; //bei Alt nichts draggen
 		
-		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //rausrechnen
+		Point p = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //rausrechnen
 		if (DragNode!=null)
 		{
 			DragNode.setPosition(p);
@@ -118,7 +122,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 			return; //bei Alt nichts draggen
 		
 		MouseOffSet = e.getPoint(); //Aktuelle Position merken f�r eventuelle Bewegungen while pressed
-		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //rausrechnen
+		Point p = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //rausrechnen
 		if ((e.getModifiers()&MouseEvent.BUTTON1_MASK)==MouseEvent.BUTTON1_MASK)
 		{
 			multiple = ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK);
@@ -152,7 +156,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 	 */
 	public void mouseReleased(MouseEvent e) {
 		super.mouseReleased(e);
-		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //rausrechnen
+		Point p = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //rausrechnen
 		if (((e.getPoint().x==-1)&&(e.getPoint().y==-1))||(firstdrag==true)) //never dragged
 		{	
 			if (DragNode!=null)

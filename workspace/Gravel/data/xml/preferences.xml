@@ -75,7 +75,6 @@
 	<group name="vgraphic">
 		<value name="cpshow" type="Boolean">true</value>
 		<value name="cpsize" type="Integer">3</value>
-		<value name="directed" type="Boolean">true</value>
 		<value name="framedistance" type="Integer">10</value>
 		<value name="selcolb" type="Integer">225</value>
 		<value name="selcolg" type="Integer">169</value>
@@ -83,7 +82,6 @@
 		<value name="selwidth" type="Integer">6</value>
 		<value name="x" type="Integer">500</value>
 		<value name="y" type="Integer">500</value>
-		<value name="zoom" type="Integer">100</value>
 	</group>
 	<group name="window">
 		<value name="x" type="Integer">600</value>

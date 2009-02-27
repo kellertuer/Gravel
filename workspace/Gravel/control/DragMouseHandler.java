@@ -14,6 +14,8 @@ import java.awt.geom.QuadCurve2D;
 import java.util.Iterator;
 import java.util.Vector;
 
+import view.VGraphic;
+
 import model.MEdge;
 import model.VEdge;
 import model.VGraph;
@@ -37,6 +39,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 	VNode movingNode;
 	VEdge movingEdge;
 	VGraph vg;
+	VGraphic vgc;
 	GeneralPreferences gp;
 	Point MouseOffSet;
 	boolean multiplemoving=false,multipleisNode,altwaspressed = false,shiftwaspressed = false, firstdrag;
@@ -47,9 +50,10 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 	 * 
 	 * @param g
 	 */
-	public DragMouseHandler(VGraph g)
+	public DragMouseHandler(VGraphic g)
 	{
-		vg = g;
+		vgc = g;
+		vg = g.getVGraph();
 		gp = GeneralPreferences.getInstance();
 		MouseOffSet = new Point(0,0);
 		firstdrag = true;
@@ -92,7 +96,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 	 */
 	private void updateSelection(int status)
 	{
-		float zoom = ((float)gp.getIntValue("vgraphic.zoom")/100);
+		float zoom = ((float)vgc.getZoom()/100);
 		Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
 		while (nodeiter.hasNext())
 		{
@@ -166,12 +170,12 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		firstdrag=true;
 		
 		MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed
-		Point p = new Point(Math.round(e.getPoint().x/((float)gp.getIntValue("vgraphic.zoom")/100)),Math.round(e.getPoint().y/((float)gp.getIntValue("vgraphic.zoom")/100))); //Rausrechnen des zooms
+		Point p = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //Rausrechnen des zooms
 		VNode inrangeN = vg.modifyNodes.getFirstinRangeOf(p);
 		
 		VEdge inrangeE;
 		if (vg.getMathGraph().isDirected())
-			inrangeE = vg.getEdgeinRangeOf(p,2.0d);
+			inrangeE = vg.getEdgeinRangeOf(p,2.0*((float)vgc.getZoom()/100));
 		else
 			inrangeE=null;
 		
@@ -181,7 +185,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 		
 		if ((!alt)&&(!shift))
 		{// insgesamt auf dem Hintergrund ohne shift und ohne alt
-			if ((inrangeN==null)&&(vg.getEdgeinRangeOf(p,2.0d)==null)&&(cpnonactive))
+			if ((inrangeN==null)&&(vg.getEdgeinRangeOf(p,2.0*((float)vgc.getZoom()/100))==null)&&(cpnonactive))
 					selstart = MouseOffSet;	
 		}
 		else if ((alt)&&(!shift))
@@ -190,13 +194,13 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 			movingEdge = inrangeE;
 			altwaspressed = true;
 			//Both Null and no Controllpoint ?
-			if ((inrangeN==null)&&(vg.getEdgeinRangeOf(p,2.0d)==null)&&(cpnonactive))
+			if ((inrangeN==null)&&(vg.getEdgeinRangeOf(p,2.0*((float)vgc.getZoom()/100))==null)&&(cpnonactive))
 				selstart = MouseOffSet;	
 		}
 		else if ((!alt)&&(shift))
 		{
 			shiftwaspressed=true;
-			if ((inrangeN==null)&&(vg.getEdgeinRangeOf(p,2.0d)==null)&&(cpnonactive))
+			if ((inrangeN==null)&&(vg.getEdgeinRangeOf(p,2.0*((float)vgc.getZoom()/100))==null)&&(cpnonactive))
 				selstart = MouseOffSet;				
 		}
 		else
@@ -226,8 +230,8 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 	public void mouseDragged(MouseEvent e) 
 	{
 		Point p = new Point(e.getPoint().x-MouseOffSet.x, e.getPoint().y-MouseOffSet.y);
-		int x = Math.round(p.x/((float)gp.getIntValue("vgraphic.zoom")/100));
-		int y = Math.round(p.y/((float)gp.getIntValue("vgraphic.zoom")/100));
+		int x = Math.round(p.x/((float)vgc.getZoom()/100)); //Zoom rausrechnen
+		int y = Math.round(p.y/((float)vgc.getZoom()/100));
 		
 		if ((altwaspressed)&&!(((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)))
 		{ //Mit alt den Drag begonnen und dann alt losgelassen

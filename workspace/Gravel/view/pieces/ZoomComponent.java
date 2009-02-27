@@ -1,7 +1,5 @@
 package view.pieces;
 
-import io.GeneralPreferences;
-
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -29,7 +27,7 @@ public class ZoomComponent extends Observable implements ChangeListener, CaretLi
 	public ZoomComponent()
 	{
 		value = new IntegerTextField();
-		value.setValue(GeneralPreferences.getInstance().getIntValue("vgraphic.zoom"));
+		value.setValue(100);
 		content = new JPanel();
 		content.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
