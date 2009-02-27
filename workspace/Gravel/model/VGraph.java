@@ -61,8 +61,8 @@ public class VGraph extends Observable implements Observer, VGraphInterface {
 		modifyEdges.addObserver(this);
 		modifySubgraphs.addObserver(this);
 	}
-	/**
-	 * deselect all Nodes and Edges
+	/* (non-Javadoc)
+	 * @see model.VGraphInterface#deselect()
 	 */
 	public void deselect() {
 		modifyNodes.deselect();
@@ -70,9 +70,8 @@ public class VGraph extends Observable implements Observer, VGraphInterface {
 		setChanged();
 		notifyObservers(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
 	}
-	/**
-	 * deletes all selected Nodes and Edges. That means, that also all incident Edges of selected Nodes are deleted
-	 * TODO
+	/* (non-Javadoc)
+	 * @see model.VGraphInterface#removeSelection()
 	 */
 	public void removeSelection()
 	{
@@ -117,7 +116,6 @@ public class VGraph extends Observable implements Observer, VGraphInterface {
 	 *  Modify the Graph to the given directed or undirected Value.
 	 *  <br>If modifying to undirected, some edges may be deleted (if and only if two edges from a to b and b to a exist)
 	 *  <br><br>
-	 *  TODO
 	 * @param d
 	 */
 	public BitSet setDirected(boolean d)
@@ -216,11 +214,8 @@ public class VGraph extends Observable implements Observer, VGraphInterface {
 		}
 		return removed;
 	}
-	/**
-	 * Translates the Graph by the given Offset in x and y direction
-	 * <br><br>
-	 * @param x Translation on the X-axis
-	 * @param y Translation on the Y-axis
+	/* (non-Javadoc)
+	 * @see model.VGraphInterface#translate(int, int)
 	 */
 	public void translate(int x, int y)
 	{
@@ -242,19 +237,15 @@ public class VGraph extends Observable implements Observer, VGraphInterface {
 			);
 	}
 	/**
-	 * Get the Math-Graph underneath this VGraph
-	 * <br><br>
-	 * @return a referenceto the MGraph
+	 * Get the Mathematical Graph this graph depends on. If you change stuff in there this Graph changes too
+	 * @return
 	 */
 	public MGraph getMathGraph() {
 		return mG;
 	}
 	/**
-	 * replace the actual VGraph with another one.
-	 * <br>Use this Method to replace this VGraph with a new loaded one or a new visualised one.
-	 * <br>
-	 * <br>The pushNotify Should be used to indicate complete replacement to reset observers
-	 * @param anotherone the New VGraph
+	 * Replace this VGraph with another one.
+	 * @param anotherone
 	 */
 	public void replace(VGraph anotherone)
 	{
@@ -288,8 +279,8 @@ public class VGraph extends Observable implements Observer, VGraphInterface {
 		);
 	}
 	/**
-	 * Clone the VGraph and
-	 * @return the copy
+	 * Get a clone of this graph
+	 * @return a Copy
 	 */
 	public VGraph clone()
 	{
@@ -335,12 +326,8 @@ public class VGraph extends Observable implements Observer, VGraphInterface {
 		//und zurückgeben
 		return clone;
 	}
-	/**
-	 * returns the maximum point that is used by the VGraph.
-	 * <br>On nodes the size of the node is included
-	 * <br>On Edges the control point is included 
-	 * 
-	 * @return Maximum as a point
+	/* (non-Javadoc)
+	 * @see model.VGraphInterface#getMaxPoint(java.awt.Graphics)
 	 */
 	public Point getMaxPoint(Graphics g)
 	{
@@ -387,15 +374,8 @@ public class VGraph extends Observable implements Observer, VGraphInterface {
 		}
 		return maximum;
 	}
-	/**
-	 * returns the minimum point that is used by the VGraph.
-	 * <br>On nodes the size of the node and the size of the text is included
-	 * <br>On Edges the control point is included
-	 * <br>The Graphics are needed to compute the fontsize
-	 * <br>Zoom is not encalculated 
-	 * <br>
-	 * @param the Graphic in which the Graph lies. 
-	 * @return Point MinPoint
+	/* (non-Javadoc)
+	 * @see model.VGraphInterface#getMinPoint(java.awt.Graphics)
 	 */
 	public Point getMinPoint(Graphics g)
 	{
@@ -555,9 +535,8 @@ public class VGraph extends Observable implements Observer, VGraphInterface {
 		}
 		pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_END));
 	}
-	/**
-	 * informs all subscribers about a change. This Method is used to push a notify from outside
-	 * mit dem Oject o als Parameter
+	/* (non-Javadoc)
+	 * @see model.VGraphInterface#pushNotify(java.lang.Object)
 	 */
 	public void pushNotify(Object o) {
 		setChanged();
@@ -566,6 +545,9 @@ public class VGraph extends Observable implements Observer, VGraphInterface {
 		else
 			notifyObservers(o);
 	}
+	/* (non-Javadoc)
+	 * @see model.VGraphInterface#getType()
+	 */
 	public int getType() {
 		return VGraphInterface.GRAPH;
 	}

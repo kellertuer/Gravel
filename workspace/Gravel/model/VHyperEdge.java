@@ -1,11 +1,9 @@
 package model;
 
 import java.awt.Point;
-import java.awt.Shape;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Vector;
 
 /**
@@ -30,11 +28,9 @@ public class VHyperEdge extends VItem {
 		
 	}		
 	protected int width;
-	
 	private VEdgeText text;
 	private VEdgeLinestyle linestyle;
-//	private VHyperEdgeForm form;
-
+	private VHyperEdgeShape shape;
 	/**
 	 * Constructor that initializes the Arrow-Part of the Edge with the GeneralPreferences Standard
 	 * 
@@ -47,7 +43,7 @@ public class VHyperEdge extends VItem {
 		width=w;
 		text = new VEdgeText();
 		linestyle = new VEdgeLinestyle();
-		//form = new VHyperEdgeform();
+		shape = new VHyperEdgeShape();
 	}
 	/**
 	 * Create an Edge with specific Arrow, Text and LineStyle Elements
@@ -57,15 +53,23 @@ public class VHyperEdge extends VItem {
 	 * @param t Text-Specifications of the edge
 	 * @param l Linestyle values of the Edge
 	 */
-	public VHyperEdge(int i,int w, /* VHyperEdgeForm f, */ VEdgeText t, VEdgeLinestyle l)
+	public VHyperEdge(int i,int w, VHyperEdgeShape s, VEdgeText t, VEdgeLinestyle l)
 	{
 		super(i);
 		width=w;
-//		form = f;
+		shape = s;
 		text = t;
 		linestyle = l;
 	}
-	// Abstract Methoden, die von jedem Typ überschrieben werden müssen
+	/**
+	 * Translate an HyperEdge (mainly by moving its Shape) - Might invalidate the HyperEgde
+	 * @param x
+	 * @param y
+	 */
+	public void translate(int x,int y)
+	{
+		shape.translate(x,y);
+	}
 	/**
 	 * Returns true if the actual edge and the edge v are equal.
 	 * That means, that every controlpoint is equal, so that they might share the same path (if they share start and endnode)
@@ -77,6 +81,9 @@ public class VHyperEdge extends VItem {
 	 */
 	public boolean PathEquals(VHyperEdge v)
 	{
+		if ((v.getShape()==null)||(shape==null))
+			return false;
+		
 		return false;
 	}
 	/**
@@ -86,7 +93,10 @@ public class VHyperEdge extends VItem {
 	 */
 	public Point getMax()
 	{
-		return null;
+		//if (shape==null)
+			return new Point(0,0);
+		//else
+			// TODO calc max-CP in shape
 	}
 	/**
 	 * get the minimum (top left) point of the rectangle border of the internal edge points
@@ -95,38 +105,32 @@ public class VHyperEdge extends VItem {
 	 */	
 	public Point getMin()
 	{
-		return null;
+		//if (shape==null)
+		return new Point(Integer.MIN_VALUE,Integer.MIN_VALUE);
+	//else
+		//TODO clac min in Shape
 	}
 	/**
 	 * Clone the edge, create a new Edge with the same values and return it
 	 */
 	public VHyperEdge clone()
 	{
-		return new VHyperEdge(getIndex(), width, /*form,*/ text.clone(), linestyle.clone());
-	}
-	/**
-	 * Calculates the length of the edge by iterating along
-	 * @param Start Position of the Startnode
-	 * @param End Position of the Endnode
-	 * @return
-	 */
-	private double getLength(Point Start,Point End)
-	{
-		return 0.0d;
+		return new VHyperEdge(getIndex(), width, shape, text.clone(), linestyle.clone());
 	}
 	/**
 	 * getPointonEdge
 	 * returns the point that is at the given part from the Start Point
 	 * So the point is on the edge at edge.lengt * part
 	 * 
-	 * @param Start Coordinates of the Startpoint
-	 * @param End Coordinates of the Endpoint of the Edge
-	 * @param part distance in % of the endge length from the start to the point required on the edge
+	 * @param part distance in % of the edge length from the start to the point required on the edge
 	 * @return the point at the adge at given part
 	 */
-	public Point getPointonEdge(Point Start,Point End,double part)
-	{
-		return null;
+	public Point getPointonEdge(double part)
+	{	
+		if (shape==null)
+			return null;
+		else
+			return null; //TODO shape.CurveAt((t.lastElement - t.get(0))*part);
 	}
 	/**
 	 * getDirectionatPointonEdge
@@ -144,7 +148,30 @@ public class VHyperEdge extends VItem {
 	}
 	public boolean containsPoint(Point p)
 	{
-		return false;
+		if (shape==null)
+			return false;
+		else
+			return false; //TODO: Check whether Point is inside of convex hull of CPs
+	}
+	/**
+	 * Validate the Shape of the 
+	 * @param nodepoints
+	 * @return
+	 */
+	public boolean validateShape(Vector<Point> nodepoints)
+	{
+		if (shape==null)
+			return false;
+		else
+		{
+			Iterator<Point >ni = nodepoints.iterator();
+			while (ni.hasNext())
+			{
+				if (!containsPoint(ni.next()))
+					return false;
+			}
+			return true; //All inside
+		}		
 	}
 	/**
 	 * Get the Width of the edge
@@ -181,15 +208,17 @@ public class VHyperEdge extends VItem {
 		linestyle = plinestyle;
 	}
 	/**
-	 * @param parrow the arrow to set
+	 * Get the Shape
+	 * @param s the new Shape
 	 */
-//	public void setForm(VHyperEdgeForm f) {
-//		form = f;
-//	}
+	public void setShape(VHyperEdgeShape s) {
+		shape = s;
+	}
 	/**
+	 * Get the actual Shape
 	 * @return the arrow
 	 */
-//	public VHyperEdgeForm getForm() {
-//		return form;
-//	}
+	public VHyperEdgeShape getShape() {
+		return shape;
+	}
 }

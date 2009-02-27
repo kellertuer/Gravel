@@ -26,7 +26,6 @@ import model.VEdge;
 import model.VGraph;
 import model.VItem;
 import model.VNode;
-import model.nurbscurve;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
@@ -56,7 +55,7 @@ public class VGraphic extends Component implements 	Observer
 	
 	private float zoomfactor;
 	private int gridx,gridy;
-	private boolean gridenabled,gridorientated, usezoom;
+	private boolean gridenabled,gridorientated;
 	GeneralPreferences gp;
 	
 	//Eine Liste der GUI-Elemente, die zur direkten Einstellung dienen (also ausser GeneralPreferences)
@@ -84,8 +83,7 @@ public class VGraphic extends Component implements 	Observer
 		this.setSize(d);
 		this.setBounds(0, 0, d.width, d.height);
 
-		zoomfactor = 1.0f; usezoom = true;
-		this.setZoomEnabled(true);
+		zoomfactor = 1.0f;
 		gridx = gp.getIntValue("grid.x");
 		gridy = gp.getIntValue("grid.y");
 		gridenabled = gp.getBoolValue("grid.enabled");
@@ -122,22 +120,6 @@ public class VGraphic extends Component implements 	Observer
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-		Vector<Double> t= new Vector<Double>();
-		t.add(0d); t.add(0d); t.add(0d); t.add(0.25d); t.add(0.5d); t.add(0.5d); t.add(0.75);
-		t.add(1d); t.add(1d); t.add(1d);
-		Vector<Point2D> b = new Vector<Point2D>();
-		b.add(new Point2D.Double(240d,200d)); b.add(new Point2D.Double(240d,160d));
-		b.add(new Point2D.Double(160d,160d)); b.add(new Point2D.Double(160d,200d));
-		b.add(new Point2D.Double(160d,240d)); b.add(new Point2D.Double(240d,240d));
-		b.add(new Point2D.Double(240d,200d));
-		Vector<Double> w = new Vector<Double>();
-		w.add(1d); w.add(0.5d); w.add(0.5d);  
-		w.add(1d); w.add(0.5d); w.add(0.5d);  
-		w.add(1d);
-		nurbscurve nc = new nurbscurve(t,b,w,2);
-		g2.setColor(Color.black);
-		g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		g2.draw(nc.getCurve(0.03d));
 	}
 	/**
 	 * Paint Edges in the graphic
@@ -447,19 +429,6 @@ public class VGraphic extends Component implements 	Observer
 		Click = null;
 	}
 	/**
-	 * Set The possibility to Zoom to a new value
-	 * @param activity trre, if zoom should be able, else false
-	 * @deprecated
-	 */
-	public void setZoomEnabled(boolean activity)
-	{
-		if (usezoom==activity) //nothing changed
-			return;
-		usezoom = activity;
-		if (!usezoom) //changed to in active-> set to 100%
-			zoomfactor = 1.0f;
-	}
-	/**
 	 * Set Zoom to a specific value - if a Component named „Zoom“ (ZoomComponent) exists, ist value is set, too
 	 * @param percent new Zoom in percent
 	 */
@@ -483,8 +452,8 @@ public class VGraphic extends Component implements 	Observer
 	{
 		if ((m.getAffectedElementTypes()&(GraphConstraints.GRAPH_ALL_ELEMENTS|GraphConstraints.SELECTION)) > 0) //Anything in Elements or selections changed
 		{
-			Point MouseOffSet = new Point(0,0);
-			if (Drag!=null)
+			Point MouseOffSet = vp.getViewPosition();
+			if ((Drag!=null)&&(Drag.dragged()))
 				MouseOffSet = Drag.getMouseOffSet(); //Bewegungspunkt
 			Point GraphSize = new Point(Math.round(vG.getMaxPoint(getGraphics()).x*zoomfactor),Math.round(vG.getMaxPoint(getGraphics()).y*zoomfactor));
 			int offset = gp.getIntValue("vgraphic.framedistance");

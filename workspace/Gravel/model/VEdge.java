@@ -5,7 +5,6 @@ import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
-import java.util.Comparator;
 import java.util.Vector;
 
 /**
@@ -17,18 +16,6 @@ import java.util.Vector;
  */
 public abstract class VEdge extends VItem {
 	
-	public static class EdgeIndexComparator implements Comparator<VEdge>
-	{
-		public int compare(VEdge a, VEdge b) {
-			if (a.getIndex() < b.getIndex())
-				return -1;
-			if (a.getIndex()==b.getIndex())
-				return 0;
-			else
-				return 1;
-		}
-		
-	}	
 	public static final int STRAIGHTLINE = 1;
 	public static final int QUADCURVE = 2;
 	public static final int SEGMENTED = 3;

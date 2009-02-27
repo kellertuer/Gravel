@@ -11,6 +11,7 @@ import java.util.TreeMap;
 import javax.swing.*;
 
 import model.VGraph;
+import model.VGraphInterface;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
@@ -83,7 +84,7 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
     	normalgui.doQuit();
     }
     //External getting referrence of the Graph for manipulating ist
-    public VGraph getVGraph()
+    public VGraphInterface getVGraph()
 	{
 		return normalgui.getVGraph();
 	}

@@ -1,6 +1,5 @@
 package model;
 import java.awt.Point;
-import java.util.Comparator;
 /**
  * The VNode contains values for
  * - the node position
@@ -11,22 +10,6 @@ import java.util.Comparator;
  */
 public class VNode extends VItem {
 	
-		public static class NodeIndexComparator implements Comparator<VNode>
-		{
-			public int compare(VNode a, VNode b)
-			{
-				if (a.getIndex() < b.getIndex())
-					return -1;
-				if (a.getIndex() == b.getIndex())
-					return 0;
-				else // >
-					return 1;
-			}
-			public boolean equals(VNode a, VNode b)
-			{
-				return a.getIndex()==b.getIndex();
-			}
-		}
 		private Point Pos; //Position in the middle
 		private int size; //Radius des Knotens
 		

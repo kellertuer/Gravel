@@ -17,11 +17,13 @@ import model.Messages.GraphMessage;
  * Class for handling all Modifications only depending on visual Nodes and
  * the Set of visual Nodes.
  * 
- * In a Graph Scenario all Depending Sets (e.g. VEdges) shoudl subscribe as Observers
+ * In a Graph Scenario all Depending Sets (e.g. VEdges) should subscribe as Observers
  * to handle the actions happening here
  * 
  * The Graph containing this Set should also subscribe to send specific messages to 
  * other Entities observing the Graph
+ * 
+ * Visual Node Set is based on an mathematical structure, e.g. MGraph or MHyperGraph
  * 
  * @author Ronny Bergmann
  * @since 0.4
@@ -31,13 +33,21 @@ public class VNodeSet extends Observable implements Observer {
 	private TreeSet<VNode> vNodes;
 	//Every Modifying Action should Lock.
 	private Lock NodeLock;
-	private MGraph mG;
-
-	public VNodeSet(MGraph g)
+	private MGraphInterface mG;
+	private MNodeSet mnodes;
+	public VNodeSet(MGraphInterface g)
 	{
 		mG = g;
-		vNodes = new TreeSet<VNode>(new VNode.NodeIndexComparator());
+		vNodes = new TreeSet<VNode>(new VItem.IndexComparator());
 		NodeLock = new ReentrantLock();
+		if (mG.getType()==MGraphInterface.GRAPH)
+		{
+			mnodes = ((MGraph)mG).modifyNodes;
+		}
+		else
+		{
+			mnodes = ((MHyperGraph)mG).modifyNodes;
+		}
 	}
 	/**
 	 * Set all Nodes to not selected. Does'nt notify anybody.
@@ -70,7 +80,7 @@ public class VNodeSet extends Observable implements Observer {
 		notifyObservers(
 			new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE, //Changed
 							GraphConstraints.REMOVAL, //Status 
-							GraphConstraints.NODE|GraphConstraints.EDGE|GraphConstraints.SELECTION) //Affected		
+							GraphConstraints.NODE|GraphConstraints.EDGE|GraphConstraints.SELECTION) //HyperEdges (are (visually) not affected		
 		);		
 	}
 	/**
@@ -88,7 +98,7 @@ public class VNodeSet extends Observable implements Observer {
 		if (get(node.getIndex()) == null) {
 			if (mnode.index!=node.getIndex())
 				mnode.index = node.getIndex();
-			mG.modifyNodes.add(mnode);
+			mnodes.add(mnode);
 			vNodes.add(node);
 			setChanged();
 			//Graph changed with an add, only nodes affected
@@ -123,7 +133,7 @@ public class VNodeSet extends Observable implements Observer {
 			return;
 		if ((get(oldi)==null)||(get(newi)!=null)) //old not or new already in use
 			return;
-		mG.modifyNodes.changeIndex(oldi, newi); //Update Adjacent edges in MGraph, so there's no need to update VEdges
+		mnodes.changeIndex(oldi, newi);
 		get(oldi).setIndex(newi);
 		setChanged();
 		notifyObservers(new GraphMessage(GraphConstraints.NODE,newi,GraphConstraints.INDEXCHANGED, GraphConstraints.GRAPH_ALL_ELEMENTS));	
@@ -134,13 +144,13 @@ public class VNodeSet extends Observable implements Observer {
 	 * if no node with the given index exists, nothing happens
 	 * @param i index of the node
 	 * 
-	 * @see MGraph.removeNode(int i)
+	 * @see M(Hyper)Graph.modifyNodes.removeNode(int i)
 	 */
 	public void remove(int i)
 	{
 		if (get(i)==null)
 			return;
-		mG.modifyNodes.remove(i);
+		mnodes.remove(i);
 		vNodes.remove(get(i));
 		setChanged();
 		notifyObservers(new GraphMessage(GraphConstraints.NODE,i,GraphConstraints.REMOVAL,GraphConstraints.GRAPH_ALL_ELEMENTS));	
@@ -148,7 +158,7 @@ public class VNodeSet extends Observable implements Observer {
 	/**
 	 * Replace the node with index given by an copy of Node with the parameter,
 	 * if a node with same index as parameter exists, else do nothing
-s	 * 
+	 * 
 	 * Its SubgraphStuff is not changed
 	 * @param node - Node that is exchanged into the graph (if a node exists with same index)
 	 * @param mnode - mnode to change e.g. the name - if its index differs from the node-index, the node index is taken
@@ -160,7 +170,7 @@ s	 *
 			return;
 		if (mnode.index!=node.getIndex())
 			mnode.index = node.getIndex();
-		mG.modifyNodes.replace(new MNode(node.getIndex(), mnode.name));
+		mnodes.replace(new MNode(node.getIndex(), mnode.name));
 		node = node.clone(); //Clone node to lose color
 		NodeLock.lock(); //Knoten finden
 		try

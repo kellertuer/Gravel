@@ -292,7 +292,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		edgelist = graphref.getMathGraph().modifySubgraphs.getNames();
+		edgelist = graphref.getMathGraph().modifyEdges.getNames();
 		int temp = 0;
 		for (int i=0; i<edgelist.size(); i++)
 		{

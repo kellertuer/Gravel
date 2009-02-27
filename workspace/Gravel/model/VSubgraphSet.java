@@ -22,6 +22,8 @@ import model.Messages.GraphMessage;
  * The Graph containing this Set should also subscribe to send specific messages to 
  * other Entities observing the Graph
  * 
+ * Visual Node Set is based on an mathematical structure, e.g. MGraph or MHyperGraph
+ *
  * @author Ronny Bergmann
  *
  */
@@ -29,17 +31,33 @@ public class VSubgraphSet extends Observable implements Observer {
 
 	private TreeSet<VSubgraph> vSubgraphs;
 //	private Lock SubgraphLock; TODO: Think about the need of this lock
-	private MGraph mG;
-	
+	private MGraphInterface mG;
+	private int allgraphElements, edgeElement;
+	MSubgraphSet msubgraphs;
+	MNodeSet mnodes;
 	/**
 	 * Create a new Set depending on the MGraph beneath
 	 * @param g
 	 */
-	public VSubgraphSet(MGraph g)
+	public VSubgraphSet(MGraphInterface g)
 	{
 		vSubgraphs = new TreeSet<VSubgraph>(new VSubgraph.SubgraphIndexComparator());
 //		SubgraphLock = new ReentrantLock();
 		mG = g;
+		if (mG.getType()==MGraphInterface.GRAPH)
+		{
+			allgraphElements = GraphConstraints.GRAPH_ALL_ELEMENTS;
+			edgeElement = GraphConstraints.EDGE;
+			msubgraphs = ((MGraph)mG).modifySubgraphs;			
+			mnodes = ((MGraph)mG).modifyNodes;
+		}
+		else
+		{
+			edgeElement = GraphConstraints.HYPEREDGE;
+			allgraphElements = GraphConstraints.HYPERGRAPH_ALL_ELEMENTS;
+			msubgraphs = ((MHyperGraph)mG).modifySubgraphs;
+			mnodes = ((MHyperGraph)mG).modifyNodes;
+		}
 	}
 
 	/**
@@ -61,30 +79,42 @@ public class VSubgraphSet extends Observable implements Observer {
 				return;
 		if (get(subgraph.getIndex())!=null) //Subgraph exists?
 			return;
-		mG.modifySubgraphs.add(msubgraph); //Add the Subgraph mathematically - so the math graph is correct now
-		for (int i=0; i<mG.modifyEdges.getNextIndex(); i++)
+		msubgraphs.add(msubgraph);
+		//Update Edges / HyperEdges 
+		if (mG.getType()==MGraphInterface.GRAPH)
 		{
-			if ((mG.modifyEdges.get(i)!=null)&&(msubgraph.containsEdge(i)))
+			for (int i=0; i<((MGraph)mG).modifyEdges.getNextIndex(); i++)
 			{
-					//Notify Edge about Color Update
-						setChanged();
-						notifyObservers(new GraphColorMessage(GraphConstraints.EDGE,i,GraphConstraints.ADDITION,subgraph.getColor()));
+				if ((((MGraph)mG).modifyEdges.get(i)!=null)&&(msubgraph.containsEdge(i)))
+				{
+							setChanged();
+							notifyObservers(new GraphColorMessage(GraphConstraints.EDGE,i,GraphConstraints.ADDITION,subgraph.getColor()));
+				}
 			}
-			
 		}
-		for (int i=0; i<mG.modifyNodes.getNextIndex(); i++)
+		else
 		{
-			if ((mG.modifyNodes.get(i)!=null)&&(msubgraph.containsNode(i)))
+			for (int i=0; i<((MHyperGraph)mG).modifyHyperEdges.getNextIndex(); i++)
 			{
-					//Notify Node about Color Update
+				if ((((MHyperGraph)mG).modifyHyperEdges.get(i)!=null)&&(msubgraph.containsEdge(i)))
+				{
+							setChanged();
+							notifyObservers(new GraphColorMessage(GraphConstraints.HYPEREDGE,i,GraphConstraints.ADDITION,subgraph.getColor()));
+				}
+			}
+		}
+		//Nodes
+		for (int i=0; i<mnodes.getNextIndex(); i++)
+		{
+			if ((mnodes.get(i)!=null)&&(msubgraph.containsEdge(i)))
+			{
 						setChanged();
 						notifyObservers(new GraphColorMessage(GraphConstraints.NODE,i,GraphConstraints.ADDITION,subgraph.getColor()));
 			}
-			
 		}
 		vSubgraphs.add(subgraph.clone());
 		setChanged();
-		notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraph.getIndex(),GraphConstraints.ADDITION,GraphConstraints.GRAPH_ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraph.getIndex(),GraphConstraints.ADDITION,allgraphElements));	
 	}
 	/**
 	 * get the set with index i
@@ -115,23 +145,36 @@ public class VSubgraphSet extends Observable implements Observer {
 		VSubgraph toDel = get(subgraphindex);
 		if (toDel==null)
 			return;
-		Iterator<MNode> iterNode = mG.modifyNodes.getIterator();
+		Iterator<MNode> iterNode;
+		iterNode = mnodes.getIterator();
 		while (iterNode.hasNext()) {
 			MNode actual = iterNode.next();
-			if (mG.modifySubgraphs.get(subgraphindex).containsNode(actual.index))
+			if (msubgraphs.get(subgraphindex).containsNode(actual.index))
 				removeNodefromSubgraph_(actual.index, subgraphindex);
 		}
-		Iterator<MEdge> iterEdge = mG.modifyEdges.getIterator();
-		while (iterEdge.hasNext()) {
-			MEdge actual = iterEdge.next();
-			if (mG.modifySubgraphs.get(subgraphindex).containsEdge(actual.index))
-				removeEdgefromSubgraph_(actual.index, subgraphindex);
+		if (mG.getType()==MGraphInterface.GRAPH)
+		{
+			Iterator<MEdge> iterEdge = ((MGraph)mG).modifyEdges.getIterator();
+			while (iterEdge.hasNext()) {
+				MEdge actual = iterEdge.next();
+				if (msubgraphs.get(subgraphindex).containsEdge(actual.index))
+					removeEdgefromSubgraph_(actual.index, subgraphindex);
+			}
+		}
+		else
+		{
+			Iterator<MHyperEdge> iterEdge = ((MHyperGraph)mG).modifyHyperEdges.getIterator();
+			while (iterEdge.hasNext()) {
+				MHyperEdge actual = iterEdge.next();
+				if (msubgraphs.get(subgraphindex).containsEdge(actual.index))
+					removeEdgefromSubgraph_(actual.index, subgraphindex);
+			}
 		}
 		toDel = get(subgraphindex);
 		vSubgraphs.remove(toDel);
-		mG.modifySubgraphs.remove(toDel.getIndex());
+		msubgraphs.remove(toDel.getIndex());
 		setChanged();
-		notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraphindex,GraphConstraints.REMOVAL,GraphConstraints.GRAPH_ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraphindex,GraphConstraints.REMOVAL,allgraphElements));	
 	}
 
 	/**
@@ -149,24 +192,40 @@ public class VSubgraphSet extends Observable implements Observer {
 			return;
 		Color oldcolor = actual.getColor();
 		//Notify Nodes
-		Iterator<MNode> mni = mG.modifyNodes.getIterator();
+		Iterator<MNode> mni = mnodes.getIterator();
 		while (mni.hasNext())
 		{
 			MNode n = mni.next();
-			if (mG.modifySubgraphs.get(index).containsNode(n.index))
+			if (msubgraphs.get(index).containsNode(n.index))
 			{
 				setChanged();
 				this.notifyObservers(new GraphColorMessage(GraphConstraints.NODE,n.index,oldcolor,newcolor));
 			}
 		}
-		Iterator<MEdge> mei = mG.modifyEdges.getIterator();
-		while (mei.hasNext())
+		if (mG.getType()==MGraphInterface.GRAPH)
 		{
-			MEdge e = mei.next();
-			if (mG.modifySubgraphs.get(index).containsEdge(e.index))
+			Iterator<MEdge> mei = ((MGraph)mG).modifyEdges.getIterator();
+			while (mei.hasNext())
 			{
-				setChanged();
-				this.notifyObservers(new GraphColorMessage(GraphConstraints.EDGE,e.index,oldcolor,newcolor));
+				MEdge e = mei.next();
+				if (msubgraphs.get(index).containsEdge(e.index))
+				{
+					setChanged();
+					this.notifyObservers(new GraphColorMessage(GraphConstraints.EDGE,e.index,oldcolor,newcolor));
+				}
+			}
+		}
+		else
+		{
+			Iterator<MHyperEdge> mei = ((MHyperGraph)mG).modifyHyperEdges.getIterator();
+			while (mei.hasNext())
+			{
+				MHyperEdge e = mei.next();
+				if (msubgraphs.get(index).containsEdge(e.index))
+				{
+					setChanged();
+					this.notifyObservers(new GraphColorMessage(GraphConstraints.HYPEREDGE,e.index,oldcolor,newcolor));
+				}
 			}
 		}
 		actual.setColor(newcolor);
@@ -183,18 +242,21 @@ public class VSubgraphSet extends Observable implements Observer {
 	 */
 	public void addEdgetoSubgraph(int edgeindex, int subgraphindex) {
 		VSubgraph actual = get(subgraphindex);
-		if ((mG.modifyEdges.get(edgeindex) != null)
-				&& (actual!=null)
-				&& (!mG.modifySubgraphs.get(subgraphindex).containsEdge(edgeindex))) {
+		if ( (mG.getType()==MGraphInterface.GRAPH) && ((((MGraph)mG).modifyEdges.get(edgeindex))==null))
+			return;
+		if ( (mG.getType()==MGraphInterface.HYPERGRAPH) && ((((MHyperGraph)mG).modifyHyperEdges.get(edgeindex))==null))
+			return;
+			
+		if ((actual!=null) && (!msubgraphs.get(subgraphindex).containsEdge(edgeindex))) {
 			// Mathematisch hinzufuegen
-			mG.modifySubgraphs.addEdgetoSubgraph(edgeindex, subgraphindex);
+			msubgraphs.addEdgetoSubgraph(edgeindex, subgraphindex);
 			// Und der Kantenmenge Bescheid sagen
 			setChanged();
-			notifyObservers(new GraphColorMessage(GraphConstraints.EDGE,edgeindex,GraphConstraints.ADDITION,actual.getColor()));
+			notifyObservers(new GraphColorMessage(edgeElement,edgeindex,GraphConstraints.ADDITION,actual.getColor()));
+			//global notify
+			setChanged();
+			notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraphindex,GraphConstraints.UPDATE,GraphConstraints.SUBGRAPH|GraphConstraints.EDGE));	
 		}
-		//global notify
-		setChanged();
-		notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraphindex,GraphConstraints.UPDATE,GraphConstraints.SUBGRAPH|GraphConstraints.EDGE));	
 	}
 	/**
 	 * remove an edge from a set
@@ -207,7 +269,7 @@ public class VSubgraphSet extends Observable implements Observer {
 		removeEdgefromSubgraph_(edgeindex,subgraphindex);
 		//Notify Graph
 		setChanged();
-		notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraphindex,GraphConstraints.UPDATE,GraphConstraints.SUBGRAPH|GraphConstraints.EDGE));	
+		notifyObservers(new GraphMessage(GraphConstraints.SUBGRAPH,subgraphindex,GraphConstraints.UPDATE,GraphConstraints.SUBGRAPH|edgeElement));	
 	}
 	/**
 	 * remove an edge from a set without informing the external observers outside the graph 
@@ -220,12 +282,12 @@ public class VSubgraphSet extends Observable implements Observer {
 		VSubgraph actual = get(SetIndex);
 		if (actual==null) //Not existent
 			return;
-		if (mG.modifySubgraphs.get(SetIndex).containsEdge(edgeindex)) 
+		if (msubgraphs.get(SetIndex).containsEdge(edgeindex)) 
 		{
-			mG.modifySubgraphs.removeEdgefromSubgraph(edgeindex, SetIndex);
+			msubgraphs.removeEdgefromSubgraph(edgeindex, SetIndex);
 			//Notify Edge-Set internal about Change			
 			setChanged();
-			notifyObservers(new GraphColorMessage(GraphConstraints.EDGE,edgeindex,GraphConstraints.REMOVAL,actual.getColor()));
+			notifyObservers(new GraphColorMessage(edgeElement,edgeindex,GraphConstraints.REMOVAL,actual.getColor()));
 		}
 	}
 	/**
@@ -240,11 +302,11 @@ public class VSubgraphSet extends Observable implements Observer {
 	 */
 	public void addNodetoSubgraph(int nodeindex, int SetIndex) {
 		VSubgraph actual = get(SetIndex);
-		if ((mG.modifyNodes.get(nodeindex) != null)
+		if ((mnodes.get(nodeindex) != null)
 				&& (actual!=null)
-				&& (!mG.modifySubgraphs.get(SetIndex).containsNode(nodeindex))) {
+				&& (!msubgraphs.get(SetIndex).containsNode(nodeindex))) {
 			// Mathematisch hinzufuegen
-			mG.modifySubgraphs.addNodetoSubgraph(nodeindex, SetIndex);
+			msubgraphs.addNodetoSubgraph(nodeindex, SetIndex);
 			// Und der Knotenmenge Bescheid sagen
 			setChanged();
 			notifyObservers(new GraphColorMessage(GraphConstraints.NODE,nodeindex,GraphConstraints.ADDITION,actual.getColor()));
@@ -277,9 +339,9 @@ public class VSubgraphSet extends Observable implements Observer {
 		VSubgraph actual = get(SetIndex);
 		if (actual==null) //Not existent
 			return;
-		if (mG.modifySubgraphs.get(SetIndex).containsNode(nodeindex))
+		if (msubgraphs.get(SetIndex).containsNode(nodeindex))
 		{
-			mG.modifySubgraphs.removeNodefromSubgraph(nodeindex, SetIndex);
+			msubgraphs.removeNodefromSubgraph(nodeindex, SetIndex);
 			//Nodify Node-Set internal about Change			
 			setChanged();
 			notifyObservers(new GraphColorMessage(GraphConstraints.NODE,nodeindex,GraphConstraints.REMOVAL,actual.getColor()));

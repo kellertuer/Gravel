@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.Color;
+import java.util.Comparator;
 
 /**
  * Abstract superclass for both nodes and edges wdich contains the similar stuff for both
@@ -10,6 +11,23 @@ import java.awt.Color;
  */
 public abstract class VItem {
 	
+	public static class IndexComparator implements Comparator<VItem>
+	{
+		public int compare(VItem a, VItem b)
+		{
+			if (a.getIndex() < b.getIndex())
+				return -1;
+			if (a.getIndex() == b.getIndex())
+				return 0;
+			else // >
+				return 1;
+		}
+		public boolean equals(VItem a, VItem b)
+		{
+			return a.getIndex()==b.getIndex();
+		}
+	}
+
 	//Definetly not selected
 	public static int DESELECTED = 0;
 	//Just ATM not selected e.g. while you drag a mouse or sth like that

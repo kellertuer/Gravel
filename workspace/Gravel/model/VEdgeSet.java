@@ -38,7 +38,7 @@ public class VEdgeSet extends Observable implements Observer {
 	
 	public VEdgeSet(MGraph g)
 	{
-		vEdges = new TreeSet<VEdge>(new VEdge.EdgeIndexComparator());
+		vEdges = new TreeSet<VEdge>(new VItem.IndexComparator());
 		EdgeLock = new ReentrantLock();
 		mG = g;
 		mG.addObserver(this); //mG is VGraph-internal so node deletions are signaled through this message
@@ -107,8 +107,7 @@ public class VEdgeSet extends Observable implements Observer {
 	/**
 	 * Set the possibility of multiple edges to the new value
 	 * If multiple edges are disabled, the multiple edges are removed and the edge values between two nodes are added
-	 * @param b TODO
-	 * @param a
+	 * @param b 
 	 */
 	public BitSet setMultipleAllowed(boolean b)
 	{

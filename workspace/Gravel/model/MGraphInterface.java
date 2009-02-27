@@ -12,5 +12,4 @@ public interface MGraphInterface {
 	 * @return
 	 */
 	int getType();
-	
 }
