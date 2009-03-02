@@ -93,10 +93,14 @@ public class VHyperEdge extends VItem {
 	 */
 	public Point getMax()
 	{
-		//if (shape==null)
+		if (shape==null) //No Shape set yet, so no Bounding Box itself, or
+						//in other words the nodes itself to themselves
 			return new Point(0,0);
-		//else
-			// TODO calc max-CP in shape
+		else
+		{
+			Point2D p = shape.getMax();
+			return new Point (Math.round((float)p.getX()),Math.round((float)p.getY()));
+		}
 	}
 	/**
 	 * get the minimum (top left) point of the rectangle border of the internal edge points
@@ -105,10 +109,14 @@ public class VHyperEdge extends VItem {
 	 */	
 	public Point getMin()
 	{
-		//if (shape==null)
-		return new Point(Integer.MIN_VALUE,Integer.MIN_VALUE);
-	//else
-		//TODO clac min in Shape
+		if (shape==null) //No Shape set yet, so no Bounding Box itself, or
+			//in other words the nodes itself to themselves
+			return new Point(Integer.MAX_VALUE,Integer.MAX_VALUE);
+		else
+		{
+			Point2D p = shape.getMin();
+			return new Point (Math.round((float)p.getX()),Math.round((float)p.getY()));
+		}
 	}
 	/**
 	 * Clone the edge, create a new Edge with the same values and return it
@@ -146,12 +154,16 @@ public class VHyperEdge extends VItem {
 	{
 		return null;
 	}
-	public boolean containsPoint(Point p)
+	public boolean containsPoint(Point p, double variance)
 	{
 		if (shape==null)
 			return false;
 		else
-			return false; //TODO: Check whether Point is inside of convex hull of CPs
+		{
+			return shape.isPointOnCurve(new Point2D.Double(p.x,p.y), variance);
+			//TODO: Use COnvex Hull instead of Bounding Box? Or even a better thing?
+			
+		}
 	}
 	/**
 	 * Validate the Shape of the 
@@ -167,7 +179,7 @@ public class VHyperEdge extends VItem {
 			Iterator<Point >ni = nodepoints.iterator();
 			while (ni.hasNext())
 			{
-				if (!containsPoint(ni.next()))
+//				if (!containsPoint(ni.next()))
 					return false;
 			}
 			return true; //All inside
