@@ -140,33 +140,11 @@ public class VGraphic extends Component implements 	Observer
 		U.add(1d);U.add(1d);U.add(1d);U.add(1d);
 		VHyperEdgeShape s = new VHyperEdgeShape(U,P,weights,27);
 		s.scale(zoomfactor);
-		GeneralPath path = s.getCurve(.002d);
-		g2.draw(path);
-		Iterator<Point2D> pi = P.iterator();
-		while (pi.hasNext())
-		{
-			Point2D p = pi.next();
-			g2.setColor(Color.LIGHT_GRAY);
-			g2.drawLine(Math.round(((float)p.getX()-7)),Math.round((float)p.getY()),Math.round(((float)p.getX()+7)),Math.round((float)p.getY()));
-			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-7)),Math.round((float)p.getX()),Math.round(((float)p.getY()+7)));
-		}
 		Vector<Double> X = new Vector<Double>();		
 		X.add(.15d); 
 		X.add(.5d);
 		X.add(.85d);
 		s.RefineKnots(X);
-		s.translate(0,110*zoomfactor);
-		path = s.getCurve(.002d);
-		g2.setColor(Color.BLACK);
-		g2.draw(path);
-		pi = s.P.iterator();
-		while (pi.hasNext())
-		{
-			Point2D p = (Point2D) pi.next();
-			g2.setColor(Color.GRAY);
-			g2.drawLine(Math.round(((float)p.getX()-5)),Math.round((float)p.getY()),Math.round(((float)p.getX()+5)),Math.round((float)p.getY()));
-			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-5)),Math.round((float)p.getX()),Math.round(((float)p.getY()+5)));
-		}
 		X.clear();
 		X.add(.075d);
 		X.add(.225d);
@@ -177,16 +155,20 @@ public class VGraphic extends Component implements 	Observer
 		s.RefineKnots(X);
 		g2.setColor(Color.BLACK);
 		s.translate(0,110*zoomfactor);
-		path = s.getCurve(.002d);
+		GeneralPath path = s.getCurve(.002d);
 		g2.draw(path);
-		pi = s.P.iterator();
+		Iterator<Point2D> pi = s.P.iterator();
 		while (pi.hasNext())
 		{
 			Point2D p = (Point2D) pi.next();
-			g2.setColor(Color.DARK_GRAY);
+			g2.setColor(Color.BLUE);
 			g2.drawLine(Math.round(((float)p.getX()-3)),Math.round((float)p.getY()),Math.round(((float)p.getX()+3)),Math.round((float)p.getY()));
 			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
 		}
+		Point2D p = s.DerivateCurveAt(1, .9999d); //Erste Ableitung an der Stelle .5
+		Point2D at = s.NURBSCurveAt(.9999);
+		System.err.println(p+" at "+at);
+		g2.drawLine(Math.round((float)at.getX()),Math.round((float)at.getY()),Math.round((float)(at.getX()+p.getX())),Math.round((float)(at.getY()+p.getY())));
 	}
 	/**
 	 * @param g

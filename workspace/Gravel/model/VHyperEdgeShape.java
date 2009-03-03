@@ -16,11 +16,11 @@ import javax.vecmath.Point3d;
  * 
  * Other Methods are
  * - Min and Max of the Bounding Box of the ControlPolygon
- * - TODO Addition & Removal of Controlpoints
- * - TODO 
+ * - Addition (Refinement of Knots)
+ *
  * - TODO Constructor with Interpolation-Points
  * - TODO Movement of an IP (possible ?)
- * - TODO Get&Set single CPs
+ * - TODO Get&Set single CPs (when they're moved)
  * - TODO (needed?) get&set knots &weights
  * - TODO In/Decrease Degree of the polynonials 
  * 
@@ -149,42 +149,57 @@ public class VHyperEdgeShape {
 	 * @param u
 	 * @return
 	 */
-	private Point2D.Double NURBSCurveAt(double u)
-	{		
-		int j = findSpan(u);
-		Point3d erg = NURBSRek(u,j,d); //Result in homogeneous Values
+	public Point2D.Double NURBSCurveAt(double u)
+	{	
+		int j = findSpan(u);			
+		Point3d erg = NURBSRek(u,j,d); //Result in homogeneous Values on Our Points		
 		if (erg.z==0) //
 			return new Point2D.Double(erg.x,erg.y);
 		else
 			return new Point2D.Double(erg.x/erg.z,erg.y/erg.z);
+		
 	}
-	/**
-	 * Private Method to evaluate the Curve at given point u \in [t_0,t_m]
-	 * Returns the Derivate Direction at given Position u
-	 * @param u
-	 * @return
-	 */
-	private Point2D.Double NURBSDerivateCurveAt(double u)
-	{		
-		//Explanation see Formular by the NURBS Book p. 59
+	public Point2D DerivateCurveAt(int degree, double u)
+	{
+		if (degree==0)
+			return NURBSCurveAt(u);
 		int j = findSpan(u);
-		Point3d derivate = NURBSRek(u,j,d-1); //Result in homogeneous Values
-		derivate.scale(d/(t.get(j+d)-t.get(j)));
-		Point3d derivatehelp = NURBSRek(u,j+1,d-1); //Result in homogeneous Values
-		derivatehelp.scale(d/(t.get(j+d+1)-t.get(j+1)));
-		derivate.sub(derivatehelp);
-		//That is the homogeneous first derivate.
-		//By formular (4.8) and the Leibnitz-rule we obtain
-		Point3d orig = NURBSRek(u,j,d); //Result in homogeneous Values
-		double derivw = derivate.z;
-		double origw = orig.z;
-		orig.scale(derivw);
-		derivate.sub(orig); //A^1(u) - w^1(u)C^0(u)
-		if (origw==0) //
-			return new Point2D.Double(derivate.x,derivate.y);
-		else
-			return new Point2D.Double(derivate.x/origw,derivate.y/origw);
+		Vector<Point3d> DerivatesBSpline = new Vector<Point3d>();
+		DerivatesBSpline.setSize(degree+1);
+		int actdeg = degree;
+		while (actdeg>=0)
+		{
+			Vector<Point3d> theirCP = CPofDerivate(degree);
+			for (int i=actdeg; i<m-actdeg; i++)
+				
+			DerivatesBSpline.set(degree,NURBSRek(u,j,d-degree)); 
+			actdeg--;
+		}
+		Point3d result = DerivatesBSpline.get(degree);
+		Vector<Point2D> DerivatesNURBS = new Vector<Point2D>();
+		DerivatesNURBS.setSize(degree);
+		DerivatesNURBS.set(0,NURBSCurveAt(u));
+		for (int k=1; k<=degree; k++)
+		{ //Calculate kth Derivate
+			Point2D.Double thisdeg = new Point2D.Double(DerivatesBSpline.get(k).x,DerivatesBSpline.get(k).y);
+			double denominator = DerivatesBSpline.get(k).z;
+			for (int i=1; i<=k; i++)
+			{
+				double factor = binomial(k,i)*DerivatesBSpline.get(i).z;
+				Point2D prev = (Point2D) DerivatesNURBS.get(k-i).clone();
+				thisdeg.x = thisdeg.x - prev.getX()*factor;
+				thisdeg.y = thisdeg.y - prev.getY()*factor;
+			}
+			if (denominator!=0.0)
+			{
+				thisdeg.x = thisdeg.x/denominator;
+				thisdeg.y = thisdeg.y/denominator;
+			}
+			DerivatesNURBS.add(k, new Point2D.Double(thisdeg.x,thisdeg.y));
+		}
+		return DerivatesNURBS.elementAt(degree);
 	}
+
 	/**
 	 * Calulation of Alpha, refer to deBoer-Algorithm
 	 * @param u
@@ -209,6 +224,7 @@ public class VHyperEdgeShape {
 	 * @param u Point u \in [0,1], which result we want
 	 * @param i Number of the Basis function of specific
 	 * @param j Degree j
+	 * @param Control Points the Curve depends ons
 	 * @return a 3d-Value of the Point in the Curve.
 	 */
 	private Point3d NURBSRek(double u, int i, int j)
@@ -369,10 +385,10 @@ public class VHyperEdgeShape {
 			newt.set(j+X.size(), t.get(j));
 		
 		int i=b+d-1; //Last Value that's new in t
-		int k=b+d+X.size()-1; //Last Value that's new in homogeneousb
-		for (int j=X.size()-1; j>=0; j--) //Insert new knots backwards 
-		{ //Insert last override previous points
-			while (X.get(j) <= t.get(i) && i > a) //Not Affected by actual insertion
+		int k=b+d+X.size()-1; //Last Value that's new in Pw
+		for (int j=X.size()-1; j>=0; j--) //Insert new knots backwards beginning at X.lastElement
+		{ 
+			while (X.get(j) <= t.get(i) && i > a) //These Values are not affected by Insertion of actual Not, copy them
 			{
 				newPw.set(k-d-1, (Point3d) Pw.get(i-d-1).clone());
 				newt.set(k, t.get(i));
@@ -419,4 +435,44 @@ public class VHyperEdgeShape {
 		InitHomogeneous();
 	}
 
+	@SuppressWarnings("unchecked")
+	private Vector<Point3d> CPofDerivate(int degree)
+	{
+		Vector<Point3d> result = new Vector<Point3d>();
+		if (degree==0)
+		{
+			for (int i=0; i<Pw.size(); i++)
+				result.add((Point3d) Pw.get(i).clone());
+			return result;
+		}
+		Vector<Point3d> degm1 = CPofDerivate(degree-1);
+		//Compute from those the actually wanted ones
+		for (int i=0; i<degm1.size()-1; i++) //one less
+		{
+			double factor = (d-degree+1)/(t.get(i+d+1)-t.get(i+degree));
+			Point3d next = (Point3d) degm1.get(i+1).clone();
+			next.sub(degm1.get(i));
+			next.scale(factor);
+			result.add(next);
+		}
+		return result;		
+	}
+	// return integer nearest to x
+	long nint(double x) {
+		if (x < 0.0) return (long) Math.ceil(x - 0.5);
+	      return (long) Math.floor(x + 0.5);
+	}
+
+	   // return log n!
+	   double logFactorial(int n) {
+	      double ans = 0.0;
+	      for (int i = 1; i <= n; i++)
+	         ans += Math.log(i);
+	      return ans;
+	   }
+
+	   // return the binomial coefficient n choose k.
+	   long binomial(int n, int k) {
+	      return nint(Math.exp(logFactorial(n) - logFactorial(k) - logFactorial(n-k)));
+	   }
 }
