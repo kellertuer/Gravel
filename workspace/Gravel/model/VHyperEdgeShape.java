@@ -31,8 +31,8 @@ public class VHyperEdgeShape {
 
 	private Vector<Double> t; //knots
 	private Vector<Double> w; //weights
-	private Vector<Point2D> b; //ControlPoints
-	private Vector<Point3d> homogeneousb; //b in homogeneous coordinates multiplied by weight
+	public Vector<Point2D> P; //ControlPoints
+	private Vector<Point3d> Pw; //b in homogeneous coordinates multiplied by weight
 
 	private int minDist;
 	private int m,n,d; //n is the number of CP, d the Order of the polynom-splines, m=n+d+1
@@ -44,9 +44,9 @@ public class VHyperEdgeShape {
 	{
 		t = new Vector<Double>();
 		w = new Vector<Double>();
-		b = new Vector<Point2D>();
+		P = new Vector<Point2D>();
 		n=0; m=0; d=0;
-		homogeneousb = new Vector<Point3d>();
+		Pw = new Vector<Point3d>();
 	}
 	/**
 	 * Init an HyperEdgeShape with
@@ -69,11 +69,11 @@ public class VHyperEdgeShape {
 	public void setCurveTo(Vector<Double> knots, Vector<Point2D> cpoints, Vector<Double> weights)
 	{
 		t = knots;
-		b = cpoints;
+		P = cpoints;
 		w = weights;
 		n = cpoints.size()-1;
 		m = t.size()-1;
-		d = t.size()-b.size()-1;
+		d = t.size()-P.size()-1;
 		InitHomogeneous();
 	}
 	/**
@@ -82,18 +82,17 @@ public class VHyperEdgeShape {
 	 */
 	private void InitHomogeneous()
 	{
-		homogeneousb = new Vector<Point3d>();
-		Iterator<Point2D> ib =  b.iterator();
+		Pw = new Vector<Point3d>();
+		Iterator<Point2D> ib =  P.iterator();
 		while (ib.hasNext()) //Modify to be 3D Coordinates (homogeneous 2D)
 		{
 			Point2D p = ib.next();
-			double weight = w.get(b.indexOf(p));
+			double weight = w.get(P.indexOf(p));
 			Point3d newp = new Point3d(p.getX(),p.getY(),weight);
 			newp.set(newp.x*weight, newp.y*weight, weight);
-			homogeneousb.add(newp);
+			Pw.add(newp);
 		}		
 	}
-	
 	/**
 	 * Get the Curve as a piecewise approximated linear Java Path
 	 * @param stepsize Size in the Intervall two points on the path differ
@@ -116,7 +115,7 @@ public class VHyperEdgeShape {
 			path.lineTo((new Double(f.x)).floatValue(), (new Double(f.y)).floatValue());
 			actual+=stepsize;
 		}
-		path.closePath();
+	//	path.closePath();
 		
 		return path;
 	}
@@ -216,7 +215,7 @@ public class VHyperEdgeShape {
 	{
 		if (j==0)
 		{
-			return homogeneousb.get(i); 
+			return Pw.get(i); 
 		}
 		Point3d bimjm = NURBSRek(u,i-1,j-1); //b_i-1^j-1
 		double alpha = alpha(u,i,j);
@@ -236,13 +235,13 @@ public class VHyperEdgeShape {
 	 */
 	public boolean CurveEquals(VHyperEdgeShape s)
 	{
-		if ((s.b.size()!=b.size())||(t.size()!=s.t.size()))
+		if ((s.P.size()!=P.size())||(t.size()!=s.t.size()))
 			return false;
-		Iterator<Point2D> bi = b.iterator();
+		Iterator<Point2D> bi = P.iterator();
 		while (bi.hasNext())
 		{
 			Point2D p = bi.next();
-			if (s.b.get(b.indexOf(p)).distance(p)!=0.0d)
+			if (s.P.get(P.indexOf(p)).distance(p)!=0.0d)
 				return false;
 		}
 		Iterator<Double> ti = t.iterator();
@@ -265,7 +264,7 @@ public class VHyperEdgeShape {
 	public Point2D getNearestCP(Point m) {
 		double mindist = Double.MAX_VALUE;
 		Point2D result = null;
-		Iterator<Point2D> bi = b.iterator();
+		Iterator<Point2D> bi = P.iterator();
 		while (bi.hasNext())
 		{
 			Point2D p = bi.next();
@@ -278,16 +277,16 @@ public class VHyperEdgeShape {
 		}
 		return result;
 	}
-	public void translate(int x, int y)
+	public void translate(double x, double y)
 	{
-		Iterator<Point2D> bi = b.iterator();
+		Vector<Point2D> Q = new Vector<Point2D>();
+		Iterator<Point2D> bi = P.iterator();
 		while (bi.hasNext())
 		{
 			Point2D p = bi.next();
-			p.setLocation(p.getX()+x,p.getY()+y);
+			Q.add(new Point2D.Double(p.getX()+x,p.getY()+y));
 		}
-		//recalculate Homogeneous
-		InitHomogeneous();
+		this.setCurveTo(t,Q,w);
 	}
 	/**
 	 * Scale all Controlpoints by factor s, of you want to resize a shape
@@ -296,7 +295,7 @@ public class VHyperEdgeShape {
 	 */
 	public void scale(double s)
 	{
-		Iterator<Point2D> bi = b.iterator();
+		Iterator<Point2D> bi = P.iterator();
 		while (bi.hasNext())
 		{
 			Point2D p = bi.next();
@@ -313,7 +312,7 @@ public class VHyperEdgeShape {
 	{
 		double x = Double.MIN_VALUE;
 		double y = Double.MIN_VALUE;
-		Iterator<Point2D> bi = b.iterator();
+		Iterator<Point2D> bi = P.iterator();
 		while (bi.hasNext())
 		{
 			Point2D p = bi.next();
@@ -331,7 +330,7 @@ public class VHyperEdgeShape {
 	{
 		double x = Double.MAX_VALUE;
 		double y = Double.MAX_VALUE;
-		Iterator<Point2D> bi = b.iterator();
+		Iterator<Point2D> bi = P.iterator();
 		while (bi.hasNext())
 		{
 			Point2D p = bi.next();
@@ -347,4 +346,77 @@ public class VHyperEdgeShape {
 	{
 		return false;
 	}
+	/**
+	 * Refine the Curve to add some new knots contained in X from wich each is between t[0] and t[m]
+	 * @param X
+	 */
+	public void RefineKnots(Vector<Double> X)
+	{
+		//Compare The NURBS Book A5.4
+		int a = findSpan(X.firstElement()), b=findSpan(X.lastElement())+1;
+		Vector<Point3d> newPw;
+		newPw = new Vector<Point3d>();
+		newPw.setSize(Pw.size()+X.size());
+		Vector<Double> newt = new Vector<Double>();
+		newt.setSize(t.size()+X.size());
+		for (int j=0; j<=a-d; j++)//Copy the first not changed values of the CPs
+			newPw.set(j, Pw.get(j));
+		for (int j=b-1; j<=n; j++)//Copy the last not changed values of the CPs
+			newPw.set(j+X.size(), Pw.get(j));
+		for (int j=0; j<=a; j++)//Copy the first not changed values of t
+			newt.set(j, t.get(j));
+		for (int j=b+d; j<=m; j++)//Copy the last not changed values of t
+			newt.set(j+X.size(), t.get(j));
+		
+		int i=b+d-1; //Last Value that's new in t
+		int k=b+d+X.size()-1; //Last Value that's new in homogeneousb
+		for (int j=X.size()-1; j>=0; j--) //Insert new knots backwards 
+		{ //Insert last override previous points
+			while (X.get(j) <= t.get(i) && i > a) //Not Affected by actual insertion
+			{
+				newPw.set(k-d-1, (Point3d) Pw.get(i-d-1).clone());
+				newt.set(k, t.get(i));
+				k--;i--;
+			}
+			newPw.set(k-d-1, (Point3d) newPw.get(k-d).clone());
+			for (int l=1; l<=d; l++)
+			{
+				int actualindex = k-d+l;
+				double alpha = newt.get(k+l)-X.get(j);
+				if (Math.abs(alpha) == 0.0d)
+					newPw.set(actualindex-1, (Point3d) newPw.get(actualindex).clone());
+				else
+				{
+					alpha = alpha/(newt.get(k+l)-t.get(i-d+l));
+					Point3d p1 = (Point3d) newPw.get(actualindex-1).clone();
+					p1.scale(alpha);
+					Point3d p2 = (Point3d) newPw.get(actualindex).clone();
+					p2.scale(1.0d - alpha);
+					p1.add(p2);
+					newPw.set(actualindex-1,p1);
+				}
+			} //All Points recomputed for this insertion
+			newt.set(k, X.get(j));
+			k--;
+		}
+		//Recompute Points & weights
+		P = new Vector<Point2D>(); 
+		w = new Vector<Double>();
+		Iterator<Point3d> Pwi = newPw.iterator();
+		while (Pwi.hasNext())
+		{
+			Point3d p1 = Pwi.next();
+			if (p1.z==0)
+				P.add(new Point2D.Double(p1.x,p1.y));
+			else
+				P.add(new Point2D.Double(p1.x/p1.z, p1.y/p1.z));
+			w.add(p1.z);
+		}
+		t = newt;
+		n = P.size()-1;
+		m = t.size()-1;
+		d = t.size()-P.size()-1;
+		InitHomogeneous();
+	}
+
 }

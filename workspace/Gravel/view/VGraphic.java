@@ -5,7 +5,10 @@ import io.GeneralPreferences;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 //import javax.swing.*;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,6 +27,7 @@ import control.StandardDragMouseHandler;
 import model.MEdge;
 import model.VEdge;
 import model.VGraph;
+import model.VHyperEdgeShape;
 import model.VItem;
 import model.VNode;
 import model.Messages.GraphConstraints;
@@ -120,9 +124,71 @@ public class VGraphic extends Component implements 	Observer
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
+		g2.setColor(Color.black);
+		g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		Vector<Point2D> P = new Vector<Point2D>();
+		Vector<Double> weights = new Vector<Double>();
+		P.add(new Point2D.Double(10,100)); weights.add(.7d);
+		P.add(new Point2D.Double(40,90)); weights.add(.9d);
+		P.add(new Point2D.Double(25,30)); weights.add(.7d);
+		P.add(new Point2D.Double(200,10)); weights.add(.9d);
+		P.add(new Point2D.Double(120,85)); weights.add(.7d);
+		P.add(new Point2D.Double(300,100)); weights.add(.9d);
+		Vector<Double> U = new Vector<Double>();
+		U.add(0d);U.add(0d);U.add(0d);U.add(0d);
+		U.add(.3d);U.add(.7d);
+		U.add(1d);U.add(1d);U.add(1d);U.add(1d);
+		VHyperEdgeShape s = new VHyperEdgeShape(U,P,weights,27);
+		s.scale(zoomfactor);
+		GeneralPath path = s.getCurve(.002d);
+		g2.draw(path);
+		Iterator<Point2D> pi = P.iterator();
+		while (pi.hasNext())
+		{
+			Point2D p = pi.next();
+			g2.setColor(Color.LIGHT_GRAY);
+			g2.drawLine(Math.round(((float)p.getX()-7)),Math.round((float)p.getY()),Math.round(((float)p.getX()+7)),Math.round((float)p.getY()));
+			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-7)),Math.round((float)p.getX()),Math.round(((float)p.getY()+7)));
+		}
+		Vector<Double> X = new Vector<Double>();		
+		X.add(.15d); 
+		X.add(.5d);
+		X.add(.85d);
+		s.RefineKnots(X);
+		s.translate(0,110*zoomfactor);
+		path = s.getCurve(.002d);
+		g2.setColor(Color.BLACK);
+		g2.draw(path);
+		pi = s.P.iterator();
+		while (pi.hasNext())
+		{
+			Point2D p = (Point2D) pi.next();
+			g2.setColor(Color.GRAY);
+			g2.drawLine(Math.round(((float)p.getX()-5)),Math.round((float)p.getY()),Math.round(((float)p.getX()+5)),Math.round((float)p.getY()));
+			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-5)),Math.round((float)p.getX()),Math.round(((float)p.getY()+5)));
+		}
+		X.clear();
+		X.add(.075d);
+		X.add(.225d);
+		X.add(.4d);
+		X.add(.6d);
+		X.add(.775d);
+		X.add(.925d);
+		s.RefineKnots(X);
+		g2.setColor(Color.BLACK);
+		s.translate(0,110*zoomfactor);
+		path = s.getCurve(.002d);
+		g2.draw(path);
+		pi = s.P.iterator();
+		while (pi.hasNext())
+		{
+			Point2D p = (Point2D) pi.next();
+			g2.setColor(Color.DARK_GRAY);
+			g2.drawLine(Math.round(((float)p.getX()-3)),Math.round((float)p.getY()),Math.round(((float)p.getX()+3)),Math.round((float)p.getY()));
+			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
+		}
 	}
 	/**
-	 * Paint Edges in the graphic
 	 * @param g
 	 */
 	private void paintEdges(Graphics g)
