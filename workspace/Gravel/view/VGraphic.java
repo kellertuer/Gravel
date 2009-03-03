@@ -165,10 +165,8 @@ public class VGraphic extends Component implements 	Observer
 			g2.drawLine(Math.round(((float)p.getX()-3)),Math.round((float)p.getY()),Math.round(((float)p.getX()+3)),Math.round((float)p.getY()));
 			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
 		}
-		Point2D p = s.DerivateCurveAt(1, .9999d); //Erste Ableitung an der Stelle .5
-		Point2D at = s.NURBSCurveAt(.9999);
-		System.err.println(p+" at "+at);
-		g2.drawLine(Math.round((float)at.getX()),Math.round((float)at.getY()),Math.round((float)(at.getX()+p.getX())),Math.round((float)(at.getY()+p.getY())));
+		Point2D p = s.ProjectionPoint(s.P.get(3));
+		g2.drawLine(Math.round((float)p.getX()),Math.round((float)p.getY()),Math.round((float)(s.P.get(3).getX())),Math.round((float)(s.P.get(3).getY())));
 	}
 	/**
 	 * @param g

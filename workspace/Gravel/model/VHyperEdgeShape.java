@@ -76,6 +76,31 @@ public class VHyperEdgeShape {
 		d = t.size()-P.size()-1;
 		InitHomogeneous();
 	}
+	private VHyperEdgeShape(Vector<Double> knots, Vector<Point3d> pPw, int dist)
+	{
+		t = new Vector<Double>();
+		w = new Vector<Double>();
+		P = new Vector<Point2D>();
+		n=0; m=0; d=0;
+		Pw = new Vector<Point3d>();
+		P.setSize(pPw.size()); 
+		w.setSize(pPw.size());
+		for (int i=0; i<pPw.size(); i++)
+		{
+			double stw = pPw.get(i).z;
+			if (stw==0)
+				P.set(i,new Point2D.Double(pPw.get(i).x,pPw.get(i).y));
+			else
+				P.set(i,new Point2D.Double(pPw.get(i).x/pPw.get(i).z,pPw.get(i).y/pPw.get(i).z));
+			w.add(i,stw);
+		}
+		minDist = dist;
+		t = knots;
+		n = P.size()-1;
+		m = t.size()-1;
+		d = t.size()-P.size()-1;
+		InitHomogeneous();		
+	}
 	/**
 	 * Initialization of the internal homogeneous Vector
 	 * Should be called everytime either the b or w vector are completly exchanged
@@ -92,6 +117,70 @@ public class VHyperEdgeShape {
 			newp.set(newp.x*weight, newp.y*weight, weight);
 			Pw.add(newp);
 		}		
+	}
+	/**
+	 * Get Maximum (bottom right edge) of the CP bunding box
+	 */
+	public Point2D getMax()
+	{
+		double x = Double.MIN_VALUE;
+		double y = Double.MIN_VALUE;
+		Iterator<Point2D> bi = P.iterator();
+		while (bi.hasNext())
+		{
+			Point2D p = bi.next();
+			if (p.getX() > x)
+				x = p.getX();
+			if (p.getY() > y)
+				y = p.getY();
+		}
+		return new Point2D.Double(x,y);
+	}
+	/**
+	 * Get Minimum (top left edge) of the CP bunding box
+	 */
+	public Point2D getMin()
+	{
+		double x = Double.MAX_VALUE;
+		double y = Double.MAX_VALUE;
+		Iterator<Point2D> bi = P.iterator();
+		while (bi.hasNext())
+		{
+			Point2D p = bi.next();
+			if (p.getX() < x)
+				x = p.getX();
+			if (p.getY() < y)
+				y = p.getY();
+		}
+		return new Point2D.Double(x,y);
+	}
+	/**
+	 * Scale all Controlpoints by factor s, of you want to resize a shape
+	 * make shure to translate its middle to 0,0 before and back afterwards
+	 * @param s
+	 */
+	public void scale(double s)
+	{
+		Iterator<Point2D> bi = P.iterator();
+		while (bi.hasNext())
+		{
+			Point2D p = bi.next();
+			p.setLocation(p.getX()*s,p.getY()*s);
+		}
+		//recalculate Homogeneous
+		InitHomogeneous();
+		
+	}
+	public void translate(double x, double y)
+	{
+		Vector<Point2D> Q = new Vector<Point2D>();
+		Iterator<Point2D> bi = P.iterator();
+		while (bi.hasNext())
+		{
+			Point2D p = bi.next();
+			Q.add(new Point2D.Double(p.getX()+x,p.getY()+y));
+		}
+		this.setCurveTo(t,Q,w);
 	}
 	/**
 	 * Get the Curve as a piecewise approximated linear Java Path
@@ -129,7 +218,7 @@ public class VHyperEdgeShape {
 	private int findSpan(double u)
 	{
 		if (u==t.lastElement())
-			return t.indexOf(t.lastElement()); //first value of t equal to t.get(m)==t.lastElement - which is m-d		
+			return t.indexOf(t.lastElement())-1; //first value of t equal to t.get(m)==t.lastElement - which is m-d		
 		//Binary Search for the intervall
 		int low = d; //because the first d+1 are equal too
 		int high = m-d; //see above
@@ -163,19 +252,19 @@ public class VHyperEdgeShape {
 	{
 		if (degree==0)
 			return NURBSCurveAt(u);
-		int j = findSpan(u);
 		Vector<Point3d> DerivatesBSpline = new Vector<Point3d>();
 		DerivatesBSpline.setSize(degree+1);
-		int actdeg = degree;
-		while (actdeg>=0)
+		int actdeg = 1;
+		while (actdeg<=degree)
 		{
 			Vector<Point3d> theirCP = CPofDerivate(degree);
-			for (int i=actdeg; i<m-actdeg; i++)
-				
-			DerivatesBSpline.set(degree,NURBSRek(u,j,d-degree)); 
-			actdeg--;
+			Vector<Double> theirt = new Vector<Double>();
+			for (int i=actdeg; i<=m-actdeg; i++)
+				theirt.add(i-actdeg,t.get(i));
+			VHyperEdgeShape theirCurve = new VHyperEdgeShape(theirt,theirCP,0);
+			DerivatesBSpline.set(actdeg,theirCurve.NURBSRek(u,theirCurve.findSpan(u),theirCurve.d)); 
+			actdeg++;
 		}
-		Point3d result = DerivatesBSpline.get(degree);
 		Vector<Point2D> DerivatesNURBS = new Vector<Point2D>();
 		DerivatesNURBS.setSize(degree);
 		DerivatesNURBS.set(0,NURBSCurveAt(u));
@@ -293,71 +382,6 @@ public class VHyperEdgeShape {
 		}
 		return result;
 	}
-	public void translate(double x, double y)
-	{
-		Vector<Point2D> Q = new Vector<Point2D>();
-		Iterator<Point2D> bi = P.iterator();
-		while (bi.hasNext())
-		{
-			Point2D p = bi.next();
-			Q.add(new Point2D.Double(p.getX()+x,p.getY()+y));
-		}
-		this.setCurveTo(t,Q,w);
-	}
-	/**
-	 * Scale all Controlpoints by factor s, of you want to resize a shape
-	 * make shure to translate its middle to 0,0 before and back afterwards
-	 * @param s
-	 */
-	public void scale(double s)
-	{
-		Iterator<Point2D> bi = P.iterator();
-		while (bi.hasNext())
-		{
-			Point2D p = bi.next();
-			p.setLocation(p.getX()*s,p.getY()*s);
-		}
-		//recalculate Homogeneous
-		InitHomogeneous();
-		
-	}
-	/**
-	 * Get Maximum (bottom right edge) of the CP bunding box
-	 */
-	public Point2D getMax()
-	{
-		double x = Double.MIN_VALUE;
-		double y = Double.MIN_VALUE;
-		Iterator<Point2D> bi = P.iterator();
-		while (bi.hasNext())
-		{
-			Point2D p = bi.next();
-			if (p.getX() > x)
-				x = p.getX();
-			if (p.getY() > y)
-				y = p.getY();
-		}
-		return new Point2D.Double(x,y);
-	}
-	/**
-	 * Get Minimum (top left edge) of the CP bunding box
-	 */
-	public Point2D getMin()
-	{
-		double x = Double.MAX_VALUE;
-		double y = Double.MAX_VALUE;
-		Iterator<Point2D> bi = P.iterator();
-		while (bi.hasNext())
-		{
-			Point2D p = bi.next();
-			if (p.getX() < x)
-				x = p.getX();
-			if (p.getY() < y)
-				y = p.getY();
-		}
-		return new Point2D.Double(x,y);
-	}
-
 	public boolean isPointOnCurve(Point2D x, double variance)
 	{
 		return false;
@@ -456,6 +480,40 @@ public class VHyperEdgeShape {
 			result.add(next);
 		}
 		return result;		
+	}
+	/**
+	 * Projects the point d to a point, whose distance is minimal to d and on the curve
+	 * @param d
+	 * @return
+	 */
+	public Point2D ProjectionPoint(Point2D d)
+	{
+		double u=.5d; //Choose sth better by observing the CPs
+
+		boolean running = true;
+		Point2D.Double Value = (Point2D.Double) NURBSCurveAt(u);
+		Point2D.Double firstDeriv = (Point2D.Double) DerivateCurveAt(1,u);
+		Point2D.Double secondDeriv = (Point2D.Double) DerivateCurveAt(2,u);
+		Point2D.Double diff = new Point2D.Double(Value.x-d.getX(),Value.y-d.getY());
+		
+		while (running)
+		{
+	
+			double nominator = firstDeriv.x*diff.x + firstDeriv.y*diff.y;
+			double denominator = secondDeriv.x*diff.y + secondDeriv.y*diff.y + firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y;
+			double unext = u - nominator/denominator;
+			Value = (Point2D.Double) NURBSCurveAt(unext);
+			firstDeriv = (Point2D.Double) DerivateCurveAt(1,unext);
+			secondDeriv = (Point2D.Double) DerivateCurveAt(2,unext);
+			diff = new Point2D.Double(Value.x-d.getX(),Value.y-d.getY());
+			double coincidence = Math.sqrt(diff.x*diff.x + diff.y*diff.y);
+			double movement = Math.abs(unext-u)*Math.sqrt(firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y);
+			u=unext;			
+			System.err.println(coincidence+" and "+movement);
+			if ((coincidence <= 0.00002d)||(movement<=0.00002d))
+				running=false;
+		}
+		return NURBSCurveAt(u);
 	}
 	// return integer nearest to x
 	long nint(double x) {
