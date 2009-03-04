@@ -222,14 +222,14 @@ public class VHyperEdgeShape {
 		//Binary Search for the intervall
 		int low = d; //because the first d+1 are equal too
 		int high = m-d; //see above
-		int mid = (low+high)/2;
+		int mid = Math.round((low+high)/2);
 		while ((u<t.get(mid)) || (u>=t.get(mid+1)))
 		{ 
 			if (u < t.get(mid))
 					high = mid;
 			else
 				low = mid;
-			mid = (low+high)/2;
+			mid = Math.round((low+high)/2);
 		} //get the first t AFTER u in Variable j
 		return mid;
 	}
@@ -255,14 +255,15 @@ public class VHyperEdgeShape {
 		Vector<Point3d> DerivatesBSpline = new Vector<Point3d>();
 		DerivatesBSpline.setSize(degree+1);
 		int actdeg = 1;
-		while (actdeg<=degree)
+		while (actdeg<=degree) //Generate all Values of lower derivates at Point u in homogeneous BSpline-Points
 		{
-			Vector<Point3d> theirCP = CPofDerivate(degree);
+			Vector<Point3d> theirCP = CPofDerivate(actdeg);
 			Vector<Double> theirt = new Vector<Double>();
 			for (int i=actdeg; i<=m-actdeg; i++)
 				theirt.add(i-actdeg,t.get(i));
 			VHyperEdgeShape theirCurve = new VHyperEdgeShape(theirt,theirCP,0);
-			DerivatesBSpline.set(actdeg,theirCurve.NURBSRek(u,theirCurve.findSpan(u),theirCurve.d)); 
+			Point3d derivp= theirCurve.NURBSRek(u,theirCurve.findSpan(u),theirCurve.d);
+			DerivatesBSpline.set(actdeg,derivp); 
 			actdeg++;
 		}
 		Vector<Point2D> DerivatesNURBS = new Vector<Point2D>();
@@ -488,30 +489,69 @@ public class VHyperEdgeShape {
 	 */
 	public Point2D ProjectionPoint(Point2D d)
 	{
-		double u=.5d; //Choose sth better by observing the CPs
-
+		//TODO: Set the value of the intervalls of u heuristically by length of the line
+		double eqdist = .00002; //Find a nice Start-value for u
+		double u = t.firstElement(),u0 = t.firstElement();
+		double mindist = Double.MAX_VALUE;
+		while (u<=t.lastElement())
+		{
+			Point2D p = NURBSCurveAt(u);
+			double thisdist = p.distance(d);
+			if (thisdist<mindist)
+			{
+				u0=u;
+				mindist=thisdist;
+			}
+			u+=eqdist;
+		}
 		boolean running = true;
-		Point2D.Double Value = (Point2D.Double) NURBSCurveAt(u);
-		Point2D.Double firstDeriv = (Point2D.Double) DerivateCurveAt(1,u);
-		Point2D.Double secondDeriv = (Point2D.Double) DerivateCurveAt(2,u);
+		Point2D.Double Value = (Point2D.Double) NURBSCurveAt(u0);
+		Point2D.Double firstDeriv = (Point2D.Double) DerivateCurveAt(1,u0);
+		Point2D.Double secondDeriv = (Point2D.Double) DerivateCurveAt(2,u0);
 		Point2D.Double diff = new Point2D.Double(Value.x-d.getX(),Value.y-d.getY());
-		
+		double ulast = Double.MAX_VALUE;
+		u=u0;
 		while (running)
 		{
-	
 			double nominator = firstDeriv.x*diff.x + firstDeriv.y*diff.y;
 			double denominator = secondDeriv.x*diff.y + secondDeriv.y*diff.y + firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y;
 			double unext = u - nominator/denominator;
+			if (unext > t.lastElement()) //Out of Range
+			{
+				if (P.lastElement().distance(P.firstElement())==0) //closed
+				{
+					while (unext > t.lastElement())
+						unext = t.firstElement() + (unext-t.lastElement());
+				}
+				else //open
+					unext = t.lastElement();
+			}
+			if (unext < t.firstElement()) //Out of Range
+			{
+				if (P.lastElement().distance(P.firstElement())==0) //closed
+				{
+					while (unext < t.firstElement())
+						unext = t.lastElement() - (t.firstElement()-unext);
+				}
+				else //open
+					unext = t.firstElement();
+			}
+			if (ulast==unext)
+			{
+				running=false; //TwoPointCircle
+			}
 			Value = (Point2D.Double) NURBSCurveAt(unext);
 			firstDeriv = (Point2D.Double) DerivateCurveAt(1,unext);
 			secondDeriv = (Point2D.Double) DerivateCurveAt(2,unext);
 			diff = new Point2D.Double(Value.x-d.getX(),Value.y-d.getY());
 			double coincidence = Math.sqrt(diff.x*diff.x + diff.y*diff.y);
 			double movement = Math.abs(unext-u)*Math.sqrt(firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y);
+			ulast=u;
 			u=unext;			
-			System.err.println(coincidence+" and "+movement);
-			if ((coincidence <= 0.00002d)||(movement<=0.00002d))
+			//System.err.println(coincidence+" and "+movement);
+			if ((coincidence <= 0.002d)||(movement<=0.002d))
 				running=false;
+			
 		}
 		return NURBSCurveAt(u);
 	}
