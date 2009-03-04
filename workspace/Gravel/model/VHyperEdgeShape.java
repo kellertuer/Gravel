@@ -340,6 +340,38 @@ public class VHyperEdgeShape {
 		}
 		return fixedj.get(j);
 	}
+	private Vector<Double> BasisN(double u, int i, int j)
+	{
+		//See A2.2 NURBS Book
+		Vector<Double> N = new Vector<Double>();N.setSize(j+1);
+		Vector<Double> left = new Vector<Double>();left.setSize(j+1);
+		Vector<Double> right = new Vector<Double>();right.setSize(j+1);
+		N.set(0,1.0d);
+		for (int k=1; k<=j; k++)
+		{
+			left.set(k, u-t.get(i+1-k));
+			right.set(k,t.get(i+k)-u);
+			double s = 0.0d;
+			for (int r=0; r<k; r++)
+			{
+				double temp = N.get(r)/(right.get(r+1)+left.get(k-r));
+				N.set(r, s+right.get(r+1)*temp);
+				s = left.get(k-r)*temp;
+			}
+			N.set(k,s);
+		}
+		return N;
+	}
+	private double BasisR(double u, int i, int j)
+	{
+		Vector<Double> N = BasisN(u,i,j);
+		int sp = findSpan(u);
+		double nomin = N.firstElement()*w.get(i);
+		double denomin = 0.0d;
+		for (int k=0; k<=d; k++)
+			denomin += N.get(k)* w.get(sp-d+k);
+		return nomin/denomin;
+	}
 	/**
 	 * Compares this Curve to another (minDist does not matter)
 	 * if alle values of t,b,w are equal it returns true, else false
@@ -394,7 +426,7 @@ public class VHyperEdgeShape {
 	}
 	public boolean isPointOnCurve(Point2D x, double variance)
 	{
-		return false;
+		return x.distance(ProjectionPoint(x))<=variance;
 	}
 	/**
 	 * Refine the Curve to add some new knots contained in X from wich each is between t[0] and t[m]
@@ -491,12 +523,16 @@ public class VHyperEdgeShape {
 		}
 		return result;		
 	}
+	public Point2D ProjectionPoint(Point2D d)
+	{
+		return NURBSCurveAt(ProjectionPointParameter(d));
+	}
 	/**
 	 * Projects the point d to a point, whose distance is minimal to d and on the curve
 	 * @param d
 	 * @return
 	 */
-	public Point2D ProjectionPoint(Point2D d)
+	public double ProjectionPointParameter(Point2D d)
 	{
 		//TODO: Set the value of the intervalls of u heuristically by length of the line
 		double eqdist = .0002; //Find a nice Start-value for u
@@ -568,8 +604,54 @@ public class VHyperEdgeShape {
 //		System.err.print(iterations+" - ");
 //		if (iterations>=1000)
 //			System.err.println("Loop!");
-		return NURBSCurveAt(u);
+		return u;
 	}
+	
+	/**
+	 * If the first Point lies on the Curve (given a specific variance, e.g. 2.0
+	 * the point is moved to the second argument and the Curve is Computed again.
+	 * @param src
+	 * @param dest
+	 * @return
+	 */
+	public boolean movePoint(Point2D src, Point2D dest)
+	{
+		double udash = ProjectionPointParameter(src);
+		Point2D.Double ProjPoint = NURBSCurveAt(udash);
+		if (src.distance(ProjPoint)>=2.0d)
+			return false; //No Movement
+		//Find the specific P, which has the most influence at src to move.
+		double min = Double.MAX_VALUE;
+		int Pindex=0;
+		for (int i=0; i<=n; i++)
+		{
+			double nodei = 0.0d;
+			for (int j=1; j<=d; j++)
+			{
+				nodei = nodei + (double)t.get(i+j);
+			}
+			nodei = nodei/d;
+			if (Math.abs(udash-nodei)<min)
+			{
+				Pindex=i;
+				min = Math.abs(udash-nodei);
+			}
+		}
+		Point2D Pk = P.get(Pindex);		
+		double dist = src.distance(dest);
+		Point2D direction = new Point2D.Double(dest.getX()-src.getX(),dest.getY()-src.getY());
+		double mov = BasisR(udash,Pindex,d);
+		Point2D.Double Pnew = new Point2D.Double(
+				Pk.getX() - direction.getX()/mov,
+				Pk.getY() - direction.getY()/mov		
+		);
+		P.set(Pindex,Pnew);
+		InitHomogeneous();
+		return true;
+	}
+	
+	
+	
 	// return integer nearest to x
 	long nint(double x) {
 		if (x < 0.0) return (long) Math.ceil(x - 0.5);

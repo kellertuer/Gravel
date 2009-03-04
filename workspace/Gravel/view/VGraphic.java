@@ -161,6 +161,35 @@ public class VGraphic extends Component implements 	Observer
 		while (pi.hasNext())
 		{
 			Point2D p = (Point2D) pi.next();
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+
+			g2.drawLine(Math.round(((float)p.getX()-3)),Math.round((float)p.getY()),Math.round(((float)p.getX()+3)),Math.round((float)p.getY()));
+			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
+		}
+		s.scale(1/zoomfactor);
+		int i=50;
+		Point2D PCurve = s.NURBSCurveAt(((double)i/100));
+		Point2D PDest = new Point2D.Double(PCurve.getX(),PCurve.getY()+50d);
+		if (vG.modifyNodes.get(1)!=null)
+			PDest = vG.modifyNodes.get(1).getPosition();
+		g2.setColor(Color.RED);		
+		s.movePoint(PCurve, PDest);
+		PCurve.setLocation(PCurve.getX()*zoomfactor, PCurve.getY()*zoomfactor);
+		PDest.setLocation(PDest.getX()*zoomfactor, PDest.getY()*zoomfactor);
+		g2.drawLine(Math.round(((float)PCurve.getX()-3)),Math.round((float)PCurve.getY()),Math.round(((float)PCurve.getX()+3)),Math.round((float)PCurve.getY()));
+		g2.drawLine(Math.round(((float)PCurve.getX())),Math.round(((float)PCurve.getY()-3)),Math.round((float)PCurve.getX()),Math.round(((float)PCurve.getY()+3)));
+		g2.drawLine(Math.round(((float)PDest.getX()-3)),Math.round((float)PDest.getY()),Math.round(((float)PDest.getX()+3)),Math.round((float)PDest.getY()));
+		g2.drawLine(Math.round(((float)PDest.getX())),Math.round(((float)PDest.getY()-3)),Math.round((float)PDest.getX()),Math.round(((float)PDest.getY()+3)));
+		g2.drawLine(Math.round(((float)PDest.getX())),Math.round(((float)PDest.getY())),Math.round((float)PCurve.getX()),Math.round(((float)PCurve.getY())));
+		s.scale(zoomfactor);
+		path = s.getCurve(.002d);
+		g2.setColor(Color.BLUE);
+		g2.draw(path);
+		pi = s.P.iterator();
+		while (pi.hasNext())
+		{
+			Point2D p = (Point2D) pi.next();
 			g2.setColor(Color.BLUE);
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 
@@ -168,34 +197,7 @@ public class VGraphic extends Component implements 	Observer
 			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
 		}
 		s.scale(1/zoomfactor);
-		VHyperEdgeShape s2 = new VHyperEdgeShape(U,P,weights,27);
-		s2.translate(0,30);
-		g2.setColor(Color.MAGENTA);
-		s2.scale(zoomfactor);
-		path = s2.getCurve(.002d);
-		s2.scale(1/zoomfactor);
-		g2.setStroke(new BasicStroke(1*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		g2.draw(path);		
-		Point2D onPlane;
-		Iterator<VNode> ni = vG.modifyNodes.getIterator();
-		while (ni.hasNext())
-		{	
-			Point nodep = ni.next().getPosition();
-			onPlane = new Point2D.Double(nodep.getX(),nodep.getY());
-			Point2D p = s.ProjectionPoint(onPlane);
-			double dist = p.distance(onPlane);
-			p = new Point2D.Double(p.getX()*zoomfactor,p.getY()*zoomfactor);
-			onPlane = new Point2D.Double(onPlane.getX()*zoomfactor,onPlane.getY()*zoomfactor);	
-			if (dist<=2.0d)
-				g2.setColor(Color.RED);
-			else			
-				g2.setColor(Color.GREEN);
-			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-			g2.drawLine(Math.round(((float)onPlane.getX()-5)),Math.round((float)onPlane.getY()),Math.round(((float)onPlane.getX()+5)),Math.round((float)onPlane.getY()));
-			g2.drawLine(Math.round(((float)onPlane.getX())),Math.round(((float)onPlane.getY()-5)),Math.round((float)onPlane.getX()),Math.round(((float)onPlane.getY()+5)));
-			g2.setColor(Color.GRAY);
-			g2.drawLine(Math.round((float)p.getX()),Math.round((float)p.getY()),Math.round((float)(onPlane.getX())),Math.round((float)(onPlane.getY())));
-		}
+		System.err.println("Distance soll:"+PCurve.distance(PDest)+" ist: "+PCurve.distance(s.NURBSCurveAt((double)i/100d))+" Quot:"+PCurve.distance(s.NURBSCurveAt((double)i/100d))/PCurve.distance(PDest)+"");
 	}
 	/**
 	 * @param g
