@@ -241,7 +241,7 @@ public class VHyperEdgeShape {
 	public Point2D.Double NURBSCurveAt(double u)
 	{	
 		int j = findSpan(u);			
-		Point3d erg = NURBSRek(u,j,d); //Result in homogeneous Values on Our Points		
+		Point3d erg = NURBS(u,j,d); //Result in homogeneous Values on Our Points		
 		if (erg.z==0) //
 			return new Point2D.Double(erg.x,erg.y);
 		else
@@ -262,7 +262,7 @@ public class VHyperEdgeShape {
 			for (int i=actdeg; i<=m-actdeg; i++)
 				theirt.add(i-actdeg,t.get(i));
 			VHyperEdgeShape theirCurve = new VHyperEdgeShape(theirt,theirCP,0);
-			Point3d derivp= theirCurve.NURBSRek(u,theirCurve.findSpan(u),theirCurve.d);
+			Point3d derivp= theirCurve.NURBS(u,theirCurve.findSpan(u),theirCurve.d);
 			DerivatesBSpline.set(actdeg,derivp); 
 			actdeg++;
 		}
@@ -304,32 +304,41 @@ public class VHyperEdgeShape {
 		return (u-t.get(i))/(t.get(i+d-j+1)-t.get(i));
 	}
 	/**
-	 * Calculate the Value recursive
-	 * This might be a little bit too much computational Overhead but 
-	 * works for experimental stuff. An Optimizational TODO is to calculate each
-	 * recursive Point and alpha only once.
+	 * Calculate the Value of the NURBSCurve in homogeneous Coordinates iterative
 	 * 
 	 * This method works for 2d homogeneous or 3d Stuff.
 	 *
 	 * @param u Point u \in [0,1], which result we want
 	 * @param i Number of the Basis function of specific
 	 * @param j Degree j
-	 * @param Control Points the Curve depends ons
 	 * @return a 3d-Value of the Point in the Curve.
 	 */
-	private Point3d NURBSRek(double u, int i, int j)
+	private Point3d NURBS(double u, int i, int j)
 	{
-		if (j==0)
+		Vector<Point3d> fixedj = new Vector<Point3d>();
+		fixedj.setSize(j+1); //for values 0,...,j
+		//Init with the Points
+		for (int l=i; l>=i-j; l--) //Beginning with i,0 up to i-j,0
 		{
-			return Pw.get(i); 
+			fixedj.set(l-i+j,Pw.get(l));
 		}
-		Point3d bimjm = NURBSRek(u,i-1,j-1); //b_i-1^j-1
-		double alpha = alpha(u,i,j);
-		Point3d bijm = NURBSRek(u,i,j-1);
-		double x = (1-alpha)*bimjm.x + alpha*bijm.x;
-		double y = (1-alpha)*bimjm.y + alpha*bijm.y;
-		double z = (1-alpha)*bimjm.z + alpha*bijm.z;
-		return new Point3d(x,y,z);
+		
+		for (int k=1; k<=j; k++) //Compute higher and hihger values of j
+		{
+			for (int l=i; l>=i-j+k; l--) //Stop each iteration one earlier
+			{
+				Point3d bimjm = fixedj.get(l-i+j-1);//b_i-1^j-1
+				double alpha = alpha(u,l,k);
+				Point3d bijm = fixedj.get(l-i+j);
+				double x = (1-alpha)*bimjm.x + alpha*bijm.x;
+				double y = (1-alpha)*bimjm.y + alpha*bijm.y;
+				double z = (1-alpha)*bimjm.z + alpha*bijm.z;
+				fixedj.set(l-i+j,new Point3d(x,y,z));
+				//System.err.println("Computing ("+l+","+k+") :"+fixedj.get(l-i+j));
+				//saving in "+(l-i+j)+" based on pervious values in "+(l-i+j-1)+" and "+(l-i+j)+".");
+			}
+		}
+		return fixedj.get(j);
 	}
 	/**
 	 * Compares this Curve to another (minDist does not matter)

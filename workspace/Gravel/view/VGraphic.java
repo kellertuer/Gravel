@@ -167,17 +167,19 @@ public class VGraphic extends Component implements 	Observer
 		}
 		VHyperEdgeShape s2 = new VHyperEdgeShape(U,P,weights,27);
 		s2.translate(0,30);
-			double u = Math.random();
+		for (int i=15; i<=15; i++)
+		{
+			double u = ((double)i)/((double)20);
 			Point2D onPlane = s2.NURBSCurveAt(u);
 //			System.err.print(u+":"+onPlane);
 			g2.setColor(Color.GREEN);
 			g2.drawLine(Math.round(((float)onPlane.getX()-5)),Math.round((float)onPlane.getY()),Math.round(((float)onPlane.getX()+5)),Math.round((float)onPlane.getY()));
 			g2.drawLine(Math.round(((float)onPlane.getX())),Math.round(((float)onPlane.getY()-5)),Math.round((float)onPlane.getX()),Math.round(((float)onPlane.getY()+5)));
-		//	Point2D p = s.ProjectionPoint(onPlane);
+			Point2D p = s.ProjectionPoint(onPlane);
 			g2.setColor(Color.GRAY);
-//			g2.drawLine(Math.round((float)p.getX()),Math.round((float)p.getY()),Math.round((float)(onPlane.getX())),Math.round((float)(onPlane.getY())));
-//			double distance= p.distance(onPlane);
-//			System.err.println("Drawn. "+u+"  "+distance);
+			g2.drawLine(Math.round((float)p.getX()),Math.round((float)p.getY()),Math.round((float)(onPlane.getX())),Math.round((float)(onPlane.getY())));
+		}
+		System.err.println("Drawn.");
 	}
 	/**
 	 * @param g
