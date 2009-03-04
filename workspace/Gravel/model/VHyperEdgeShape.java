@@ -499,7 +499,7 @@ public class VHyperEdgeShape {
 	public Point2D ProjectionPoint(Point2D d)
 	{
 		//TODO: Set the value of the intervalls of u heuristically by length of the line
-		double eqdist = .00002; //Find a nice Start-value for u
+		double eqdist = .0002; //Find a nice Start-value for u
 		double u = t.firstElement(),u0 = t.firstElement();
 		double mindist = Double.MAX_VALUE;
 		while (u<=t.lastElement())
@@ -520,8 +520,10 @@ public class VHyperEdgeShape {
 		Point2D.Double diff = new Point2D.Double(Value.x-d.getX(),Value.y-d.getY());
 		double ulast = Double.MAX_VALUE;
 		u=u0;
+		int iterations=0;
 		while (running)
 		{
+			iterations++;
 			double nominator = firstDeriv.x*diff.x + firstDeriv.y*diff.y;
 			double denominator = secondDeriv.x*diff.y + secondDeriv.y*diff.y + firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y;
 			double unext = u - nominator/denominator;
@@ -560,8 +562,12 @@ public class VHyperEdgeShape {
 			//System.err.println(coincidence+" and "+movement);
 			if ((coincidence <= 0.002d)||(movement<=0.002d))
 				running=false;
-			
+			if (iterations>1000) //Verhindere Schleifen
+				running=false;
 		}
+//		System.err.print(iterations+" - ");
+//		if (iterations>=1000)
+//			System.err.println("Loop!");
 		return NURBSCurveAt(u);
 	}
 	// return integer nearest to x

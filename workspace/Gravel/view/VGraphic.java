@@ -125,7 +125,7 @@ public class VGraphic extends Component implements 	Observer
 			g2.draw(Drag.getSelectionRectangle());
 		}
 		g2.setColor(Color.black);
-		g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		g2.setStroke(new BasicStroke(1*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		Vector<Point2D> P = new Vector<Point2D>();
 		Vector<Double> weights = new Vector<Double>();
 		P.add(new Point2D.Double(10,100)); weights.add(.7d);
@@ -139,7 +139,6 @@ public class VGraphic extends Component implements 	Observer
 		U.add(.3d);U.add(.7d);
 		U.add(1d);U.add(1d);U.add(1d);U.add(1d);
 		VHyperEdgeShape s = new VHyperEdgeShape(U,P,weights,27);
-		s.scale(zoomfactor);
 		Vector<Double> X = new Vector<Double>();		
 		X.add(.15d); 
 		X.add(.5d);
@@ -154,7 +153,8 @@ public class VGraphic extends Component implements 	Observer
 		X.add(.925d);
 		s.RefineKnots(X);
 		g2.setColor(Color.BLACK);
-		s.translate(0,110*zoomfactor);
+		s.translate(0,110);
+		s.scale(zoomfactor);
 		GeneralPath path = s.getCurve(.002d);
 		g2.draw(path);
 		Iterator<Point2D> pi = s.P.iterator();
@@ -162,24 +162,40 @@ public class VGraphic extends Component implements 	Observer
 		{
 			Point2D p = (Point2D) pi.next();
 			g2.setColor(Color.BLUE);
+			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+
 			g2.drawLine(Math.round(((float)p.getX()-3)),Math.round((float)p.getY()),Math.round(((float)p.getX()+3)),Math.round((float)p.getY()));
 			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
 		}
+		s.scale(1/zoomfactor);
 		VHyperEdgeShape s2 = new VHyperEdgeShape(U,P,weights,27);
 		s2.translate(0,30);
-		for (int i=15; i<=15; i++)
-		{
-			double u = ((double)i)/((double)20);
-			Point2D onPlane = s2.NURBSCurveAt(u);
-//			System.err.print(u+":"+onPlane);
-			g2.setColor(Color.GREEN);
+		g2.setColor(Color.MAGENTA);
+		s2.scale(zoomfactor);
+		path = s2.getCurve(.002d);
+		s2.scale(1/zoomfactor);
+		g2.setStroke(new BasicStroke(1*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		g2.draw(path);		
+		Point2D onPlane;
+		Iterator<VNode> ni = vG.modifyNodes.getIterator();
+		while (ni.hasNext())
+		{	
+			Point nodep = ni.next().getPosition();
+			onPlane = new Point2D.Double(nodep.getX(),nodep.getY());
+			Point2D p = s.ProjectionPoint(onPlane);
+			double dist = p.distance(onPlane);
+			p = new Point2D.Double(p.getX()*zoomfactor,p.getY()*zoomfactor);
+			onPlane = new Point2D.Double(onPlane.getX()*zoomfactor,onPlane.getY()*zoomfactor);	
+			if (dist<=2.0d)
+				g2.setColor(Color.RED);
+			else			
+				g2.setColor(Color.GREEN);
+			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.drawLine(Math.round(((float)onPlane.getX()-5)),Math.round((float)onPlane.getY()),Math.round(((float)onPlane.getX()+5)),Math.round((float)onPlane.getY()));
 			g2.drawLine(Math.round(((float)onPlane.getX())),Math.round(((float)onPlane.getY()-5)),Math.round((float)onPlane.getX()),Math.round(((float)onPlane.getY()+5)));
-			Point2D p = s.ProjectionPoint(onPlane);
 			g2.setColor(Color.GRAY);
 			g2.drawLine(Math.round((float)p.getX()),Math.round((float)p.getY()),Math.round((float)(onPlane.getX())),Math.round((float)(onPlane.getY())));
 		}
-		System.err.println("Drawn.");
 	}
 	/**
 	 * @param g
