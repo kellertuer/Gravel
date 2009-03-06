@@ -5,6 +5,7 @@ import io.GeneralPreferences;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
+import view.VCommonGraphic;
 import view.VGraphic;
 
 import model.MNode;
@@ -19,14 +20,14 @@ import model.VNode;
 public class OCMClickMouseHandler extends ClickMouseHandler {
 	
 	private VGraph vg;
-	private VGraphic vgc;
+	private VCommonGraphic vgc;
 	private GeneralPreferences gp;
 		
 	public OCMClickMouseHandler(VGraphic g)
 	{
 		super(g);
 		vgc = g;
-		vg = g.getVGraph();
+		vg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
 	}
 	

@@ -13,6 +13,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
 
+import view.VCommonGraphic;
 import view.VGraphic;
 
 import model.MEdge;
@@ -64,7 +65,7 @@ public class CEdgeArrowPreview extends Container implements Observer{
 		ArrowTest.modifyEdges.get(ArrowTest.getMathGraph().modifyEdges.indicesBetween(1, 2).firstElement()).setTextProperties(new VEdgeText());
 		ArrowTest.modifyEdges.get(ArrowTest.getMathGraph().modifyEdges.indicesBetween(1, 2).firstElement()).setLinestyle(new VEdgeLinestyle());
 		ArrowG = new VGraphic(new Dimension(200,60), ArrowTest);
-		ArrowG.setMouseHandling(VGraphic.NO_MOUSEHANDLING);
+		ArrowG.setMouseHandling(VCommonGraphic.NO_MOUSEHANDLING);
 		ArrowG.setPreferredSize(new Dimension(200,62));
 		GeneralPreferences.getInstance().deleteObserver(ArrowG);
 		add(ArrowG,c);
@@ -80,7 +81,7 @@ public class CEdgeArrowPreview extends Container implements Observer{
 	{
 		if (e!=null)
 		{
-			ArrowEdge = ArrowG.getVGraph().modifyEdges.get(1);
+			ArrowEdge = ArrowG.getGraph().modifyEdges.get(1);
 			ArrowEdge.getArrow().setAngle(e.getArrow().getAngle());
 			ArrowEdge.getArrow().setPart(e.getArrow().getPart());
 			ArrowEdge.getArrow().setSize(e.getArrow().getSize());

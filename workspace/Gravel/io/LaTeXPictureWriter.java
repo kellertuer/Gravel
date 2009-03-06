@@ -14,8 +14,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
+import java.util.Vector;
 
+import view.VCommonGraphic;
 import view.VGraphic;
+import view.VHyperGraphic;
 /**
  * each node is written to the tex file and translated therefore
  * x - offset to get rid of the free space left of the graph
@@ -27,23 +30,54 @@ public class LaTeXPictureWriter implements TeXWriter {
 
 	private final static String NL = "\r\n";
 	private final static double LINESPPT = 4.0d;
-	VGraphic vgc;
-	VGraph vg;
+	VCommonGraphic vgc;
+	VGraphInterface vg;
 	GeneralPreferences gp;
 	Point max,offset;
 	private int width;
 	double sizeppt; //Groeße die ein punkt/pixel ind er Grafik dann in mm aufm Papier hat
-	private boolean wholedoc;
+	private boolean wholedoc,directed;
+
+	VNodeSet nodes;
+	Vector<String> nodenames, edgenames, subgraphnames;
+	VEdgeSet edges;
+	MEdgeSet medges;
+	MHyperEdgeSet mhyperedges;
+	VSubgraphSet subgraphs;
+	VHyperEdgeSet hyperedges;
+
 	/**
 	 * Starts the LaTeX-Export with some parameters
 	 * @param a_picture a given VGraph in an VGraphic-Environment
 	 * @param w width of the picture in LaTeX in mm
 	 * @param type eiter "doc" for al whole LaTeX-Document or "fig" for just the figure
 	 */
-	public LaTeXPictureWriter(VGraphic a_picture, int w, String type)
+	public LaTeXPictureWriter(VCommonGraphic a_picture, int w, String type)
 	{
 		vgc = a_picture;
-		vg = vgc.getVGraph();
+		if (vgc.getType()==VCommonGraphic.VGRAPHIC)
+		{
+			nodes = ((VGraphic)vgc).getGraph().modifyNodes;
+			nodenames = ((VGraphic)vgc).getGraph().getMathGraph().modifyNodes.getNames();
+			edges = ((VGraphic)vgc).getGraph().modifyEdges;
+			medges = ((VGraphic)vgc).getGraph().getMathGraph().modifyEdges;
+			edgenames = ((VGraphic)vgc).getGraph().getMathGraph().modifyEdges.getNames();
+			subgraphs = ((VGraphic)vgc).getGraph().modifySubgraphs;
+			subgraphnames = ((VGraphic)vgc).getGraph().getMathGraph().modifySubgraphs.getNames();
+			vg=((VGraphic)vgc).getGraph();
+			directed = ((VGraphic)vgc).getGraph().getMathGraph().isDirected();
+		}
+		else if (vgc.getType()==VCommonGraphic.VHYPERGRAPHIC)
+		{
+				nodes = ((VHyperGraphic)vgc).getGraph().modifyNodes;
+				hyperedges = ((VHyperGraphic)vgc).getGraph().modifyHyperEdges;
+				mhyperedges = ((VHyperGraphic)vgc).getGraph().getMathGraph().modifyHyperEdges;
+				edgenames = ((VHyperGraphic)vgc).getGraph().getMathGraph().modifyHyperEdges.getNames();
+				subgraphs = ((VHyperGraphic)vgc).getGraph().modifySubgraphs;
+				subgraphnames = ((VHyperGraphic)vgc).getGraph().getMathGraph().modifySubgraphs.getNames();
+				vg=((VHyperGraphic)vgc).getGraph();
+		}
+
 		gp = GeneralPreferences.getInstance();
 		width = w;
 		if (type.equalsIgnoreCase("doc"))
@@ -104,7 +138,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 	private void writeNodes(OutputStreamWriter s) throws IOException
 	{
 	    //Nodes
-	    Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
+	    Iterator<VNode> nodeiter = nodes.getIterator();
 	    while (nodeiter.hasNext())
 	    {
 	    	VNode actual = nodeiter.next();
@@ -117,7 +151,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 				//Invert y
 				int y = drawpoint.y + Math.round((float)actual.getNameDistance()*(float)Math.sin(Math.toRadians((double)actual.getNameRotation())));
 				double tsize = Math.round((double)actual.getNameSize()*sizeppt*((double)1000))/1000;
-				s.write(NL+"\t\t\\put("+x+","+y+"){\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(vg.getMathGraph().modifyNodes.get(actual.getIndex()).name)+"}}");
+				s.write(NL+"\t\t\\put("+x+","+y+"){\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(nodenames.get(actual.getIndex()))+"}}");
 			}
 		}
 	}
@@ -156,11 +190,11 @@ public class LaTeXPictureWriter implements TeXWriter {
 	private void writeEdges(OutputStreamWriter s) throws IOException
 	{
 	       //Nodes
-	    	Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
+	    	Iterator<VEdge> edgeiter = edges.getIterator();
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();
-	    	   MEdge me = vg.getMathGraph().modifyEdges.get(actual.getIndex());
+	    	   MEdge me = medges.get(actual.getIndex());
 //	    	   Vector<Integer> values = vg.getEdgeProperties(actual.getIndex());
 	    	   int start = me.StartIndex;
 	    	   int ende = me.EndIndex;
@@ -194,8 +228,8 @@ public class LaTeXPictureWriter implements TeXWriter {
 						top = true;
 						part = ((double)pos)*2.0d/100.0d;
 					}
-					Point p = actual.getPointonEdge(vg.modifyNodes.get(start).getPosition(),vg.modifyNodes.get(ende).getPosition(), part);
-					Point2D.Double dir = actual.getDirectionatPointonEdge(vg.modifyNodes.get(start).getPosition(),vg.modifyNodes.get(ende).getPosition(), part);
+					Point p = actual.getPointonEdge(nodes.get(start).getPosition(),nodes.get(ende).getPosition(), part);
+					Point2D.Double dir = actual.getDirectionatPointonEdge(nodes.get(start).getPosition(),nodes.get(ende).getPosition(), part);
 					double l = dir.distance(0.0d,0.0d);
 					//and norm dir
 					dir.x = dir.x/l; dir.y = dir.y/l;
@@ -216,7 +250,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 				    if (t.isshowvalue())
 						text = ""+me.Value;
 				    else
-				    	text = vg.getMathGraph().modifyEdges.get(actual.getIndex()).name;
+				    	text = edgenames.get(actual.getIndex());
 				    double tsize = Math.round((double)t.getSize()*sizeppt*((double)1000))/1000;
 					s.write(NL+"\t\t\\put("+(m.x-offset.x)+","+(max.y-m.y)+"){\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(text)+"}}");
 				}
@@ -240,7 +274,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 		String s ="";
     	double[] coords = new double[2];
     	double x = 0.0, y = 0.0, lastx=0.0, lasty = 0.0;
-		GeneralPath p = actual.getDrawPath(vg.modifyNodes.get(start).getPosition(),vg.modifyNodes.get(ende).getPosition(),1.0f); //no zoom on check! But with line style
+		GeneralPath p = actual.getDrawPath(nodes.get(start).getPosition(),nodes.get(ende).getPosition(),1.0f); //no zoom on check! But with line style
 		PathIterator path = p.getPathIterator(null, 0.005d/sizeppt); 
 		// 0.005/sizeppt =  = the flatness; reduce if result is not accurate enough!
 		Point2D.Double dir, orth_n_h;
@@ -308,9 +342,9 @@ public class LaTeXPictureWriter implements TeXWriter {
 		String s = "";
 		if (actual.getWidth()>1) //Dann wurde die kante mit Thicklines verbreitert -> wiederzurück zu thin
 			s += NL+"\\thinlines";
-		if (vg.getMathGraph().isDirected())
+		if (directed)
 		{
-		  	Shape arrow = actual.getArrowShape(vg.modifyNodes.get(start).getPosition(),vg.modifyNodes.get(ende).getPosition(),Math.round(vg.modifyNodes.get(start).getSize()/2),Math.round(vg.modifyNodes.get(ende).getSize()/2),1.0f);
+		  	Shape arrow = actual.getArrowShape(nodes.get(start).getPosition(),nodes.get(ende).getPosition(),Math.round(nodes.get(start).getSize()/2),Math.round(nodes.get(ende).getSize()/2),1.0f);
 		  	PathIterator path = arrow.getPathIterator(null, 0.001);
 		  	int i=0;
 		    while( !path.isDone() ) 
@@ -358,6 +392,10 @@ public class LaTeXPictureWriter implements TeXWriter {
 	{
 	}
 
+	private void writeHyperEdges(OutputStreamWriter s) throws IOException
+	{
+		//TODO: LaTeX-Picture Writer Export Hyper Edge Shape
+	}
 	public String saveToFile(File f)
 	{
 		if (!f.exists())
@@ -374,7 +412,10 @@ public class LaTeXPictureWriter implements TeXWriter {
 	       OutputStream bout= new BufferedOutputStream(fout);
 	       OutputStreamWriter out = new OutputStreamWriter(bout, "UTF8");
 	       writeHeader(out,f.getName());
-	       writeEdges(out);
+	       if (edges!=null)
+	    	   writeEdges(out);
+	       else if (hyperedges!=null)
+	    	   writeHyperEdges(out);
 	       writeNodes(out);
 	       writeSubgraphs(out);
 	       writeFooter(out,"Gravel Graphen-Export '"+f.getName()+"'");

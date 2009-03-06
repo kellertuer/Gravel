@@ -11,7 +11,6 @@ import java.awt.Point;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Observable;
-import java.util.Observer;
 
 import model.VNode;
 import model.Messages.GraphConstraints;
@@ -27,7 +26,7 @@ import model.Messages.GraphMessage;
  *
  * @author Ronny Bergmann 
  */
-public class VHyperGraph extends Observable implements Observer, VGraphInterface {
+public class VHyperGraph extends Observable implements VGraphInterface {
 
 	MHyperGraph mG;
 	public VNodeSet modifyNodes;
@@ -100,6 +99,10 @@ public class VHyperGraph extends Observable implements Observer, VGraphInterface
 							GraphConstraints.REMOVAL|GraphConstraints.BLOCK_END, //Status 
 							GraphConstraints.NODE|GraphConstraints.HYPEREDGE|GraphConstraints.SELECTION) //Affected		
 		);		
+	}
+	public boolean hasSelection()
+	{
+		return modifyNodes.hasSelection()||modifyHyperEdges.hasSelection();
 	}
 	/* (non-Javadoc)
 	 * @see model.VGraphInterface#translate(int, int)

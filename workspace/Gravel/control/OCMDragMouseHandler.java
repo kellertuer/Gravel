@@ -7,6 +7,7 @@ import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
+import view.VCommonGraphic;
 import view.VGraphic;
 
 import model.MEdge;
@@ -31,7 +32,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 {
 
 	private VGraph vg;
-	private VGraphic vgc;
+	private VCommonGraphic vgc;
 	private Point MouseOffSet;
 	private GeneralPreferences gp;
 	private VNode StartNode,DragNode;
@@ -46,7 +47,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 	{
 		super(g);
 		vgc = g;
-		vg = g.getVGraph();
+		vg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
 		DragNode = null;
 		MouseOffSet = new Point(0,0);

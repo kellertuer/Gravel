@@ -10,20 +10,24 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import model.VGraphInterface;
+
+import view.VCommonGraphic;
 import view.VGraphic;
+import view.VHyperGraphic;
 /**
  * Export the Graph to a PNG-File
  * @author Ronny Bergmann
  */
 public class PNGWriter
 {
-	private VGraphic vGc; //Die Umgebung zum zeichnen
+	private VCommonGraphic vGc; //Die Umgebung zum zeichnen
 	/**
 	 * Init the exporter to a given Graphic Enviroment, that draws the 
 	 * @param vg The VGraphic-Envronment containing the graph, that should be written to an PNG
 	 * @param tB - Indicator whether the Background of the image should be transparent or white
 	 */
-	public PNGWriter(VGraphic vg)
+	public PNGWriter(VCommonGraphic vg)
 	{
 		vGc = vg;
 	}
@@ -39,8 +43,13 @@ public class PNGWriter
 	{
 		BufferedImage img;
 		String type="png";
-		Point min =  vGc.getVGraph().getMinPoint(vGc.getGraphics());
-		Point max =  vGc.getVGraph().getMaxPoint(vGc.getGraphics());
+		VGraphInterface vG=null;
+		if (vGc.getType()==VCommonGraphic.VGRAPHIC)
+			vG = ((VGraphic)vGc).getGraph();
+		else if (vGc.getType()==VCommonGraphic.VHYPERGRAPHIC)
+			vG = ((VHyperGraphic)vGc).getGraph();
+		Point min =  vG.getMinPoint(vGc.getGraphics());
+		Point max =  vG.getMaxPoint(vGc.getGraphics());
 		int oldz = vGc.getZoom();
 		int origx = (max.x-min.x);
 		float z2 = (float)x/(float)origx;

@@ -17,7 +17,6 @@ import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Observable;
-import java.util.Observer;
 import java.util.Vector;
 
 import model.VEdge;
@@ -35,7 +34,7 @@ import model.Messages.GraphMessage;
  *
  * @author Ronny Bergmann 
  */
-public class VGraph extends Observable implements Observer, VGraphInterface {
+public class VGraph extends Observable implements VGraphInterface {
 
 	MGraph mG;
 	public VNodeSet modifyNodes;
@@ -111,6 +110,10 @@ public class VGraph extends Observable implements Observer, VGraphInterface {
 							GraphConstraints.REMOVAL|GraphConstraints.BLOCK_END, //Status 
 							GraphConstraints.NODE|GraphConstraints.EDGE|GraphConstraints.SELECTION) //Affected		
 		);		
+	}
+	public boolean hasSelection()
+	{
+		return modifyNodes.hasSelection()||modifyEdges.hasSelection();
 	}
 	/**
 	 *  Modify the Graph to the given directed or undirected Value.

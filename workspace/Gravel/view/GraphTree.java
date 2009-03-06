@@ -17,7 +17,10 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import model.MEdge;
+import model.MHyperEdge;
 import model.VGraph;
+import model.VGraphInterface;
+import model.VHyperGraph;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
@@ -30,7 +33,7 @@ import dialogs.*;
  * 
  * This Sidebar may only subscribe itself (as Observer) to Classes that ONLY
  * provide GraphMessage-Updates
- * @author ronny
+ * @author Ronny Bergmann
  *
  */
 public class GraphTree extends JTree implements TreeSelectionListener, 
@@ -41,32 +44,44 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 
 	private static final long serialVersionUID = 1L;
 	private final int USENODES = 1;
-	private final int USEEDGES = 2;
-	private final int USESUBGRAPHS = 3;
+	private final int USEEDGES = 2; //Might also be Hyperedges - it's the same entry-list
+	private final int USESUBGRAPHS = 4;
 	private DefaultMutableTreeNode root, Kanten, Knoten,Mengen;
 	private Vector<String> Knotennamen, Kantennamen, Mengennamen;
 	private DefaultTreeModel Daten;
-	
+	private VGraph vG;
+	private VHyperGraph vhG;
 	//Menuesachen
 	int selectedPosition; //selecktierte Position im 
 	int ParentType; //Vater
 	JMenuItem Text,Properties, Delete, SCrop;
 	JPopupMenu Menu;
 	//Für updates
-	private VGraph vG;
 	/**
 	 * Init sidebar to contain a specific VGraph. The Changes of the VGRaph are tracked
 	 * @param Graph
 	 */
-	public GraphTree(VGraph Graph)
+	public GraphTree(VGraphInterface Graph)
 	{
 		super();
-		vG = Graph;
-		vG.addObserver(this); //Beim Graphen als Observer anmelden
 		root = new DefaultMutableTreeNode("r00t");
 		//Graph
-		Kanten = new DefaultMutableTreeNode("Kanten");
-		root.add(Kanten);
+		if (Graph.getType()==VGraphInterface.GRAPH)
+		{
+			vG = (VGraph)Graph;
+			vG.addObserver(this);
+			Kanten = new DefaultMutableTreeNode("Kanten");
+			root.add(Kanten);
+			vhG=null; //to be secure
+		}
+		else if (Graph.getType()==VGraphInterface.HYPERGRAPH)
+		{
+			vhG = (VHyperGraph)Graph;
+			vhG.addObserver(this);
+			Kanten = new DefaultMutableTreeNode("Hyperkanten");
+			root.add(Kanten);
+			vG=null; 
+		}
 		Knoten = new DefaultMutableTreeNode("Knoten");
 		
 		root.add(Knoten);
@@ -101,7 +116,11 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	 */
 	public void updateNodes()
 	{
-		Vector<String> nodenames = vG.getMathGraph().modifyNodes.getNames();
+		Vector<String> nodenames = new Vector<String>();
+		if (vG!=null)
+			nodenames = vG.getMathGraph().modifyNodes.getNames();
+		else if (vhG!=null)
+			nodenames = vhG.getMathGraph().modifyNodes.getNames();
 		Knoten.removeAllChildren();
 		for (int i=0; i<nodenames.size(); i++)
 		{
@@ -122,18 +141,23 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	 */
 	public void updateEdges()
 	{
-		Vector<String> edges = vG.getMathGraph().modifyEdges.getNames();
+		Vector<String> edgenames = new Vector<String>();
+		if (vG!=null)
+			edgenames = vG.getMathGraph().modifyEdges.getNames();
+		else if (vhG!=null)
+			edgenames = vhG.getMathGraph().modifyHyperEdges.getNames();
+
 		Kanten.removeAllChildren();
-		for (int i=0; i<edges.size(); i++)
+		for (int i=0; i<edgenames.size(); i++)
 		{
-			if (edges.elementAt(i)!=null) //Eine kante mit dem Index existiert
+			if (edgenames.elementAt(i)!=null) //Eine kante mit dem Index existiert
 			{
-				DefaultMutableTreeNode t = new DefaultMutableTreeNode(edges.elementAt(i));
+				DefaultMutableTreeNode t = new DefaultMutableTreeNode(edgenames.elementAt(i));
 				Kanten.add(t);
 			}
 		}
 		//Zur Ruecktransformation zum Index bei Auswahl
-		Kantennamen = edges;
+		Kantennamen = edgenames;
 		this.updateUI();
 		this.revalidate();
 		this.validate();
@@ -143,18 +167,22 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	 */
 	public void updateSubgraphs()
 	{
-		Vector<String> Subgraphs = vG.getMathGraph().modifySubgraphs.getNames();
+		Vector<String> subgraphnames = new Vector<String>();
+		if (vG!=null)
+			subgraphnames = vG.getMathGraph().modifySubgraphs.getNames();
+		else if (vhG!=null)
+			subgraphnames = vhG.getMathGraph().modifySubgraphs.getNames();
 		Mengen.removeAllChildren();
-		for (int i=0; i<Subgraphs.size(); i++)
+		for (int i=0; i<subgraphnames.size(); i++)
 		{
-			if (Subgraphs.elementAt(i)!=null) //Ein set mit dem Index existiert
+			if (subgraphnames.elementAt(i)!=null) //Ein set mit dem Index existiert
 			{
-				DefaultMutableTreeNode t = new DefaultMutableTreeNode(Subgraphs.elementAt(i));
+				DefaultMutableTreeNode t = new DefaultMutableTreeNode(subgraphnames.elementAt(i));
 				Mengen.add(t);
 			}
 		}
 		//Zur Ruecktransformation zum Index bei Auswahl
-		Mengennamen = Subgraphs;
+		Mengennamen = subgraphnames;
 		this.updateUI();
 		this.revalidate();
 		this.validate();
@@ -195,22 +223,38 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		if (selectedNode.getParent().toString().equals("Knoten"))
 		{
 			ParentType = USENODES;
-			Text.setText(vG.getMathGraph().modifyNodes.get(StringPos2Index(USENODES,selectedPosition)).name);
+			int index = StringPos2Index(USENODES,selectedPosition);
+			if (vG!=null)
+				Text.setText(vG.getMathGraph().modifyNodes.get(index).name);
+			else if (vhG!=null)
+				Text.setText(vhG.getMathGraph().modifyNodes.get(index).name);
 		}
 		else if (selectedNode.getParent().toString().equals("Kanten"))
 		{
 			ParentType = USEEDGES;
-			MEdge me = vG.getMathGraph().modifyEdges.get(StringPos2Index(USEEDGES,selectedPosition));
-			String t = me.StartIndex+" -";
-			if (vG.getMathGraph().isDirected()) t+="> "; 
-			t+=""+me.EndIndex;
-			Text.setText(t);
+			int index = StringPos2Index(USEEDGES,selectedPosition);
+			if (vG!=null)
+			{
+				MEdge me = vG.getMathGraph().modifyEdges.get(index);
+				String t = me.StartIndex+" -";
+				if (vG.getMathGraph().isDirected()) t+="> "; 
+				t+=""+me.EndIndex;
+				Text.setText(t);
+			}
+			else if (vhG!=null)
+			{
+				Text.setText(vhG.getMathGraph().modifyHyperEdges.get(index).name);
+			}
 		}
 		else if (selectedNode.getParent().toString().equals("Untergraphen"))
 		{
 			//System.err.println("")
 			ParentType = USESUBGRAPHS;
-			Text.setText(vG.getMathGraph().modifySubgraphs.getNames().elementAt(StringPos2Index(USESUBGRAPHS,selectedPosition)));
+			int index = StringPos2Index(USESUBGRAPHS,selectedPosition);
+			if (vG!=null)
+				Text.setText(vG.getMathGraph().modifySubgraphs.get(index).getName());
+			else if (vhG!=null)
+				Text.setText(vhG.getMathGraph().modifySubgraphs.get(index).getName());			
 		}
 		else if (true) //sonst kein menu anzeigen
 		{
@@ -227,7 +271,13 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			switch (ParentType) //Wo war das zuletzt
 			{
 				case USENODES : {new JNodeDialog(vG.modifyNodes.get(StringPos2Index(ParentType,selectedPosition)),vG); break;}
-				case USEEDGES : {new JEdgeDialog(vG.modifyEdges.get(StringPos2Index(ParentType,selectedPosition)),vG); break;}
+				case USEEDGES : {
+					if (vG!=null)
+						new JEdgeDialog(vG.modifyEdges.get(StringPos2Index(ParentType,selectedPosition)),vG); 
+					else
+						System.err.println("TODO in GraphTree:281: Start HyperEdgeDialog");
+					break;
+					}
 				case USESUBGRAPHS : {new JSubgraphDialog(vG.modifySubgraphs.get(StringPos2Index(ParentType,selectedPosition)),vG); break;}
 				default : {return;}
 			}
@@ -238,7 +288,14 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			switch (ParentType) //Wo war das zuletzt
 			{
 				case USENODES : {msg +="den Knoten <br> "+Knotennamen.elementAt(selectedPosition+1)+"<br>l"+main.CONST.html_oe+"schen ?"; break;}
-				case USEEDGES : {msg +="die Kante <br>"+Kantennamen.elementAt(selectedPosition+1)+"<br>l"+main.CONST.html_oe+"schen ?"; break;}
+				case USEEDGES : {
+							msg +="die ";
+							if (vG!=null)
+								msg+="Kante ";
+							else if (vhG!=null)
+								msg="Hyperkante ";
+							msg +="<br>"+Kantennamen.elementAt(selectedPosition+1)+"<br>l"+main.CONST.html_oe+"schen ?"; 
+						break;}
 				case USESUBGRAPHS : {msg +="den Untergraphen "+Mengennamen.elementAt(selectedPosition+1)+"<br>l"+main.CONST.html_oe+"schen ?<br>(Knoten und Kanten bleiben bestehen)"; break;}
 				default : {return;}
 			}
@@ -249,7 +306,13 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				   switch (ParentType) //Wo war das zuletzt
 					{
 						case USENODES : {vG.modifyNodes.remove(StringPos2Index(ParentType,selectedPosition)); updateNodes(); updateEdges(); break;}
-						case USEEDGES : {vG.modifyEdges.remove(StringPos2Index(ParentType,selectedPosition)); updateEdges(); break;}
+						case USEEDGES : {
+							if (vG!=null)
+								vG.modifyEdges.remove(StringPos2Index(ParentType,selectedPosition));
+							else
+								vhG.modifyHyperEdges.remove(StringPos2Index(ParentType,selectedPosition)); 
+							updateEdges();
+							break;}
 						case USESUBGRAPHS : {vG.modifySubgraphs.remove(StringPos2Index(ParentType,selectedPosition)); updateSubgraphs(); break;}
 						default : {return;}
 					}
@@ -291,7 +354,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		GraphMessage m = (GraphMessage)arg;
 		if (m==null)
 			return;
-		if (o.equals(vG)) //Der Graph wurde aktualisiert und auch echt ein String gegeben, der Auftr�ge enth�lt
+		if ((o.equals(vG))||(o.equals(vhG))) //Der Graph wurde aktualisiert und auch echt ein String gegeben, der Auftr�ge enth�lt
 		{
 			if ((m.getAffectedElementTypes()&GraphConstraints.NODE)==GraphConstraints.NODE) //Ein Knoten ist beteiligt
 			{
@@ -299,6 +362,10 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				updateEdges();
 			}
 			if ((m.getAffectedElementTypes()&GraphConstraints.EDGE)==GraphConstraints.EDGE) //Kanten beteiligt
+			{
+				updateEdges();
+			}
+			if ((m.getAffectedElementTypes()&GraphConstraints.HYPEREDGE)==GraphConstraints.HYPEREDGE) //Kanten beteiligt
 			{
 				updateEdges();
 			}

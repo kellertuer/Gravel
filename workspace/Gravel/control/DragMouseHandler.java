@@ -14,6 +14,7 @@ import java.awt.geom.QuadCurve2D;
 import java.util.Iterator;
 import java.util.Vector;
 
+import view.VCommonGraphic;
 import view.VGraphic;
 
 import model.MEdge;
@@ -39,7 +40,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 	VNode movingNode;
 	VEdge movingEdge;
 	VGraph vg;
-	VGraphic vgc;
+	VCommonGraphic vgc;
 	GeneralPreferences gp;
 	Point MouseOffSet;
 	boolean multiplemoving=false,multipleisNode,altwaspressed = false,shiftwaspressed = false, firstdrag;
@@ -53,7 +54,7 @@ public abstract class DragMouseHandler implements MouseListener, MouseMotionList
 	public DragMouseHandler(VGraphic g)
 	{
 		vgc = g;
-		vg = g.getVGraph();
+		vg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
 		MouseOffSet = new Point(0,0);
 		firstdrag = true;

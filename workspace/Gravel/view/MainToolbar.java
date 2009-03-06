@@ -22,12 +22,12 @@ import view.pieces.ZoomComponent;
 public class MainToolbar extends JToolBar implements ActionListener 
 {	
 	private static final long serialVersionUID = 1L;
-	private VGraphic vG;
+	private VCommonGraphic vG;
 	/**
 	 * Init Toolbar, that is  added as an Control-Element to a VGraphic
 	 * @param g VGraphic it controls
 	 */
-	public MainToolbar (VGraphic g)
+	public MainToolbar (VCommonGraphic g)
 	{
 		super();
 		vG = g;

@@ -11,7 +11,9 @@ import java.util.Vector;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
+import view.VCommonGraphic;
 import view.VGraphic;
+import view.VHyperGraphic;
 
 /**
  * The Mathematical Statistic calcualtion of the Standard Vallues that can be used to create own Entries
@@ -53,22 +55,36 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 	"$Node.Distance.Av", //Knotenabstand, durchschnittlich
 	};
 	
-	private VGraphic vgc;
 	private VGraph vg;
+	private VHyperGraph vhg;
+	private VCommonGraphic vcg;
 	private TreeMap<String,Double> atomvalues;
 	private int blockdepth;
 	/**
 	 * Init the Statistics as it corresponds always to a graph there must be a
 	 * @param g VGraph 
 	 */
-	public GraphStatisticAtoms(VGraphic g)
+	public GraphStatisticAtoms(VCommonGraphic g)
 	{
 		blockdepth=0;
+		vcg=g;
 		atomvalues = new TreeMap<String, Double>();
-		vgc = g;
-		vg = vgc.getVGraph();
-		vg.addObserver(this);
-		update(vg,new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.ADDITION,GraphConstraints.GRAPH_ALL_ELEMENTS));
+		if (g.getType()==VCommonGraphic.VGRAPHIC)
+		{
+			vg = ((VGraphic)g).getGraph();
+			vhg=null;
+			vg.addObserver(this);
+			//INIT VALUES
+			update(vg,new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.ADDITION,GraphConstraints.GRAPH_ALL_ELEMENTS));
+		}
+		else if (g.getType()==VCommonGraphic.VHYPERGRAPHIC)
+		{
+			vg = null;
+			vhg= ((VHyperGraphic)g).getGraph();
+			vhg.addObserver(this);
+			//INIT VALUES
+			update(vhg,new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.ADDITION,GraphConstraints.HYPERGRAPH_ALL_ELEMENTS));
+		}
 	}
 	/**
 	 * Get the Value of an Atom Value, if there is no Value with the given Name, NaN is returned
@@ -87,6 +103,17 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 	 */
 	private void calculate()
 	{
+		if (vg!=null)
+			calculateGraph();
+		else if (vhg!=null)
+			calculateHypergraph();
+	}
+	private void calculateHypergraph()
+	{
+		//TODO: Calculate Hypergraph-Stats
+	}
+	private void calculateGraph()
+	{
 		TreeMap<Integer,Integer> valenz, invalenz, outvalenz, bends;
 		TreeMap<Integer,Double> kantenlaenge, knotenabstand;
 		valenz = new TreeMap<Integer,Integer>();
@@ -94,7 +121,6 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 		outvalenz = new TreeMap<Integer,Integer>();
 		bends = new TreeMap<Integer,Integer>();
 		kantenlaenge = new TreeMap<Integer,Double>();
-//		int compareCount = new Double(vg.NodeCount()*vg.NodeCount()/2 - vg.NodeCount()/2).intValue();
 		knotenabstand = new TreeMap<Integer,Double>();
 		Iterator<MEdge> edgeiter = vg.getMathGraph().modifyEdges.getIterator();
 		while (edgeiter.hasNext())
@@ -320,13 +346,24 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 				return;
 
 		calculate();
-		atomvalues.put("$Graph.MaxX",(double)vg.getMaxPoint(vgc.getGraphics()).x);
-		atomvalues.put("$Graph.MaxY",(double)vg.getMaxPoint(vgc.getGraphics()).y);
-		atomvalues.put("$Graph.MinX",(double)vg.getMinPoint(vgc.getGraphics()).x);
-		atomvalues.put("$Graph.MinY",(double)vg.getMinPoint(vgc.getGraphics()).y);
+		VGraphInterface temp=null;
+		if (vg!=null)
+		{
+			temp = vg;
+			atomvalues.put("$Node.Count",(double)vg.getMathGraph().modifyNodes.cardinality()); 
+			atomvalues.put("$Edge.Count",(double)vg.getMathGraph().modifyEdges.cardinality()); 
+		}
+		else if (vhg!=null)
+		{
+			temp = vhg;
+			atomvalues.put("$Node.Count",(double)vhg.getMathGraph().modifyNodes.cardinality()); 
+			atomvalues.put("$Edge.Count",(double)vhg.getMathGraph().modifyHyperEdges.cardinality()); 
+		}
+		atomvalues.put("$Graph.MaxX",(double)temp.getMaxPoint(vcg.getGraphics()).x);
+		atomvalues.put("$Graph.MaxY",(double)temp.getMaxPoint(vcg.getGraphics()).y);
+		atomvalues.put("$Graph.MinX",(double)temp.getMinPoint(vcg.getGraphics()).x);
+		atomvalues.put("$Graph.MinY",(double)temp.getMinPoint(vcg.getGraphics()).y);
 		atomvalues.put("$Graph.Area",(double)0);
-		atomvalues.put("$Node.Count",(double)vg.getMathGraph().modifyNodes.cardinality()); 
-		atomvalues.put("$Edge.Count",(double)vg.getMathGraph().modifyEdges.cardinality()); 
 		setChanged();
 		notifyObservers("Atoms");
 	}

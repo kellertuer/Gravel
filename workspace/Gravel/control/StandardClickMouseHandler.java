@@ -3,6 +3,7 @@ package control;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
+import view.VCommonGraphic;
 import view.VGraphic;
 
 import model.VEdge;
@@ -22,7 +23,7 @@ import model.Messages.GraphMessage;
 public class StandardClickMouseHandler extends ClickMouseHandler {
 	
 	private VGraph vg;
-	private VGraphic vgc;
+	private VCommonGraphic vgc;
 	/**
 	 * Initialize the given Standard Mode with an graph it is bound to 
 	 * @param g
@@ -31,7 +32,7 @@ public class StandardClickMouseHandler extends ClickMouseHandler {
 	{
 		super(g);
 		vgc = g;
-		vg = g.getVGraph();
+		vg = g.getGraph();
 	}
 	
 	public void mousePressed(MouseEvent e) {}

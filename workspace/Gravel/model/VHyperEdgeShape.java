@@ -563,13 +563,17 @@ public class VHyperEdgeShape {
 		degree = Knots.size()-controlPoints.size()-1;
 		InitHomogeneous();
 	}
+	
+	public void removeKnot(double knotval)
+	{
+		
+	}
 	/**
 	 * Little Helping Function: Compute Controloints of the Derivate
 	 * of given degree based on the ControlPoints in this Curve here 
 	 * @param pDegree th degree-th Derivate
 	 * @return ControlPoints are returned
 	 */
-	@SuppressWarnings("unchecked")
 	private Vector<Point3d> CPofDerivate(int pDegree)
 	{
 		Vector<Point3d> result = new Vector<Point3d>();

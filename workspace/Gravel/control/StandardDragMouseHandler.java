@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.util.Iterator;
 import java.util.Vector;
 
+import view.VCommonGraphic;
 import view.VGraphic;
 
 import model.MEdge;
@@ -28,7 +29,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 {
 
 	private VGraph vg;
-	private VGraphic vgc;
+	private VCommonGraphic vgc;
 	private Point MouseOffSet;
 	private GeneralPreferences gp;
 	private VNode movingNode;
@@ -44,7 +45,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 	{
 		super(g);
 		vgc = g;
-		vg = g.getVGraph();
+		vg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
 		MouseOffSet = new Point(0,0);
 		firstdrag = true; //Not dragged up to now

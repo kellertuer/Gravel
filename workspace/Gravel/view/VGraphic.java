@@ -1,42 +1,19 @@
 package view;
 
 import history.GraphHistoryManager;
-import io.GeneralPreferences;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-//import javax.swing.*;
-import java.util.HashMap;
+
 import java.util.Iterator;
 import java.util.Observable;
 import java.util.Vector;
-import javax.swing.JViewport;
 
-import control.ClickMouseHandler;
-import control.DragMouseHandler;
-
-import control.OCMClickMouseHandler;
-import control.OCMDragMouseHandler;
-import control.StandardClickMouseHandler;
-import control.StandardDragMouseHandler;
-
-import model.MEdge;
-import model.VEdge;
-import model.VGraph;
-import model.VHyperEdgeShape;
-import model.VItem;
-import model.VNode;
-import model.Messages.GraphConstraints;
-import model.Messages.GraphMessage;
-
-import view.pieces.GridComponent;
-import view.pieces.ZoomComponent;
-
-import java.util.Observer;
+import control.*;
+import model.*;
+import model.Messages.*;
 
 /**
  * class VGraphic
@@ -45,32 +22,13 @@ import java.util.Observer;
  * @author Ronny Bergmann
  *
  */
-public class VGraphic extends Component implements 	Observer
+public class VGraphic extends VCommonGraphic
 {
-	public static final int NO_MOUSEHANDLING=0;
-	public static final int STD_MOUSEHANDLING=1;
-	public static final int OCM_MOUSEHANDLING=2;
-	
 	// VGraph : Die Daten des Graphen
 	private VGraph vG;
-	private GraphHistoryManager vGh;
-	
-	private JViewport vp;
-	
-	private float zoomfactor;
-	private int gridx,gridy;
-	private boolean gridenabled,gridorientated;
-	GeneralPreferences gp;
-	
-	//Eine Liste der GUI-Elemente, die zur direkten Einstellung dienen (also ausser GeneralPreferences)
-	//etwa Zoom, Grid,...
-	
-	private HashMap<String,Observable> Controls;
-	
 	// Visual Styles
 	private BasicStroke vEdgeStyle;
-	private Color selColor; //Color of selected Elements
-	private int selWidth; //Width of selection border
+	//Mouse Handler
 	private DragMouseHandler Drag;
 	private ClickMouseHandler Click;
 	private static final long serialVersionUID = 1L;
@@ -81,26 +39,12 @@ public class VGraphic extends Component implements 	Observer
 	 * @param Graph Graph to be represented
 	 */
 	public VGraphic(Dimension d,VGraph Graph) {
-		//GeneralPreferences als beobachter eintragen
-		gp = GeneralPreferences.getInstance();
-		gp.addObserver(this);
-		this.setSize(d);
-		this.setBounds(0, 0, d.width, d.height);
-
-		zoomfactor = 1.0f;
-		gridx = gp.getIntValue("grid.x");
-		gridy = gp.getIntValue("grid.y");
-		gridenabled = gp.getBoolValue("grid.enabled");
-		gridorientated = gp.getBoolValue("grid.orientated");
-		
+		super(d,Graph);
 		vEdgeStyle = new BasicStroke(5.0f, BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND);
-		selColor = new Color(gp.getIntValue("vgraphic.selcolr"),gp.getIntValue("vgraphic.selcolg"),gp.getIntValue("vgraphic.selcolb"));
-		selWidth = gp.getIntValue("vgraphic.selwidth");
 		
 		vG = Graph;
 		vG.addObserver(this); //Die Graphikumgebung als Observer der Datenstruktur eintragen
 		vGh = new GraphHistoryManager(vG);
-		Controls = new HashMap<String,Observable>();
 	}
 	
 	public void paint(Graphics g) 
@@ -123,105 +67,6 @@ public class VGraphic extends Component implements 	Observer
 			g2.setColor(selColor);
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
-		}
-		g2.setColor(Color.black);
-		g2.setStroke(new BasicStroke(1*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		Vector<Point2D> P = new Vector<Point2D>();
-		Vector<Double> weights = new Vector<Double>();
-		P.add(new Point2D.Double(10,100)); weights.add(1d);
-		P.add(new Point2D.Double(70,90)); weights.add(1d);
-		P.add(new Point2D.Double(25,30)); weights.add(1d);
-		P.add(new Point2D.Double(200,10)); weights.add(3d);
-		P.add(new Point2D.Double(100,85)); weights.add(1d);
-		P.add(new Point2D.Double(300,100)); weights.add(1d);
-		P.add(new Point2D.Double(350,100)); weights.add(1d);
-		Vector<Double> U = new Vector<Double>();
-		U.add(0d);U.add(0d);U.add(0d);U.add(0d);
-		U.add(.25d);U.add(.5d); U.add(.75d);
-		U.add(1d);U.add(1d);U.add(1d);U.add(1d);
-		VHyperEdgeShape s = new VHyperEdgeShape(U,P,weights,27);
-		Vector<Double> X = new Vector<Double>();		
-		X.add(.125d); 
-		X.add(.375d);
-		X.add(.625d);
-		X.add(.875d);		
-		s.RefineKnots(X);
-		X.clear();
-		X.add(.0625d);
-		X.add(.1875d);
-		X.add(.4375d);
-		X.add(.5625d);
-		X.add(.6875d);
-		X.add(.8125d);
-		X.add(.9375d);
-		s.RefineKnots(X);
-		g2.setColor(Color.BLACK);
-		s.scale(zoomfactor);
-		GeneralPath path = s.getCurve(.002d);
-		g2.draw(path);
-		Iterator<Point2D> pi = s.controlPoints.iterator();
-		while (pi.hasNext())
-		{
-			Point2D p = (Point2D) pi.next();
-			g2.setColor(Color.BLACK);
-			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-
-			g2.drawLine(Math.round(((float)p.getX()-3)),Math.round((float)p.getY()),Math.round(((float)p.getX()+3)),Math.round((float)p.getY()));
-			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
-		}
-		s.scale(1/zoomfactor);
-		int i=87;
-		Point2D PCurve = s.NURBSCurveAt(((double)i/100));
-		Point2D PDest = new Point2D.Double(PCurve.getX(),PCurve.getY()+50d);
-		if (vG.modifyNodes.get(1)!=null)
-			PDest = (Point2D) vG.modifyNodes.get(1).getPosition().clone();
-		g2.setColor(Color.RED);		
-		s.movePoint(PCurve, PDest);
-		PCurve.setLocation(PCurve.getX()*zoomfactor, PCurve.getY()*zoomfactor);
-		PDest.setLocation(PDest.getX()*zoomfactor, PDest.getY()*zoomfactor);
-		g2.drawLine(Math.round(((float)PCurve.getX()-3)),Math.round((float)PCurve.getY()),Math.round(((float)PCurve.getX()+3)),Math.round((float)PCurve.getY()));
-		g2.drawLine(Math.round(((float)PCurve.getX())),Math.round(((float)PCurve.getY()-3)),Math.round((float)PCurve.getX()),Math.round(((float)PCurve.getY()+3)));
-		g2.drawLine(Math.round(((float)PDest.getX()-3)),Math.round((float)PDest.getY()),Math.round(((float)PDest.getX()+3)),Math.round((float)PDest.getY()));
-		g2.drawLine(Math.round(((float)PDest.getX())),Math.round(((float)PDest.getY()-3)),Math.round((float)PDest.getX()),Math.round(((float)PDest.getY()+3)));
-		g2.drawLine(Math.round(((float)PDest.getX())),Math.round(((float)PDest.getY())),Math.round((float)PCurve.getX()),Math.round(((float)PCurve.getY())));
-		s.scale(zoomfactor);
-		path = s.getCurve(.002d);
-		g2.setColor(Color.BLUE);
-		g2.draw(path);
-		pi = s.controlPoints.iterator();
-		while (pi.hasNext())
-		{
-			Point2D p = (Point2D) pi.next();
-			g2.setColor(Color.BLUE);
-			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-
-			g2.drawLine(Math.round(((float)p.getX()-3)),Math.round((float)p.getY()),Math.round(((float)p.getX()+3)),Math.round((float)p.getY()));
-			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
-		}
-		s.scale(1/zoomfactor);
-		Iterator<VNode> ni = vG.modifyNodes.getIterator();
-		while (ni.hasNext())
-		{
-			VNode actual = ni.next();
-			if (actual.getIndex()>1)
-			{
-				Point2D p = s.ProjectionPoint((Point2D) actual.getPosition().clone());
-				g2.setColor(Color.GRAY);
-				g2.drawLine(
-						Math.round(actual.getPosition().x*zoomfactor),
-						Math.round(actual.getPosition().y*zoomfactor),
-						Math.round((float)p.getX()*zoomfactor),
-						Math.round((float)p.getY()*zoomfactor));
-				if (p.distance(actual.getPosition())<=2.0d)
-					g2.setColor(Color.GREEN);
-				else
-					g2.setColor(Color.RED);					
-				g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-
-				g2.drawLine(Math.round(((float)actual.getPosition().getX()*zoomfactor-3)),Math.round((float)actual.getPosition().getY()*zoomfactor),Math.round(((float)actual.getPosition().getX()*zoomfactor+3)),Math.round((float)actual.getPosition().getY()*zoomfactor));
-				g2.drawLine(Math.round(((float)actual.getPosition().getX()*zoomfactor)),Math.round(((float)actual.getPosition().getY()*zoomfactor-3)),Math.round((float)actual.getPosition().getX()*zoomfactor),Math.round(((float)actual.getPosition().getY()*zoomfactor+3)));
-
-			}
 		}
 	}
 	/**
@@ -312,51 +157,6 @@ public class VGraphic extends Component implements 	Observer
 		}
 	}
 	/**
-	 * Paint nodes in the Graphic g
-	 * @param g
-	 */
-	private void paintNodes(Graphics g)
-	{
-		Graphics2D g2 = (Graphics2D) g;
-		Iterator<VNode> nodeiter = vG.modifyNodes.getIterator();
-		while (nodeiter.hasNext()) // drawNodes
-		{
-			VNode temp = nodeiter.next();
-			if ((((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)||((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))&&((temp.getSelectedStatus()&VItem.SOFT_DESELECTED)!=VItem.SOFT_DESELECTED))
-			{ //Draw all Nodes that are selected or temporarily selected as selected in the GUI
-				g2.setColor(selColor);
-				g2.fillOval(Math.round((temp.getdrawpoint().x-selWidth/2)*zoomfactor), 
-						Math.round((temp.getdrawpoint().y-selWidth/2)*zoomfactor),
-						Math.round((temp.getSize() + selWidth)*zoomfactor),
-						Math.round((temp.getSize() + selWidth)*zoomfactor));
-			}
-			g2.setColor(temp.getColor());
-			g2.fillOval(Math.round(temp.getdrawpoint().x*zoomfactor), Math.round(temp.getdrawpoint().y*zoomfactor), Math.round(temp.getSize()*zoomfactor), Math.round(temp.getSize()*zoomfactor));
-			if (temp.isNameVisible())
-			{	
-				g2.setColor(Color.black);					
-				Font f = new Font("Arial",Font.PLAIN, Math.round(temp.getNameSize()*zoomfactor));
-				g2.setFont(f);
-				//mittelpunkt des Textes
-				int x = temp.getPosition().x + Math.round((float)temp.getNameDistance()*(float)Math.cos(Math.toRadians((double)temp.getNameRotation())));
-				int y = temp.getPosition().y - Math.round((float)temp.getNameDistance()*(float)Math.sin(Math.toRadians((double)temp.getNameRotation())));
-				
-				//System.err.println("For "+temp.getNameRotation()+" Degrees  and NameDistance "+temp.getNameDistance()
-				//					+" is ("+temp.getPosition().x+"+("+Math.round((float)temp.getNameDistance()*(float)Math.cos(Math.toRadians((double)temp.getNameRotation())))+") = "+x
-				//					+" and ("+temp.getPosition().y+"+"+Math.round((float)temp.getNameDistance()*(float)Math.sin(Math.toRadians((double)temp.getNameRotation())))+") = "+y);
-			    FontMetrics metrics = g2.getFontMetrics(f);
-			    int hgt = metrics.getAscent()-metrics.getLeading()-metrics.getDescent();
-			    int adv = metrics.stringWidth(vG.getMathGraph().modifyNodes.get(temp.getIndex()).name);
-			    x = Math.round(x*zoomfactor);
-			    y = Math.round(y*zoomfactor);
-			    x -= Math.round(adv/2); y += Math.round(hgt/2);
-				g2.drawString(vG.getMathGraph().modifyNodes.get(temp.getIndex()).name, x,y);
-				
-			}
-		}
-		g2.setColor(Color.black);
-	}
-	/**
 	 * Paint Edge Controll-Points in the Graphic
 	 * @param g
 	 */
@@ -372,117 +172,15 @@ public class VGraphic extends Component implements 	Observer
 		}
 	}
 	/**
-	 * Draw a single ControllPoint in
-	 * @param g the Graphic g
-	 * @param p at the Position of this point
-	 */
-	private void drawCP(Graphics g, Point p)
-	{
-		int cpsize = gp.getIntValue("vgraphic.cpsize");
-		Graphics2D g2 = (Graphics2D) g;
-		g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
-		g2.setColor(Color.BLUE);
-		g2.drawLine(Math.round((p.x-cpsize)*zoomfactor),Math.round(p.y*zoomfactor),Math.round((p.x+cpsize)*zoomfactor),Math.round(p.y*zoomfactor));
-		g2.drawLine(Math.round(p.x*zoomfactor),Math.round((p.y-cpsize)*zoomfactor),Math.round(p.x*zoomfactor),Math.round((p.y+cpsize)*zoomfactor));
-		
-	}
-	/**
-	 * Paint a grid in the Graphics
-	 * @param g
-	 */
-	private void paintgrid(Graphics g)
-	{
-		Graphics2D g2 = (Graphics2D) g;
-		if ((!gridenabled)||(vp==null))
-			return;
-		int minX = vp.getViewRect().x;
-		int maxX = vp.getViewRect().x + vp.getViewRect().width;
-		int minY = vp.getViewRect().y;
-		int maxY = vp.getViewRect().y + vp.getViewRect().height;
-		g2.setColor(Color.GRAY);
-		g2.setStroke(new BasicStroke(1,BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-		//Draw vertical Lines
-		for (int i=Math.round(gridx*zoomfactor); i<maxX; i+=Math.round(gridx*zoomfactor))
-		{
-			if (i >= minX)
-				g2.drawLine(i, minY,i,maxY);
-		}
-		//horizontal
-		for (int i=Math.round(gridy*zoomfactor); i<maxY; i+=Math.round(gridy*zoomfactor))
-		{
-			if (i >= minY)
-				g2.drawLine(minX, i, maxX, i);
-		}		
-	}
-	/**
 	 * Get the represented Graph for manipulation.
 	 * The Manipulation is handled by pushing Notifications to the Graph-Observers 
 	 * 
 	 * @return the actual VGraph that is handled in the this GUI
 	 */
-	public VGraph getVGraph()
+	public VGraph getGraph()
 	{
 		return vG;
 	}
-	/**
-	 * Get the GraphHIstoryManager that tracks, records and enables undo for the graph
-	 * Use this Method to do the Undo/Redo and sth like that
-	 * 
-	 * @return GraphHistoryManager
-	 */
-	public GraphHistoryManager getGraphHistoryManager()
-	{
-		return vGh;
-	}
-	/**
-	 * Set the ViewPort of the VGraphic
-	 * @param p new ViewPort
-	 */
-	public void setViewPort(JViewport p)
-	{
-		vp = p;
-	}
-	/**
-	 * Get the Viewport
-	 * @return
-	 */
-	public JViewport getViewPort()
-	{
-		return vp;
-	}
-	/**
-	 * Add an Element to the controls.
-	 * These Controls are observed for changes
-	 * The Name is used to identify the Piece and react on changes in it
-	 * @param name
-	 * @param element
-	 */
-	public void addPiece(String name, Observable element)
-	{
-		Controls.put(name,element);
-		element.addObserver(this);
-	}
-	/**
-	 * Remove an Element of the controls. It is no longer observed
-	 * So no further action in the Observable object trigger changes here
-	 * @param name name of the Object to be removed
-	 */
-	public void removePiece(String name)
-	{
-		Controls.get(name).deleteObserver(this);
-		Controls.remove(name);
-	}
-	/**
-	 * Change Mouse-Handling to a new State.
-	 * Mouse actions in Progress are stopped (e.g. an Drag in progress)
-	 * 
-	 * possible Values
-	 * - NO_MOUSEHANDLING - Mouse-Actions aren't handled in any way
-	 * - STD_MOUSEHANDLING - Standard-Mode (default)
-	 * - OCM_MOUSEHANDLING - Set to OneClick-Mode
-	 * 
-	 * @param state new Mousehandling state
-	 */
 	public void setMouseHandling(int state) {
 		if (Drag!=null)
 		{
@@ -530,120 +228,37 @@ public class VGraphic extends Component implements 	Observer
 		Drag = null;
 		Click = null;
 	}
-	/**
-	 * Set Zoom to a specific value - if a Component named „Zoom“ (ZoomComponent) exists, ist value is set, too
-	 * @param percent new Zoom in percent
-	 */
-	public void setZoom(int percent)
+
+	protected Point DragMouseOffSet()
 	{
-		zoomfactor = ((float)percent)/100.0f;
-		if (this.Controls.get("Zoom")!=null)
-		{
-			((ZoomComponent)Controls.get("Zoom")).setZoom(percent);
-		}
+		if ((Drag!=null)&&(Drag.dragged()))
+				return Drag.getMouseOffSet();
+		else
+			return null;
 	}
-	/**
-	 * Get the actual Zoom-Factor in percent.
-	 * @return an int representing the zoom in percent.
-	 */
-	public int getZoom()
+	public void handlePreferencedUpdate()
 	{
-		return (new Float(zoomfactor*100.0f)).intValue();
-	}
-	private void handleGraphUpdate(GraphMessage m)
-	{
-		if ((m.getAffectedElementTypes()&(GraphConstraints.GRAPH_ALL_ELEMENTS|GraphConstraints.SELECTION)) > 0) //Anything in Elements or selections changed
-		{
-			Point MouseOffSet = vp.getViewPosition();
-			if ((Drag!=null)&&(Drag.dragged()))
-				MouseOffSet = Drag.getMouseOffSet(); //Bewegungspunkt
-			Point GraphSize = new Point(Math.round(vG.getMaxPoint(getGraphics()).x*zoomfactor),Math.round(vG.getMaxPoint(getGraphics()).y*zoomfactor));
-			int offset = gp.getIntValue("vgraphic.framedistance");
-			int x = Math.max(GraphSize.x+offset,vp.getViewRect().x+vp.getViewRect().width-offset);
-			int y = Math.max(GraphSize.y+offset,vp.getViewRect().y+vp.getViewRect().height-offset);
-			setPreferredSize(new Dimension(x,y));
-			setSize(new Dimension(x,y));
-			//Nun soll mitgescrollt werden, falls ein Knoten oder eine Kante (CP) in Bewegung ist 
-			//und die Maus theoretisch aus dem sichtbaren kram raus ist
-			Rectangle r = vp.getViewRect();
-			if ((Drag!=null)&&(Drag.dragged())&&(!r.contains(MouseOffSet)))	
-			{		
-				//System.err.print("Move Me : "+r+" and "+MouseOffSet);
-				int xdiff = MouseOffSet.x-r.x-r.width;
-				if (xdiff > 0) //Dann ist die Maus nach rechts rausgewandert
-					r.x += xdiff;
-				xdiff = r.x - MouseOffSet.x;
-				if (xdiff > 0) //nach Links rausgewandert
-					r.x -= xdiff;
-				int ydiff = MouseOffSet.y-r.y-r.height;
-				if (ydiff > 0) //nach unten rausgewandert
-					r.y += ydiff;
-				ydiff = r.y - MouseOffSet.y;
-				if (ydiff > 0) //nach oben rausgewandert
-					r.y -=ydiff;
-				if (r.y < 0) r.y = 0;
-				if (r.x < 0) r.x = 0;
-				vp.setViewPosition(new Point(r.x,r.y));
-				//wiederholen bis das nicht mehr der fall ist ?
-			}
-			vp.revalidate();
-			vp.getParent().validate();
-			repaint();	
-		}
-		else if ((m.getModifiedElementTypes()&GraphConstraints.SUBGRAPH)==GraphConstraints.SUBGRAPH)
-		{
-			repaint();
-			if (Click!=null)
-				Click.updateSubgraphList();
-		}
-	}
-	public void handlePreferencesUpdate()
-	{
-		gridx = gp.getIntValue("grid.x");
-		gridy = gp.getIntValue("grid.y");
-		gridenabled = gp.getBoolValue("grid.enabled");
-		gridorientated = gp.getBoolValue("grid.orientated");
+		super.handlePreferencesUpdate();
 		if (Drag!=null)
 		{
 			Drag.setGridOrientated(gridenabled&&gridorientated);
 			Drag.setGrid(gridx,gridy);
 		}
-		selColor = new Color(gp.getIntValue("vgraphic.selcolr"),gp.getIntValue("vgraphic.selcolg"),gp.getIntValue("vgraphic.selcolb"));
-		selWidth = gp.getIntValue("vgraphic.selwidth");
-		vG.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE)); //Zoom and Selection stuff belong to the mark actions on a graph - they don't change the state to "not saved yet"
-		repaint();
 	}
 	public void update(Observable o, Object arg)
 	{
-		if (arg instanceof GraphMessage)
-			handleGraphUpdate((GraphMessage)arg);
+		super.updateControls(o,arg);
+		if (arg instanceof GraphMessage) //All Other GraphUpdates are handled in VGRaphCommons
+		{
+			if (Click!=null) 
+				Click.updateSubgraphList();
+			repaint();
+		}
 		else if (o.equals(gp)) //We got news from gp
 			handlePreferencesUpdate();
-		else if ((Controls.get(arg)!=null)&&(Controls.get(arg).equals(o))) 
-			//We got a Message from an Control that has Subscribed itself
-			{
-				if (arg.equals("Zoom"))
-				{
-					ZoomComponent myZoom = ((ZoomComponent)o);
-					if (myZoom.getZoom()!=getZoom()) //Zoom really changed externally - update here
-						zoomfactor = ((float)myZoom.getZoom())/100.0f;
-					//internally update scrolls
-					handleGraphUpdate(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
-				}
-				else if (arg.equals("Grid"))
-				{
-					gridx = ((GridComponent)o).getGridX();
-					gridy = ((GridComponent)o).getGridY();
-					gridenabled = ((GridComponent)o).isEnabled();
-					gridorientated = ((GridComponent)o).isOrientated();
-					if (Drag!=null)
-					{
-						Drag.setGridOrientated(gridenabled&&gridorientated);
-						Drag.setGrid(gridx,gridy);
-					}
-					repaint();
-					//UpdateGrid
-				}
-			}
+	}
+
+	public int getType() {
+		return VCommonGraphic.VGRAPHIC;
 	}
 }

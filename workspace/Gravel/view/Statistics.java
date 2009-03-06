@@ -64,7 +64,7 @@ public class Statistics extends JPanel implements Observer, ActionListener
 	 * Init Statistics based on a VGraphic g
 	 * @param g
 	 */
-	public Statistics(VGraphic g)
+	public Statistics(VCommonGraphic g)
 	{
 		vgs = new GraphStatisticAtoms(g);
 		vgs.addObserver(this);

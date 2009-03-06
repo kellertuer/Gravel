@@ -17,20 +17,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import view.VGraphic;
+import view.*;
+import dialogs.*;
+import model.*;
+import model.Messages.*;
 
-import dialogs.JEdgeDialog;
-import dialogs.JNodeDialog;
-import dialogs.JSubgraphDialog;
-
-import model.MEdge;
-import model.VEdge;
-import model.VGraph;
-import model.VItem;
-import model.VNode;
-import model.VSubgraph;
-import model.Messages.GraphConstraints;
-import model.Messages.GraphMessage;
 /**
  * Super class for the mouse handler for mouseclicks
  * this class is abstract, and is implemented by every mouse mode that is available in gravel
@@ -72,7 +63,7 @@ public abstract class ClickMouseHandler implements MouseListener, ActionListener
 	{
 		vgc= g;
 		gp = GeneralPreferences.getInstance();
-		vg = vgc.getVGraph();
+		vg = vgc.getGraph();
 		vg.addObserver(this); //Sub
 		initPopups();
 		updateSubgraphList();

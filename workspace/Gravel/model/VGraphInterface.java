@@ -2,32 +2,34 @@ package model;
 
 import java.awt.Graphics;
 import java.awt.Point;
+import java.util.Observer;
 
 import model.Messages.GraphConstraints;
 
-public interface VGraphInterface {
+public interface VGraphInterface extends Observer {
 
 	
 	public final int GRAPH = GraphConstraints.VISUAL|GraphConstraints.GRAPH;
 	public final int HYPERGRAPH = GraphConstraints.VISUAL|GraphConstraints.HYPERGRAPH;
-
+	
 	/**
 	 * deselect all Nodes and Edges
 	 */
-	public abstract void deselect();
+	public void deselect();
 
 	/**
 	 * deletes all selected Nodes and (Hyper)Edges. That means, that also all incident Edges of selected Nodes are deleted
 	 */
-	public abstract void removeSelection();
+	public void removeSelection();
 
+	public boolean hasSelection();
 	/**
 	 * Translates the Graph by the given Offset in x and y direction
 	 * <br><br>
 	 * @param x Translation on the X-axis
 	 * @param y Translation on the Y-axis
 	 */
-	public abstract void translate(int x, int y);
+	public void translate(int x, int y);
 
 	/**
 	 * returns the maximum point that is used by the VGraph.
@@ -36,7 +38,7 @@ public interface VGraphInterface {
 	 * 
 	 * @return Maximum as a point
 	 */
-	public abstract Point getMaxPoint(Graphics g);
+	public Point getMaxPoint(Graphics g);
 
 	/**
 	 * returns the minimum point that is used by the VGraph.
@@ -48,14 +50,14 @@ public interface VGraphInterface {
 	 * @param the Graphic in which the Graph lies. 
 	 * @return Point MinPoint
 	 */
-	public abstract Point getMinPoint(Graphics g);
+	public Point getMinPoint(Graphics g);
 
 	/**
 	 * informs all subscribers about a change. This Method is used to push a notify from outside
 	 * mit dem Oject o als Parameter
 	 */
-	public abstract void pushNotify(Object o);
+	public void pushNotify(Object o);
 
-	public abstract int getType();
+	public int getType();
 
 }

@@ -20,30 +20,28 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import model.VGraph;
+import model.VGraphInterface;
+import model.VHyperGraph;
 
 import view.Gui;
+import view.VCommonGraphic;
 import view.VGraphic;
+import view.VHyperGraphic;
 
 /**
- * JFileDialogs stellt alle Dialoge zum Laden und Speichern von Graphen zur Verfügung
- * Observes VGraph of the Editor to indicate whether the graph was saved yet or not.
+ * JFileDialogs provides all Dialogs concerning loading/saving and the questions for Loading/Saving of Graphs
+ * Observes the Changes in the actually edited (Hyper)graph to indicate whether it was saved yet or not.
  * 
- * 
- * - "Laden" des eigenen Formates
- * 		wobei hier eventuell der VisualisierungsWizard aufgerufen wird, falls kein visueller Graph vorliegt
- * - "Speichern unter" des eigenen Formates mit der Auswahl, welches der beiden Formate gespeichert werden soll
- * - "Speichern" des aktuellen Graphen unter dem zuletzt verwendeten Namen im zuletzt gewählten Format
- * 
- * 
- * 		PNG Export
- * 		LaTeX Picture Export
- * 		SVG		Export als Vektorgrafik
- * (	GraphML Export mit oder ohne visuelle Informationen
- * 		.dot	Export das Format von Graphviz 
- * 
- * 		GraphML Import eines mathematischen Graphen => Wizard starten
- *		.dot	Import so jeder Knoten mindestens x und y enthält VGraph sonst MGraph
- * 		GML Import ?		)
+ * Features
+ * - Loading of GravelML (without handling pure mathematical graphs, because there is no algorithm/Dialog for that yet)
+ * - Save as and Save in GravelML ith questioning of saving format (pure math or all)
+ * - Exports to
+ * 	- PNG
+ * 	- LaTeX	Picture Export
+ * 	- SVG	Export als Vektorgrafik
+
+ * Ideas for further Exports: GraphML, .dot, TikZ,...?
+ * Ideas for Imports: GraphML, .dot, GML,...?
  * 
  * @author Ronny Bergmann
  */
@@ -149,17 +147,29 @@ public class JFileDialogs implements Observer
 	
 	private boolean saveVisual = true;
 	
-	private VGraphic vGc;
+	private VCommonGraphic vGc;
+	private int GraphType;
+	private VGraphInterface vG;
 	private boolean actualState;
 	/**
 	 * Constructor 
 	 * @param pvg the actual graph editor Component
 	 * @param programmstart initialize graphsaved
 	 */
-	public JFileDialogs(VGraphic pvg)
+	public JFileDialogs(VCommonGraphic pvg)
 	{
+		GraphType = pvg.getType();
 		vGc = pvg;
-		vGc.getVGraph().addObserver(this);
+		if (GraphType==VCommonGraphic.VGRAPHIC)
+		{
+			vG = ((VGraphic)vGc).getGraph(); 
+			((VGraphic)vGc).getGraph().addObserver(this);
+		}
+		else
+		{
+			vG = ((VHyperGraphic)vGc).getGraph(); 
+			((VHyperGraphic)vGc).getGraph().addObserver(this);
+		}
 		actualState=vGc.getGraphHistoryManager().IsGraphUnchanged();
 	}
 	/**
@@ -214,8 +224,10 @@ public class JFileDialogs implements Observer
 	    			Gui.getInstance().setVGraph(R.getVGraph());
 	    			GeneralPreferences.getInstance().setStringValue("graph.lastfile",f.getAbsolutePath());
 					Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+"");
-	    			vGc.getVGraph().getMathGraph().deleteObserver(this);
-	    			vGc.getVGraph().addObserver(this);
+					if (GraphType==VCommonGraphic.VGRAPHIC)
+						((VGraphic)vGc).getGraph().addObserver(this);
+					else
+						((VHyperGraphic)vGc).getGraph().addObserver(this);
 	    			//Set actual State saved.
 	    			vGc.getGraphHistoryManager().setGraphSaved();
 	    			return true;
@@ -250,7 +262,10 @@ public class JFileDialogs implements Observer
 		}
 		String filename = GeneralPreferences.getInstance().getStringValue("graph.lastfile");
 		File f = new File (filename);
-		GravelMLWriter iw = new GravelMLWriter(vGc.getVGraph()); //Save the actual reference
+		GravelMLWriter iw = new GravelMLWriter(((VGraphic)vGc).getGraph()); //Save the actual reference
+		//TODO Change to the next line if MLWriter done
+		//GravelMLWriter iw = new GravelMLWriter(vG);
+		
 		saveVisual = GeneralPreferences.getInstance().getStringValue("graph.fileformat").equals("visual");
 		if (saveVisual)
 		{
@@ -296,7 +311,9 @@ public class JFileDialogs implements Observer
 		if (returnVal == JFileChooser.APPROVE_OPTION)
 		{
 			File f = fc.getSelectedFile();
-			GravelMLWriter iw = new GravelMLWriter(vGc.getVGraph());
+			GravelMLWriter iw = new GravelMLWriter(((VGraphic)vGc).getGraph()); //Save the actual reference
+			//TODO Change to the next line if MLWriter done
+			//GravelMLWriter iw = new GravelMLWriter(vG);
 			
 			SaveAsDialog sad = new SaveAsDialog(Gui.getInstance().getParentWindow());
 			if (sad.IsAccepted())
@@ -310,8 +327,10 @@ public class JFileDialogs implements Observer
 					{
 						GeneralPreferences.getInstance().setStringValue("graph.lastfile",f.getAbsolutePath());
 						//Observe VGraph
-						vGc.getVGraph().getMathGraph().deleteObserver(this);
-						vGc.getVGraph().addObserver(this);
+						if (GraphType==VCommonGraphic.VGRAPHIC)
+							((VGraphic)vGc).getGraph().addObserver(this);
+						else
+							((VHyperGraphic)vGc).getGraph().addObserver(this);
 						Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName());
 		    			//Set actual State saved.
 		    			vGc.getGraphHistoryManager().setGraphSaved();
@@ -324,8 +343,10 @@ public class JFileDialogs implements Observer
 					{
 						GeneralPreferences.getInstance().setStringValue("graph.lastfile",f.getAbsolutePath());
 						//Observe MGraph
-						vGc.getVGraph().getMathGraph().addObserver(this);
-						vGc.getVGraph().deleteObserver(this);
+						if (GraphType==VCommonGraphic.VGRAPHIC)
+							((VGraphic)vGc).getGraph().addObserver(this);
+						else
+							((VHyperGraphic)vGc).getGraph().addObserver(this);
 						Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+" (math only)");
 		    			//Set actual State saved.
 		    			vGc.getGraphHistoryManager().setGraphSaved();
@@ -341,7 +362,7 @@ public class JFileDialogs implements Observer
 	 * Export an File
 	 *	PNG
 	 *	TeX
-	 *rest still todo
+	 *  PNG
 	 */
 	public boolean Export()
 	{
@@ -363,8 +384,8 @@ public class JFileDialogs implements Observer
 	    		if (png.accept(f))
 	    		{
 	    			ExportPNGDialog esvgd = new ExportPNGDialog(Gui.getInstance().getParentWindow(),
-	    					(vGc.getVGraph().getMaxPoint(vGc.getGraphics()).x-vGc.getVGraph().getMinPoint(vGc.getGraphics()).x),
-	    					(vGc.getVGraph().getMaxPoint(vGc.getGraphics()).y-vGc.getVGraph().getMinPoint(vGc.getGraphics()).y));
+	    					(vG.getMaxPoint(vGc.getGraphics()).x-vG.getMinPoint(vGc.getGraphics()).x),
+	    					(vG.getMaxPoint(vGc.getGraphics()).y-vG.getMinPoint(vGc.getGraphics()).y));
 	    			if (esvgd.IsAccepted())
 	    			{
 	    				PNGWriter iw = new PNGWriter(vGc); 
@@ -375,11 +396,11 @@ public class JFileDialogs implements Observer
 	    		else if (svg.accept(f))
 	    		{
 	    			ExportSVGDialog esvgd = new ExportSVGDialog(Gui.getInstance().getParentWindow(),
-	    					(vGc.getVGraph().getMaxPoint(vGc.getGraphics()).x-vGc.getVGraph().getMinPoint(vGc.getGraphics()).x),
-	    					(vGc.getVGraph().getMaxPoint(vGc.getGraphics()).y-vGc.getVGraph().getMinPoint(vGc.getGraphics()).y));
+	    					(vG.getMaxPoint(vGc.getGraphics()).x-vG.getMinPoint(vGc.getGraphics()).x),
+	    					(vG.getMaxPoint(vGc.getGraphics()).y-vG.getMinPoint(vGc.getGraphics()).y));
 	    			if (esvgd.IsAccepted())
 	    			{
-	    				SVGWriter iw = new SVGWriter(vGc,esvgd.getSizeX(),""); 
+	    				SVGWriter iw = new SVGWriter(vGc,esvgd.getSizeX()); 
 	    				iw.saveToFile(f);
 	    				return true;
 	    			}
@@ -387,8 +408,8 @@ public class JFileDialogs implements Observer
 	    		else if (tex.accept(f))
 	    		{
 	    			ExportTeXDialog etexd = new ExportTeXDialog(Gui.getInstance().getParentWindow(),
-	    					(vGc.getVGraph().getMaxPoint(vGc.getGraphics()).x-vGc.getVGraph().getMinPoint(vGc.getGraphics()).x),
-	    					(vGc.getVGraph().getMaxPoint(vGc.getGraphics()).y-vGc.getVGraph().getMinPoint(vGc.getGraphics()).y));
+	    					(vG.getMaxPoint(vGc.getGraphics()).x-vG.getMinPoint(vGc.getGraphics()).x),
+	    					(vG.getMaxPoint(vGc.getGraphics()).y-vG.getMinPoint(vGc.getGraphics()).y));
 	    			if (etexd.IsAccepted())
 	    			{
 	    				String type="";
@@ -397,12 +418,12 @@ public class JFileDialogs implements Observer
 	    				else if (etexd.IsOnlyFigure())
 	    					type="fig";
 	    				TeXWriter lp;
-	    				if (etexd.IsPlainTeX())
+//	    				if (etexd.IsPlainTeX())
 	    					lp = new LaTeXPictureWriter(vGc,etexd.getSizeX(),type);
-	    				else
-	    				{	    			
-	    					lp = new MyTikZPictureWriter(vGc,etexd.getSizeX(),type);
-	    				}
+//	    				else
+//	    				{	    			
+//	    					lp = new MyTikZPictureWriter(vGc,etexd.getSizeX(),type);
+//	    				}
 	    				String error = lp.saveToFile(f);
 		    			if (error.equals(""))
 		    				return true;
@@ -434,7 +455,13 @@ public class JFileDialogs implements Observer
 	 */
 	private boolean SaveOnNewOrOpen()
 	{
-		if ((!vGc.getGraphHistoryManager().IsGraphUnchanged())&&(vGc.getVGraph().getMathGraph().modifyNodes.cardinality()>0)) //saved/no changes
+		boolean existsNode=false;
+		if (vG.getType()==VGraphInterface.GRAPH)
+			existsNode = ((VGraph)vG).getMathGraph().modifyNodes.cardinality()>0;
+		else if (vG.getType()==VGraphInterface.HYPERGRAPH)
+			existsNode = ((VHyperGraph)vG).getMathGraph().modifyNodes.cardinality()>0;
+			
+		if ((!vGc.getGraphHistoryManager().IsGraphUnchanged())&&(existsNode)) //saved/no changes
         {
         	if (GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
         	{ //SaveAs anbieten
@@ -471,9 +498,7 @@ public class JFileDialogs implements Observer
 		
 		GeneralPreferences.getInstance().setStringValue("graph.lastfile","$NONE");
 		//Deactivate HistoryStuff
-		vGc.getVGraph().replace(vg);
-		vGc.getVGraph().getMathGraph().deleteObserver(this);
-		vGc.getVGraph().addObserver(this);
+		Gui.getInstance().setVGraph(vg); //This should kill us if the graphtype changed
 		//Reset (and with that reactivate History
 		Gui.getInstance().getParentWindow().setTitle(Gui.WindowName);
 	}	

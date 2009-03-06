@@ -12,9 +12,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
+import java.util.Vector;
 import java.awt.Color;
 
+import view.VCommonGraphic;
 import view.VGraphic;
+import view.VHyperGraphic;
 
 	/**
 	 * each node is written to the tex file and translated therefore
@@ -26,25 +29,55 @@ import view.VGraphic;
 public class SVGWriter
 {
 		private final static String NL = "\r\n";
-		VGraphic vgc;
-		VGraph vg;
+		VCommonGraphic vgc;
+		VGraphInterface vg;
 		GeneralPreferences gp;
 		Point max,offset;
+		boolean directed=false;
+		//All needed Sets and Name Vectors
+		VNodeSet nodes;
+		Vector<String> nodenames, edgenames, subgraphnames;
+		VEdgeSet edges;
+		MEdgeSet medges;
+		MHyperEdgeSet mhyperedges;
+		VSubgraphSet subgraphs;
+		VHyperEdgeSet hyperedges;
+		
 		private int width;
 		/**
 		 * Starts the LaTeX-Export with some parameters
 		 * @param a_picture a given VGraph in an VGraphic-Environment
 		 * @param w width of the picture in LaTeX in mm
-		 * @param type eiter "doc" for al whole LaTeX-Document or "fig" for just the figure
+		 * @param type either "doc" for al whole LaTeX-Document or "fig" for just the figure
 		 */
-		public SVGWriter(VGraphic a_picture, int w, String type)
+		public SVGWriter(VCommonGraphic a_picture, int w)
 		{
 			vgc = a_picture;
-			vg = vgc.getVGraph();
+			if (vgc.getType()==VCommonGraphic.VGRAPHIC)
+			{
+				nodes = ((VGraphic)vgc).getGraph().modifyNodes;
+				nodenames = ((VGraphic)vgc).getGraph().getMathGraph().modifyNodes.getNames();
+				edges = ((VGraphic)vgc).getGraph().modifyEdges;
+				medges = ((VGraphic)vgc).getGraph().getMathGraph().modifyEdges;
+				edgenames = ((VGraphic)vgc).getGraph().getMathGraph().modifyEdges.getNames();
+				subgraphs = ((VGraphic)vgc).getGraph().modifySubgraphs;
+				subgraphnames = ((VGraphic)vgc).getGraph().getMathGraph().modifySubgraphs.getNames();
+				vg=((VGraphic)vgc).getGraph();
+				directed = ((VGraphic)vgc).getGraph().getMathGraph().isDirected();
+			}
+			else if (vgc.getType()==VCommonGraphic.VHYPERGRAPHIC)
+			{
+					nodes = ((VHyperGraphic)vgc).getGraph().modifyNodes;
+					hyperedges = ((VHyperGraphic)vgc).getGraph().modifyHyperEdges;
+					mhyperedges = ((VHyperGraphic)vgc).getGraph().getMathGraph().modifyHyperEdges;
+					edgenames = ((VHyperGraphic)vgc).getGraph().getMathGraph().modifyHyperEdges.getNames();
+					subgraphs = ((VHyperGraphic)vgc).getGraph().modifySubgraphs;
+					subgraphnames = ((VHyperGraphic)vgc).getGraph().getMathGraph().modifySubgraphs.getNames();
+					vg=((VHyperGraphic)vgc).getGraph();
+			}
 			gp = GeneralPreferences.getInstance();
 			width = w;
-		}
-		
+		}		
 		//General
 		
 		private void writeHeader(OutputStreamWriter s, String filename) throws IOException
@@ -78,13 +111,12 @@ public class SVGWriter
 		 * Get a Color for the node
 		 * @return 
 		 */
-		private String getNodeColorString(int nodeindex)
+		private String getItemColorString(VItem Item)
 		{
-			VNode v = vg.modifyNodes.get(nodeindex);
 			String c="";
-			if (v==null)
+			if (Item==null)
 				return c;
-			Color col = v.getColor();
+			Color col = Item.getColor();
 			c +="rgb("+col.getRed()+","+col.getGreen()+","+col.getBlue()+")";
 			return c;
 		}
@@ -92,18 +124,18 @@ public class SVGWriter
 		private void writeNodes(OutputStreamWriter s) throws IOException
 		{
 		    //Nodes
-		    Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
+		    Iterator<VNode> nodeiter = nodes.getIterator();
 		    while (nodeiter.hasNext())
 		    {
 		    	VNode actual = nodeiter.next();
 				s.write(NL+"\t\t<circle cx=\""+actual.getPosition().x+"\" cy=\""+actual.getPosition().y+"\" r=\""+(actual.getSize()/2)+"px\" ");
-				s.write("style=\"fill:"+getNodeColorString(actual.getIndex())+"\"/>"+NL);
+				s.write("style=\"fill:"+getItemColorString(actual)+"\"/>"+NL);
 		    	if (actual.isNameVisible()) //draw name
 				{	
 					//mittelpunkt des Textes
 					int x = actual.getPosition().x + Math.round((float)actual.getNameDistance()*(float)Math.cos(Math.toRadians((double)actual.getNameRotation())));
 					int y = actual.getPosition().y - Math.round((float)actual.getNameDistance()*(float)Math.sin(Math.toRadians((double)actual.getNameRotation())));
-					s.write("\t\t\t<text x=\""+x+"\" y=\""+y+"\" style=\"font-size:"+actual.getNameSize()+"px; baseline-shift:-"+(actual.getNameSize()/2)+";\">"+formname(vg.getMathGraph().modifyNodes.get(actual.getIndex()).name)+"</text>");
+					s.write("\t\t\t<text x=\""+x+"\" y=\""+y+"\" style=\"font-size:"+actual.getNameSize()+"px; baseline-shift:-"+(actual.getNameSize()/2)+";\">"+formname(nodenames.get(actual.getIndex()))+"</text>");
 				}
 			}
 		}
@@ -142,33 +174,18 @@ public class SVGWriter
 			return sb.toString();
 		}
 
-		/**
-		 * Get a Color for the edge
-		 * @return 
-		 */
-		private String getEdgeColorString(int edgeindex)
-		{
-			VEdge e = vg.modifyEdges.get(edgeindex);
-			String c="";
-			if (e==null)
-				return c;
-			Color col = e.getColor();
-			c +="rgb("+col.getRed()+","+col.getGreen()+","+col.getBlue()+")";
-			return c;
-		}
-
 		private void writeEdges(OutputStreamWriter s) throws IOException
 		{
 		       //Nodes
-	    	Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
+	    	Iterator<VEdge> edgeiter = edges.getIterator();
 	    	while (edgeiter.hasNext())
 	    	{
 	    	   VEdge actual = edgeiter.next();
-	    	   MEdge me = vg.getMathGraph().modifyEdges.get(actual.getIndex());
+	    	   MEdge me = medges.get(actual.getIndex());
 	    	   int start = me.StartIndex;
 	    	   int ende = me.EndIndex;
-	    	   Point b = vg.modifyNodes.get(start).getPosition();
-	    	   Point e = vg.modifyNodes.get(ende).getPosition();
+	    	   Point b = nodes.get(start).getPosition();
+	    	   Point e = nodes.get(ende).getPosition();
 	    	   b.x = b.x; b.y = b.y;
 	    	   e.x = e.x; e.y = e.y;
 	    	   //not needed int value = values.elementAt(MGraph.EDGEVALUE);
@@ -202,7 +219,7 @@ public class SVGWriter
 	    	   {
 	    		   VLoopEdge l = (VLoopEdge)actual;
 	    		   Point m = l.getControlPoints().firstElement();
-	    		   Point n = vg.modifyNodes.get(me.EndIndex).getPosition();
+	    		   Point n = nodes.get(me.EndIndex).getPosition();
 	    		   //Mitte zwischen Kontrollpunkt und Start/Endknoten der hier der selbe ist
 	    		   m.x = (n.x+m.x)/2;
 	    		   m.y = (n.y+m.y)/2;
@@ -219,7 +236,7 @@ public class SVGWriter
 		      if (style.getType()==VEdgeLinestyle.DOTDASHED)
 		    		s.write(" stroke-dasharray:"+style.getLength()+","+style.getDistance()+",0,"+style.getDistance()+";");  
 		      
-			  s.write(" stroke-linecap:round; stroke-linejoin:round; stroke:"+getEdgeColorString(actual.getIndex())+"; stroke-width:"+actual.getWidth()+"px; fill:none;\"/>"+NL);
+			  s.write(" stroke-linecap:round; stroke-linejoin:round; stroke:"+getItemColorString(actual)+"; stroke-width:"+actual.getWidth()+"px; fill:none;\"/>"+NL);
 		      
 			  if (actual.getTextProperties().isVisible()) //draw name
 				{	
@@ -238,8 +255,8 @@ public class SVGWriter
 						top = true;
 						part = ((double)pos)*2.0d/100.0d;
 					}
-					Point p = actual.getPointonEdge(vg.modifyNodes.get(start).getPosition(),vg.modifyNodes.get(ende).getPosition(), part);
-					Point2D.Double dir = actual.getDirectionatPointonEdge(vg.modifyNodes.get(start).getPosition(),vg.modifyNodes.get(ende).getPosition(), part);
+					Point p = actual.getPointonEdge(nodes.get(start).getPosition(),nodes.get(ende).getPosition(), part);
+					Point2D.Double dir = actual.getDirectionatPointonEdge(nodes.get(start).getPosition(),nodes.get(ende).getPosition(), part);
 					double l = dir.distance(0.0d,0.0d);
 					//and norm dir
 					dir.x = dir.x/l; dir.y = dir.y/l;
@@ -279,9 +296,9 @@ public class SVGWriter
 			int x = 0, y = 0;
 			//Point2D.Double arrowhead = new Point2D.Double(),line1start = new Point2D.Double(),line1 = new Point2D.Double(),line2start = new Point2D.Double(),line2 = new Point2D.Double();
 			String s = "";
-			if (vg.getMathGraph().isDirected())
+			if (directed)
 			{
-			  	Shape arrow = edge.getArrowShape(vg.modifyNodes.get(start).getPosition(),vg.modifyNodes.get(ende).getPosition(),Math.round(vg.modifyNodes.get(start).getSize()/2),Math.round(vg.modifyNodes.get(ende).getSize()/2),1.0f);
+			  	Shape arrow = edge.getArrowShape(nodes.get(start).getPosition(),nodes.get(ende).getPosition(),Math.round(nodes.get(start).getSize()/2),Math.round(nodes.get(ende).getSize()/2),1.0f);
 			  	PathIterator path = arrow.getPathIterator(null, 0.001);
 //			  	int i=0;
 			  	s += "<path d=\"";
@@ -299,14 +316,17 @@ public class SVGWriter
 			    	}
 			    	path.next();
 			    }
-			  s +="z\" style=\"fill:"+getEdgeColorString(edge.getIndex())+"\"/>";
+			  s +="z\" style=\"fill:"+getItemColorString(edge)+"\"/>";
 			}
 			return s;
 		}
 		private void writeSubgraphs(OutputStreamWriter s) throws IOException
 		{
 		}
-		
+		private void writeHyperEdges(OutputStreamWriter s) throws IOException
+		{
+		}
+
 		public String saveToFile(File f)
 		{
 			if (!f.exists())
@@ -323,7 +343,10 @@ public class SVGWriter
 		       OutputStream bout= new BufferedOutputStream(fout);
 		       OutputStreamWriter out = new OutputStreamWriter(bout, "UTF8");
 		       writeHeader(out,f.getName());
-		       writeEdges(out);
+		       if (edges!=null) //Graph
+		    	   writeEdges(out);
+		       else if (hyperedges!=null) //Hypergraph
+		    	   writeHyperEdges(out);
 		       writeSubgraphs(out);
 		       writeNodes(out);
 		       writeFooter(out,"Gravel Graphen-Export '"+f.getName()+"'");

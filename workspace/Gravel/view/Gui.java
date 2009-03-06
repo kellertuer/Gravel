@@ -13,6 +13,7 @@ import javax.swing.*;
 
 
 import model.VGraph;
+import model.VGraphInterface;
 
 /**
  * 	Hauptklasse der GUI, stellt das Hauptfenster zur Verfügung mittels Singelton-Muster.
@@ -148,7 +149,7 @@ public class Gui implements WindowListener
         
         //Die GraphicKomponente
         graphpart = new VGraphic(new Dimension(gp.getIntValue("vgraphic.x"),gp.getIntValue("vgraphic.y")),MainGraph);
-        graphpart.setMouseHandling(VGraphic.STD_MOUSEHANDLING);
+        graphpart.setMouseHandling(VCommonGraphic.STD_MOUSEHANDLING);
         //Das Ganze als Scrollpane
         JScrollPane scrollPane = new JScrollPane(graphpart);
         scrollPane.setViewportView(graphpart);
@@ -229,9 +230,11 @@ public class Gui implements WindowListener
      * Change the VGraph to a new one, also resets History.
      * @param vg
      */
-    public void setVGraph(VGraph vg)
+    public void setVGraph(VGraphInterface vg)
 	{
-		MainGraph.replace(vg);
+    	//TODO handle MainGraph as Graphinterface and rebuild nearly all elements if Type changes
+    	if (vg.getType()==VGraphInterface.GRAPH)
+    		MainGraph.replace((VGraph)vg);
 	}
    /**
     * Get Entries of the Statistics

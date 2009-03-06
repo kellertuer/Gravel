@@ -36,11 +36,12 @@ public class MyTikZPictureWriter implements TeXWriter {
 	 * @param a_picture a given VGraph in an VGraphic-Environment
 	 * @param w width of the picture in LaTeX in mm
 	 * @param type eiter "doc" for al whole LaTeX-Document or "fig" for just the figure
+	 * TODO: Next Time working on TikZ make VGraphi into VCommonGraphic !
 	 */
 	public MyTikZPictureWriter(VGraphic a_picture, int w, String type)
 	{
 		vgc = a_picture;
-		vg = vgc.getVGraph();
+		vg = vgc.getGraph();
 		gp = GeneralPreferences.getInstance();
 		width = w;
 		if (type.equalsIgnoreCase("doc"))

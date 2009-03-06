@@ -71,7 +71,7 @@ public class AlgorithmGUI extends JDialog implements ActionListener
 		c.gridheight = 8;
 		vGc = new VGraphic(new Dimension(500,500),new VGraph(false,false,false));
 		//noneditable
-		vGc.setMouseHandling(VGraphic.NO_MOUSEHANDLING);
+		vGc.setMouseHandling(VCommonGraphic.NO_MOUSEHANDLING);
 //		Das Ganze als Scrollpane
         JScrollPane scrollPane = new JScrollPane(vGc);
         scrollPane.setViewportView(vGc);
@@ -93,7 +93,7 @@ public class AlgorithmGUI extends JDialog implements ActionListener
 		c.gridy = 0;
 		if (Algorithm.isStepwiseRunable()) //Ist der Algorithmus schrittweise ausfuehrbar ?
 		{
-			vGc.getVGraph().replace(Algorithm.getactualState()); //Anfangsleer anzeigen
+			vGc.getGraph().replace(Algorithm.getactualState()); //Anfangsleer anzeigen
 			Algorithm.getactualState().addObserver(vGc);
 			bPlay = new JButton(" Play ");
 			bPlay.addActionListener(this);
@@ -113,7 +113,7 @@ public class AlgorithmGUI extends JDialog implements ActionListener
 		{
 			//Am Stück ausführen
 			Algorithm.run();
-			vGc.getVGraph().replace(Algorithm.getactualState());
+			vGc.getGraph().replace(Algorithm.getactualState());
 			Algorithm.getactualState().addObserver(vGc);
 		}
 		Statistics stats = new Statistics(vGc);
@@ -246,7 +246,7 @@ public class AlgorithmGUI extends JDialog implements ActionListener
 		}
 		else if (e.getSource()==bOk)
 		{
-			Gui.getInstance().setVGraph(vGc.getVGraph());
+			Gui.getInstance().setVGraph(vGc.getGraph());
 			this.dispose();
 		}
 		else if (e.getSource()==bNew)
