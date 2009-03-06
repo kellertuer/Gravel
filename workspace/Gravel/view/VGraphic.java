@@ -128,36 +128,39 @@ public class VGraphic extends Component implements 	Observer
 		g2.setStroke(new BasicStroke(1*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		Vector<Point2D> P = new Vector<Point2D>();
 		Vector<Double> weights = new Vector<Double>();
-		P.add(new Point2D.Double(10,100)); weights.add(.7d);
-		P.add(new Point2D.Double(40,90)); weights.add(.9d);
-		P.add(new Point2D.Double(25,30)); weights.add(.7d);
-		P.add(new Point2D.Double(200,10)); weights.add(.9d);
-		P.add(new Point2D.Double(120,85)); weights.add(.7d);
-		P.add(new Point2D.Double(300,100)); weights.add(.9d);
+		P.add(new Point2D.Double(10,100)); weights.add(1d);
+		P.add(new Point2D.Double(70,90)); weights.add(1d);
+		P.add(new Point2D.Double(25,30)); weights.add(1d);
+		P.add(new Point2D.Double(200,10)); weights.add(3d);
+		P.add(new Point2D.Double(100,85)); weights.add(1d);
+		P.add(new Point2D.Double(300,100)); weights.add(1d);
+		P.add(new Point2D.Double(350,100)); weights.add(1d);
 		Vector<Double> U = new Vector<Double>();
 		U.add(0d);U.add(0d);U.add(0d);U.add(0d);
-		U.add(.3d);U.add(.7d);
+		U.add(.25d);U.add(.5d); U.add(.75d);
 		U.add(1d);U.add(1d);U.add(1d);U.add(1d);
 		VHyperEdgeShape s = new VHyperEdgeShape(U,P,weights,27);
 		Vector<Double> X = new Vector<Double>();		
-		X.add(.15d); 
-		X.add(.5d);
-		X.add(.85d);
+		X.add(.125d); 
+		X.add(.375d);
+		X.add(.625d);
+		X.add(.875d);		
 		s.RefineKnots(X);
 		X.clear();
-		X.add(.075d);
-		X.add(.225d);
-		X.add(.4d);
-		X.add(.6d);
-		X.add(.775d);
-		X.add(.925d);
+		X.add(.0625d);
+		X.add(.1875d);
+		X.add(.4375d);
+		X.add(.5625d);
+		X.add(.6875d);
+		X.add(.8125d);
+		X.add(.9375d);
 		s.RefineKnots(X);
 		g2.setColor(Color.BLACK);
 		s.translate(0,110);
 		s.scale(zoomfactor);
 		GeneralPath path = s.getCurve(.002d);
 		g2.draw(path);
-		Iterator<Point2D> pi = s.P.iterator();
+		Iterator<Point2D> pi = s.controlPoints.iterator();
 		while (pi.hasNext())
 		{
 			Point2D p = (Point2D) pi.next();
@@ -168,7 +171,7 @@ public class VGraphic extends Component implements 	Observer
 			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
 		}
 		s.scale(1/zoomfactor);
-		int i=50;
+		int i=66;
 		Point2D PCurve = s.NURBSCurveAt(((double)i/100));
 		Point2D PDest = new Point2D.Double(PCurve.getX(),PCurve.getY()+50d);
 		if (vG.modifyNodes.get(1)!=null)
@@ -186,7 +189,7 @@ public class VGraphic extends Component implements 	Observer
 		path = s.getCurve(.002d);
 		g2.setColor(Color.BLUE);
 		g2.draw(path);
-		pi = s.P.iterator();
+		pi = s.controlPoints.iterator();
 		while (pi.hasNext())
 		{
 			Point2D p = (Point2D) pi.next();
@@ -197,7 +200,6 @@ public class VGraphic extends Component implements 	Observer
 			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
 		}
 		s.scale(1/zoomfactor);
-		System.err.println("Distance soll:"+PCurve.distance(PDest)+" ist: "+PCurve.distance(s.NURBSCurveAt((double)i/100d))+" Quot:"+PCurve.distance(s.NURBSCurveAt((double)i/100d))/PCurve.distance(PDest)+"");
 	}
 	/**
 	 * @param g

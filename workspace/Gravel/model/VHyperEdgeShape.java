@@ -19,7 +19,6 @@ import javax.vecmath.Point3d;
  * - Addition (Refinement of Knots)
  *
  * - TODO Constructor with Interpolation-Points
- * - TODO Movement of an IP (possible ?)
  * - TODO Get&Set single CPs (when they're moved)
  * - TODO (needed?) get&set knots &weights
  * - TODO In/Decrease Degree of the polynonials 
@@ -29,76 +28,84 @@ import javax.vecmath.Point3d;
  */
 public class VHyperEdgeShape {
 
-	private Vector<Double> t; //knots
-	private Vector<Double> w; //weights
-	public Vector<Point2D> P; //ControlPoints
-	private Vector<Point3d> Pw; //b in homogeneous coordinates multiplied by weight
+	private Vector<Double> Knots;
+	private Vector<Double> cpWeight;
+	public Vector<Point2D> controlPoints; //ControlPoints
+	private Vector<Point3d> controlPointsHom; //b in homogeneous coordinates multiplied by weight
 
 	private int minDist;
-	private int m,n,d; //n is the number of CP, d the Order of the polynom-splines, m=n+d+1
+	private int maxKnotIndex, //The Knots are numbered 0,1,...,maxKnotIndex
+				maxCPIndex, //The ControlPoints are numbered 0,1,...,maxCPIndex
+				degree; //Order of the piecewise polynomials - depends on the maxIndices Above: degree = maxKnotIndex-maxCPindex-1
 
 	/**
 	 * Create an empty shape so nothing ever happens but its at least not null
 	 */
 	public VHyperEdgeShape()
 	{
-		t = new Vector<Double>();
-		w = new Vector<Double>();
-		P = new Vector<Point2D>();
-		n=0; m=0; d=0;
-		Pw = new Vector<Point3d>();
+		Knots = new Vector<Double>();
+		cpWeight = new Vector<Double>();
+		controlPoints = new Vector<Point2D>();
+		maxCPIndex=0; maxKnotIndex=0; degree=0;
+		controlPointsHom = new Vector<Point3d>();
 	}
 	/**
 	 * Init an HyperEdgeShape with
-	 * @param knots nots of the NURBS
+	 * @param pKnots nots of the NURBS
 	 * @param cpoints Controlpoints of the NURBS
 	 * @param weights weights of the CP 
 	 * @param dist minimal distance the curve should have from each node (whose are not saved here)
 	 */
-	public VHyperEdgeShape(Vector<Double> knots, Vector<Point2D> cpoints, Vector<Double> weights, int dist)//, int degree)
+	public VHyperEdgeShape(Vector<Double> pKnots, Vector<Point2D> CPoints, Vector<Double> weights, int dist)//, int degree)
 	{
 		minDist = dist;
-		setCurveTo(knots,cpoints,weights);
+		setCurveTo(pKnots,CPoints,weights);
 	}
 	/**
 	 * Set the Curve to another NURBS
-	 * @param knots
-	 * @param cpoints
+	 * @param pKnots
+	 * @param CPoints
 	 * @param weights
 	 */
-	public void setCurveTo(Vector<Double> knots, Vector<Point2D> cpoints, Vector<Double> weights)
+	public void setCurveTo(Vector<Double> pKnots, Vector<Point2D> CPoints, Vector<Double> weights)
 	{
-		t = knots;
-		P = cpoints;
-		w = weights;
-		n = cpoints.size()-1;
-		m = t.size()-1;
-		d = t.size()-P.size()-1;
+		Knots = pKnots;
+		controlPoints = CPoints;
+		cpWeight = weights;
+		maxCPIndex = CPoints.size()-1;
+		maxKnotIndex = Knots.size()-1;
+		degree = Knots.size()-controlPoints.size()-1;
 		InitHomogeneous();
 	}
+	/**
+	 * Private Constructor to (re)create with Homogeneous ControlPointVector
+	 * @param knots
+	 * @param pPw
+	 * @param dist
+	 */
 	private VHyperEdgeShape(Vector<Double> knots, Vector<Point3d> pPw, int dist)
 	{
-		t = new Vector<Double>();
-		w = new Vector<Double>();
-		P = new Vector<Point2D>();
-		n=0; m=0; d=0;
-		Pw = new Vector<Point3d>();
-		P.setSize(pPw.size()); 
-		w.setSize(pPw.size());
+		Knots = new Vector<Double>();
+		cpWeight = new Vector<Double>();
+		controlPoints = new Vector<Point2D>();
+		maxCPIndex=0; maxKnotIndex=0; degree=0;
+		controlPointsHom = new Vector<Point3d>();
+		controlPoints.setSize(pPw.size()); 
+		cpWeight.setSize(pPw.size());
 		for (int i=0; i<pPw.size(); i++)
 		{
 			double stw = pPw.get(i).z;
 			if (stw==0)
-				P.set(i,new Point2D.Double(pPw.get(i).x,pPw.get(i).y));
+				controlPoints.set(i,new Point2D.Double(pPw.get(i).x,pPw.get(i).y));
 			else
-				P.set(i,new Point2D.Double(pPw.get(i).x/pPw.get(i).z,pPw.get(i).y/pPw.get(i).z));
-			w.add(i,stw);
+				controlPoints.set(i,new Point2D.Double(pPw.get(i).x/pPw.get(i).z,pPw.get(i).y/pPw.get(i).z));
+			cpWeight.add(i,stw);
 		}
 		minDist = dist;
-		t = knots;
-		n = P.size()-1;
-		m = t.size()-1;
-		d = t.size()-P.size()-1;
+		Knots = knots;
+		maxCPIndex = controlPoints.size()-1;
+		maxKnotIndex = Knots.size()-1;
+		degree = Knots.size()-controlPoints.size()-1;
 		InitHomogeneous();		
 	}
 	/**
@@ -107,15 +114,15 @@ public class VHyperEdgeShape {
 	 */
 	private void InitHomogeneous()
 	{
-		Pw = new Vector<Point3d>();
-		Iterator<Point2D> ib =  P.iterator();
+		controlPointsHom = new Vector<Point3d>();
+		Iterator<Point2D> ib =  controlPoints.iterator();
 		while (ib.hasNext()) //Modify to be 3D Coordinates (homogeneous 2D)
 		{
 			Point2D p = ib.next();
-			double weight = w.get(P.indexOf(p));
+			double weight = cpWeight.get(controlPoints.indexOf(p));
 			Point3d newp = new Point3d(p.getX(),p.getY(),weight);
 			newp.set(newp.x*weight, newp.y*weight, weight);
-			Pw.add(newp);
+			controlPointsHom.add(newp);
 		}		
 	}
 	/**
@@ -125,7 +132,7 @@ public class VHyperEdgeShape {
 	{
 		double x = Double.MIN_VALUE;
 		double y = Double.MIN_VALUE;
-		Iterator<Point2D> bi = P.iterator();
+		Iterator<Point2D> bi = controlPoints.iterator();
 		while (bi.hasNext())
 		{
 			Point2D p = bi.next();
@@ -143,7 +150,7 @@ public class VHyperEdgeShape {
 	{
 		double x = Double.MAX_VALUE;
 		double y = Double.MAX_VALUE;
-		Iterator<Point2D> bi = P.iterator();
+		Iterator<Point2D> bi = controlPoints.iterator();
 		while (bi.hasNext())
 		{
 			Point2D p = bi.next();
@@ -161,7 +168,7 @@ public class VHyperEdgeShape {
 	 */
 	public void scale(double s)
 	{
-		Iterator<Point2D> bi = P.iterator();
+		Iterator<Point2D> bi = controlPoints.iterator();
 		while (bi.hasNext())
 		{
 			Point2D p = bi.next();
@@ -171,16 +178,21 @@ public class VHyperEdgeShape {
 		InitHomogeneous();
 		
 	}
+	/**
+	 * Translate Curve - due to Translation Invariance, only the ControlPoints need to be moved
+	 * @param x
+	 * @param y
+	 */
 	public void translate(double x, double y)
 	{
 		Vector<Point2D> Q = new Vector<Point2D>();
-		Iterator<Point2D> bi = P.iterator();
+		Iterator<Point2D> bi = controlPoints.iterator();
 		while (bi.hasNext())
 		{
 			Point2D p = bi.next();
 			Q.add(new Point2D.Double(p.getX()+x,p.getY()+y));
 		}
-		this.setCurveTo(t,Q,w);
+		this.setCurveTo(Knots,Q,cpWeight);
 	}
 	/**
 	 * Get the Curve as a piecewise approximated linear Java Path
@@ -191,8 +203,8 @@ public class VHyperEdgeShape {
 	public GeneralPath getCurve(double stepsize) //Adapt to a length on the curve?
 	{
 		//Intervallborders
-		double first = t.firstElement();
-		double last = t.lastElement();
+		double first = Knots.firstElement();
+		double last = Knots.lastElement();
 		double actual = first;
 		GeneralPath path = new GeneralPath();
 		Point2D.Double f = NURBSCurveAt(first);
@@ -217,15 +229,15 @@ public class VHyperEdgeShape {
 	 */
 	private int findSpan(double u)
 	{
-		if (u==t.lastElement())
-			return t.indexOf(t.lastElement())-1; //first value of t equal to t.get(m)==t.lastElement - which is m-d		
+		if (u==Knots.lastElement())
+			return Knots.indexOf(Knots.lastElement())-1; //first value of t equal to t.get(m)==t.lastElement - which is m-d		
 		//Binary Search for the intervall
-		int low = d; //because the first d+1 are equal too
-		int high = m-d; //see above
+		int low = degree; //because the first d+1 are equal too
+		int high = maxKnotIndex-degree; //see above
 		int mid = Math.round((low+high)/2);
-		while ((u<t.get(mid)) || (u>=t.get(mid+1)))
+		while ((u<Knots.get(mid)) || (u>=Knots.get(mid+1)))
 		{ 
-			if (u < t.get(mid))
+			if (u < Knots.get(mid))
 					high = mid;
 			else
 				low = mid;
@@ -240,36 +252,41 @@ public class VHyperEdgeShape {
 	 */
 	public Point2D.Double NURBSCurveAt(double u)
 	{	
-		int j = findSpan(u);			
-		Point3d erg = NURBS(u,j,d); //Result in homogeneous Values on Our Points		
+		Point3d erg = deBoer3D(u); //Result in homogeneous Values on Our Points		
 		if (erg.z==0) //
 			return new Point2D.Double(erg.x,erg.y);
 		else
 			return new Point2D.Double(erg.x/erg.z,erg.y/erg.z);
 		
 	}
-	public Point2D DerivateCurveAt(int degree, double u)
+	/**
+	 * get the Value of the degree-th Derivate of this NURBS at Position u
+	 * @param pDegree
+	 * @param u
+	 * @return
+	 */
+	public Point2D DerivateCurveAt(int pDegree, double u)
 	{
-		if (degree==0)
+		if (pDegree==0)
 			return NURBSCurveAt(u);
 		Vector<Point3d> DerivatesBSpline = new Vector<Point3d>();
-		DerivatesBSpline.setSize(degree+1);
+		DerivatesBSpline.setSize(pDegree+1);
 		int actdeg = 1;
-		while (actdeg<=degree) //Generate all Values of lower derivates at Point u in homogeneous BSpline-Points
+		while (actdeg<=pDegree) //Generate all Values of lower derivates at Point u in homogeneous BSpline-Points
 		{
 			Vector<Point3d> theirCP = CPofDerivate(actdeg);
 			Vector<Double> theirt = new Vector<Double>();
-			for (int i=actdeg; i<=m-actdeg; i++)
-				theirt.add(i-actdeg,t.get(i));
+			for (int i=actdeg; i<=maxKnotIndex-actdeg; i++)
+				theirt.add(i-actdeg,Knots.get(i));
 			VHyperEdgeShape theirCurve = new VHyperEdgeShape(theirt,theirCP,0);
-			Point3d derivp= theirCurve.NURBS(u,theirCurve.findSpan(u),theirCurve.d);
+			Point3d derivp= theirCurve.deBoer3D(u);
 			DerivatesBSpline.set(actdeg,derivp); 
 			actdeg++;
 		}
 		Vector<Point2D> DerivatesNURBS = new Vector<Point2D>();
-		DerivatesNURBS.setSize(degree);
+		DerivatesNURBS.setSize(pDegree);
 		DerivatesNURBS.set(0,NURBSCurveAt(u));
-		for (int k=1; k<=degree; k++)
+		for (int k=1; k<=pDegree; k++)
 		{ //Calculate kth Derivate
 			Point2D.Double thisdeg = new Point2D.Double(DerivatesBSpline.get(k).x,DerivatesBSpline.get(k).y);
 			double denominator = DerivatesBSpline.get(k).z;
@@ -287,9 +304,8 @@ public class VHyperEdgeShape {
 			}
 			DerivatesNURBS.add(k, new Point2D.Double(thisdeg.x,thisdeg.y));
 		}
-		return DerivatesNURBS.elementAt(degree);
+		return DerivatesNURBS.elementAt(pDegree);
 	}
-
 	/**
 	 * Calulation of Alpha, refer to deBoer-Algorithm
 	 * @param u
@@ -299,9 +315,9 @@ public class VHyperEdgeShape {
 	 */
 	private double alpha(double u,int i, int j)
 	{
-		if ((u==t.get(i)&&(t.get(i+d-j+1)==t.get(i))))
+		if ((u==Knots.get(i)&&(Knots.get(i+degree-j+1)==Knots.get(i))))
 			return 0;
-		return (u-t.get(i))/(t.get(i+d-j+1)-t.get(i));
+		return (u-Knots.get(i))/(Knots.get(i+degree-j+1)-Knots.get(i));
 	}
 	/**
 	 * Calculate the Value of the NURBSCurve in homogeneous Coordinates iterative
@@ -309,68 +325,108 @@ public class VHyperEdgeShape {
 	 * This method works for 2d homogeneous or 3d Stuff.
 	 *
 	 * @param u Point u \in [0,1], which result we want
-	 * @param i Number of the Basis function of specific
-	 * @param j Degree j
 	 * @return a 3d-Value of the Point in the Curve.
 	 */
-	private Point3d NURBS(double u, int i, int j)
+	private Point3d deBoer3D(double u)
 	{
+		int i = findSpan(u);
 		Vector<Point3d> fixedj = new Vector<Point3d>();
-		fixedj.setSize(j+1); //for values 0,...,j
+		fixedj.setSize(degree+1); //for values 0,...,d, because only d+1 Basis Functions are nonzero
 		//Init with the Points
-		for (int l=i; l>=i-j; l--) //Beginning with i,0 up to i-j,0
+		for (int l=i; l>=i-degree; l--) //Beginning with i,0 up to i-d,0
 		{
-			fixedj.set(l-i+j,Pw.get(l));
+			fixedj.set(l-i+degree,controlPointsHom.get(l));
 		}
 		
-		for (int k=1; k<=j; k++) //Compute higher and hihger values of j
+		for (int k=1; k<=degree; k++) //Compute higher and hihger values of the degree
 		{
-			for (int l=i; l>=i-j+k; l--) //Stop each iteration one earlier
+			for (int l=i; l>=i-degree+k; l--) //Stop each iteration one earlier
 			{
-				Point3d bimjm = fixedj.get(l-i+j-1);//b_i-1^j-1
+				Point3d bimjm = fixedj.get(l-i+degree-1);//b_i-1^j-1
 				double alpha = alpha(u,l,k);
-				Point3d bijm = fixedj.get(l-i+j);
+				Point3d bijm = fixedj.get(l-i+degree);
 				double x = (1-alpha)*bimjm.x + alpha*bijm.x;
 				double y = (1-alpha)*bimjm.y + alpha*bijm.y;
 				double z = (1-alpha)*bimjm.z + alpha*bijm.z;
-				fixedj.set(l-i+j,new Point3d(x,y,z));
+				fixedj.set(l-i+degree,new Point3d(x,y,z));
 				//System.err.println("Computing ("+l+","+k+") :"+fixedj.get(l-i+j));
 				//saving in "+(l-i+j)+" based on pervious values in "+(l-i+j-1)+" and "+(l-i+j)+".");
 			}
 		}
-		return fixedj.get(j);
+		return fixedj.get(degree);
 	}
-	private Vector<Double> BasisN(double u, int i, int j)
+	/**
+	 * Calculate all Nonzero BSpline-Functions of this NURBS.
+	 * These are all N_i,d with i between findSpan(u) (first t less or equal u) and 
+	 * findSpan(u)-d due to locality of the functions
+	 * 
+	 * The Nonzero Functions are returned in an compressed array, so
+	 * the least entry of the Vector (V.get(0)) is the Function N_i,d, i=findSpan(u)-d
+	 * and the last the one with i=findSpan(u)
+	 * 
+	 * @param u
+	 * @return All nonzero Values of BSpline-Basis-Functions at u
+	 */
+	private Vector<Double> BasisBSpline(double u)
 	{
-		//See A2.2 NURBS Book
-		Vector<Double> N = new Vector<Double>();N.setSize(j+1);
-		Vector<Double> left = new Vector<Double>();left.setSize(j+1);
-		Vector<Double> right = new Vector<Double>();right.setSize(j+1);
-		N.set(0,1.0d);
-		for (int k=1; k<=j; k++)
+		//Calculate all Needed Values
+		int max = findSpan(u); //Only constant function that is nonzero
+		//this is also the maximum value that is nonzero in the resulting BasisN
+		int min = max-degree; //minimum nonzero function in N due to loaclity
+		Vector<Double> N = new Vector<Double>();
+		N.setSize(degree+1); //Due to locality only d+1 values (from min to max) are needed
+		for (int k=0; k<degree; k++)
 		{
-			left.set(k, u-t.get(i+1-k));
-			right.set(k,t.get(i+k)-u);
-			double s = 0.0d;
-			for (int r=0; r<k; r++)
-			{
-				double temp = N.get(r)/(right.get(r+1)+left.get(k-r));
-				N.set(r, s+right.get(r+1)*temp);
-				s = left.get(k-r)*temp;
+			N.set(k,0.0d); //Set min+k to zero
+		}
+		N.set(degree, 1.0); //The highest constant (N_i,0) is 0 all others are zero
+		for (int actualDegree=1; actualDegree<=degree; actualDegree++) //calcutlate higher degrees
+		{
+			//Max-actualDegree is the first nonzero function, max the last
+			for (int k=max-actualDegree; k<=max; k++)
+			{ //Calculate N_k,actualDegree
+				double fac1,fac2;
+				if ((u==Knots.get(k)&&(Knots.get(k+actualDegree)==Knots.get(k)))) //0 divided by 0
+					fac1=1.0;
+				else
+					fac1 = (u-Knots.get(k))/(Knots.get(k+actualDegree)-Knots.get(k));
+				if ((u==Knots.get(k+actualDegree+1)&&(Knots.get(k+actualDegree+1)==Knots.get(k+1)))) //0 divided by 0
+					fac2=1.0;
+				else
+					fac2 = (Knots.get(k+actualDegree+1)-u)/(Knots.get(k+actualDegree +1)-Knots.get(k+1));
+				
+				double kth = N.get(k-min); //N_k of value one degree less (shiftet by min)
+				double kpth = 0.0d; //N_k+1 of previous degree init with 0, because it stays 0 if k=max
+				if (k<max)
+					kpth = N.get(k+1-min); //shiftet by min
+				
+				N.set(k-min, fac1*kth + fac2*kpth); //Override kth entry because it is not needed anymore
+				//Calculate N_k,actualDegree
 			}
-			N.set(k,s);
 		}
 		return N;
 	}
-	private double BasisR(double u, int i, int j)
+	/**
+	 * Get the Value of the ith NURBS-BasisFunction R_number,d at Point u
+	 * @param u
+	 * @param number
+	 * @return
+	 */
+	public double BasisR(double u, int number)
 	{
-		Vector<Double> N = BasisN(u,i,j);
-		int sp = findSpan(u);
-		double nomin = N.firstElement()*w.get(i);
+		int max = findSpan(u);
+		int min = max - degree;
+		if ((number<min)||(number>max))
+			return 0.0d; //Due to locality R_i,d is zero in these cases
+		//Else Compute BSpline-Basis
+		Vector<Double> N = BasisBSpline(u);		
+		double nomin = N.get(number-min)*cpWeight.get(number); //get Specific B-Spline (see function above shiftet by min multiply by its weight
 		double denomin = 0.0d;
-		for (int k=0; k<=d; k++)
-			denomin += N.get(k)* w.get(sp-d+k);
-		return nomin/denomin;
+		for (int k=0; k<=degree; k++)
+		{
+			denomin += N.get(k)* cpWeight.get(k+min); //See above shiftet by min
+		}
+		return (nomin/denomin);
 	}
 	/**
 	 * Compares this Curve to another (minDist does not matter)
@@ -382,36 +438,36 @@ public class VHyperEdgeShape {
 	 */
 	public boolean CurveEquals(VHyperEdgeShape s)
 	{
-		if ((s.P.size()!=P.size())||(t.size()!=s.t.size()))
+		if ((s.controlPoints.size()!=controlPoints.size())||(Knots.size()!=s.Knots.size()))
 			return false;
-		Iterator<Point2D> bi = P.iterator();
+		Iterator<Point2D> bi = controlPoints.iterator();
 		while (bi.hasNext())
 		{
 			Point2D p = bi.next();
-			if (s.P.get(P.indexOf(p)).distance(p)!=0.0d)
+			if (s.controlPoints.get(controlPoints.indexOf(p)).distance(p)!=0.0d)
 				return false;
 		}
-		Iterator<Double> ti = t.iterator();
+		Iterator<Double> ti = Knots.iterator();
 		while (ti.hasNext())
 		{
 			Double v = ti.next();
-			if (s.t.get(t.indexOf(v)).compareTo(v)==0) //Equal
+			if (s.Knots.get(Knots.indexOf(v)).compareTo(v)==0) //Equal
 				return false;
 		}
-		Iterator<Double> wi = w.iterator();
+		Iterator<Double> wi = cpWeight.iterator();
 		while (wi.hasNext())
 		{
 			Double v = wi.next();
-			if (s.w.get(w.indexOf(v)).compareTo(v)==0) //Equal
+			if (s.cpWeight.get(cpWeight.indexOf(v)).compareTo(v)==0) //Equal
 				return false;
 		}
 		return true;
 	}
-
+	
 	public Point2D getNearestCP(Point m) {
 		double mindist = Double.MAX_VALUE;
 		Point2D result = null;
-		Iterator<Point2D> bi = P.iterator();
+		Iterator<Point2D> bi = controlPoints.iterator();
 		while (bi.hasNext())
 		{
 			Point2D p = bi.next();
@@ -424,6 +480,13 @@ public class VHyperEdgeShape {
 		}
 		return result;
 	}
+	/**
+	 * Check whether a given Point is in Range of the Curve.
+	 * The Range or max distance is the variance so if
+	 * @param x the specified point has maximum
+	 * @param variance the value specified
+	 * @return this method returns true, else false
+	 */
 	public boolean isPointOnCurve(Point2D x, double variance)
 	{
 		return x.distance(ProjectionPoint(x))<=variance;
@@ -438,38 +501,38 @@ public class VHyperEdgeShape {
 		int a = findSpan(X.firstElement()), b=findSpan(X.lastElement())+1;
 		Vector<Point3d> newPw;
 		newPw = new Vector<Point3d>();
-		newPw.setSize(Pw.size()+X.size());
+		newPw.setSize(controlPointsHom.size()+X.size());
 		Vector<Double> newt = new Vector<Double>();
-		newt.setSize(t.size()+X.size());
-		for (int j=0; j<=a-d; j++)//Copy the first not changed values of the CPs
-			newPw.set(j, Pw.get(j));
-		for (int j=b-1; j<=n; j++)//Copy the last not changed values of the CPs
-			newPw.set(j+X.size(), Pw.get(j));
+		newt.setSize(Knots.size()+X.size());
+		for (int j=0; j<=a-degree; j++)//Copy the first not changed values of the CPs
+			newPw.set(j, controlPointsHom.get(j));
+		for (int j=b-1; j<=maxCPIndex; j++)//Copy the last not changed values of the CPs
+			newPw.set(j+X.size(), controlPointsHom.get(j));
 		for (int j=0; j<=a; j++)//Copy the first not changed values of t
-			newt.set(j, t.get(j));
-		for (int j=b+d; j<=m; j++)//Copy the last not changed values of t
-			newt.set(j+X.size(), t.get(j));
+			newt.set(j, Knots.get(j));
+		for (int j=b+degree; j<=maxKnotIndex; j++)//Copy the last not changed values of t
+			newt.set(j+X.size(), Knots.get(j));
 		
-		int i=b+d-1; //Last Value that's new in t
-		int k=b+d+X.size()-1; //Last Value that's new in Pw
+		int i=b+degree-1; //Last Value that's new in t
+		int k=b+degree+X.size()-1; //Last Value that's new in Pw
 		for (int j=X.size()-1; j>=0; j--) //Insert new knots backwards beginning at X.lastElement
 		{ 
-			while (X.get(j) <= t.get(i) && i > a) //These Values are not affected by Insertion of actual Not, copy them
+			while (X.get(j) <= Knots.get(i) && i > a) //These Values are not affected by Insertion of actual Not, copy them
 			{
-				newPw.set(k-d-1, (Point3d) Pw.get(i-d-1).clone());
-				newt.set(k, t.get(i));
+				newPw.set(k-degree-1, (Point3d) controlPointsHom.get(i-degree-1).clone());
+				newt.set(k, Knots.get(i));
 				k--;i--;
 			}
-			newPw.set(k-d-1, (Point3d) newPw.get(k-d).clone());
-			for (int l=1; l<=d; l++)
+			newPw.set(k-degree-1, (Point3d) newPw.get(k-degree).clone());
+			for (int l=1; l<=degree; l++)
 			{
-				int actualindex = k-d+l;
+				int actualindex = k-degree+l;
 				double alpha = newt.get(k+l)-X.get(j);
 				if (Math.abs(alpha) == 0.0d)
 					newPw.set(actualindex-1, (Point3d) newPw.get(actualindex).clone());
 				else
 				{
-					alpha = alpha/(newt.get(k+l)-t.get(i-d+l));
+					alpha = alpha/(newt.get(k+l)-Knots.get(i-degree+l));
 					Point3d p1 = (Point3d) newPw.get(actualindex-1).clone();
 					p1.scale(alpha);
 					Point3d p2 = (Point3d) newPw.get(actualindex).clone();
@@ -482,40 +545,45 @@ public class VHyperEdgeShape {
 			k--;
 		}
 		//Recompute Points & weights
-		P = new Vector<Point2D>(); 
-		w = new Vector<Double>();
+		controlPoints = new Vector<Point2D>(); 
+		cpWeight = new Vector<Double>();
 		Iterator<Point3d> Pwi = newPw.iterator();
 		while (Pwi.hasNext())
 		{
 			Point3d p1 = Pwi.next();
 			if (p1.z==0)
-				P.add(new Point2D.Double(p1.x,p1.y));
+				controlPoints.add(new Point2D.Double(p1.x,p1.y));
 			else
-				P.add(new Point2D.Double(p1.x/p1.z, p1.y/p1.z));
-			w.add(p1.z);
+				controlPoints.add(new Point2D.Double(p1.x/p1.z, p1.y/p1.z));
+			cpWeight.add(p1.z);
 		}
-		t = newt;
-		n = P.size()-1;
-		m = t.size()-1;
-		d = t.size()-P.size()-1;
+		Knots = newt;
+		maxCPIndex = controlPoints.size()-1;
+		maxKnotIndex = Knots.size()-1;
+		degree = Knots.size()-controlPoints.size()-1;
 		InitHomogeneous();
 	}
-
+	/**
+	 * Little Helping Function: Compute Controloints of the Derivate
+	 * of given degree based on the ControlPoints in this Curve here 
+	 * @param pDegree th degree-th Derivate
+	 * @return ControlPoints are returned
+	 */
 	@SuppressWarnings("unchecked")
-	private Vector<Point3d> CPofDerivate(int degree)
+	private Vector<Point3d> CPofDerivate(int pDegree)
 	{
 		Vector<Point3d> result = new Vector<Point3d>();
-		if (degree==0)
+		if (pDegree==0)
 		{
-			for (int i=0; i<Pw.size(); i++)
-				result.add((Point3d) Pw.get(i).clone());
+			for (int i=0; i<controlPointsHom.size(); i++)
+				result.add((Point3d) controlPointsHom.get(i).clone());
 			return result;
 		}
-		Vector<Point3d> degm1 = CPofDerivate(degree-1);
+		Vector<Point3d> degm1 = CPofDerivate(pDegree-1);
 		//Compute from those the actually wanted ones
 		for (int i=0; i<degm1.size()-1; i++) //one less
 		{
-			double factor = (d-degree+1)/(t.get(i+d+1)-t.get(i+degree));
+			double factor = (degree-pDegree+1)/(Knots.get(i+degree+1)-Knots.get(i+pDegree));
 			Point3d next = (Point3d) degm1.get(i+1).clone();
 			next.sub(degm1.get(i));
 			next.scale(factor);
@@ -536,9 +604,9 @@ public class VHyperEdgeShape {
 	{
 		//TODO: Set the value of the intervalls of u heuristically by length of the line
 		double eqdist = .0002; //Find a nice Start-value for u
-		double u = t.firstElement(),u0 = t.firstElement();
+		double u = Knots.firstElement(),u0 = Knots.firstElement();
 		double mindist = Double.MAX_VALUE;
-		while (u<=t.lastElement())
+		while (u<=Knots.lastElement())
 		{
 			Point2D p = NURBSCurveAt(u);
 			double thisdist = p.distance(d);
@@ -563,25 +631,25 @@ public class VHyperEdgeShape {
 			double nominator = firstDeriv.x*diff.x + firstDeriv.y*diff.y;
 			double denominator = secondDeriv.x*diff.y + secondDeriv.y*diff.y + firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y;
 			double unext = u - nominator/denominator;
-			if (unext > t.lastElement()) //Out of Range
+			if (unext > Knots.lastElement()) //Out of Range
 			{
-				if (P.lastElement().distance(P.firstElement())==0) //closed
+				if (controlPoints.lastElement().distance(controlPoints.firstElement())==0) //closed
 				{
-					while (unext > t.lastElement())
-						unext = t.firstElement() + (unext-t.lastElement());
+					while (unext > Knots.lastElement())
+						unext = Knots.firstElement() + (unext-Knots.lastElement());
 				}
 				else //open
-					unext = t.lastElement();
+					unext = Knots.lastElement();
 			}
-			if (unext < t.firstElement()) //Out of Range
+			if (unext < Knots.firstElement()) //Out of Range
 			{
-				if (P.lastElement().distance(P.firstElement())==0) //closed
+				if (controlPoints.lastElement().distance(controlPoints.firstElement())==0) //closed
 				{
-					while (unext < t.firstElement())
-						unext = t.lastElement() - (t.firstElement()-unext);
+					while (unext < Knots.firstElement())
+						unext = Knots.lastElement() - (Knots.firstElement()-unext);
 				}
 				else //open
-					unext = t.firstElement();
+					unext = Knots.firstElement();
 			}
 			if (ulast==unext)
 			{
@@ -606,7 +674,6 @@ public class VHyperEdgeShape {
 //			System.err.println("Loop!");
 		return u;
 	}
-	
 	/**
 	 * If the first Point lies on the Curve (given a specific variance, e.g. 2.0
 	 * the point is moved to the second argument and the Curve is Computed again.
@@ -623,51 +690,47 @@ public class VHyperEdgeShape {
 		//Find the specific P, which has the most influence at src to move.
 		double min = Double.MAX_VALUE;
 		int Pindex=0;
-		for (int i=0; i<=n; i++)
+		for (int i=0; i<=maxCPIndex; i++)
 		{
 			double nodei = 0.0d;
-			for (int j=1; j<=d; j++)
+			for (int j=1; j<=degree; j++)
 			{
-				nodei = nodei + (double)t.get(i+j);
+				nodei = nodei + (double)Knots.get(i+j);
 			}
-			nodei = nodei/d;
+			nodei = nodei/degree;
 			if (Math.abs(udash-nodei)<min)
 			{
 				Pindex=i;
 				min = Math.abs(udash-nodei);
 			}
 		}
-		Point2D Pk = P.get(Pindex);		
-		double dist = src.distance(dest);
+		Point2D Pk = controlPoints.get(Pindex);		
 		Point2D direction = new Point2D.Double(dest.getX()-src.getX(),dest.getY()-src.getY());
-		double mov = BasisR(udash,Pindex,d);
+		double mov = BasisR(udash,Pindex);
 		Point2D.Double Pnew = new Point2D.Double(
-				Pk.getX() - direction.getX()/mov,
-				Pk.getY() - direction.getY()/mov		
+				Pk.getX() + direction.getX()/mov,
+				Pk.getY() + direction.getY()/mov		
 		);
-		P.set(Pindex,Pnew);
+		controlPoints.set(Pindex,Pnew);
 		InitHomogeneous();
 		return true;
 	}
-	
-	
-	
 	// return integer nearest to x
-	long nint(double x) {
+	long nint(double x)
+	{
 		if (x < 0.0) return (long) Math.ceil(x - 0.5);
 	      return (long) Math.floor(x + 0.5);
 	}
-
-	   // return log n!
-	   double logFactorial(int n) {
-	      double ans = 0.0;
-	      for (int i = 1; i <= n; i++)
-	         ans += Math.log(i);
-	      return ans;
-	   }
-
-	   // return the binomial coefficient n choose k.
-	   long binomial(int n, int k) {
-	      return nint(Math.exp(logFactorial(n) - logFactorial(k) - logFactorial(n-k)));
-	   }
+	// return log n!
+	double logFactorial(int n) {
+		double ans = 0.0;
+		for (int i = 1; i <= n; i++)
+			ans += Math.log(i);
+		return ans;
+	}
+	// return the binomial coefficient n choose k.
+	long binomial(int n, int k)
+	{
+		return nint(Math.exp(logFactorial(n) - logFactorial(k) - logFactorial(n-k)));
+	}
 }
