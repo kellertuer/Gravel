@@ -597,13 +597,15 @@ public class VHyperEdgeShape {
 	}
 	/**
 	 * Projects the point d to a point, whose distance is minimal to d and on the curve
+	 * 
+	 * TODO: Newtn Iteraton, if this is not qcurate enough?
 	 * @param d
 	 * @return
 	 */
 	public double ProjectionPointParameter(Point2D d)
 	{
 		//TODO: Set the value of the intervalls of u heuristically by length of the line
-		double eqdist = .0002; //Find a nice Start-value for u
+		double eqdist = .0001; //Find a nice Start-value for u
 		double u = Knots.firstElement(),u0 = Knots.firstElement();
 		double mindist = Double.MAX_VALUE;
 		while (u<=Knots.lastElement())
@@ -617,62 +619,7 @@ public class VHyperEdgeShape {
 			}
 			u+=eqdist;
 		}
-		boolean running = true;
-		Point2D.Double Value = (Point2D.Double) NURBSCurveAt(u0);
-		Point2D.Double firstDeriv = (Point2D.Double) DerivateCurveAt(1,u0);
-		Point2D.Double secondDeriv = (Point2D.Double) DerivateCurveAt(2,u0);
-		Point2D.Double diff = new Point2D.Double(Value.x-d.getX(),Value.y-d.getY());
-		double ulast = Double.MAX_VALUE;
-		u=u0;
-		int iterations=0;
-		while (running)
-		{
-			iterations++;
-			double nominator = firstDeriv.x*diff.x + firstDeriv.y*diff.y;
-			double denominator = secondDeriv.x*diff.y + secondDeriv.y*diff.y + firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y;
-			double unext = u - nominator/denominator;
-			if (unext > Knots.lastElement()) //Out of Range
-			{
-				if (controlPoints.lastElement().distance(controlPoints.firstElement())==0) //closed
-				{
-					while (unext > Knots.lastElement())
-						unext = Knots.firstElement() + (unext-Knots.lastElement());
-				}
-				else //open
-					unext = Knots.lastElement();
-			}
-			if (unext < Knots.firstElement()) //Out of Range
-			{
-				if (controlPoints.lastElement().distance(controlPoints.firstElement())==0) //closed
-				{
-					while (unext < Knots.firstElement())
-						unext = Knots.lastElement() - (Knots.firstElement()-unext);
-				}
-				else //open
-					unext = Knots.firstElement();
-			}
-			if (ulast==unext)
-			{
-				running=false; //TwoPointCircle
-			}
-			Value = (Point2D.Double) NURBSCurveAt(unext);
-			firstDeriv = (Point2D.Double) DerivateCurveAt(1,unext);
-			secondDeriv = (Point2D.Double) DerivateCurveAt(2,unext);
-			diff = new Point2D.Double(Value.x-d.getX(),Value.y-d.getY());
-			double coincidence = Math.sqrt(diff.x*diff.x + diff.y*diff.y);
-			double movement = Math.abs(unext-u)*Math.sqrt(firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y);
-			ulast=u;
-			u=unext;			
-			//System.err.println(coincidence+" and "+movement);
-			if ((coincidence <= 0.002d)||(movement<=0.002d))
-				running=false;
-			if (iterations>1000) //Verhindere Schleifen
-				running=false;
-		}
-//		System.err.print(iterations+" - ");
-//		if (iterations>=1000)
-//			System.err.println("Loop!");
-		return u;
+		return u0;
 	}
 	/**
 	 * If the first Point lies on the Curve (given a specific variance, e.g. 2.0

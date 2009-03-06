@@ -156,7 +156,6 @@ public class VGraphic extends Component implements 	Observer
 		X.add(.9375d);
 		s.RefineKnots(X);
 		g2.setColor(Color.BLACK);
-		s.translate(0,110);
 		s.scale(zoomfactor);
 		GeneralPath path = s.getCurve(.002d);
 		g2.draw(path);
@@ -171,11 +170,11 @@ public class VGraphic extends Component implements 	Observer
 			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
 		}
 		s.scale(1/zoomfactor);
-		int i=66;
+		int i=87;
 		Point2D PCurve = s.NURBSCurveAt(((double)i/100));
 		Point2D PDest = new Point2D.Double(PCurve.getX(),PCurve.getY()+50d);
 		if (vG.modifyNodes.get(1)!=null)
-			PDest = vG.modifyNodes.get(1).getPosition();
+			PDest = (Point2D) vG.modifyNodes.get(1).getPosition().clone();
 		g2.setColor(Color.RED);		
 		s.movePoint(PCurve, PDest);
 		PCurve.setLocation(PCurve.getX()*zoomfactor, PCurve.getY()*zoomfactor);
@@ -200,6 +199,30 @@ public class VGraphic extends Component implements 	Observer
 			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
 		}
 		s.scale(1/zoomfactor);
+		Iterator<VNode> ni = vG.modifyNodes.getIterator();
+		while (ni.hasNext())
+		{
+			VNode actual = ni.next();
+			if (actual.getIndex()>1)
+			{
+				Point2D p = s.ProjectionPoint((Point2D) actual.getPosition().clone());
+				g2.setColor(Color.GRAY);
+				g2.drawLine(
+						Math.round(actual.getPosition().x*zoomfactor),
+						Math.round(actual.getPosition().y*zoomfactor),
+						Math.round((float)p.getX()*zoomfactor),
+						Math.round((float)p.getY()*zoomfactor));
+				if (p.distance(actual.getPosition())<=2.0d)
+					g2.setColor(Color.GREEN);
+				else
+					g2.setColor(Color.RED);					
+				g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+
+				g2.drawLine(Math.round(((float)actual.getPosition().getX()*zoomfactor-3)),Math.round((float)actual.getPosition().getY()*zoomfactor),Math.round(((float)actual.getPosition().getX()*zoomfactor+3)),Math.round((float)actual.getPosition().getY()*zoomfactor));
+				g2.drawLine(Math.round(((float)actual.getPosition().getX()*zoomfactor)),Math.round(((float)actual.getPosition().getY()*zoomfactor-3)),Math.round((float)actual.getPosition().getX()*zoomfactor),Math.round(((float)actual.getPosition().getY()*zoomfactor+3)));
+
+			}
+		}
 	}
 	/**
 	 * @param g
