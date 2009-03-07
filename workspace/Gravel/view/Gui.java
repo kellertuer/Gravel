@@ -14,6 +14,7 @@ import javax.swing.*;
 
 import model.VGraph;
 import model.VGraphInterface;
+import model.VHyperGraph;
 
 /**
  * 	Hauptklasse der GUI, stellt das Hauptfenster zur Verfügung mittels Singelton-Muster.
@@ -26,11 +27,11 @@ public class Gui implements WindowListener
 	public static final String WindowName = "Gravel "+main.CONST.version;
 	
 	//Global der Graph als Datensatz
-	private VGraph MainGraph;
+	private VGraphInterface MainGraph;
 	//Der MainContentFrame
 	private JFrame frame;
 	private JPanel mainPanel;
-	private VGraphic graphpart; 
+	private VCommonGraphic graphpart; 
 	private Statistics stats;
 	private GraphTree graphlist;
 	private JToolBar gToolBar;
@@ -107,7 +108,7 @@ public class Gui implements WindowListener
         frame.addWindowListener(this);        
         BorderLayout test = new BorderLayout();
         frame.setLayout(test);
-        buildmaingrid();
+        buildmaingrid(new Dimension(gp.getIntValue("window.x"),gp.getIntValue("window.y")),new Dimension(gp.getIntValue("vgraphic.x"),gp.getIntValue("vgraphic.y")));
         frame.getContentPane().add("Center",mainPanel);        
         //Display the window.
         //Create the menu bar and bind it's actions on the graphpart.
@@ -142,27 +143,30 @@ public class Gui implements WindowListener
      * buildmaingrid() baut ein Grid in dem oben eine Buttonliste ist und dadrunter ein
      * SplitPane in dem man die beiden Inhalte, den Graph und den Tree mit Eigenschaften in der Breite variieren kann
      */
-    public void buildmaingrid() 
+    public void buildmaingrid(Dimension window, Dimension graphsize) 
     {
         mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
         
         //Die GraphicKomponente
-        graphpart = new VGraphic(new Dimension(gp.getIntValue("vgraphic.x"),gp.getIntValue("vgraphic.y")),MainGraph);
+        if (MainGraph.getType()==VGraphInterface.GRAPH)
+        	graphpart = new VGraphic(graphsize,(VGraph)MainGraph);
+        else if (MainGraph.getType()==VGraphInterface.HYPERGRAPH)
+        	graphpart = new VHyperGraphic(graphsize,(VHyperGraph)MainGraph);        	
         graphpart.setMouseHandling(VCommonGraphic.STD_MOUSEHANDLING);
         //Das Ganze als Scrollpane
         JScrollPane scrollPane = new JScrollPane(graphpart);
         scrollPane.setViewportView(graphpart);
         graphpart.setViewPort(scrollPane.getViewport());
         scrollPane.setMinimumSize(new Dimension(gp.getIntValue("vgraphic.x"),gp.getIntValue("vgraphic.y")));
-        scrollPane.setPreferredSize(new Dimension(gp.getIntValue("vgraphic.x"),gp.getIntValue("vgraphic.y")));
+        scrollPane.setPreferredSize(graphsize);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        graphpart.setSize(new Dimension(gp.getIntValue("vgraphic.x"),gp.getIntValue("vgraphic.y")));
+        graphpart.setSize(graphsize);
         graphpart.validate();
         //Toolbar
         gToolBar = new MainToolbar(graphpart);
-        gToolBar.setSize(new Dimension(gp.getIntValue("window.x"),gToolBar.getSize().height));
+        gToolBar.setSize(new Dimension(window.width,gToolBar.getSize().height));
     	gToolBar.setMinimumSize(gToolBar.getSize());
     	mainPanel.add(gToolBar,BorderLayout.NORTH);
         
@@ -171,23 +175,21 @@ public class Gui implements WindowListener
         
         //Das Ganze als Scrollpane
         JScrollPane scrollPane2 = new JScrollPane(graphlist);
-        scrollPane2.setMinimumSize(new Dimension(gp.getIntValue("window.x")-gp.getIntValue("vgraphic.x"),gp.getIntValue("window.y")-gp.getIntValue("statistics.y")));
+        scrollPane2.setMinimumSize(new Dimension(gp.getIntValue("window.x")-gp.getIntValue("vgraphic.x"),gp.getIntValue("window.y")-gp.getIntValue("vgraphic.y")));
         
         //Unter die GraphList noch die Statistik
         stats = new Statistics(graphpart);
         JSplitPane rightside = new JSplitPane(JSplitPane.VERTICAL_SPLIT,scrollPane2,stats);
-        rightside.setPreferredSize(new Dimension(gp.getIntValue("window.x")-gp.getIntValue("vgraphic.x"),gp.getIntValue("window.y")));
+        rightside.setPreferredSize(new Dimension(window.width-graphsize.width,window.height-graphsize.height));
         rightside.setResizeWeight(1.0);
         rightside.validate();
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                    scrollPane,rightside/*graphlist*/);
         splitPane.setDividerLocation(0.66);
-        //splitPane.setOneTouchExpandable(true);
-        splitPane.setPreferredSize(new Dimension(500+50+40,500+15));
         splitPane.setResizeWeight(1.0);
         mainPanel.add(splitPane,BorderLayout.CENTER);
-        mainPanel.setMinimumSize(new Dimension(gp.getIntValue("window.x"),gp.getIntValue("window.y")));
-        mainPanel.setPreferredSize(new Dimension(gp.getIntValue("window.x"),gp.getIntValue("window.y")));
+        mainPanel.setMinimumSize(window);
+        mainPanel.setPreferredSize(window);
         mainPanel.doLayout();
     }
     /**
@@ -222,7 +224,7 @@ public class Gui implements WindowListener
      * 
      * @return the VGraph from the editor
      */
-    public VGraph getVGraph()
+    public VGraphInterface getVGraph()
 	{
 		return MainGraph;
 	}
@@ -232,9 +234,48 @@ public class Gui implements WindowListener
      */
     public void setVGraph(VGraphInterface vg)
 	{
-    	//TODO handle MainGraph as Graphinterface and rebuild nearly all elements if Type changes
-    	if (vg.getType()==VGraphInterface.GRAPH)
-    		MainGraph.replace((VGraph)vg);
+    	if (vg.getType()==MainGraph.getType()) //Type not changed - simple replace
+    	{
+        	switch (vg.getType())
+        	{
+        		case VGraphInterface.GRAPH: 
+        		{
+               		((VGraph)MainGraph).replace((VGraph)vg);
+               		break;
+        		}
+        		case VGraphInterface.HYPERGRAPH:
+        		{
+               		((VHyperGraph)MainGraph).replace((VHyperGraph)vg);
+               		break;
+        		}
+        	}
+    	}
+    	else //Type Changed - init new to vg
+    	{
+   			MainGraph = vg;
+   			frame.getContentPane().removeAll();
+   			System.err.println(mainPanel.getSize()+" "+graphpart.getSize());
+   			buildmaingrid(mainPanel.getSize(),graphpart.getSize()); //Rebuild all
+   			frame.getContentPane().add("Center",mainPanel);        
+   	        //Display the window.
+   	        //Create the menu bar and bind it's actions on the graphpart.
+   	        MenuBar = new MainMenu(graphpart);
+   	        //Set the menu bar and add the label to the content pane.
+   	    	frame.setJMenuBar(MenuBar);
+   	        if (System.getProperty("os.name").toLowerCase().indexOf("mac")!=-1)
+   	        {
+   	        	//The normal way would be just to set the frame Menubar to NULL
+   	        	//But then the Key-Shortcuts won't work.
+   	        	//But if the Menubar is still in the Frame the shortcuts work. 
+   	        	//So this just sets the MenuBarSize to 0
+   	        	MenuBar.setBounds(new Rectangle(0,0,0,0));
+   	        	MenuBar.setSize(new Dimension(0,0));
+   	        	MenuBar.setOpaque(false);
+   	        	MenuBar.setPreferredSize(new Dimension(0,0));
+   	        	MenuBar.setMaximumSize(new Dimension(0,0));
+   	        }
+   	        frame.pack();
+   		}
 	}
    /**
     * Get Entries of the Statistics

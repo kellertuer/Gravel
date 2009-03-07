@@ -6,17 +6,29 @@ import io.GravelMLReader;
 import io.SVGWriter;
 import io.TeXWriter;
 import io.LaTeXPictureWriter;
-import io.MyTikZPictureWriter;
+//import io.MyTikZPictureWriter;
 import io.GravelMLWriter;
 
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
 import javax.swing.filechooser.FileFilter;
 
 import model.VGraph;
@@ -486,6 +498,13 @@ public class JFileDialogs implements Observer
 		//No one aborted so return true
 		return true;
 	}
+	private String buildNewGraph()
+	{
+	  String[] selections = { "Graph", "Hypergraph"};
+	  return (String) JOptionPane.showInputDialog(Gui.getInstance().getParentWindow(), "<html>Bitte Graphentyp w"+main.CONST.html_ae+"hlen:</html>",
+	            "Neue Graphen erstellen", JOptionPane.QUESTION_MESSAGE,null,
+	            selections, selections[0]);
+	}
 	/**
 	 * Create a New Graph in the GUI
 	 *
@@ -494,8 +513,16 @@ public class JFileDialogs implements Observer
 	{
 		if (!SaveOnNewOrOpen()) //s.o. aborted
 			return;
-		VGraph vg = new VGraph(GeneralPreferences.getInstance().getBoolValue("graph.directed"),GeneralPreferences.getInstance().getBoolValue("graph.allowloops"),GeneralPreferences.getInstance().getBoolValue("graph.allowmultiple"));
-		
+		VGraphInterface vg;
+		String newgraph = buildNewGraph();
+		if (newgraph==null)
+			newgraph="";
+		if (newgraph.equals("Graph"))
+			vg = new VGraph(GeneralPreferences.getInstance().getBoolValue("graph.directed"),GeneralPreferences.getInstance().getBoolValue("graph.allowloops"),GeneralPreferences.getInstance().getBoolValue("graph.allowmultiple"));
+		else if (newgraph.equals("Hypergraph"))
+			vg = new VHyperGraph();
+		else
+			return;
 		GeneralPreferences.getInstance().setStringValue("graph.lastfile","$NONE");
 		//Deactivate HistoryStuff
 		Gui.getInstance().setVGraph(vg); //This should kill us if the graphtype changed

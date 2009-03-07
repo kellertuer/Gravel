@@ -4,13 +4,13 @@ import com.apple.eawt.*;
 
 import io.GeneralPreferences;
 
+import java.awt.Dimension;
 import java.awt.event.*;
 
 import java.util.TreeMap;
 
 import javax.swing.*;
 
-import model.VGraph;
 import model.VGraphInterface;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
@@ -65,9 +65,9 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
      * buildmaingrid() baut ein Grid in dem oben eine Buttonliste ist und dadrunter ein
      * SplitPane in dem man die beiden Inhalte, den Graph und den Tree mit Eigenschaften in der Breite variieren kann
      */
-    public void buildmaingrid() 
+    public void buildmaingrid(Dimension window, Dimension graphsize) 
     {
-        normalgui.buildmaingrid();
+        normalgui.buildmaingrid(window,graphsize);
     }
     /**
      * Display About-Dialog
@@ -88,7 +88,7 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
 	{
 		return normalgui.getVGraph();
 	}
-    public void setVGraph(VGraph vg)
+    public void setVGraph(VGraphInterface vg)
 	{
 		normalgui.setVGraph(vg);
 	}

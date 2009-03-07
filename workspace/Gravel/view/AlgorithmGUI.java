@@ -21,6 +21,7 @@ import javax.swing.Timer;
 import view.pieces.ZoomComponent;
 
 import model.VGraph;
+import model.VGraphInterface;
 
 import algorithm.AlgorithmFactory;
 import algorithm.forms.*;
@@ -162,7 +163,9 @@ public class AlgorithmGUI extends JDialog implements ActionListener
 		Algorithm = AlgorithmFactory.getAlgorithm(AlgType);
 		AlgorithmParameterForm form;
 		try {
-			form = AlgorithmFactory.getForm(AlgType,Gui.getInstance().getVGraph().clone());
+			if (Gui.getInstance().getVGraph().getType()!=VGraphInterface.GRAPH)
+				return false;
+			form = AlgorithmFactory.getForm(AlgType, ((VGraph) Gui.getInstance().getVGraph()));
 		}
 		catch (Exception e)
 		{

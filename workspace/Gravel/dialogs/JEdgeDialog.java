@@ -39,6 +39,7 @@ import model.VEdge;
 import model.VEdgeLinestyle;
 import model.VEdgeText;
 import model.VGraph;
+import model.VGraphInterface;
 import model.VItem;
 import model.VOrthogonalEdge;
 import model.VQuadCurveEdge;
@@ -106,6 +107,8 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 	 */
 	public JEdgeDialog(int index, int start, int end, int width,VGraph vg)
 	{
+		if (Gui.getInstance().getVGraph().getType()!=VGraphInterface.GRAPH)
+			return;
 		chEdge = null;
 		oldindex = index;
 		oldstart = start;
@@ -114,7 +117,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		graphref = vg;
 		oldText = new VEdgeText(); //Std-Werte
 		oldLinestyle = new VEdgeLinestyle();
-		CreateDialog(null, Gui.getInstance().getVGraph());
+		CreateDialog(null, (VGraph) Gui.getInstance().getVGraph());
 	}
 	/**
 	 * Initialization of the Dialog with the properties of

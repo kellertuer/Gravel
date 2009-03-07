@@ -16,11 +16,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import model.MEdge;
-import model.MHyperEdge;
-import model.VGraph;
-import model.VGraphInterface;
-import model.VHyperGraph;
+import model.*;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 

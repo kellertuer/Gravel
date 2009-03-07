@@ -21,6 +21,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
+import model.VGraph;
+import model.VGraphInterface;
+import model.VHyperGraph;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
@@ -54,29 +57,64 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 	JMenuItem mAVTest,mAVLTD, mAVMAS;
 	JMenuItem mHIndex,mHAbout;
 	JFileDialogs fileDialogs;
-	VGraphic graphpart;
+	VCommonGraphic graphpart;
 	GraphHistoryManager GraphHistory;
-	
-	boolean isMac;
-	public MainMenu(VGraphic vgraphic)
+	int MenuAccModifier;
+	boolean isMac, isGraph;
+	public MainMenu(VCommonGraphic vgraphic)
 	{
-        this.graphpart = vgraphic;
+        graphpart = vgraphic;
         GraphHistory = graphpart.getGraphHistoryManager();
         isMac = (System.getProperty("os.name").toLowerCase().indexOf("mac")!=-1);
+        isGraph = vgraphic.getType()==VCommonGraphic.VGRAPHIC;
         createMenuBar();
 		fileDialogs = new JFileDialogs(vgraphic);
 		setOpaque(true);
         setPreferredSize(new Dimension(200, 20));
-        graphpart.getGraph().addObserver(this);
+        if (isGraph)
+        	((VGraphic)graphpart).getGraph().addObserver(this);
+        else
+        	((VHyperGraphic)graphpart).getGraph().addObserver(this);
  	}
 	/**
 	 * Create the Menu-Bar with all its items
 	 */
 	private void createMenuBar() {
-		int MenuAccModifier;
-		
 		MenuAccModifier = java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		
+        buildFileMenu();
+        add(mFile);
+        
+        buildEditMenu();
+        add(mEdit);
+
+        buildViewMenu();
+        add(mView);
+        
+        //Letzter Menüpunkt : Hilfe.
+        mHelp = new JMenu("Hilfe");
+        if (!isMac) mHelp.setMnemonic(KeyEvent.VK_H);
+        add(mHelp);
+        mHIndex = new JMenuItem("Index",KeyEvent.VK_I);
+        	mHIndex.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1,0));
+   
+        mHIndex.getAccessibleContext().setAccessibleDescription("Hilfe-Index");
+        mHIndex.addActionListener(this);
+        if (!isMac) mHIndex.setMnemonic(KeyEvent.VK_I);
+        mHelp.add(mHIndex);
+        if (!isMac)
+        {
+        	mHAbout = new JMenuItem("Über",KeyEvent.VK_B);
+        	mHAbout.getAccessibleContext().setAccessibleDescription(
+        			main.CONST.utf8_Ue+"ber Gravel</html>");
+        	mHAbout.addActionListener(this);
+            if (!isMac) mHAbout.setMnemonic(KeyEvent.VK_A);
+        	mHelp.add(mHAbout);
+        }
+    }
+	
+	private void buildFileMenu()
+	{
 		//Das erste Menü : Datei
         if (isMac)
         {
@@ -87,8 +125,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         	mFile = new JMenu("Datei");
         	mFile.setMnemonic(KeyEvent.VK_D);         
         }
-        add(mFile);
-        //Datei öffnen
+        //TODO : Datei-> Neu mit Dialog?
         mFNew = new JMenuItem("Neuer Graph");
         mFNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, MenuAccModifier));
         if (!isMac) mFNew.setMnemonic(KeyEvent.VK_N);
@@ -143,7 +180,10 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         	mFExit.addActionListener(this);
         	mFile.add(mFExit);
         }
-        //Menüpunkt bearbeiten
+	}
+
+	private void buildEditMenu()
+	{
         mEdit = new JMenu("Bearbeiten");
         if (!isMac) mEdit.setMnemonic(KeyEvent.VK_E);
         add(mEdit);
@@ -172,21 +212,21 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
             mEdDelSelection.setMnemonic(KeyEvent.VK_D);
     	}
     	mEdDelSelection.addActionListener(this);
-    	mEdDelSelection.setEnabled(graphpart.getGraph().modifyEdges.hasSelection()||graphpart.getGraph().modifyNodes.hasSelection());
+    	mEdDelSelection.setEnabled(hasGraphSelection());
     	
     	mEdModifySelection = new JMenuItem("Auswahl bearbeiten...");
    		mEdModifySelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, MenuAccModifier));    		
        	if (!isMac)
            mEdModifySelection.setMnemonic(KeyEvent.VK_M);
     	mEdModifySelection.addActionListener(this);
-    	mEdModifySelection.setEnabled(graphpart.getGraph().modifyEdges.hasSelection()||graphpart.getGraph().modifyNodes.hasSelection());
+    	mEdModifySelection.setEnabled(hasGraphSelection());
 
     	mEdArrangeSelection = new JMenuItem("Auswahl anordnen...");
    		//mEdArrangeSelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, MenuAccModifier));    		
        	if (!isMac)
            mEdArrangeSelection.setMnemonic(KeyEvent.VK_R);
     	mEdArrangeSelection.addActionListener(this);
-    	mEdArrangeSelection.setEnabled(graphpart.getGraph().modifyNodes.hasSelection());
+    	mEdArrangeSelection.setEnabled(hasGraphSelectedNodes());
 
     	
     	if (!isMac) mEdit.setMnemonic(KeyEvent.VK_E);
@@ -196,43 +236,51 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     	mEdit.add(mEdDelSelection);        
         mEdit.add(mEdModifySelection);
         mEdit.add(mEdArrangeSelection);
+	}
+	
+	private void buildViewMenu()
+	{
         //Menüpunkt Ansicht
         mView = new JMenu("Ansicht");
         if (!isMac) mView.setMnemonic(KeyEvent.VK_A);
-        add(mView);
 
-//      Editor Umformung directed / undirected Graph
-        mVGraph = new JMenu("Graph umformen (zu)");
-        if (!isMac) mVGraph.setMnemonic(KeyEvent.VK_G);
-        mView.add(mVGraph);
+        if (isGraph)
+        {
+        	VGraph vG = ((VGraphic)graphpart).getGraph();
+        	//Editor Umformung directed / undirected Graph
+        	mVGraph = new JMenu("Graph umformen (zu)");
+        	if (!isMac) mVGraph.setMnemonic(KeyEvent.VK_G);
+        	mView.add(mVGraph);
         
-        if (graphpart.getGraph().getMathGraph().isDirected())
-        	mVGDirCh = new JMenuItem("ungerichtet");
-        else
-        	mVGDirCh = new JMenuItem("umformen zu gerichtetem Graph");        	
-        mVGDirCh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, MenuAccModifier));
-        mVGDirCh.addActionListener(this);
-        if (!isMac) mVGDirCh.setMnemonic(KeyEvent.VK_D);
-        mVGraph.add(mVGDirCh);        
-
-        if (graphpart.getGraph().getMathGraph().isLoopAllowed())
-        	mVGLoopCh = new JMenuItem("entferne Schleifen");
-        else
-        	mVGLoopCh = new JMenuItem("erlaube Schleifen");        	
-        mVGLoopCh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, MenuAccModifier));
-        mVGLoopCh.addActionListener(this);
-        if (!isMac) mVGLoopCh.setMnemonic(KeyEvent.VK_L);
-        mVGraph.add(mVGLoopCh);        
+        	if (vG.getMathGraph().isDirected())
+        		mVGDirCh = new JMenuItem("ungerichtet");
+        	else
+        		mVGDirCh = new JMenuItem("umformen zu gerichtetem Graph");        	
+        	
+        	mVGDirCh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, MenuAccModifier));
+        	mVGDirCh.addActionListener(this);
+        	if (!isMac) mVGDirCh.setMnemonic(KeyEvent.VK_D);
+        		mVGraph.add(mVGDirCh);        
+        		
+        	if (vG.getMathGraph().isLoopAllowed())
+        		mVGLoopCh = new JMenuItem("entferne Schleifen");
+        	else
+        		mVGLoopCh = new JMenuItem("erlaube Schleifen");        	
+        	mVGLoopCh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, MenuAccModifier));
+        	mVGLoopCh.addActionListener(this);
+        	if (!isMac) mVGLoopCh.setMnemonic(KeyEvent.VK_L);
+        		mVGraph.add(mVGLoopCh);        
        
-        if (graphpart.getGraph().getMathGraph().isMultipleAllowed())
-        	mVGMultipleCh = new JMenuItem("entferne Mehrfachkanten");
-        else
-        	mVGMultipleCh = new JMenuItem("erlaube Mehrfachkanten");        	
-        //mVGMultipleCh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, MenuAccModifier));
-        mVGMultipleCh.addActionListener(this);
-        if (!isMac) mVGMultipleCh.setMnemonic(KeyEvent.VK_M);
-        mVGraph.add(mVGMultipleCh);        
-        
+        	if (vG.getMathGraph().isMultipleAllowed())
+        		mVGMultipleCh = new JMenuItem("entferne Mehrfachkanten");
+        	else
+        		mVGMultipleCh = new JMenuItem("erlaube Mehrfachkanten");        	
+        	
+        	//mVGMultipleCh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, MenuAccModifier));
+        	mVGMultipleCh.addActionListener(this);
+        	if (!isMac) mVGMultipleCh.setMnemonic(KeyEvent.VK_M);
+        	mVGraph.add(mVGMultipleCh);        
+        }
         //--Editor Modus--
         mEdModus = new JMenu("Modus");
         if (!isMac) mEdModus.setMnemonic(KeyEvent.VK_M);
@@ -254,14 +302,16 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         mVModusNormal.setSelected(true);
         //group.setSelected(mEdModusNormal, true);
         
-//      Editor Kontrollpunkte der Kanten
-        mVShowBP = new JCheckBoxMenuItem("Kanten-Kontrollpunkte anzeigen");
-        mVShowBP.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, MenuAccModifier));
-        mVShowBP.setSelected(GeneralPreferences.getInstance().getBoolValue("vgraphic.cpshow"));
-        if (!isMac) mVShowBP.setMnemonic(KeyEvent.VK_A);
-        mVShowBP.addActionListener(this);
-        mView.add(mVShowBP);        
-        
+        if (isGraph)
+        {
+        	//      Editor Kontrollpunkte der Kanten
+        	mVShowBP = new JCheckBoxMenuItem("Kanten-Kontrollpunkte anzeigen");
+        	mVShowBP.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, MenuAccModifier));
+        	mVShowBP.setSelected(GeneralPreferences.getInstance().getBoolValue("vgraphic.cpshow"));
+        	if (!isMac) mVShowBP.setMnemonic(KeyEvent.VK_A);
+        	mVShowBP.addActionListener(this);
+        	mView.add(mVShowBP);        
+        }
         //Editor Raster
         mVGrid = new JMenuItem("Raster-Einstellungen...");
         mVGrid.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, MenuAccModifier));
@@ -294,29 +344,22 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         zoomgroup.add(mVZoom1);
         zoomgroup.add(mVZoom2);
         zoomgroup.add(mVZoom3); 
-        
-        //Letzter Menüpunkt : Hilfe.
-        mHelp = new JMenu("Hilfe");
-        if (!isMac) mHelp.setMnemonic(KeyEvent.VK_H);
-        add(mHelp);
-        mHIndex = new JMenuItem("Index",KeyEvent.VK_I);
-        	mHIndex.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1,0));
-   
-        mHIndex.getAccessibleContext().setAccessibleDescription("Hilfe-Index");
-        mHIndex.addActionListener(this);
-        if (!isMac) mHIndex.setMnemonic(KeyEvent.VK_I);
-        mHelp.add(mHIndex);
-        if (!isMac)
-        {
-        	mHAbout = new JMenuItem("Über",KeyEvent.VK_B);
-        	mHAbout.getAccessibleContext().setAccessibleDescription(
-        			main.CONST.utf8_Ue+"ber Gravel</html>");
-        	mHAbout.addActionListener(this);
-            if (!isMac) mHAbout.setMnemonic(KeyEvent.VK_A);
-        	mHelp.add(mHAbout);
-        }
-    }
-
+	}
+	
+	private boolean hasGraphSelection()
+	{
+    	if (isGraph)
+    		return ((VGraphic)graphpart).getGraph().hasSelection();
+    	else
+    		return ((VHyperGraphic)graphpart).getGraph().hasSelection();
+	}
+	private boolean hasGraphSelectedNodes()
+	{
+    	if (isGraph)
+    		return ((VGraphic)graphpart).getGraph().modifyNodes.hasSelection();
+    	else
+    		return ((VHyperGraphic)graphpart).getGraph().modifyNodes.hasSelection();
+	}
 	/**
 	 * Check, whether a Graph is saved, if not ask for Saving and handle the answer
 	 */
@@ -327,7 +370,12 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			//Fragen
 			if (GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
 			{
-				if (Gui.getInstance().getVGraph().getMathGraph().modifyNodes.cardinality()>0) //es gibt überhaupt was
+				int cardinality = 0;
+				if (Gui.getInstance().getVGraph().getType()==VGraphInterface.GRAPH)
+					cardinality = ((VGraph)Gui.getInstance().getVGraph()).getMathGraph().modifyNodes.cardinality();
+				else if (Gui.getInstance().getVGraph().getType()==VGraphInterface.HYPERGRAPH)
+					cardinality = ((VHyperGraph)Gui.getInstance().getVGraph()).getMathGraph().modifyNodes.cardinality();
+				if (cardinality>0) //es gibt überhaupt was
 				{
 					int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Der aktuelle Graph wurde nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie den Graph noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_OPTION);
 					if (n==JOptionPane.YES_OPTION)
@@ -398,46 +446,6 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     	    	
     	    	graphpart.removePiece("Grid");
     	    } else 
-    	    if (item==mVGDirCh)
-    	    {
-    	    	if (graphpart.getGraph().getMathGraph().isDirected())
-    	    	{
-    				int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Wirklich umformen in ungerichteten Graphen ?<br>Dabei k"+main.CONST.html_oe+"nnen Kanten verloren gehen.","Umformen bestätigen",JOptionPane.YES_NO_OPTION);
-    	    		if (n==JOptionPane.YES_OPTION)
-    	    		{
-    	    			graphpart.getGraph().setDirected(false);
-    	    		}
-    	    	}
-    	    	else
-    	    		graphpart.getGraph().setDirected(true);
-       	    } else
-        	if (item==mVGLoopCh)
-        	{
-        	  	if (graphpart.getGraph().getMathGraph().isLoopAllowed())
-        	   	{
-        			int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Wirklich umformen in einen Graphen ohne Schleifen ?<br>Dabei werdem alle existenten Schleifen gel"+main.CONST.html_oe+"scht.","Umformen bestätigen",JOptionPane.YES_NO_OPTION);
-        	   		if (n==JOptionPane.YES_OPTION)
-        	   		{
-        	   			graphpart.getGraph().modifyEdges.setLoopsAllowed(false);
-        	   		}
-        	   	}
-        	   	else
-        	   		graphpart.getGraph().modifyEdges.setLoopsAllowed(true);
-           	} else	
-            if (item==mVGMultipleCh)
-           	{
-           	  	if (graphpart.getGraph().getMathGraph().isMultipleAllowed())
-           	   	{
-            			int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Wirklich umformen in einen Graphen ohne Mehrfachkanten ?<br>Dabei werden alle Mehrfachkanten zwischen Knoten auf eine Kante reduziert.","Umformen bestätigen",JOptionPane.YES_NO_OPTION);
-            	   		if (n==JOptionPane.YES_OPTION)
-            	   		{
-            	   			graphpart.getGraph().modifyEdges.setMultipleAllowed(false);
-            	   		}
-            	   	}
-            	   	else
-            	   		graphpart.getGraph().modifyEdges.setMultipleAllowed(true);
-               	} else	
-
     	    if (item == mAVTest)
     		{
     			new AlgorithmGUI(AlgorithmFactory.RANDOM_VISUALIZE);
@@ -471,16 +479,65 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
        		}
     		else if (item == mEdDelSelection)
     		{
-    			graphpart.getGraph().removeSelection();
+    			if (isGraph)
+    				((VGraphic)graphpart).getGraph().removeSelection();
+    			else
+    				((VHyperGraphic)graphpart).getGraph().removeSelection();
     		}
      		else if (item == mEdModifySelection)
     		{
-    			new JSelectionModifyDialog(false, true, true, "Auswahl bearbeiten", graphpart.getGraph());
+     			if (isGraph)
+     				new JSelectionModifyDialog(false, true, true, "Auswahl bearbeiten", ((VGraphic)graphpart).getGraph());
+     			//else TODO: Enable SelectionModifyDialog if its ready for Hypergraphs
+     			//	new JSelectionModifyDialog(false, true, true, "Auswahl bearbeiten", ((VHyperGraphic)graphpart).getGraph());
     		}
      		else if (item == mEdArrangeSelection)
     		{
-    			new JSelectionModifyDialog(true, false, false, "selektierte Knoten nordnen", graphpart.getGraph());
+     			if (isGraph)
+     				new JSelectionModifyDialog(true, false, false, "selektierte Knoten anordnen",  ((VGraphic)graphpart).getGraph());
+     			//else TODO: Enable SelectionModifyDialog for Node Arrangements in HyperGraphs if ready
+     			//	new JSelectionModifyDialog(true,false,false, "selektioerte Knoten anordnen", ((VHyperGraphic)graphpart).getGraph());
     		}
+			if(!isGraph)
+				return;
+	   	    if (item==mVGDirCh)
+    	    {
+    			//Only active if we have a Graph
+    	    	if (((VGraphic)graphpart).getGraph().getMathGraph().isDirected())
+    	    	{
+    				int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Wirklich umformen in ungerichteten Graphen ?<br>Dabei k"+main.CONST.html_oe+"nnen Kanten verloren gehen.","Umformen bestätigen",JOptionPane.YES_NO_OPTION);
+    	    		if (n==JOptionPane.YES_OPTION)
+    	    		{
+    	    			((VGraphic)graphpart).getGraph().setDirected(false);
+    	    		}
+    	    	}
+    	    	else
+    	    		((VGraphic)graphpart).getGraph().setDirected(true);
+       	    } else
+        	if (item==mVGLoopCh)
+        	{
+        	  	if (((VGraphic)graphpart).getGraph().getMathGraph().isLoopAllowed())
+        	   	{
+        			int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Wirklich umformen in einen Graphen ohne Schleifen ?<br>Dabei werdem alle existenten Schleifen gel"+main.CONST.html_oe+"scht.","Umformen bestätigen",JOptionPane.YES_NO_OPTION);
+        	   		if (n==JOptionPane.YES_OPTION)
+        	   			((VGraphic)graphpart).getGraph().modifyEdges.setLoopsAllowed(false);
+        	   	}
+        	   	else
+        	   		((VGraphic)graphpart).getGraph().modifyEdges.setLoopsAllowed(true);
+           	} else	
+            if (item==mVGMultipleCh)
+           	{
+           	  	if (((VGraphic)graphpart).getGraph().getMathGraph().isMultipleAllowed())
+           	   	{
+            			int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Wirklich umformen in einen Graphen ohne Mehrfachkanten ?<br>Dabei werden alle Mehrfachkanten zwischen Knoten auf eine Kante reduziert.","Umformen bestätigen",JOptionPane.YES_NO_OPTION);
+            	   		if (n==JOptionPane.YES_OPTION)
+            	   		{
+            	   			((VGraphic)graphpart).getGraph().modifyEdges.setMultipleAllowed(false);
+            	   		}
+            	   	}
+            	   	else
+            	   		((VGraphic)graphpart).getGraph().modifyEdges.setMultipleAllowed(true);
+             }
     	}
 	}
 	
@@ -489,37 +546,41 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 		GraphMessage m = (GraphMessage)arg1;
 		if (m==null)
 			return;
-		
+		mEdUndo.setEnabled(GraphHistory.CanUndo());
+		mEdRedo.setEnabled(GraphHistory.CanRedo());
 		//either Selection changed or was affected
 		if (((m.getAffectedElementTypes()&GraphConstraints.SELECTION)==GraphConstraints.SELECTION)||((m.getModifiedElementTypes()&GraphConstraints.SELECTION)==GraphConstraints.SELECTION))
 		{
-			mEdDelSelection.setEnabled(graphpart.getGraph().modifyEdges.hasSelection()||graphpart.getGraph().modifyNodes.hasSelection());		
-			mEdModifySelection.setEnabled(graphpart.getGraph().modifyEdges.hasSelection()||graphpart.getGraph().modifyNodes.hasSelection());		
-			mEdArrangeSelection.setEnabled(graphpart.getGraph().modifyNodes.hasSelection());
+			mEdDelSelection.setEnabled(hasGraphSelection());		
+			mEdModifySelection.setEnabled(hasGraphSelection());		
+			mEdArrangeSelection.setEnabled(hasGraphSelection());
 		}
+		if (graphpart.getType()!=VCommonGraphic.VGRAPHIC)
+			return;
 		if ((m.getModifiedElementTypes()&GraphConstraints.DIRECTION)==GraphConstraints.DIRECTION) //directed changed
 		{
-	    	if (graphpart.getGraph().getMathGraph().isDirected())
+			//Only active if we have a Graph
+	    	if (((VGraphic)graphpart).getGraph().getMathGraph().isDirected())
 	        	mVGDirCh.setText("ungerichtet");
 	        else
 	        	mVGDirCh.setText("gerichtet");        	
 		}
 		if ((m.getModifiedElementTypes()&GraphConstraints.LOOPS)==GraphConstraints.LOOPS) //Loops changed
 		{
-	    	if (graphpart.getGraph().getMathGraph().isLoopAllowed())
+			//Only active if we have a Graph
+	    	if (((VGraphic)graphpart).getGraph().getMathGraph().isLoopAllowed())
 	        	mVGLoopCh.setText("entferne Schleifen");
 	        else
 	        	mVGLoopCh.setText("erlaube Schleifen");        	
 		}
 		if ((m.getModifiedElementTypes()&GraphConstraints.MULTIPLE)==GraphConstraints.MULTIPLE) //Multiple Edges Changed
 		{
-	    	if (graphpart.getGraph().getMathGraph().isMultipleAllowed())
+			//Only active if we have a Graph
+	    	if (((VGraphic)graphpart).getGraph().getMathGraph().isMultipleAllowed())
 	        	mVGMultipleCh.setText("entferne Mehrfachkanten");
 	        else
 	        	mVGMultipleCh.setText("erlaube Mehrfachkanten");        	
 		}
-		mEdUndo.setEnabled(GraphHistory.CanUndo());
-		mEdRedo.setEnabled(GraphHistory.CanRedo());
 		this.repaint();
 	}
 }
