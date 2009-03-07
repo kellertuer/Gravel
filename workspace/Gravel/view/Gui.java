@@ -254,7 +254,6 @@ public class Gui implements WindowListener
     	{
    			MainGraph = vg;
    			frame.getContentPane().removeAll();
-   			System.err.println(mainPanel.getSize()+" "+graphpart.getSize());
    			buildmaingrid(mainPanel.getSize(),graphpart.getSize()); //Rebuild all
    			frame.getContentPane().add("Center",mainPanel);        
    	        //Display the window.
