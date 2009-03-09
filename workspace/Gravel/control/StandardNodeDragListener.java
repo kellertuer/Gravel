@@ -1,14 +1,11 @@
 package control;
 
-import io.GeneralPreferences;
-
 import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.Iterator;
-import java.util.Vector;
 
 import view.*;
 import model.*;
@@ -31,7 +28,6 @@ public class StandardNodeDragListener  implements MouseListener, MouseMotionList
 	private VHyperGraph vhg=null;
 	private VCommonGraphic vgc;
 	private Point MouseOffSet;
-	private GeneralPreferences gp;
 	private VNode movingNode;
 	private int gridx,gridy;
 	private boolean gridorientated, shiftwaspressed,firstdrag=true, multiplemoving=false;
@@ -40,7 +36,6 @@ public class StandardNodeDragListener  implements MouseListener, MouseMotionList
 	{
 		vgc = g;
 		vg = g.getGraph();
-		gp = GeneralPreferences.getInstance();
 		MouseOffSet = new Point(0,0);
 	}
 
@@ -48,7 +43,6 @@ public class StandardNodeDragListener  implements MouseListener, MouseMotionList
 	{
 		vgc = g;
 		vhg = g.getGraph();
-		gp = GeneralPreferences.getInstance();
 		MouseOffSet = new Point(0,0);
 	}
 	
@@ -220,6 +214,11 @@ public class StandardNodeDragListener  implements MouseListener, MouseMotionList
 			if (!((e.getPoint().x==-1)||(e.getPoint().y==-1)))//kein Reset von außerhalb wegen modusumschaltung
 				mouseDragged(e); //Das gleiche wie als wenn man bewegt, nur ist danach kein Knoten mehr bewegter Knoten
 		}
+		VGraphInterface notify=null;
+		if (vg!=null) //Normal Graph
+			notify = vg;
+		else if (vhg!=null) //Hypergraph
+			notify=vhg;
 		if (!((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))
 		{ //No Shift - Snap the moving node (if existent) to grid
 			if ((movingNode!=null)&&gridorientated)
@@ -240,13 +239,13 @@ public class StandardNodeDragListener  implements MouseListener, MouseMotionList
 				movingNode.setPosition(newpos);	
 			}
 			if (movingNode!=null) //End Nove Movement-Block
-				vg.pushNotify(new GraphMessage(GraphConstraints.NODE,movingNode.getIndex(),GraphConstraints.UPDATE|GraphConstraints.BLOCK_END,GraphConstraints.NODE|GraphConstraints.EDGE));
+				notify.pushNotify(new GraphMessage(GraphConstraints.NODE,movingNode.getIndex(),GraphConstraints.UPDATE|GraphConstraints.BLOCK_END,GraphConstraints.NODE|GraphConstraints.EDGE));
 			movingNode=null;
 		}
 		else if (!firstdrag) //With Shift and a real drag
 		{
 			multiplemoving=false;
-			vg.pushNotify(new GraphMessage(GraphConstraints.NODE|GraphConstraints.EDGE|GraphConstraints.SELECTION,GraphConstraints.BLOCK_END));
+			notify.pushNotify(new GraphMessage(GraphConstraints.NODE|GraphConstraints.EDGE|GraphConstraints.SELECTION,GraphConstraints.BLOCK_END));
 		}
 		firstdrag = true;
 	}

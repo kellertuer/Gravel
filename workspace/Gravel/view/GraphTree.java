@@ -266,7 +266,10 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		{
 			switch (ParentType) //Wo war das zuletzt
 			{
-				case USENODES : {new JNodeDialog(vG.modifyNodes.get(StringPos2Index(ParentType,selectedPosition)),vG); break;}
+				case USENODES : {
+					if (vG!=null)	
+						new JNodeDialog(vG.modifyNodes.get(StringPos2Index(ParentType,selectedPosition)),vG); break;}
+				//TODO else if VhG
 				case USEEDGES : {
 					if (vG!=null)
 						new JEdgeDialog(vG.modifyEdges.get(StringPos2Index(ParentType,selectedPosition)),vG); 
@@ -274,7 +277,13 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 						System.err.println("TODO in GraphTree:281: Start HyperEdgeDialog");
 					break;
 					}
-				case USESUBGRAPHS : {new JSubgraphDialog(vG.modifySubgraphs.get(StringPos2Index(ParentType,selectedPosition)),vG); break;}
+				case USESUBGRAPHS :
+				{
+					if (vG!=null)	
+						new JSubgraphDialog(vG.modifySubgraphs.get(StringPos2Index(ParentType,selectedPosition)),vG);
+				//TODO else if VhG
+					break;
+				}
 				default : {return;}
 			}
 		}

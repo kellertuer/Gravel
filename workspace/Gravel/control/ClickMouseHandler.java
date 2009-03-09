@@ -43,6 +43,15 @@ public abstract class ClickMouseHandler implements MouseListener, Observer
 		SelectionMouseActions.mouseClicked(e);
 		PopupClickActions.mouseClicked(e);
 	}
+
+	public void mousePressed(MouseEvent e) {}
+
+	public void mouseEntered(MouseEvent e) {}
+
+	public void mouseExited(MouseEvent e) {}
+
+	public void mouseReleased(MouseEvent e) {}
+
 	public void update(Observable o, Object arg)
 	{
 		PopupClickActions.update(o, arg);

@@ -114,6 +114,7 @@ public class ContextMenuClickListener
 		{
 			BgCreateHyperEdgefromSel = new JMenuItem("Neue Hyperkante...");
 			BgCreateHyperEdgefromSel.addActionListener(this);
+			BgPopup.add(BgCreateHyperEdgefromSel);
 		}
 	}
 	private void initNodePopup()
@@ -153,8 +154,14 @@ public class ContextMenuClickListener
 		NodePopup = new JPopupMenu();
 		NodePopup.add(Nname);
 		NodePopup.addSeparator();
-		NodePopup.add(NaddEdgesTo);
-		NodePopup.add(NaddEdgesFrom);
+		if (vg!=null)
+		{
+			NodePopup.add(NaddEdgesTo);
+			NodePopup.add(NaddEdgesFrom);
+		}
+		else if (vhg!=null)
+			NodePopup.add(NCreateHyperEdgefromSel);
+		
 		NodePopup.add(Nproperties);
 		NodePopup.add(NaddtoSet);
 		NodePopup.add(NremfromSet);
@@ -178,7 +185,10 @@ public class ContextMenuClickListener
 		EremfromSet.setEnabled(false);
 		EremfromSet.addActionListener(this);
 		EDelSelection = new JMenuItem("Auswahl löschen");
-		EDelSelection.setEnabled(vg.modifyNodes.hasSelection()||vg.modifyEdges.hasSelection());
+		if (vg!=null)
+			EDelSelection.setEnabled(vg.hasSelection());
+		else if (vhg!=null)
+			EDelSelection.setEnabled(vhg.hasSelection());
 		EDelSelection.addActionListener(this);	
 		EdgePopup = new JPopupMenu();
 		EdgePopup.add(Ename);
@@ -274,11 +284,24 @@ public class ContextMenuClickListener
 	public void updateSubgraphList()
 	{
 		vSubgraphNMenus.removeAllElements(); //Untergraphen-Menues aktualisieren
-		Iterator<VSubgraph> siter = vg.modifySubgraphs.getIterator();
+		Iterator<VSubgraph> siter;
+		MSubgraphSet subgraphs;
+		if (vg!=null)
+		{
+			siter = vg.modifySubgraphs.getIterator();
+			subgraphs = vg.getMathGraph().modifySubgraphs;
+		}
+		else if (vhg!=null)
+		{
+			subgraphs = vhg.getMathGraph().modifySubgraphs;
+			siter = vhg.modifySubgraphs.getIterator();
+		}
+		else
+			return;
 		while (siter.hasNext())
 		{
 			VSubgraph actual = siter.next();
-			JMenuItem t = new JMenuItem(vg.getMathGraph().modifySubgraphs.get(actual.getIndex()).getName());
+			JMenuItem t = new JMenuItem(subgraphs.get(actual.getIndex()).getName());
 			t.addActionListener(this);
 			if ((actual.getIndex()+1)>vSubgraphNMenus.size())
 			{

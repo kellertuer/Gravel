@@ -106,9 +106,8 @@ public class VHyperGraphic extends VCommonGraphic
 			break;
 			case OCM_MOUSEHANDLING:
 				resetMouseHandling();
-//TODO: Implement Mouse Handling
 				Click = new OCMClickMouseHandler(this);
-//				Drag = new OCMDragMouseHandler(this);
+				Drag = new OCMDragMouseHandler(this);
 				this.addMouseListener(Drag);
 				this.addMouseMotionListener(Drag);
 				this.addMouseListener(Click);
@@ -117,7 +116,7 @@ public class VHyperGraphic extends VCommonGraphic
 			default:
 				resetMouseHandling();
 				Click = new StandardClickMouseHandler(this);
-//				Drag = new StandardDragMouseHandler(this);
+				Drag = new StandardDragMouseHandler(this);
 				this.addMouseListener(Drag);
 				this.addMouseMotionListener(Drag);
 				this.addMouseListener(Click);
@@ -165,6 +164,7 @@ public class VHyperGraphic extends VCommonGraphic
 		{
 			if (Click!=null) 
 				Click.update(o,arg);
+			repaint();
 		}
 		else if (o.equals(gp)) //We got news from gp
 			handlePreferencesUpdate();
