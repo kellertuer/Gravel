@@ -167,6 +167,15 @@ public class SelectionDragListener
 			
 	}
 
+	public Rectangle getSelectionRectangle()
+	{
+		return selrect;
+	}
+
+	public boolean dragged()
+	{
+		return (selrect!=null)&&(!firstdrag);
+	}
 	private void reset()
 	{
 		//Only if a Block was started: End it...
@@ -184,7 +193,7 @@ public class SelectionDragListener
 		firstdrag = true;
 	}
 	//One every Click a potental Drag is initialized but firstdrag = true signals, that no Drag-Movement happened yet
-	public void mouseClicked(MouseEvent e) {
+	public void mousePressed(MouseEvent e) {
 		firstdrag=true;
 		
 		MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed
@@ -229,21 +238,6 @@ public class SelectionDragListener
 				selstart = MouseOffSet;
 		}
 		//Only Case that remains is Alt&&Shift...don't handle that here
-	}
-
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void mouseReleased(MouseEvent e) {
@@ -343,9 +337,12 @@ public class SelectionDragListener
 		firstdrag = false;
 	}
 
-	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
+	public void mouseMoved(MouseEvent e) {}
 
-	}
+	public void mouseEntered(MouseEvent e) {}
+
+	public void mouseExited(MouseEvent e) {}
+
+	public void mouseClicked(MouseEvent e) {}
 
 }

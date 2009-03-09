@@ -66,7 +66,7 @@ public class StandardDragMouseHandler extends DragMouseHandler
 	 */
 	public boolean dragged()
 	{
-		return ((movingNode!=null)||(movingControlPointEdge!=null)||(selrect!=null));
+		return ((movingNode!=null)||(movingControlPointEdge!=null)||(super.dragged()));
 	}
 	/** set whether the nodes are set to a gridpoint after dragging or not. 
 	 * 
