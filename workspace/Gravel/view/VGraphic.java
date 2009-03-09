@@ -4,7 +4,6 @@ import history.GraphHistoryManager;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
 import java.util.Iterator;
@@ -251,7 +250,7 @@ public class VGraphic extends VCommonGraphic
 		if (arg instanceof GraphMessage) //All Other GraphUpdates are handled in VGRaphCommons
 		{
 			if (Click!=null) 
-				Click.updateSubgraphList();
+				Click.update(o,arg);
 			repaint();
 		}
 		else if (o.equals(gp)) //We got news from gp

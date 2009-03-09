@@ -107,7 +107,7 @@ public class VHyperGraphic extends VCommonGraphic
 			case OCM_MOUSEHANDLING:
 				resetMouseHandling();
 //TODO: Implement Mouse Handling
-//				Click = new OCMClickMouseHandler(this);
+				Click = new OCMClickMouseHandler(this);
 //				Drag = new OCMDragMouseHandler(this);
 				this.addMouseListener(Drag);
 				this.addMouseMotionListener(Drag);
@@ -116,7 +116,7 @@ public class VHyperGraphic extends VCommonGraphic
 			case STD_MOUSEHANDLING:
 			default:
 				resetMouseHandling();
-//				Click = new StandardClickMouseHandler(this);
+				Click = new StandardClickMouseHandler(this);
 //				Drag = new StandardDragMouseHandler(this);
 				this.addMouseListener(Drag);
 				this.addMouseMotionListener(Drag);
@@ -164,7 +164,7 @@ public class VHyperGraphic extends VCommonGraphic
 		if (arg instanceof GraphMessage) //All Other GraphUpdates are handled in VGRaphCommons
 		{
 			if (Click!=null) 
-				Click.updateSubgraphList();
+				Click.update(o,arg);
 		}
 		else if (o.equals(gp)) //We got news from gp
 			handlePreferencesUpdate();

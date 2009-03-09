@@ -7,19 +7,23 @@ import java.awt.event.MouseEvent;
 
 import view.VCommonGraphic;
 import view.VGraphic;
+import view.VHyperGraphic;
 
 import model.MNode;
 import model.VGraph;
+import model.VHyperGraph;
 import model.VNode;
 /**
- * Handling left click on background to create nodes - all other click actions are in the superclass
+ * Additionally to the ClickMouseHandler
  * 
+ * his Class handles left Click on Background as Node Creation in V(Hyper)Graphs
  * 
  * @author Ronny Bergmann
  */
 public class OCMClickMouseHandler extends ClickMouseHandler {
 	
-	private VGraph vg;
+	private VGraph vg=null;
+	private VHyperGraph vhg = null;
 	private VCommonGraphic vgc;
 	private GeneralPreferences gp;
 		
@@ -31,6 +35,13 @@ public class OCMClickMouseHandler extends ClickMouseHandler {
 		gp = GeneralPreferences.getInstance();
 	}
 	
+	public OCMClickMouseHandler(VHyperGraphic g)
+	{
+		super(g);
+		vgc = g;
+		vhg = g.getGraph();
+		gp = GeneralPreferences.getInstance();
+	}
 	/*
 	 * Mouse Listener fuer Tastenaktionen
 	 */
@@ -38,17 +49,32 @@ public class OCMClickMouseHandler extends ClickMouseHandler {
 	public void mouseClicked(MouseEvent e) 
 	{
 		super.mouseClicked(e);
+		Point pointInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100)));
+		VNode r=null;
+		if (vg!=null) //Normal Graph
+			r = vg.modifyNodes.getFirstinRangeOf(pointInGraph);
+		else if (vhg!=null) //Hypergraph
+			r = vhg.modifyNodes.getFirstinRangeOf(pointInGraph);
+		else
+			return;
+
 		Point p = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //rausrechnen
 		if (e.getModifiers()==MouseEvent.BUTTON1_MASK) // Button 1/Links
 		{
-			VNode r = vg.modifyNodes.getFirstinRangeOf(p);
 			if (r==null) 
 			{	//Kein Knoten in der Nähe, also einen erstellen
-				int i= vg.getMathGraph().modifyNodes.getNextIndex();
-				//TODO: Semantisch nochmal überlegen, ob die Auswahl entfertn werden soll, so ein neuer Knoten erstellt wird
-				if ((vg.modifyEdges.hasSelection()||vg.modifyNodes.hasSelection()))
-					vg.deselect();
-				vg.modifyNodes.add(new VNode(i,p.x,p.y, gp.getIntValue("node.size"), gp.getIntValue("node.name_distance"), gp.getIntValue("node.name_rotation"), gp.getIntValue("node.name_size"), gp.getBoolValue("node.name_visible")), new MNode(i,gp.getNodeName(i)));
+				if (vg!=null)
+				{
+					int i = vg.getMathGraph().modifyNodes.getNextIndex();
+					vg.modifyNodes.add(new VNode(i,p.x,p.y, gp.getIntValue("node.size"), gp.getIntValue("node.name_distance"), gp.getIntValue("node.name_rotation"), gp.getIntValue("node.name_size"), gp.getBoolValue("node.name_visible")), new MNode(i,gp.getNodeName(i)));
+				}
+				else if (vhg!=null)
+				{
+					int i = vhg.getMathGraph().modifyNodes.getNextIndex();
+					vhg.modifyNodes.add(new VNode(i,p.x,p.y, gp.getIntValue("node.size"), gp.getIntValue("node.name_distance"), gp.getIntValue("node.name_rotation"), gp.getIntValue("node.name_size"), gp.getBoolValue("node.name_visible")), new MNode(i,gp.getNodeName(i)));
+				}
+				else
+					return;
 			}	
 		}
 	}	

@@ -1,26 +1,16 @@
 package control;
 
-import io.GeneralPreferences;
 
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Observable;
-import java.util.Observer;
 
 import view.VCommonGraphic;
 import view.VGraphic;
 import view.VHyperGraphic;
 
-import model.VEdge;
-import model.VGraph;
-import model.VGraphInterface;
-import model.VHyperEdge;
-import model.VHyperGraph;
-import model.VItem;
-import model.VNode;
-import model.Messages.GraphConstraints;
-import model.Messages.GraphMessage;
+import model.*;
+import model.Messages.*;
 
 /**
  * Handle Selection-Click-Stuff
@@ -28,15 +18,8 @@ import model.Messages.GraphMessage;
  * @author ronny
  *
  */
-public class SelectionClickListener implements MouseListener, Observer {
+public class SelectionClickListener implements MouseListener {
 
-	//Save Any Item that is clicked
-	private VNode selectedNode=null; 
-	private VEdge selectedEdge=null; 
-	private VHyperEdge selectedHyperEdge=null;
-	
-	private Point PopupCoordinates;
-	private GeneralPreferences gp;
 	VCommonGraphic vgc;
 	VGraph vg=null;
 	VHyperGraph vhg=null;
@@ -44,17 +27,13 @@ public class SelectionClickListener implements MouseListener, Observer {
 	public SelectionClickListener(VGraphic g)
 	{
 		vgc= g;
-		gp = GeneralPreferences.getInstance();
 		vg = g.getGraph();
-		vg.addObserver(this); //Sub
 	}
 
 	public SelectionClickListener(VHyperGraphic g)
 	{
 		vgc= g;
-		gp = GeneralPreferences.getInstance();
 		vhg = g.getGraph();
-		vhg.addObserver(this); //Sub
 	}
 
 	public void mouseClicked(MouseEvent e) {
@@ -104,6 +83,8 @@ public class SelectionClickListener implements MouseListener, Observer {
 					t.deselect();
 				notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));			
 			}
+			else
+				notify.deselect();
 		}
 		else if (e.getModifiers() == MouseEvent.BUTTON1_MASK) //Single Click
 		{
@@ -128,6 +109,4 @@ public class SelectionClickListener implements MouseListener, Observer {
 	public void mousePressed(MouseEvent e) {}
 
 	public void mouseReleased(MouseEvent e) {}
-
-	public void update(Observable o, Object arg) {}
 }
