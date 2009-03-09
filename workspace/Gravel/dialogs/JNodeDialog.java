@@ -487,7 +487,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 					}
 				}
 				Colorfield.setBackground(colour);
-				Colorfield.validate();
+				Colorfield.repaint();
 				return;
 			}
 		}

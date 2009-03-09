@@ -329,10 +329,12 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		{
 			JColorChooser t = new JColorChooser();
 			t.setPreviewPanel(new JLabel());
-			Colorfield.setBackground(JColorChooser.showDialog(t, "Farbe "+main.CONST.utf8_ae+"ndern",	Colorfield.getBackground()));
-			Colorfield.requestFocus();
+			Color c = JColorChooser.showDialog(t, "Farbe "+main.CONST.utf8_ae+"ndern",	Colorfield.getBackground());
+			if (c==null)
+				return;
+			Colorfield.setBackground(c);
+			Colorfield.validate();
 			Colorfield.repaint();
-			this.repaint();
 		}
 		if (event.getSource()==bCancel)
 		{

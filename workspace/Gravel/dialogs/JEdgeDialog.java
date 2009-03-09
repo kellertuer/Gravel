@@ -1002,6 +1002,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 					}
 				}
 				Colorfield.setBackground(colour);
+				Colorfield.repaint();
 				return;
 			}
 		}
