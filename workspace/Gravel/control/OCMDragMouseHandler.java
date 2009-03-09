@@ -26,12 +26,8 @@ public class OCMDragMouseHandler extends DragMouseHandler
 	private VGraph vg;
 	private VHyperGraph vhg;
 	private VCommonGraphic vgc;
-	private OCMNodeDragListener GraphNodeDragActions;
+	private NodeDragEdgeCreationListener GraphNodeDragActions;
 	private Point MouseOffSet;
-	private GeneralPreferences gp;
-	private VNode StartNode,DragNode;
-	
-	private boolean multiple, firstdrag;
 	/**
 	 * Initializes the Drag Handler to observe a specific VGraph
 	 * 
@@ -43,7 +39,7 @@ public class OCMDragMouseHandler extends DragMouseHandler
 		vgc = g;
 		vg = g.getGraph();
 		MouseOffSet = new Point(0,0);
-		GraphNodeDragActions = new OCMNodeDragListener(g);
+		GraphNodeDragActions = new NodeDragEdgeCreationListener(g);
 	}
 
 	/**

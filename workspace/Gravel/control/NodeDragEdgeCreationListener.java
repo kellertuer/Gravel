@@ -30,7 +30,7 @@ import model.Messages.GraphMessage;
  * 
  * @author Ronny Bergmann
  */
-public class OCMNodeDragListener implements MouseListener, MouseMotionListener 
+public class NodeDragEdgeCreationListener implements MouseListener, MouseMotionListener 
 {
 
 	private VGraph vg;
@@ -44,7 +44,7 @@ public class OCMNodeDragListener implements MouseListener, MouseMotionListener
 	 * 
 	 * @param g the vgraph
 	 */
-	public OCMNodeDragListener(VGraphic g)
+	public NodeDragEdgeCreationListener(VGraphic g)
 	{
 		vgc = g;
 		vg = g.getGraph();
