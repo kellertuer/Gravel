@@ -1,26 +1,11 @@
 package control;
 
-import io.GeneralPreferences;
-
-import java.awt.Color;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Vector;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 
 import view.*;
-import dialogs.*;
-import model.*;
-import model.Messages.*;
 
 /**
  * Super class for the mouse handler for mouseclicks

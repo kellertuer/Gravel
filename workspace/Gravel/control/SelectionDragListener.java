@@ -240,6 +240,53 @@ public class SelectionDragListener
 		//Only Case that remains is Alt&&Shift...don't handle that here
 	}
 
+	public void mouseDragged(MouseEvent e) {
+		
+		if ((altwaspressed)&&!(((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)))
+		{ //Drag begun with alt and was released
+			reset();
+			return;
+		}
+		if ((shiftwaspressed)&&!(((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK)))
+		{ //Drag begun with shift and released
+			reset();
+			return;
+		}
+		
+		//Handling selection Rectangle
+		if (selstart!=null)
+		{
+			//Update Rectangle
+			int rx,ry,rw,rh;
+			rx = Math.min(selstart.x,e.getPoint().x);				
+			ry = Math.min(selstart.y,e.getPoint().y);
+			rw = Math.abs(selstart.x-e.getPoint().x);
+			rh = Math.abs(selstart.y-e.getPoint().y);
+			selrect = new Rectangle(rx,ry,rw,rh);
+			if ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK)
+			 //Handle Shift selection
+				updateSelection(VItem.SOFT_SELECTED);	
+			else if ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)
+			 //Handle ALT Selection
+				updateSelection(VItem.SOFT_DESELECTED);				
+			else
+			 //weder shift noch alt -> Selektiertes auf SELECTED
+				updateSelection(VItem.SELECTED);
+			VGraphInterface notify=null;
+			if (vg!=null) //Normal Graph
+				notify = vg;
+			else if (vhg!=null) //Hypergraph
+				notify=vhg;
+
+			if (firstdrag) //If wirst drag - start Block
+				notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE,GraphConstraints.SELECTION));
+			else		//continnue Block
+				notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE,GraphConstraints.SELECTION));
+		}
+		MouseOffSet = e.getPoint();
+		firstdrag = false;
+	}
+
 	public void mouseReleased(MouseEvent e) {
 		//nur falls schon gedragged wurde nochmals draggen
 		if (!firstdrag)
@@ -285,56 +332,6 @@ public class SelectionDragListener
 			} //End while hyperedges
 		}		
 		reset();
-	}
-
-	public void mouseDragged(MouseEvent e) {
-		Point p = new Point(e.getPoint().x-MouseOffSet.x, e.getPoint().y-MouseOffSet.y);
-		int x = Math.round(p.x/((float)vgc.getZoom()/100)); //Zoom rausrechnen
-		int y = Math.round(p.y/((float)vgc.getZoom()/100));
-		
-		if ((altwaspressed)&&!(((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)))
-		{ //Drag begun with alt and was released
-			reset();
-			return;
-		}
-		if ((shiftwaspressed)&&!(((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK)))
-		{ //Drag begun with shift and released
-			reset();
-			return;
-		}
-		
-		//Handling selection Rectangle
-		if (selstart!=null)
-		{
-			//Update Rectangle
-			int rx,ry,rw,rh;
-			rx = Math.min(selstart.x,e.getPoint().x);				
-			ry = Math.min(selstart.y,e.getPoint().y);
-			rw = Math.abs(selstart.x-e.getPoint().x);
-			rh = Math.abs(selstart.y-e.getPoint().y);
-			selrect = new Rectangle(rx,ry,rw,rh);
-			if ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK)
-			 //Handle Shift selection
-				updateSelection(VItem.SOFT_SELECTED);	
-			else if ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)
-			 //Handle ALT Selection
-				updateSelection(VItem.SOFT_DESELECTED);				
-			else
-			 //weder shift noch alt -> Selektiertes auf SELECTED
-				updateSelection(VItem.SELECTED);
-			VGraphInterface notify=null;
-			if (vg!=null) //Normal Graph
-				notify = vg;
-			else if (vhg!=null) //Hypergraph
-				notify=vhg;
-
-			if (firstdrag) //If wirst drag - start Block
-				notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE,GraphConstraints.SELECTION));
-			else		//continnue Block
-				notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE,GraphConstraints.SELECTION));
-		}
-		MouseOffSet = e.getPoint();
-		firstdrag = false;
 	}
 
 	public void mouseMoved(MouseEvent e) {}
