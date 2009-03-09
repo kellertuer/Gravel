@@ -41,7 +41,10 @@ public class StandardClickMouseHandler extends ClickMouseHandler {
 
 	public void mousePressed(MouseEvent e) {}
 
-	public void mouseClicked(MouseEvent e) {}
+	public void mouseClicked(MouseEvent e)
+	{
+		super.mouseClicked(e);
+	}
 
 	public void mouseEntered(MouseEvent e) {}
 
