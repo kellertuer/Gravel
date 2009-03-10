@@ -717,10 +717,10 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 			EdgeWidth.setForeground(Color.GRAY);
 		bChEdgeWidth.setSelected(pre.getWidth()!=-1);iEdgeWidth.setEnabled(pre.getWidth()!=-1);
 		
-		cText.InitValues(pre);
+		cText.InitValues(pre.getTextProperties());
 		cText.updateUI(preEdgeShowTextgiven, preEdgeTextShowValuegiven);
 
-		cLine.InitValues(pre);
+		cLine.InitValues(pre.getLinestyle());
 		cLine.updateUI(preEdgeLineTypegiven);
 		
 		if (vg.getMathGraph().isDirected())

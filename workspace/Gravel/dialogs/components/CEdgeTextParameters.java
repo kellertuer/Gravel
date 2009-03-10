@@ -27,6 +27,7 @@ import dialogs.IntegerTextField;
 
 import model.VEdge;
 import model.VEdgeText;
+import model.VHyperEdge;
 /**
  * Container for the Parameters Fields of the Text Properties of an edge
  * @author ronny
@@ -49,9 +50,9 @@ public class CEdgeTextParameters extends Observable implements ActionListener, C
 	/**
 	 * Initialize the Parameter GUI with the Values of the arrow of Edge e
 	 * Choose null for General Preferences
-	 * @param e
+	 * @param t The TextStyle to be modified
 	 */
-	public CEdgeTextParameters(VEdge e, boolean g, boolean checks)
+	public CEdgeTextParameters(VEdgeText t, boolean g, boolean checks)
 	{
 		global = (!checks&&global);
 		checksEnabled = checks;
@@ -143,9 +144,9 @@ public class CEdgeTextParameters extends Observable implements ActionListener, C
 			c.gridx++;
 		}		
 		TextShowChoice = new ButtonGroup();
-		rShowValue = new JRadioButton("Kantengewicht");
+		rShowValue = new JRadioButton("Gewicht");
 		rShowValue.addActionListener(this);
-		rShowText = new JRadioButton("Kantenname");
+		rShowText = new JRadioButton("Name");
 		rShowText.addActionListener(this);
 		TextShowChoice.add(rShowValue); TextShowChoice.add(rShowText);
 		c.gridwidth=2;
@@ -161,7 +162,7 @@ public class CEdgeTextParameters extends Observable implements ActionListener, C
 		values = new Vector<Integer>(5);
 		values.setSize(6);
 		values.set(0,CEdgeTextParameters.CEDGETEXTPARAMETERS);
-		InitValues(e);
+		InitValues(t);
 	}
 	/**
 	 * get the GUI-Content
@@ -177,26 +178,25 @@ public class CEdgeTextParameters extends Observable implements ActionListener, C
 	 * 
 	 * @param e
 	 */
-	public void InitValues(VEdge e)
+	public void InitValues(VEdgeText e)
 	{
 		if (e!=null)
 		{
 			//	public static final int BSHOWTEXT=1, TEXTPOSITION=2, TEXTDISTANCE=3, BTEXTCHOICE=4, BTEXTVISIBLE=5;  
 
-			if (e.getTextProperties().isshowvalue())
+			if (e.isshowvalue())
 				values.set(BSHOWTEXTVALUE, 1);
 			else
 				values.set(BSHOWTEXTVALUE,0);
 			
-			values.set(TEXTPOSITION, e.getTextProperties().getPosition());
-			values.set(TEXTDISTANCE, e.getTextProperties().getDistance());
-			values.set(TEXTSIZE, e.getTextProperties().getSize());
+			values.set(TEXTPOSITION, e.getPosition());
+			values.set(TEXTDISTANCE, e.getDistance());
+			values.set(TEXTSIZE, e.getSize());
 			
-			if (e.getTextProperties().isVisible())
+			if (e.isVisible())
 				values.set(BTEXTVISIBLE, 1);
 			else
-				values.set(BTEXTVISIBLE,0);
-			
+				values.set(BTEXTVISIBLE,0);	
 		}
 		else
 		{
@@ -350,6 +350,38 @@ public class CEdgeTextParameters extends Observable implements ActionListener, C
 	 * @param e the Edge that should be modified 
 	 */
 	public VEdge modifyEdge(VEdge e)
+	{
+		if (!VerifyInput("a").equals(""))//do not check empty Text again
+			return null;
+		//Text bauen
+
+		if (checksEnabled)
+		{
+			VEdgeText t = e.getTextProperties();
+			if (bChShowText.isSelected())
+				t.setVisible(bShowText.isSelected());
+			if (bChTextChoice.isSelected())
+				t.setshowvalue(rShowValue.isSelected());
+			if (bChTextPosition.isSelected())
+				t.setPosition(iTextPosition.getValue());
+			if (bChTextDistance.isSelected())
+				t.setDistance(iTextDistance.getValue());
+			if (bChTextSize.isSelected())
+				t.setSize(iTextSize.getValue());
+			e.setTextProperties(t); //notwenidg ?
+		}
+		else
+		{
+			VEdgeText newtext = new VEdgeText(iTextDistance.getValue(),iTextPosition.getValue(), iTextSize.getValue(), bShowText.isSelected(), rShowValue.isSelected());
+			e.setTextProperties(newtext);
+		}
+		return e;
+	}
+	/**
+	 * modifies the given Edge to the Fields in this Container, if the Inputs are all valid
+	 * @param e the Edge that should be modified 
+	 */
+	public VHyperEdge modifyHyperEdge(VHyperEdge e)
 	{
 		if (!VerifyInput("a").equals(""))//do not check empty Text again
 			return null;

@@ -105,7 +105,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 	 * @param width width of the edge
 	 * @param vg corresponding vgraph
 	 */
-	public JEdgeDialog(int index, int start, int end, int width,VGraph vg)
+	public JEdgeDialog(int index, int start, int end, int width)
 	{
 		if (Gui.getInstance().getVGraph().getType()!=VGraphInterface.GRAPH)
 			return;
@@ -114,7 +114,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		oldstart = start;
 		oldend = end;
 		oldwidth = width;
-		graphref = vg;
+		graphref = (VGraph) Gui.getInstance().getVGraph();
 		oldText = new VEdgeText(); //Std-Werte
 		oldLinestyle = new VEdgeLinestyle();
 		CreateDialog(null, (VGraph) Gui.getInstance().getVGraph());
@@ -162,8 +162,8 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		buildEdgeRadioButtons();
 
 		cArrowP = new CEdgeArrowPreview(chEdge);
-		cText = new CEdgeTextParameters(chEdge,false,false); //nonglobal, no checks
-		cLine = new CEdgeLineParameters(chEdge,false,false); //nonglobal no checks
+		cText = new CEdgeTextParameters(chEdge.getTextProperties(),false,false); //nonglobal, no checks
+		cLine = new CEdgeLineParameters(chEdge.getLinestyle(),false,false); //nonglobal no checks
 		cText.addObserver(cArrowP);
 		cLine.addObserver(cArrowP);
 		

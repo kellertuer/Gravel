@@ -23,6 +23,7 @@ import dialogs.IntegerTextField;
 
 import model.VEdge;
 import model.VEdgeLinestyle;
+import model.VHyperEdge;
 /**
  * Container for the Parameters Fields of the Text Properties of an edge
  * @author ronny
@@ -48,7 +49,7 @@ public class CEdgeLineParameters extends Observable implements ActionListener, C
 	 * Choose null for General Preferences
 	 * @param e
 	 */
-	public CEdgeLineParameters(VEdge e, boolean g, boolean checks)
+	public CEdgeLineParameters(VEdgeLinestyle e, boolean g, boolean checks)
 	{
 		global = (g)&&(!checks); //global is only possible if there are no checkBoxes
 		checksEnabled = checks;
@@ -130,13 +131,13 @@ public class CEdgeLineParameters extends Observable implements ActionListener, C
 	 * 
 	 * @param e
 	 */
-	public void InitValues(VEdge e)
+	public void InitValues(VEdgeLinestyle e)
 	{
 		if (e!=null)
 		{
-			values.set(LINETYPE, e.getLinestyle().getType()-1);
-			values.set(LINELENGTH, e.getLinestyle().getLength());
-			values.set(LINEDISTANCE, e.getLinestyle().getDistance());
+			values.set(LINETYPE, e.getType()-1);
+			values.set(LINELENGTH, e.getLength());
+			values.set(LINEDISTANCE, e.getDistance());
 		}
 		else
 		{
@@ -263,7 +264,40 @@ public class CEdgeLineParameters extends Observable implements ActionListener, C
 		}
 		return e;
 	}
-	
+
+	/**
+	 * modifies the given Edge to the Fields in this Container, if the Inputs are all valid
+	 * @param e the Edge that should be modified 
+	 */
+	public VHyperEdge modifyHyperEdge(VHyperEdge e)
+	{
+		if (!VerifyInput().equals(""))
+			return null;
+		//Text bauen
+		if (checksEnabled)
+		{
+			VEdgeLinestyle actualline = e.getLinestyle(); //get old style
+			if (bChLineDistance.isSelected())
+				actualline.setDistance(iLineDistance.getValue());
+			if (bChLineLength.isSelected())
+				actualline.setLength(iLineLength.getValue());
+			if (bChLineType.isSelected())
+				actualline.setType(cLineTypes.getSelectedIndex()+1);
+			e.setLinestyle(actualline);
+		}
+		else
+		{
+			VEdgeLinestyle newline = e.getLinestyle(); //Set every value that is possible in the nonglobal case
+			if (global||(iLineLength.getValue()!=-1))
+				newline.setLength(iLineLength.getValue());
+			if (global||iLineDistance.getValue()!=-1)
+				newline.setDistance(iLineDistance.getValue());
+			newline.setType(cLineTypes.getSelectedIndex()+1);
+			e.setLinestyle(newline);
+		}
+		return e;
+	}
+
 	public void caretUpdate(CaretEvent event) 
 	{
 		if (event.getSource()==iLineLength)
