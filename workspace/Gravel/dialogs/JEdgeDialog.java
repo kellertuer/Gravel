@@ -140,6 +140,8 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		{
 			this.setTitle("Neue Kante erstellen");
 			chEdge = null;
+			cText = new CEdgeTextParameters(null,false,false); //nonglobal, no checks
+			cLine = new CEdgeLineParameters(null,false,false); //nonglobal no checks
 		}
 		else
 		{
@@ -153,6 +155,8 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 			oldText = e.getTextProperties().clone();
 			oldLinestyle = e.getLinestyle().clone(); 
 			this.setTitle("Eigenschaften der Kante '"+graphref.getMathGraph().modifyEdges.get(e.getIndex()).name+"' (#"+e.getIndex()+") von '"+graphref.getMathGraph().modifyNodes.get(oldstart).name+"'->'"+graphref.getMathGraph().modifyNodes.get(oldend).name+"'");	
+			cText = new CEdgeTextParameters(chEdge.getTextProperties(),false,false); //nonglobal, no checks
+			cLine = new CEdgeLineParameters(chEdge.getLinestyle(),false,false); //nonglobal no checks
 		}
 		
 		tabs = new JTabbedPane();
@@ -162,8 +166,6 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		buildEdgeRadioButtons();
 
 		cArrowP = new CEdgeArrowPreview(chEdge);
-		cText = new CEdgeTextParameters(chEdge.getTextProperties(),false,false); //nonglobal, no checks
-		cLine = new CEdgeLineParameters(chEdge.getLinestyle(),false,false); //nonglobal no checks
 		cText.addObserver(cArrowP);
 		cLine.addObserver(cArrowP);
 		
@@ -270,7 +272,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		c.anchor = GridBagConstraints.WEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		MainContent.add(new JLabel("Kantenindex"),c);
+		MainContent.add(new JLabel("Index"),c);
 		c.gridx = 1;
 		iEdgeIndex = new IntegerTextField();
 		iEdgeIndex.setPreferredSize(new Dimension(100, 20));

@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
@@ -18,6 +19,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import dialogs.JEdgeDialog;
+import dialogs.JHyperEdgeDialog;
 import dialogs.JNodeDialog;
 import dialogs.JSubgraphDialog;
 
@@ -28,6 +30,7 @@ import model.VEdge;
 import model.VGraph;
 import model.VHyperEdge;
 import model.VHyperGraph;
+import model.VItem;
 import model.VNode;
 import model.VSubgraph;
 import model.VSubgraphSet;
@@ -427,10 +430,6 @@ public class ContextMenuClickListener
 			else if (vhg!=null)
 				new JSubgraphDialog(vhg.getMathGraph().modifySubgraphs.getNextIndex(),gp.getSubgraphName(vhg.getMathGraph().modifySubgraphs.getNextIndex()),c,vhg);
 		}
-		if (e.getSource() ==BgCreateHyperEdgefromSel)
-		{
-			System.err.println("Neue Hyperkante - Dialog einbauen");
-		}
 	}
 
 	private void handleSubgraphItems(ActionEvent e)
@@ -498,10 +497,6 @@ public class ContextMenuClickListener
 			else if (vhg!=null)
 				vhg.modifyNodes.remove(selectedNode.getIndex());
 		}
-		if (e.getSource() == NCreateHyperEdgefromSel)
-		{
-			System.err.println("Neue Kante von selektierten Knoten erstellen...");
-		}
 	}
 	
 	private void handleEdgeItems(ActionEvent e)
@@ -522,7 +517,21 @@ public class ContextMenuClickListener
 		handleSubgraphItems(e);
 		handleNodeItems(e);
 		handleEdgeItems(e);
-		//Knoten oder Kantenmenü Auswahl löschen
+		if ((e.getSource()==BgCreateHyperEdgefromSel)||(e.getSource()==NCreateHyperEdgefromSel))
+		{
+			if (vhg!=null)
+			{
+				BitSet selNodes = new BitSet();
+				Iterator<VNode> nodeiter = vhg.modifyNodes.getIterator();
+				while (nodeiter.hasNext())
+				{
+					VNode actual = nodeiter.next();
+					if ((actual.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
+						selNodes.set(actual.getIndex());
+				}
+				new JHyperEdgeDialog(selNodes);
+			}
+		}
 		if ((e.getSource()==EDelSelection)||(e.getSource()==NDelSelection))
 		{
 			if (vg!=null)

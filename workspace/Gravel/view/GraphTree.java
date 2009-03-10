@@ -237,10 +237,13 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				t+=""+me.EndIndex;
 				Text.setText(t);
 			}
-			else if (vhG!=null)
-			{
+		}
+		else if (selectedNode.getParent().toString().equals("Hyperkanten"))
+		{
+			ParentType = USEEDGES;
+			int index = StringPos2Index(USEEDGES,selectedPosition);
+			if (vhG!=null)
 				Text.setText(vhG.getMathGraph().modifyHyperEdges.get(index).name);
-			}
 		}
 		else if (selectedNode.getParent().toString().equals("Untergraphen"))
 		{
@@ -252,7 +255,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			else if (vhG!=null)
 				Text.setText(vhG.getMathGraph().modifySubgraphs.get(index).getName());			
 		}
-		else if (true) //sonst kein menu anzeigen
+		else //sonst kein menu anzeigen
 		{
 			return;
 		}
@@ -275,8 +278,8 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				case USEEDGES : {
 					if (vG!=null)
 						new JEdgeDialog(vG.modifyEdges.get(StringPos2Index(ParentType,selectedPosition)),vG); 
-					else
-						System.err.println("TODO in GraphTree:281: Start HyperEdgeDialog");
+					else if (vhG!=null)
+						new JHyperEdgeDialog(vhG.modifyHyperEdges.get(StringPos2Index(ParentType,selectedPosition)));
 					break;
 					}
 				case USESUBGRAPHS :
