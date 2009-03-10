@@ -324,7 +324,7 @@ public class JFileDialogs implements Observer
 		{
 			File f = fc.getSelectedFile();
 			GravelMLWriter iw = new GravelMLWriter(((VGraphic)vGc).getGraph()); //Save the actual reference
-			//TODO Change to the next line if MLWriter done
+			//TODO Change to the next line if MLWriter HyperGraphCapable
 			//GravelMLWriter iw = new GravelMLWriter(vG);
 			
 			SaveAsDialog sad = new SaveAsDialog(Gui.getInstance().getParentWindow());

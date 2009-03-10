@@ -342,7 +342,8 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 		pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.ADDITION|GraphConstraints.BLOCK_START));
 		Iterator<VNode> iter = modifyNodes.getIterator();
 		int i = mG.modifyHyperEdges.getNextIndex();
-		MHyperEdge me = new MHyperEdge(i,GeneralPreferences.getInstance().getIntValue("edge.value"),"HE"+i); //TODO: VHyperGraph:addHyperEdge(SelNodes) Standardname					
+		MHyperEdge me = new MHyperEdge(i,GeneralPreferences.getInstance().getIntValue("edge.value"),"HE"+i);
+		//TODO: VHyperGraph:addHyperEdge(SelNodes) Standardname					
 		modifyHyperEdges.add(new VHyperEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), me);
 		while (iter.hasNext()) 
 		{

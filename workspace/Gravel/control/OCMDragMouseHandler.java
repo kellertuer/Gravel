@@ -1,17 +1,14 @@
 package control;
 
-import io.GeneralPreferences;
 
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-import view.VCommonGraphic;
 import view.VGraphic;
 import view.VHyperGraphic;
 
 import model.VGraph;
 import model.VHyperGraph;
-import model.VNode;
 /**
  * OneClick Handling of Mouse Drag actions
  * 
@@ -25,7 +22,6 @@ public class OCMDragMouseHandler extends DragMouseHandler
 
 	private VGraph vg;
 	private VHyperGraph vhg;
-	private VCommonGraphic vgc;
 	private NodeDragEdgeCreationListener GraphNodeDragActions;
 	private Point MouseOffSet;
 	/**
@@ -36,7 +32,6 @@ public class OCMDragMouseHandler extends DragMouseHandler
 	public OCMDragMouseHandler(VGraphic g)
 	{
 		super(g);
-		vgc = g;
 		vg = g.getGraph();
 		MouseOffSet = new Point(0,0);
 		GraphNodeDragActions = new NodeDragEdgeCreationListener(g);
@@ -50,7 +45,6 @@ public class OCMDragMouseHandler extends DragMouseHandler
 	public OCMDragMouseHandler(VHyperGraphic g)
 	{
 		super(g);
-		vgc = g;
 		vhg = g.getGraph();
 		MouseOffSet = new Point(0,0);
 	}

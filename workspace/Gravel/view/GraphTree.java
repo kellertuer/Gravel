@@ -268,8 +268,10 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			{
 				case USENODES : {
 					if (vG!=null)	
-						new JNodeDialog(vG.modifyNodes.get(StringPos2Index(ParentType,selectedPosition)),vG); break;}
-				//TODO else if VhG
+						new JNodeDialog(vG.modifyNodes.get(StringPos2Index(ParentType,selectedPosition)),vG); 
+					else if (vhG!=null)
+						new JNodeDialog(vhG.modifyNodes.get(StringPos2Index(ParentType,selectedPosition)),vhG); 
+					break;}
 				case USEEDGES : {
 					if (vG!=null)
 						new JEdgeDialog(vG.modifyEdges.get(StringPos2Index(ParentType,selectedPosition)),vG); 
@@ -281,7 +283,8 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				{
 					if (vG!=null)	
 						new JSubgraphDialog(vG.modifySubgraphs.get(StringPos2Index(ParentType,selectedPosition)),vG);
-				//TODO else if VhG
+					else if (vhG!=null)
+						new JSubgraphDialog(vhG.modifySubgraphs.get(StringPos2Index(ParentType,selectedPosition)),vhG);
 					break;
 				}
 				default : {return;}
@@ -310,7 +313,14 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			   {
 				   switch (ParentType) //Wo war das zuletzt
 					{
-						case USENODES : {vG.modifyNodes.remove(StringPos2Index(ParentType,selectedPosition)); updateNodes(); updateEdges(); break;}
+						case USENODES : {
+							if (vG!=null)
+								vG.modifyNodes.remove(StringPos2Index(ParentType,selectedPosition));
+							else if (vhG!=null)
+								vhG.modifyNodes.remove(StringPos2Index(ParentType,selectedPosition));							
+							updateNodes();
+							updateEdges();
+						break;}
 						case USEEDGES : {
 							if (vG!=null)
 								vG.modifyEdges.remove(StringPos2Index(ParentType,selectedPosition));
@@ -318,7 +328,13 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 								vhG.modifyHyperEdges.remove(StringPos2Index(ParentType,selectedPosition)); 
 							updateEdges();
 							break;}
-						case USESUBGRAPHS : {vG.modifySubgraphs.remove(StringPos2Index(ParentType,selectedPosition)); updateSubgraphs(); break;}
+						case USESUBGRAPHS : {
+							if (vG!=null)
+								vG.modifySubgraphs.remove(StringPos2Index(ParentType,selectedPosition)); 
+							else if (vhG!=null)	
+								vhG.modifySubgraphs.remove(StringPos2Index(ParentType,selectedPosition));
+							updateSubgraphs(); 									
+								break;}
 						default : {return;}
 					}
 			   }
@@ -367,17 +383,11 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				updateEdges();
 			}
 			if ((m.getAffectedElementTypes()&GraphConstraints.EDGE)==GraphConstraints.EDGE) //Kanten beteiligt
-			{
 				updateEdges();
-			}
 			if ((m.getAffectedElementTypes()&GraphConstraints.HYPEREDGE)==GraphConstraints.HYPEREDGE) //Kanten beteiligt
-			{
 				updateEdges();
-			}
 			if ((m.getAffectedElementTypes()&GraphConstraints.SUBGRAPH)==GraphConstraints.SUBGRAPH) //Sets beteiligt
-			{
 				updateSubgraphs();
-			}
 			if ((m.getAffectedElementTypes()&GraphConstraints.SELECTION)==GraphConstraints.SELECTION)
 			{
 				//updateSelection();

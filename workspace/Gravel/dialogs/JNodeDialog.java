@@ -36,8 +36,13 @@ import dialogs.components.CNodeNameParameters;
 import view.Gui;
 
 import model.MNode;
+import model.MSubgraphSet;
 import model.VGraph;
+import model.VGraphInterface;
+import model.VHyperGraph;
 import model.VNode;
+import model.VNodeSet;
+import model.VSubgraphSet;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
@@ -51,7 +56,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 	private static final long serialVersionUID = 423L;
 	private String oldname;
 	private int oldindex, oldx, oldy,oldsize; //Beim Abbrechen Wiederherstellen
-	private VGraph graphref;
+	private VGraphInterface graphref;
 	private IntegerTextField iNodeIndex,ixPos,iyPos,iSize;
 	private JTextField sname, Colorfield;
 
@@ -78,7 +83,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 	 * @param size node size (diameter
 	 * @param vg vgraph the node should be inserted into
 	 */
-	public JNodeDialog(int index,String name, int x, int y, int size, VGraph vg)
+	public JNodeDialog(int index,String name, int x, int y, int size, VGraphInterface vg)
 	{
 		chNode = null;
 		oldname = name;
@@ -95,7 +100,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 	 * @param v existing node that should be variated
 	 * @param vg VGRaph the node is placed in
 	 */
-	public JNodeDialog(VNode v, VGraph vg)
+	public JNodeDialog(VNode v, VGraphInterface vg)
 	{
 		graphref=vg;
 		CreateDialog(v);
@@ -120,7 +125,10 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 			oldx = v.getPosition().x;
 			oldy = v.getPosition().y;
 			oldsize = v.getSize();
-			oldname = graphref.getMathGraph().modifyNodes.get(oldindex).name;
+			if (graphref.getType()==VGraphInterface.GRAPH)
+				oldname = ((VGraph)graphref).getMathGraph().modifyNodes.get(oldindex).name;
+			else if (graphref.getType()==VGraphInterface.HYPERGRAPH)
+				oldname = ((VHyperGraph)graphref).getMathGraph().modifyNodes.get(oldindex).name;
 			this.setTitle("Eigenschaften des Knotens '"+oldname+"' (#"+v.getIndex()+")");	
 		}
 		
@@ -300,7 +308,14 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		subgraphlist = graphref.getMathGraph().modifySubgraphs.getNames();
+		MSubgraphSet subgraphs = null;
+		if (graphref.getType()==VGraphInterface.GRAPH)
+			subgraphs = ((VGraph)graphref).getMathGraph().modifySubgraphs;
+		else if (graphref.getType()==VGraphInterface.HYPERGRAPH)
+			subgraphs = ((VHyperGraph)graphref).getMathGraph().modifySubgraphs;
+		else
+			return;
+		subgraphlist = subgraphs.getNames();
 		int temp = 0;
 		for (int i=0; i<subgraphlist.size(); i++)
 		{
@@ -313,9 +328,9 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 		{
 			if (subgraphlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				SubgraphChecks[temp] = new JCheckBox(graphref.getMathGraph().modifySubgraphs.get(i).getName());
+				SubgraphChecks[temp] = new JCheckBox(subgraphs.get(i).getName());
 				if (chNode!=null)
-					SubgraphChecks[temp].setSelected(graphref.getMathGraph().modifySubgraphs.get(i).containsNode(chNode.getIndex()));
+					SubgraphChecks[temp].setSelected(subgraphs.get(i).containsNode(chNode.getIndex()));
 				CiSubgraphs.add(SubgraphChecks[temp],c);
 				SubgraphChecks[temp].addItemListener(this);
 				c.gridy++;
@@ -327,7 +342,6 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 		iSubgraphs.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		iSubgraphs.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		iSubgraphs.setPreferredSize(new Dimension(200,100));
-		
 	}
 	/**
 	 * handle the button and radio button actions
@@ -358,9 +372,25 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 					JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderungen am Knoten nicht m"+main.CONST.html_oe+"glich.<br><br>"+t+".</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);					
 				return;	
 			}
+			//For Check extract The Node and SubgraphSet from V(Hyper)Graph
+			VNodeSet nodes;
+			VSubgraphSet subgraphs;
+			if (graphref.getType()==VGraphInterface.GRAPH)
+			{
+				nodes = ((VGraph)graphref).modifyNodes;
+				subgraphs = ((VGraph)graphref).modifySubgraphs;
+			}
+			else if (graphref.getType()==VGraphInterface.HYPERGRAPH)
+			{
+				nodes = ((VHyperGraph)graphref).modifyNodes;
+				subgraphs = ((VHyperGraph)graphref).modifySubgraphs;
+			}
+			else
+				return;
 			if (chNode==null) //neuer Knoten, index testen
 			{
-				if (graphref.modifyNodes.get(iNodeIndex.getValue())!=null) //So einen gibt es schon
+
+				if (nodes.get(iNodeIndex.getValue())!=null) //So einen gibt es schon
 				{
 					JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Knotens nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -376,14 +406,14 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 					//Neuen Knoten einfuegen
 					VNode newnode = new VNode(iNodeIndex.getValue(),ixPos.getValue(), iyPos.getValue(), iSize.getValue(),0,0,0,false);
 					newnode = cNodeName.modifyNode(newnode);
-					graphref.modifyNodes.add(newnode, new MNode(newnode.getIndex(),sname.getText()));
+					nodes.add(newnode, new MNode(newnode.getIndex(),sname.getText()));
 				}
 			}
 			else //Knoten geaendert
 			{
 				if (oldindex != iNodeIndex.getValue()) //Der Benutzer hat den Index geaendert
 				{
-					if (graphref.modifyNodes.get(iNodeIndex.getValue())!=null) //So einen gibt es schon
+					if (nodes.get(iNodeIndex.getValue())!=null) //So einen gibt es schon
 					{
 						JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -393,22 +423,26 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 						JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Knotens nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index muss echt gr"+main.CONST.html_oe+""+main.CONST.html_sz+"er 0 sein.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 						return;					
 					}
-					graphref.pushNotify(new GraphMessage(GraphConstraints.NODE, GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, GraphConstraints.GRAPH_ALL_ELEMENTS));
-					graphref.modifyNodes.changeIndex(oldindex, iNodeIndex.getValue());
+					if (graphref.getType()==VGraphInterface.GRAPH)
+						graphref.pushNotify(new GraphMessage(GraphConstraints.NODE, GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, GraphConstraints.GRAPH_ALL_ELEMENTS));
+					else if (graphref.getType()==VGraphInterface.HYPERGRAPH)
+						graphref.pushNotify(new GraphMessage(GraphConstraints.NODE, GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, GraphConstraints.HYPERGRAPH_ALL_ELEMENTS));
+					nodes.changeIndex(oldindex, iNodeIndex.getValue());
 				}
 				else
 				{
 					graphref.pushNotify(new GraphMessage(GraphConstraints.NODE, iNodeIndex.getValue(), GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, GraphConstraints.NODE));
 				}
 				//Allgemeine Werte aktualisieren
-				graphref.getMathGraph().modifyNodes.get(iNodeIndex.getValue()).name = sname.getText();
-				VNode n = graphref.modifyNodes.get(iNodeIndex.getValue()); 
+				if (graphref.getType()==VGraphInterface.GRAPH)
+					((VGraph)graphref).getMathGraph().modifyNodes.get(iNodeIndex.getValue()).name = sname.getText();
+				else if (graphref.getType()==VGraphInterface.HYPERGRAPH)
+					((VHyperGraph)graphref).getMathGraph().modifyNodes.get(iNodeIndex.getValue()).name = sname.getText();
+				VNode n = nodes.get(iNodeIndex.getValue()); 
 				n.setPosition(new Point(ixPos.getValue(), iyPos.getValue()));
 				n.setSize(iSize.getValue());
 				//Knotennamenanzeigewerte
-				cNodeName.modifyNode(graphref.modifyNodes.get(iNodeIndex.getValue()));
-				
-
+				cNodeName.modifyNode(nodes.get(iNodeIndex.getValue()));
 			}
 			//Gruppen noch wieder aktualisieren
 			int temp = 0;
@@ -417,20 +451,19 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 				if (subgraphlist.elementAt(i)!=null) //Ein Untergraph mit dem Index existiert
 				{
 					if (SubgraphChecks[temp].isSelected())
-						graphref.modifySubgraphs.addNodetoSubgraph(iNodeIndex.getValue(), i);
+						subgraphs.addNodetoSubgraph(iNodeIndex.getValue(), i);
 					else //Sonst entfernen, da das nur geupdated wird oben !
-						graphref.modifySubgraphs.removeNodefromSubgraph(iNodeIndex.getValue(), i);
+						subgraphs.removeNodefromSubgraph(iNodeIndex.getValue(), i);
 					temp++; //Anzahl Knoten zaehlen
 				}
 			}
 			if (gp.getBoolValue("grid.orientated")&&gp.getBoolValue("grid.enabled"))
 			{ //Noch am Raster ausrichten, falls das aktiv ist
-				graphref.modifyNodes.get(iNodeIndex.getValue()).setPosition(gridsnap(iNodeIndex.getValue()));	
+				nodes.get(iNodeIndex.getValue()).setPosition(gridsnap(iNodeIndex.getValue()));	
 			}
 			graphref.pushNotify(new GraphMessage(GraphConstraints.NODE,GraphConstraints.BLOCK_END));
 			this.dispose();
-		}
-		
+		} //End Handling OK
 	}
 	/**
 	 * snap the variated/created node to a gridpoint
@@ -439,7 +472,13 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 	 */
 	private Point gridsnap(int nodeindex)
 	{
-		VNode movingNode = graphref.modifyNodes.get(iNodeIndex.getValue());
+		VNode movingNode;
+		if (graphref.getType()==VGraphInterface.GRAPH)
+			movingNode = ((VGraph)graphref).modifyNodes.get(iNodeIndex.getValue());
+		else if (graphref.getType()==VGraphInterface.HYPERGRAPH)
+			movingNode = ((VHyperGraph)graphref).modifyNodes.get(iNodeIndex.getValue());
+		else
+			return null;
 		int gridx = gp.getIntValue("grid.x");
 		int gridy = gp.getIntValue("grid.y");
 		int xdistanceupper = movingNode.getPosition().x%gridx;
@@ -457,9 +496,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 			newpos.y =  (new Double(Math.floor((double)movingNode.getPosition().y/(double)gridy)).intValue())*gridy;
 		return newpos;
 	}
-	/**
-	 * react on changes in subgraph-things, vary the color
-	 */
+
 	public void itemStateChanged(ItemEvent event) {
 		for (int i=0; i<SubgraphChecks.length; i++)
 		{
@@ -475,7 +512,13 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 					{
 						if (SubgraphChecks[temp].isSelected())
 						{
-							Color newc = graphref.modifySubgraphs.get(j).getColor();
+							Color newc;
+							if (graphref.getType()==VGraphInterface.GRAPH)
+								newc = ((VGraph)graphref).modifySubgraphs.get(j).getColor();
+							else if (graphref.getType()==VGraphInterface.HYPERGRAPH)
+								newc = ((VHyperGraph)graphref).modifySubgraphs.get(j).getColor();
+							else
+								return;
 							int b=colour.getBlue()*colourcount + newc.getBlue();
 							int a=colour.getAlpha()*colourcount + newc.getAlpha();
 							int g=colour.getGreen()*colourcount + newc.getGreen();

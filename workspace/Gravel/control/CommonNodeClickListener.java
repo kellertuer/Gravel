@@ -51,8 +51,8 @@ public class CommonNodeClickListener implements MouseListener {
 			{
 				if (vg!=null)
 					new JNodeDialog(r,vg);
-//				else
-//TODO					new JNodeDialog(r,vhg);
+				else
+					new JNodeDialog(r,vhg);
 			}
 		}
 	}

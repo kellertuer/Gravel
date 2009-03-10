@@ -396,8 +396,8 @@ public class ContextMenuClickListener
 			}
 			else if (vhg!=null)
 			{
-			//		int newindex = vhg.getMathGraph().modifyNodes.getNextIndex();
-			//TODO	new JNodeDialog(newindex,gp.getNodeName(newindex),PopupCoordinates.x,PopupCoordinates.y,gp.getIntValue("node.size"),vhg);
+					int newindex = vhg.getMathGraph().modifyNodes.getNextIndex();
+					new JNodeDialog(newindex,gp.getNodeName(newindex),PopupCoordinates.x,PopupCoordinates.y,gp.getIntValue("node.size"),vhg);
 			}
 			PopupCoordinates = new Point(0,0);
 		} 
@@ -424,8 +424,8 @@ public class ContextMenuClickListener
 			} while(colorgone);
 			if (vg!=null)
 				new JSubgraphDialog(vg.getMathGraph().modifySubgraphs.getNextIndex(),gp.getSubgraphName(vg.getMathGraph().modifySubgraphs.getNextIndex()),c,vg);
-//			else if (vhg!=null)
-//TODO:				new JSubgraphDialog(vg.getMathGraph().modifySubgraphs.getNextIndex(),gp.getSubgraphName(vg.getMathGraph().modifySubgraphs.getNextIndex()),c,vg);
+			else if (vhg!=null)
+				new JSubgraphDialog(vhg.getMathGraph().modifySubgraphs.getNextIndex(),gp.getSubgraphName(vhg.getMathGraph().modifySubgraphs.getNextIndex()),c,vhg);
 		}
 		if (e.getSource() ==BgCreateHyperEdgefromSel)
 		{
@@ -488,8 +488,8 @@ public class ContextMenuClickListener
 		{
 			if (vg!=null)
 				new JNodeDialog(selectedNode,vg);
-//			else
-//TODO				new JNodeDialog(selectedNode,vhg);
+			else
+				new JNodeDialog(selectedNode,vhg);
 		} 
 		//KnotenMenü : Knoten entfernen
 		if (e.getSource() == Ndelete) {

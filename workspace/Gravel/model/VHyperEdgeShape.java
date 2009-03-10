@@ -18,7 +18,6 @@ import javax.vecmath.Point3d;
  * - Min and Max of the Bounding Box of the ControlPolygon
  * - Addition (Refinement of Knots)
  *
- * - TODO Constructor with Interpolation-Points
  * - TODO Get&Set single CPs (when they're moved)
  * - TODO (needed?) get&set knots &weights
  * - TODO In/Decrease Degree of the polynonials 

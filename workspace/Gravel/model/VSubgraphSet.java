@@ -30,7 +30,6 @@ import model.Messages.GraphMessage;
 public class VSubgraphSet extends Observable implements Observer {
 
 	private TreeSet<VSubgraph> vSubgraphs;
-//	private Lock SubgraphLock; TODO: Think about the need of this lock
 	private MGraphInterface mG;
 	private int allgraphElements, edgeElement;
 	MSubgraphSet msubgraphs;
@@ -42,7 +41,6 @@ public class VSubgraphSet extends Observable implements Observer {
 	public VSubgraphSet(MGraphInterface g)
 	{
 		vSubgraphs = new TreeSet<VSubgraph>(new VSubgraph.SubgraphIndexComparator());
-//		SubgraphLock = new ReentrantLock();
 		mG = g;
 		if (mG.getType()==MGraphInterface.GRAPH)
 		{

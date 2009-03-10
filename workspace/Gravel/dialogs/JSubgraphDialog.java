@@ -32,12 +32,7 @@ import javax.swing.KeyStroke;
 
 import view.Gui;
 
-import model.MEdge;
-import model.MSubgraph;
-import model.VEdge;
-import model.VGraph;
-import model.VNode;
-import model.VSubgraph;
+import model.*;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
@@ -60,7 +55,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 	private JCheckBox[] nodechecks, edgechecks; //Array der Knotennamen und ob diese enthalten sind (CheckBoxes)
 	private JScrollPane iNodes, iEdges;
 	//Der Graph
-	private VGraph graphref;
+	private VGraphInterface graphref;
 	//Die Einfgabefelder
 	private IntegerTextField iSubgraphIndex;
 	private TextField iSubgraphName, Colorfield;
@@ -77,7 +72,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 	 * @param color	its color and the
 	 * @param vg	corresponding VGraph
 	 */
-	public JSubgraphDialog(int index, String name, Color color, VGraph vg)
+	public JSubgraphDialog(int index, String name, Color color, VGraphInterface vg)
 	{
 		chSubgraph = null;
 		oldindex = index;
@@ -91,48 +86,82 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 	 * @param s Subgraph in the
 	 * @param vg corresponding VGraph
 	 */
-	public JSubgraphDialog(VSubgraph s,VGraph vg)
+	public JSubgraphDialog(VSubgraph s,VGraphInterface vg)
 	{
 		CreateDialog(s,vg);
 	}
 	/**
 	 * Create and init the Dialog for a 
-	 * @param s given Subgraph
+	 * @param originalSubgraph given Subgraph
 	 * @param vG in a corresponding VGraph
 	 */
-	private void CreateDialog(VSubgraph s, VGraph vG)
+	private void CreateDialog(VSubgraph originalSubgraph, VGraphInterface vG)
 	{
 		graphref = vG;
+		VSubgraphSet subgraphs;
+		MSubgraphSet msubgraphs;
+		VNodeSet nodes;
+		VEdgeSet edges=null;
+		VHyperEdgeSet hyperedges=null;
+		
+		if (graphref.getType()==VGraphInterface.GRAPH)
+		{
+			nodes = ((VGraph)graphref).modifyNodes;
+			edges = ((VGraph)graphref).modifyEdges;
+			subgraphs = ((VGraph)graphref).modifySubgraphs;
+			msubgraphs = ((VGraph)graphref).getMathGraph().modifySubgraphs;
+		}
+		else if (graphref.getType()==VGraphInterface.HYPERGRAPH)
+		{
+			nodes = ((VHyperGraph)graphref).modifyNodes;
+			hyperedges = ((VHyperGraph)graphref).modifyHyperEdges;
+			subgraphs = ((VHyperGraph)graphref).modifySubgraphs;
+			msubgraphs = ((VHyperGraph)graphref).getMathGraph().modifySubgraphs;
+		}
+		else
+			return;
 		oldedges = new BitSet();
 		oldnodes = new BitSet();
-		if ((s!=null)&&(!vG.modifySubgraphs.get(s.getIndex()).equals(s))) //In diesem Graphen ist s gar nicht drin
-			s = null;
-		if (s==null)
+		if ((originalSubgraph!=null)&&(!subgraphs.get(originalSubgraph.getIndex()).equals(originalSubgraph))) //In diesem Graphen ist s gar nicht drin
+			originalSubgraph = null;
+		if (originalSubgraph==null)
 		{
 			this.setTitle("Neuen Untergraphen erstellen");
 			chSubgraph = null;
 		}
 		else
 		{
-			chSubgraph = s;
-			oldname = graphref.getMathGraph().modifySubgraphs.get(s.getIndex()).getName();
-			oldindex = s.getIndex();
-			oldcolor = s.getColor();
+			chSubgraph = originalSubgraph;
+			oldname = msubgraphs.get(originalSubgraph.getIndex()).getName();
+			oldindex = originalSubgraph.getIndex();
+			oldcolor = originalSubgraph.getColor();
 			//Knoten finden
-			Iterator<VNode> nodeiter = graphref.modifyNodes.getIterator();
+			Iterator<VNode> nodeiter = nodes.getIterator();
 			while (nodeiter.hasNext())
 			{
 				VNode n = nodeiter.next();
-				oldnodes.set(n.getIndex(),graphref.getMathGraph().modifySubgraphs.get(s.getIndex()).containsNode(n.getIndex()));
+				oldnodes.set(n.getIndex(),msubgraphs.get(originalSubgraph.getIndex()).containsNode(n.getIndex()));
 			}
 			//Kanten finden
-			Iterator <VEdge> edgeiter = graphref.modifyEdges.getIterator();
-			while (edgeiter.hasNext())
+			if (edges!=null)
 			{
-				VEdge e = edgeiter.next();
-				oldedges.set(e.getIndex(),graphref.getMathGraph().modifySubgraphs.get(s.getIndex()).containsEdge(e.getIndex()));
+				Iterator <VEdge> edgeiter = edges.getIterator();
+				while (edgeiter.hasNext())
+				{
+					VEdge e = edgeiter.next();
+					oldedges.set(e.getIndex(),msubgraphs.get(originalSubgraph.getIndex()).containsEdge(e.getIndex()));
+				}
 			}
-			this.setTitle("Eigenschaften des Untergraphen '"+graphref.getMathGraph().modifySubgraphs.get(s.getIndex()).getName()+"'");	
+			else if (hyperedges!=null)
+			{
+				Iterator <VHyperEdge> edgeiter = hyperedges.getIterator();
+				while (edgeiter.hasNext())
+				{
+					VHyperEdge e = edgeiter.next();
+					oldedges.set(e.getIndex(),msubgraphs.get(originalSubgraph.getIndex()).containsEdge(e.getIndex()));
+				}
+			}
+			this.setTitle("Eigenschaften des Untergraphen '"+msubgraphs.get(originalSubgraph.getIndex()).getName()+"'");	
 		}
 		
 		Container content = getContentPane();
@@ -183,7 +212,10 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		c.anchor = GridBagConstraints.CENTER;
 		content.add(new JLabel("Knoten"),c);
 		c.gridx=1;
-		content.add(new JLabel("Kanten"),c);
+		if (graphref.getType()==VGraphInterface.GRAPH)
+			content.add(new JLabel("Kanten"),c);
+		else if (graphref.getType()==VGraphInterface.HYPERGRAPH)
+			content.add(new JLabel("Hyperkanten"),c);
 		c.gridy++;
 		c.gridx=0;
 		c.anchor = GridBagConstraints.WEST;
@@ -213,7 +245,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 
 		c.gridx = 1;
 		c.anchor = GridBagConstraints.EAST;
-		if (s==null)
+		if (originalSubgraph==null)
 			bOK = new JButton("Untergraphen erstellen");
 		else
 			bOK = new JButton("<html>"+main.CONST.html_Ae+"nderungen speichern</html>");
@@ -253,7 +285,10 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		nodelist = graphref.getMathGraph().modifyNodes.getNames();
+		if (graphref.getType()==VGraphInterface.GRAPH)
+			nodelist = ((VGraph)graphref).getMathGraph().modifyNodes.getNames();
+		else if (graphref.getType()==VGraphInterface.HYPERGRAPH)
+			nodelist = ((VHyperGraph)graphref).getMathGraph().modifyNodes.getNames();
 		int temp = 0;
 		for (int i=0; i<nodelist.size(); i++)
 		{
@@ -266,7 +301,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		{
 			if (nodelist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				nodechecks[temp] = new JCheckBox(graphref.getMathGraph().modifyNodes.get(i).name+"   (#"+i+")");
+				nodechecks[temp] = new JCheckBox(nodelist.get(i)+"   (#"+i+")");
 				nodechecks[temp].setSelected(oldnodes.get(i));
 				CiNodes.add(nodechecks[temp],c);
 				c.gridy++;
@@ -292,7 +327,10 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		edgelist = graphref.getMathGraph().modifyEdges.getNames();
+		if (graphref.getType()==VGraphInterface.GRAPH)
+			edgelist = ((VGraph)graphref).getMathGraph().modifyEdges.getNames();
+		else if (graphref.getType()==VGraphInterface.HYPERGRAPH)
+			edgelist = ((VHyperGraph)graphref).getMathGraph().modifyHyperEdges.getNames();
 		int temp = 0;
 		for (int i=0; i<edgelist.size(); i++)
 		{
@@ -305,16 +343,24 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		{
 			if (edgelist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
-				MEdge me = graphref.getMathGraph().modifyEdges.get(i);
-				String actualname = "#"+me.StartIndex+" -";
-				if (graphref.getMathGraph().isDirected()) 
-					actualname+=">";
-				actualname +=" #"+me.EndIndex;
-				edgechecks[temp] = new JCheckBox(actualname);
+				String guiname="";
+				if (graphref.getType()==VGraphInterface.GRAPH)
+				{
+					MEdge me = ((VGraph)graphref).getMathGraph().modifyEdges.get(i);
+					guiname = "#"+me.StartIndex+" -";
+					if (((VGraph)graphref).getMathGraph().isDirected()) 
+						guiname+=">";
+					guiname +=" #"+me.EndIndex;
+				}
+				else if (graphref.getType()==VGraphInterface.HYPERGRAPH)
+				{
+					guiname = edgelist.get(i)+" (#"+i+")";
+				}
+				edgechecks[temp] = new JCheckBox(guiname);
 				edgechecks[temp].setSelected(oldedges.get(i));
 				CiEdges.add(edgechecks[temp],c);
 				c.gridy++;
-				temp++; //Anzahl Knoten zaehlen
+				temp++; //Anzahl Kanten zaehlen
 			}
 		}
 		iEdges = new JScrollPane(CiEdges);
@@ -342,6 +388,22 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		}
 		if (event.getSource()==bOK)
 		{
+			VSubgraphSet subgraphs;
+			int edgemsg, allelements;
+			if (graphref.getType()==VGraphInterface.GRAPH)
+			{
+				edgemsg = GraphConstraints.EDGE;
+				allelements = GraphConstraints.GRAPH_ALL_ELEMENTS;
+				subgraphs = ((VGraph)graphref).modifySubgraphs;
+			}
+			else if (graphref.getType()==VGraphInterface.HYPERGRAPH)
+			{
+				edgemsg = GraphConstraints.HYPEREDGE;
+				allelements = GraphConstraints.HYPERGRAPH_ALL_ELEMENTS;
+				subgraphs = ((VHyperGraph)graphref).modifySubgraphs;
+			}
+			else
+				return;
 			//Test, ob die notwendigen Felder ausgefuellt sind, das umfasst einen INdex und einen Namen
 			if ((iSubgraphIndex.getValue()==-1)||(iSubgraphName.equals("")))
 			{
@@ -356,7 +418,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 			}
 			// Farbe bereits vergeben ?
 			boolean colorgone = false;
-			Iterator<VSubgraph> siter = graphref.modifySubgraphs.getIterator();
+			Iterator<VSubgraph> siter = subgraphs.getIterator();
 			while (siter.hasNext())
 			{
 				if (siter.next().getColor().equals(Colorfield.getBackground())) //Farbe vergeben!
@@ -365,20 +427,20 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 			int SetIndex = iSubgraphIndex.getValue();
 			GraphMessage startblock;
 			if (chSubgraph==null)
-				startblock = new GraphMessage(GraphConstraints.SUBGRAPH, SetIndex, GraphConstraints.ADDITION|GraphConstraints.BLOCK_START, GraphConstraints.GRAPH_ALL_ELEMENTS);
+				startblock = new GraphMessage(GraphConstraints.SUBGRAPH, SetIndex, GraphConstraints.ADDITION|GraphConstraints.BLOCK_START, allelements);
 			else
 			{
 				if (SetIndex!=oldindex) //Index modify
-					startblock = new GraphMessage(GraphConstraints.SUBGRAPH, GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, GraphConstraints.GRAPH_ALL_ELEMENTS);
+					startblock = new GraphMessage(GraphConstraints.SUBGRAPH, GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,allelements);
 				else
-					startblock = new GraphMessage(GraphConstraints.SUBGRAPH, SetIndex, GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, GraphConstraints.GRAPH_ALL_ELEMENTS);
+					startblock = new GraphMessage(GraphConstraints.SUBGRAPH, SetIndex, GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, allelements);
 			}	
 			//TESTS
 			//1. Falls der Graph neu ist
 			if (chSubgraph==null) //neuer Untergraph, index testen
 			{
 				//Index bereits vergeben ?
-				if (graphref.modifySubgraphs.get(SetIndex)!=null) //So einen gibt es schon
+				if (subgraphs.get(SetIndex)!=null) //So einen gibt es schon
 				{
 					JOptionPane.showMessageDialog(this, "<html><p>Erstellen des Untergraphen Nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index #"+SetIndex+" ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -396,7 +458,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 			{
 				//Auswertung der neuen Daten, Pruefung auf Korrektheit
 				//Falls sich der UGindex geaendert hat darf dieser nicht vergeben sein
-				if ((graphref.modifySubgraphs.get(SetIndex)!=null)&&(SetIndex!=oldindex)) //So einen gibt es schon
+				if ((subgraphs.get(SetIndex)!=null)&&(SetIndex!=oldindex)) //So einen gibt es schon
 				{
 					JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung des Untergraphen nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -410,22 +472,22 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 				//Sonst läßt sich das alles ändern, also entfernen
 				startblock.setMessage("Untergraph #"+SetIndex+" verändert");
 				graphref.pushNotify(startblock);
-				graphref.modifySubgraphs.remove(oldindex);
+				subgraphs.remove(oldindex);
 			}
 			//Und (im zweiten Fall neu, sonst allgemein) einfuegen
 			//Sonst geht alles seiner Wege und wir fuegen den Untergraphen ein
 			VSubgraph vs = new VSubgraph(SetIndex,Colorfield.getBackground());
 			MSubgraph ms = new MSubgraph(SetIndex,iSubgraphName.getText());
-			graphref.modifySubgraphs.add(vs, ms);
+			subgraphs.add(vs, ms);
 			//Einfuegen der Knoten und Kanten in den Untergraphen
 			//Kanten
 			int temp = 0;
-			for (int i=0; i<edgelist.size(); i++)
+			for (int i=0; i<edgelist.size(); i++) //Works due to generality of the VSubGraphSet for both edges and hyperedges
 			{
 				if (edgelist.elementAt(i)!=null) //Eine Kante mit diesem Index existiert und sie ist selektiert
 				{
 					if (edgechecks[temp].isSelected())
-						graphref.modifySubgraphs.addEdgetoSubgraph(i, SetIndex);
+						subgraphs.addEdgetoSubgraph(i, SetIndex);
 					temp ++; //Anzahl Kanten zaehlen
 				}	
 
@@ -437,12 +499,12 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 				if (nodelist.elementAt(i)!=null) //Eine Knoten mit diesem Index existiert und sie ist selektiert
 				{
 					if (nodechecks[temp].isSelected())
-						graphref.modifySubgraphs.addNodetoSubgraph(i, SetIndex);
+						subgraphs.addNodetoSubgraph(i, SetIndex);
 					temp ++; //Anzahl Knoten zaehlen
 				}	
 				
 			}
-			graphref.pushNotify(new GraphMessage(GraphConstraints.SUBGRAPH,GraphConstraints.BLOCK_END, GraphConstraints.NODE|GraphConstraints.EDGE));
+			graphref.pushNotify(new GraphMessage(GraphConstraints.SUBGRAPH,GraphConstraints.BLOCK_END, GraphConstraints.NODE|edgemsg));
 			this.dispose();
 		}
 	}

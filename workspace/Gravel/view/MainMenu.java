@@ -125,7 +125,6 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         	mFile = new JMenu("Datei");
         	mFile.setMnemonic(KeyEvent.VK_D);         
         }
-        //TODO : Datei-> Neu mit Dialog?
         mFNew = new JMenuItem("Neuer Graph");
         mFNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, MenuAccModifier));
         if (!isMac) mFNew.setMnemonic(KeyEvent.VK_N);
