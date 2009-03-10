@@ -103,7 +103,9 @@ public class Gui implements WindowListener
 			}
 		}
 		else //don't load a Graph on start
-			MainGraph = new VGraph(gp.getBoolValue("graph.directed"),gp.getBoolValue("graph.allowloops"),gp.getBoolValue("graph.allowmultiple"));			
+		//	MainGraph = new VGraph(gp.getBoolValue("graph.directed"),gp.getBoolValue("graph.allowloops"),gp.getBoolValue("graph.allowmultiple"));			
+		//For Debug Start with a HyperGraph	
+			MainGraph = new VHyperGraph();
         //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.addWindowListener(this);        
         BorderLayout test = new BorderLayout();

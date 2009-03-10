@@ -183,14 +183,22 @@ public class StandardNodeDragListener  implements MouseListener, MouseMotionList
 		{
 			Point newpos = movingNode.getPosition();
 			newpos.translate(Gtransx,Gtransy); //Bewegung im Graphen aber mit Rungungsfehlern, also nur zurbetrachtung der Gesamtgraphbewegung
+			//For Graph Translation get the non-null into an graphinterface
+			VGraphInterface vgtr;
+			if (vg!=null)
+				vgtr = vg;
+			else if (vhg!=null)
+				vgtr = vhg;
+			else
+				return;
 			if (newpos.x < 0)
 			{
-				vg.translate(Math.abs(newpos.x), 0);
+				vgtr.translate(Math.abs(newpos.x), 0);
 				posInGraph.x=0;
 			}
 			if (newpos.y < 0)
 			{
-				vg.translate(0,Math.abs(newpos.y));
+				vgtr.translate(0,Math.abs(newpos.y));
 				posInGraph.y = 0;
 			}
 			if (vg!=null)
