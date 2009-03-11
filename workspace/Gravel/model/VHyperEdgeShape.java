@@ -124,6 +124,14 @@ public class VHyperEdgeShape {
 			controlPointsHom.add(newp);
 		}		
 	}
+	@SuppressWarnings("unchecked")
+	public VHyperEdgeShape clone()
+	{
+		Vector<Double> k = (Vector<Double>) Knots.clone();
+		Vector<Double> w = (Vector<Double>) cpWeight.clone();
+		Vector<Point2D> p = (Vector<Point2D>) controlPoints.clone();
+		return new VHyperEdgeShape(k,p,w,minDist);
+	}
 	/**
 	 * Get Maximum (bottom right edge) of the CP bunding box
 	 */
@@ -215,7 +223,7 @@ public class VHyperEdgeShape {
 			path.lineTo((new Double(f.x)).floatValue(), (new Double(f.y)).floatValue());
 			actual+=stepsize;
 		}
-	//	path.closePath();
+		path.closePath();
 		
 		return path;
 	}

@@ -1,11 +1,7 @@
 package control;
 
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Observable;
 import java.util.Observer;
-
-import view.*;
 
 /**
  * Super class for the mouse handler for mouseclicks
@@ -17,43 +13,7 @@ import view.*;
  * @author ronny
  *
  */
-public abstract class ClickMouseHandler implements MouseListener, Observer
+public interface  ClickMouseHandler extends MouseListener, Observer
 {
-	CommonNodeClickListener NodeMouseActions;
-	SelectionClickListener SelectionMouseActions;
-	ContextMenuClickListener PopupClickActions;
-
-	public ClickMouseHandler(VGraphic g)
-	{
-		NodeMouseActions = new CommonNodeClickListener(g);
-		SelectionMouseActions = new SelectionClickListener(g);;
-		PopupClickActions = new ContextMenuClickListener(g);
-	}
-
-	public ClickMouseHandler(VHyperGraphic hg)
-	{
-		NodeMouseActions = new CommonNodeClickListener(hg);
-		SelectionMouseActions = new SelectionClickListener(hg);;
-		PopupClickActions = new ContextMenuClickListener(hg);
-	}
-
-	public void mouseClicked(MouseEvent e)
-	{
-		NodeMouseActions.mouseClicked(e);
-		SelectionMouseActions.mouseClicked(e);
-		PopupClickActions.mouseClicked(e);
-	}
-
-	public void mousePressed(MouseEvent e) {}
-
-	public void mouseEntered(MouseEvent e) {}
-
-	public void mouseExited(MouseEvent e) {}
-
-	public void mouseReleased(MouseEvent e) {}
-
-	public void update(Observable o, Object arg)
-	{
-		PopupClickActions.update(o, arg);
-	}
+	
 }

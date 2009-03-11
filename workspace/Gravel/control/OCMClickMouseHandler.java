@@ -4,6 +4,7 @@ import io.GeneralPreferences;
 
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.util.Observable;
 
 import view.VCommonGraphic;
 import view.VGraphic;
@@ -20,16 +21,23 @@ import model.VNode;
  * 
  * @author Ronny Bergmann
  */
-public class OCMClickMouseHandler extends ClickMouseHandler {
+public class OCMClickMouseHandler implements ClickMouseHandler {
 	
 	private VGraph vg=null;
 	private VHyperGraph vhg = null;
 	private VCommonGraphic vgc;
 	private GeneralPreferences gp;
+	
+	CommonNodeClickListener NodeMouseActions;
+	SelectionClickListener SelectionMouseActions;
+	ContextMenuClickListener PopupClickActions;
+
 		
 	public OCMClickMouseHandler(VGraphic g)
 	{
-		super(g);
+		NodeMouseActions = new CommonNodeClickListener(g);
+		SelectionMouseActions = new SelectionClickListener(g);;
+		PopupClickActions = new ContextMenuClickListener(g);
 		vgc = g;
 		vg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
@@ -37,7 +45,9 @@ public class OCMClickMouseHandler extends ClickMouseHandler {
 	
 	public OCMClickMouseHandler(VHyperGraphic g)
 	{
-		super(g);
+		NodeMouseActions = new CommonNodeClickListener(g);
+		SelectionMouseActions = new SelectionClickListener(g);;
+		PopupClickActions = new ContextMenuClickListener(g);
 		vgc = g;
 		vhg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
@@ -48,7 +58,9 @@ public class OCMClickMouseHandler extends ClickMouseHandler {
 	public void mousePressed(MouseEvent e) {}
 	public void mouseClicked(MouseEvent e) 
 	{
-		super.mouseClicked(e);
+		NodeMouseActions.mouseClicked(e);
+		SelectionMouseActions.mouseClicked(e);
+		PopupClickActions.mouseClicked(e);
 		Point pointInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100)));
 		VNode r=null;
 		if (vg!=null) //Normal Graph
@@ -81,4 +93,9 @@ public class OCMClickMouseHandler extends ClickMouseHandler {
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
 	public void mouseReleased(MouseEvent e) {}
+	
+	public void update(Observable o, Object arg)
+	{
+		PopupClickActions.update(o, arg);
+	}	
 }

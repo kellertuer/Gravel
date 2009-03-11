@@ -1,6 +1,9 @@
 package control;
 
 
+import java.awt.event.MouseEvent;
+import java.util.Observable;
+
 import view.*;
 
 // import model.*;
@@ -14,26 +17,43 @@ import view.*;
  * @author Ronny Bergmann
  *
  */
-public class StandardClickMouseHandler extends ClickMouseHandler {
+public class StandardClickMouseHandler implements ClickMouseHandler {
 	
-//	private VGraph vg = null;
-//	private VHyperGraph vhg = null;
-//	private VCommonGraphic vgc;
+	CommonNodeClickListener NodeMouseActions;
+	SelectionClickListener SelectionMouseActions;
+	ContextMenuClickListener PopupClickActions;
+
 	/**
 	 * Initialize the given Standard Mode with an graph it is bound to 
 	 * @param g
 	 */
 	public StandardClickMouseHandler(VGraphic g)
 	{
-		super(g);
-//		vgc = g;
-//		vg = g.getGraph();
+		NodeMouseActions = new CommonNodeClickListener(g);
+		SelectionMouseActions = new SelectionClickListener(g);;
+		PopupClickActions = new ContextMenuClickListener(g);
 	}
 
 	public StandardClickMouseHandler(VHyperGraphic g)
 	{
-		super(g);
-//		vgc = g;
-//		vhg = g.getGraph();
+		NodeMouseActions = new CommonNodeClickListener(g);
+		SelectionMouseActions = new SelectionClickListener(g);;
+		PopupClickActions = new ContextMenuClickListener(g);
 	}
+	
+	public void mouseClicked(MouseEvent e)
+	{
+		NodeMouseActions.mouseClicked(e);
+		SelectionMouseActions.mouseClicked(e);
+		PopupClickActions.mouseClicked(e);
+	}
+
+	public void update(Observable o, Object arg)
+	{
+		PopupClickActions.update(o, arg);
+	}
+	public void mouseEntered(MouseEvent e) {}
+	public void mouseExited(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {}
 }

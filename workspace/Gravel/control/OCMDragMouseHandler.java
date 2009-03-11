@@ -2,6 +2,7 @@ package control;
 
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
 import view.VGraphic;
@@ -17,13 +18,16 @@ import model.VHyperGraph;
  * 
  * @author Ronny Bergmann
  */
-public class OCMDragMouseHandler extends DragMouseHandler
+public class OCMDragMouseHandler implements DragMouseHandler
 {
 
 	private VGraph vg;
 	private VHyperGraph vhg;
 	private NodeDragEdgeCreationListener GraphNodeDragActions;
 	private Point MouseOffSet;
+	private SelectionDragListener cSelectionDragActions;
+	private CommonNodeDragListener cNodeDragActions;
+	private CommonEdgeDragListener cEdgeDragActions;
 	/**
 	 * Initializes the Drag Handler to observe a specific VGraph
 	 * 
@@ -31,10 +35,12 @@ public class OCMDragMouseHandler extends DragMouseHandler
 	 */
 	public OCMDragMouseHandler(VGraphic g)
 	{
-		super(g);
 		vg = g.getGraph();
 		MouseOffSet = new Point(0,0);
 		GraphNodeDragActions = new NodeDragEdgeCreationListener(g);
+		cSelectionDragActions= new SelectionDragListener(g);
+		cNodeDragActions = new CommonNodeDragListener(g);
+		cEdgeDragActions = new CommonEdgeDragListener(g);
 	}
 
 	/**
@@ -44,9 +50,10 @@ public class OCMDragMouseHandler extends DragMouseHandler
 	 */
 	public OCMDragMouseHandler(VHyperGraphic g)
 	{
-		super(g);
 		vhg = g.getGraph();
 		MouseOffSet = new Point(0,0);
+		cSelectionDragActions= new SelectionDragListener(g);
+		cNodeDragActions = new CommonNodeDragListener(g);
 	}
 
 	/**
@@ -65,28 +72,42 @@ public class OCMDragMouseHandler extends DragMouseHandler
 	public boolean dragged()
 	{
 		if (vg!=null)
-			return (GraphNodeDragActions.dragged());
+			return (GraphNodeDragActions.dragged()||cEdgeDragActions.dragged()||cNodeDragActions.dragged()||cSelectionDragActions.dragged());
+		else if (vhg!=null)
+			return (cNodeDragActions.dragged()||cSelectionDragActions.dragged());
 		else
 			return false;
 	}
 	public void mouseDragged(MouseEvent e) {
-		super.mouseDragged(e);
+
+		cSelectionDragActions.mouseDragged(e);
+		cNodeDragActions.mouseDragged(e);
 		if (vg!=null)
+		{
+			cEdgeDragActions.mouseDragged(e);
 			GraphNodeDragActions.mouseDragged(e);
+		}
 	}
 
 	public void mousePressed(MouseEvent e) {
-		super.mousePressed(e);
+		cSelectionDragActions.mousePressed(e);
+		cNodeDragActions.mousePressed(e);
 		if (vg!=null)
+		{
+			cEdgeDragActions.mousePressed(e);
 			GraphNodeDragActions.mousePressed(e);
-
+		}
 		MouseOffSet = e.getPoint();
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		super.mouseReleased(e);
+		cSelectionDragActions.mouseReleased(e);
+		cNodeDragActions.mouseReleased(e);
 		if (vg!=null)
+		{
+			cEdgeDragActions.mouseReleased(e);
 			GraphNodeDragActions.mouseReleased(e);
+		}
 		MouseOffSet = new Point(0,0);
 	}
 
@@ -94,4 +115,12 @@ public class OCMDragMouseHandler extends DragMouseHandler
 	public void mouseClicked(MouseEvent e) {}
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
+
+	public Rectangle getSelectionRectangle() {
+		return cSelectionDragActions.getSelectionRectangle();
+	}
+
+	public void setGrid(int x, int y) {}
+
+	public void setGridOrientated(boolean b) {}
 }

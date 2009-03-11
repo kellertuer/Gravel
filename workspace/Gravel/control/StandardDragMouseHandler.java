@@ -2,12 +2,14 @@ package control;
 
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
 import view.VGraphic;
 import view.VHyperGraphic;
 
 import model.VGraph;
+import model.VHyperGraph;
 /**
  * Standard Mouse Drag Hanlder extends the DragMouseHandler to the standard actions
  *
@@ -15,13 +17,18 @@ import model.VGraph;
  * @author Ronny Bergmann
  *
  */
-public class StandardDragMouseHandler extends DragMouseHandler
+public class StandardDragMouseHandler implements DragMouseHandler
 {
 
 	private VGraph vg;
+	private VHyperGraph vhg;
 	private Point MouseOffSet;
-	private StandardNodeDragListener NodeDragActions;
-	private StandardEdgeDragListener EdgeDragActions;
+	private StandardNodeDragListener sNodeDragActions;
+	private StandardEdgeDragListener sEdgeDragActions;
+	SelectionDragListener cSelectionDragActions;
+	CommonNodeDragListener cNodeDragActions;
+	CommonEdgeDragListener cEdgeDragActions;
+
 	/**
 	 * Initializes the Handler to a given VGraph
 	 * 
@@ -29,11 +36,14 @@ public class StandardDragMouseHandler extends DragMouseHandler
 	 */
 	public StandardDragMouseHandler(VGraphic g)
 	{
-		super(g);
 		vg = g.getGraph();
 		MouseOffSet = new Point(0,0);
-		NodeDragActions = new StandardNodeDragListener(g);
-		EdgeDragActions = new StandardEdgeDragListener(g);
+		sNodeDragActions = new StandardNodeDragListener(g);
+		sEdgeDragActions = new StandardEdgeDragListener(g);
+		cSelectionDragActions= new SelectionDragListener(g);
+		cNodeDragActions = new CommonNodeDragListener(g);
+		cEdgeDragActions = new CommonEdgeDragListener(g);
+
 	}
 	/**
 	 * Initializes the Handler to a given VGraph
@@ -42,10 +52,11 @@ public class StandardDragMouseHandler extends DragMouseHandler
 	 */
 	public StandardDragMouseHandler(VHyperGraphic g)
 	{
-		super(g);
 		vhg = g.getGraph();
 		MouseOffSet = new Point(0,0);
-		NodeDragActions = new StandardNodeDragListener(g);		
+		sNodeDragActions = new StandardNodeDragListener(g);
+		cSelectionDragActions= new SelectionDragListener(g);
+		cNodeDragActions = new CommonNodeDragListener(g);
 	}
 
 	/**
@@ -65,9 +76,9 @@ public class StandardDragMouseHandler extends DragMouseHandler
 	public boolean dragged()
 	{
 		if (vg!=null)
-			return ((NodeDragActions.dragged())||(EdgeDragActions.dragged())||(super.dragged()));
+			return (sNodeDragActions.dragged()||sEdgeDragActions.dragged()||cEdgeDragActions.dragged()||cNodeDragActions.dragged()||cSelectionDragActions.dragged());
 		else if (vhg!=null)
-			return ((NodeDragActions.dragged())||(super.dragged()));
+			return ((sNodeDragActions.dragged())||cNodeDragActions.dragged()||cSelectionDragActions.dragged());
 		else
 			return false;
 	}
@@ -76,40 +87,57 @@ public class StandardDragMouseHandler extends DragMouseHandler
 	 */
 	public void setGridOrientated(boolean b)
 	{
-		NodeDragActions.setGridOrientated(b);
+		sNodeDragActions.setGridOrientated(b);
 	}	
 	/** update Gridinfo coordinate distances
 	 * 
 	 */
 	public void setGrid(int x, int y)
 	{
-		NodeDragActions.setGrid(x, y);
+		sNodeDragActions.setGrid(x, y);
 	}
 	/**
 	 * Handle a drag event, update the positions of moved nodes and theis adjacent edges
 	 */
 	public void mouseDragged(MouseEvent e) {
-		super.mouseDragged(e);
-		NodeDragActions.mouseDragged(e);
+
+		cSelectionDragActions.mouseDragged(e);
+		cNodeDragActions.mouseDragged(e);
+		sNodeDragActions.mouseDragged(e);
 		if (vg!=null)
-			EdgeDragActions.mouseClicked(e);
+		{
+			cEdgeDragActions.mouseDragged(e);
+			sEdgeDragActions.mouseDragged(e);
+		}
 		MouseOffSet = e.getPoint();
 	}
 	public void mousePressed(MouseEvent e) {
-		super.mousePressed(e);
-		NodeDragActions.mousePressed(e);
+		cSelectionDragActions.mousePressed(e);
+		cNodeDragActions.mousePressed(e);
+		sNodeDragActions.mousePressed(e);		
 		if (vg!=null)
-			EdgeDragActions.mousePressed(e);
+		{
+			cEdgeDragActions.mousePressed(e);
+			sEdgeDragActions.mousePressed(e);			
+		}
 	}
 	public void mouseReleased(MouseEvent e) {
-		super.mouseReleased(e);
-		NodeDragActions.mouseReleased(e);
+		cSelectionDragActions.mouseReleased(e);
+		cNodeDragActions.mouseReleased(e);
+		sNodeDragActions.mouseReleased(e);
 		if (vg!=null)
-			EdgeDragActions.mouseReleased(e);
+		{
+			cEdgeDragActions.mouseReleased(e);
+			sEdgeDragActions.mouseReleased(e);
+		}
 		MouseOffSet = new Point(0,0);
+	}
+	public Rectangle getSelectionRectangle() {
+		return cSelectionDragActions.getSelectionRectangle();
 	}
 	public void mouseMoved(MouseEvent arg0) {}
 	public void mouseClicked(MouseEvent e) {}
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
+
 }

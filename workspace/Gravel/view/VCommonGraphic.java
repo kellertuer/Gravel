@@ -36,6 +36,7 @@ public abstract class VCommonGraphic extends Component implements Observer
 	public static final int NO_MOUSEHANDLING = 0;
 	public static final int STD_MOUSEHANDLING = 1;
 	public static final int OCM_MOUSEHANDLING = 2;
+	public static final int CIRCLE_MOUSEHANDLING = 3;
 
 	public static final int VGRAPHIC = 1;
 	public static final int VHYPERGRAPHIC = 2;
@@ -139,12 +140,12 @@ public abstract class VCommonGraphic extends Component implements Observer
 	 * @param g the Graphic g
 	 * @param p at the Position of this point
 	 */
-	protected void drawCP(Graphics g, Point p)
+	protected void drawCP(Graphics g, Point p, Color c)
 	{
 		int cpsize = gp.getIntValue("vgraphic.cpsize");
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
-		g2.setColor(Color.BLUE);
+		g2.setColor(c);
 		g2.drawLine(Math.round((p.x-cpsize)*zoomfactor),Math.round(p.y*zoomfactor),Math.round((p.x+cpsize)*zoomfactor),Math.round(p.y*zoomfactor));
 		g2.drawLine(Math.round(p.x*zoomfactor),Math.round((p.y-cpsize)*zoomfactor),Math.round(p.x*zoomfactor),Math.round((p.y+cpsize)*zoomfactor));
 		
