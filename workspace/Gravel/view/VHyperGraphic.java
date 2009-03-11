@@ -170,6 +170,16 @@ public class VHyperGraphic extends VCommonGraphic
 
 			}
 		}
+		Vector<Object> param = new Vector<Object>();
+		param.setSize(NURBSShapeFactory.MAX_INDEX);
+		param.add(NURBSShapeFactory.CIRCLE_ORIGIN, new Point(Math.round((float)(200*zoomfactor)),Math.round((float)(200*zoomfactor))));
+		param.add(NURBSShapeFactory.CIRCLE_RADIUS, Math.round((float)(180*zoomfactor)));
+		param.add(NURBSShapeFactory.DISTANCE_TO_NODE,20);
+		VHyperEdgeShape circle = NURBSShapeFactory.CreateShape("Circle",param);
+		g2.setColor(Color.CYAN);
+		g2.setStroke(new BasicStroke(1*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		path = circle.getCurve(.002d);
+		g2.draw(path);
 	}
 	/**
 	 * @param g
