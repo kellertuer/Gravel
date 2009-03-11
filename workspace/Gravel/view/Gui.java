@@ -166,6 +166,7 @@ public class Gui implements WindowListener
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         graphpart.setSize(graphsize);
         graphpart.validate();
+        
         //Toolbar
         gToolBar = new MainToolbar(graphpart);
         gToolBar.setSize(new Dimension(window.width,gToolBar.getSize().height));

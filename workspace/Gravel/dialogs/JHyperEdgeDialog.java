@@ -70,6 +70,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		
 	private CEdgeLineParameters cLine;
 	private CEdgeTextParameters cText;
+	private CHyperEdgeShapeParameters shapeDialog;
 	private Container MainContent, TextContent;
 
 	private JTabbedPane tabs;
@@ -152,7 +153,12 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		
 		tabs.addTab("Allgemein", MainContent);
 		tabs.addTab("Ansicht", TextContent);
-
+		
+		VHyperGraph editClone = graphref.clone();
+		editClone.modifyHyperEdges.add(oldvhyperedge,oldmhyperedge);
+		shapeDialog = new CHyperEdgeShapeParameters(oldvhyperedge.getIndex(),editClone);
+		tabs.addTab("Umriss", shapeDialog.getContent());
+		
 		Container ContentPane = this.getContentPane();
 		ContentPane.setLayout(new GridBagLayout());
 		c.gridy=0;c.gridx=0;c.gridwidth=2;
