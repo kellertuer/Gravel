@@ -96,7 +96,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			}
 			Point p = (Point) Drag.getShapeParameters().get(NURBSShapeFactory.CIRCLE_ORIGIN);
 			Point p2 = Drag.getMouseOffSet();
-			if (p!=null)
+			if ((p!=null)&&(p2.x!=0)&&(p2.y!=0)) //Set per Drag
 			{
 				super.drawCP(g2, p,selColor);
 				GeneralPath path = new GeneralPath();
@@ -255,6 +255,11 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			return Drag.getShapeParameters();
 	else
 		return null;		
+	}
+	public void setShapeParameters(Vector<Object> p)
+	{
+		if (Drag!=null)
+			Drag.setShapeParameters(p);
 	}
 	protected Point DragMouseOffSet()
 	{

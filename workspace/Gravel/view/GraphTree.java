@@ -300,11 +300,11 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			{
 				case USENODES : {msg +="den Knoten <br> "+Knotennamen.elementAt(selectedPosition+1)+"<br>l"+main.CONST.html_oe+"schen ?"; break;}
 				case USEEDGES : {
-							msg +="die ";
+							msg +="Die ";
 							if (vG!=null)
 								msg+="Kante ";
 							else if (vhG!=null)
-								msg="Hyperkante ";
+								msg+="Hyperkante ";
 							msg +="<br>"+Kantennamen.elementAt(selectedPosition+1)+"<br>l"+main.CONST.html_oe+"schen ?"; 
 						break;}
 				case USESUBGRAPHS : {msg +="den Untergraphen "+Mengennamen.elementAt(selectedPosition+1)+"<br>l"+main.CONST.html_oe+"schen ?<br>(Knoten und Kanten bleiben bestehen)"; break;}

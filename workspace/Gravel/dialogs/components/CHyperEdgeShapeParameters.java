@@ -12,7 +12,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
 
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -23,7 +22,6 @@ import javax.swing.event.CaretListener;
 import dialogs.IntegerTextField;
 
 import view.VCommonGraphic;
-import view.VHyperGraphic;
 import view.VHyperShapeGraphic;
 
 import model.NURBSShapeFactory;
@@ -48,6 +46,11 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 	private IntegerTextField iDistance;
 	private JComboBox cBasicShape;
 	private JLabel Distance, BasicShape;
+	
+	private JLabel CircleOriginX, CircleOriginY, CircleRadius;
+	private IntegerTextField iCOrigX, iCOrigY, iCRad;
+	
+	private Container CircleFields;
 	/**
 	 * Create the Dialog for an hyperedge with index i
 	 * and the corresponding VHyperGraph
@@ -110,7 +113,54 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 		c.gridx++;
 		cont.add(cBasicShape,c);
 		
+		c.gridy++;
+		c.gridx=2;
+		c.gridwidth=2;
+		c.insets = new Insets(30,7,0,7);
+		buildCirclePanel();
+		cont.add(CircleFields,c);
+		CircleFields.setVisible(false);
 		cont.validate();
+	}
+	
+	private void buildCirclePanel()
+	{
+		CircleFields = new Container();
+		CircleFields.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(5,7,5,7);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridy = 0;
+		c.gridx = 0;
+		c.gridwidth=1;
+		c.gridheight=1;
+		iCOrigX = new IntegerTextField();
+		iCOrigX.addCaretListener(this);;
+		iCOrigX.setPreferredSize(new Dimension(100, 20));
+		CircleOriginX = new JLabel("<html><p>Mittelpunkt X</p></html>");
+		CircleFields.add(CircleOriginX,c);
+		c.gridx++;
+		CircleFields.add(iCOrigX,c);
+
+		c.gridy++;
+		c.gridx=0;
+		iCOrigY = new IntegerTextField();
+		iCOrigY.addCaretListener(this);;
+		iCOrigY.setPreferredSize(new Dimension(100, 20));
+		CircleOriginY = new JLabel("<html><p>Mittelpunkt Y</p></html>");
+		CircleFields.add(CircleOriginY,c);
+		c.gridx++;
+		CircleFields.add(iCOrigY,c);
+
+		c.gridy++;
+		c.gridx=0;
+		iCRad = new IntegerTextField();
+		iCRad.addCaretListener(this);;
+		iCRad.setPreferredSize(new Dimension(100, 20));
+		CircleRadius = new JLabel("<html><p>Radius</p></html>");
+		CircleFields.add(CircleRadius,c);
+		c.gridx++;
+		CircleFields.add(iCRad,c);
 	}
 	/**
 	 * get the GUI-Content
@@ -120,10 +170,22 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 	{
 		return cont;
 	}
-	public void caretUpdate(CaretEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void caretUpdate(CaretEvent e)
+	{
+		if ((e.getSource()==iCOrigX)||(e.getSource()==iCOrigY)||(e.getSource()==iCRad))
+		{
+			if ((iCOrigX.getValue()!=-1)&&(iCOrigY.getValue()!=-1)&&(iCRad.getValue()!=-1)&&(iDistance.getValue()!=-1))
+			{
+				Vector<Object> param = new Vector<Object>();
+				param.setSize(NURBSShapeFactory.MAX_INDEX);
+				param.add(NURBSShapeFactory.CIRCLE_ORIGIN, new Point(iCOrigX.getValue(), iCOrigY.getValue()));
+				param.add(NURBSShapeFactory.CIRCLE_RADIUS, iCRad.getValue());
+				param.add(NURBSShapeFactory.DISTANCE_TO_NODE,iDistance.getValue()); //TODO-Std Value			
+				Editfield.setShapeParameters(param);
+			}
+		}
 	}
+	
 	public void actionPerformed(ActionEvent e) {
 	        if (e.getSource()==cBasicShape)//ComboBox
 	        {
@@ -131,6 +193,12 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 	        	if (Shape.equals("Kreis"))
 	        	{
 	        		Editfield.setMouseHandling(VCommonGraphic.CIRCLE_MOUSEHANDLING);
+	        		CircleFields.setVisible(true);
+	        	}
+	        	else
+	        	{
+	        		Editfield.setMouseHandling(VCommonGraphic.NO_MOUSEHANDLING);
+	        		CircleFields.setVisible(false);
 	        	}
 	        }
 
@@ -139,14 +207,23 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 		if (arg instanceof GraphMessage) //All Other GraphUpdates are handled in VGRaphCommons
 		{
 			GraphMessage m = (GraphMessage) arg;
-			if ( ((String)cBasicShape.getSelectedItem()).equals("Kreis")
-				&& (m.getModifiedElementTypes()==GraphConstraints.SELECTION)
-				&&((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END))
+			if ((m.getModifiedElementTypes()==GraphConstraints.SELECTION)
+				&&((m.getModification()&GraphConstraints.UPDATE)==GraphConstraints.UPDATE))
 			{
+				if  (((String)cBasicShape.getSelectedItem()).equals("Kreis"))
+				{
 				Vector<Object> params = Editfield.getShapeParameters();
 				Point porig = (Point) params.get(NURBSShapeFactory.CIRCLE_ORIGIN);
 				int size = Integer.parseInt(params.get(NURBSShapeFactory.CIRCLE_RADIUS).toString());
-				System.err.println("Setting Point Values to "+porig.x+","+porig.y+" and Radius to "+size);
+				if (porig==null)
+						return;
+				if (porig.x!=iCOrigX.getValue())
+					iCOrigX.setValue(porig.x);
+				if (porig.y!=iCOrigY.getValue())
+					iCOrigY.setValue(porig.y);
+				if (size!=iCRad.getValue())
+					iCRad.setValue(size);
+				}
 			}
 		}
 		

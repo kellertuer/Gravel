@@ -87,6 +87,23 @@ public class CircleDragListener implements DragShapeMouseHandler {
 		param.add(NURBSShapeFactory.DISTANCE_TO_NODE,20); //TODO-Std Value
 		return param;
 	}
+	public void setShapeParameters(Vector<Object> p)
+	{
+		if (dragged())
+			return;
+		Point mp = (Point) p.get(NURBSShapeFactory.CIRCLE_ORIGIN);
+		int rad = Integer.parseInt(p.get(NURBSShapeFactory.CIRCLE_RADIUS).toString());
+		if ((mp!=null)&&(rad>0))
+		{
+			CircleOrigin = mp;
+			size = rad;
+			buildCircle();
+			if (vg!=null) //Normal Graph
+				vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE,GraphConstraints.SELECTION));
+			else if (vhg!=null) //Hypergraph
+				vhg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE,GraphConstraints.SELECTION));
+		}
+	}
 	public VHyperEdgeShape getShape()
 	{
 		return lastcircle;
