@@ -176,13 +176,21 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 	{
 		VHyperGraph clone = new VHyperGraph();
 		//Knoten
+		//Untergraphen
+		Iterator<VSubgraph> n1 = modifySubgraphs.getIterator();
+		while (n1.hasNext())
+		{
+			VSubgraph actualSet = n1.next().clone();
+			//Add it as an empty SubSet
+			clone.modifySubgraphs.add(actualSet, new MSubgraph(actualSet.index, mG.modifySubgraphs.get(actualSet.index).getName())); //Jedes Set kopieren
+		}
 		Iterator<VNode> n2 = modifyNodes.getIterator();
 		while (n2.hasNext())
 		{
 			VNode nodeclone = n2.next().clone();
 			clone.modifyNodes.add(nodeclone, mG.modifyNodes.get(nodeclone.getIndex()));
 			//In alle Sets einfuegen
-			Iterator<VSubgraph>n1 = modifySubgraphs.getIterator();
+			n1 = modifySubgraphs.getIterator();
 			while (n1.hasNext())
 			{
 				VSubgraph actualSet = n1.next();
@@ -198,20 +206,13 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 			MHyperEdge me = mG.modifyHyperEdges.get(cloneEdge.getIndex());
 			clone.modifyHyperEdges.add(cloneEdge, me);
 			//In alle Sets einfuegen
-			Iterator<VSubgraph> n1 = modifySubgraphs.getIterator();
+			n1 = modifySubgraphs.getIterator();
 			while (n1.hasNext())
 			{
 				VSubgraph actualSet = n1.next();
 				if (mG.modifySubgraphs.get(actualSet.index).containsEdge(cloneEdge.getIndex()))
 					clone.modifySubgraphs.addEdgetoSubgraph(cloneEdge.getIndex(), actualSet.getIndex()); //Jedes Set kopieren
 			}
-		}
-		//Untergraphen
-		Iterator<VSubgraph> n1 = modifySubgraphs.getIterator();
-		while (n1.hasNext())
-		{
-			VSubgraph actualSet = n1.next();
-			clone.modifySubgraphs.add(actualSet, mG.modifySubgraphs.get(actualSet.index)); //Jedes Set kopieren
 		}
 		//und zurückgeben
 		return clone;

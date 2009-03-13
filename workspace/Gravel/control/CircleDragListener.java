@@ -130,6 +130,8 @@ public class CircleDragListener implements DragShapeMouseHandler {
 		//Only if a Block was started: End it...
 		if ((CircleOrigin!=null)&&(!firstdrag)) //We had an Drag an a Circle was created, draw it one final time
 		{
+			CircleOrigin=null;
+			size = 0;
 			if (vg!=null)
 				vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.BLOCK_END));
 			else if (vhg!=null)

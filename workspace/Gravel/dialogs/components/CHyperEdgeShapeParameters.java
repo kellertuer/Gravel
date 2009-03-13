@@ -75,7 +75,7 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 		c.gridwidth=2;
 		c.gridheight=4;
 		Dimension d = new Dimension(400,400);
-		Editfield = new VHyperShapeGraphic(d,vhg);
+		Editfield = new VHyperShapeGraphic(d,vhg,index);
 		Editfield.setMouseHandling(VHyperShapeGraphic.NO_MOUSEHANDLING);
         //Das Ganze als Scrollpane
         JScrollPane scrollPane = new JScrollPane(Editfield);
@@ -169,6 +169,10 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 	public Container getContent()
 	{
 		return cont;
+	}
+	public void repaint()
+	{
+		cont.repaint();
 	}
 	public void caretUpdate(CaretEvent e)
 	{

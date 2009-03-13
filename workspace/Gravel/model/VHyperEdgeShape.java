@@ -227,6 +227,10 @@ public class VHyperEdgeShape {
 		
 		return path;
 	}
+	public boolean isEmpty()
+	{
+		return (Knots.isEmpty()||controlPoints.isEmpty()||cpWeight.isEmpty());
+	}
 	/**
 	 * Find the interval u \in [t.get(j),t.get(j+1)] and return the index j
 	 * 

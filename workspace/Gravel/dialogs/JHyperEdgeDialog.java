@@ -55,8 +55,9 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 {
 	private static final long serialVersionUID = 1L;
 
-	private MHyperEdge oldmhyperedge;
-	private VHyperEdge oldvhyperedge, chHyperEdge;
+	private MHyperEdge oldmhyperedge, refMHyperEdge;
+	private VHyperEdge oldvhyperedge, refVHyperEdge;
+	boolean isNewHyperedge;
 	private Vector<String> nodelist; //Zum rueckwaerts nachschauen des Indexes
 	private JCheckBox[] NodeChecks;
 	private JScrollPane iNode;
@@ -109,8 +110,9 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		if (Gui.getInstance().getVGraph().getType()!=VGraphInterface.HYPERGRAPH)
 			return;
 		graphref = (VHyperGraph)Gui.getInstance().getVGraph();
-		oldmhyperedge = graphref.getMathGraph().modifyHyperEdges.get(e.getIndex());
-		oldvhyperedge = e;
+		oldmhyperedge = graphref.getMathGraph().modifyHyperEdges.get(e.getIndex()).clone();
+		oldvhyperedge = e.clone();
+		e.copyColorStatus(oldvhyperedge);
 		CreateDialog(e);
 	}
 	/**
@@ -123,16 +125,16 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		if (e==null)
 		{
 			this.setTitle("Neue Hyperkante erstellen");
-			chHyperEdge = null;
+			isNewHyperedge=false;
 			cText = new CEdgeTextParameters(null,false,false); //nonglobal, no checks
 			cLine = new CEdgeLineParameters(null,false,false); //nonglobal no checks
 		}
 		else
 		{
-			chHyperEdge = e;
+			isNewHyperedge=true;
 			this.setTitle("Eigenschaften der Kante '"+oldmhyperedge.name+"' (#"+e.getIndex()+")");	
-			cText = new CEdgeTextParameters(chHyperEdge.getTextProperties(),false,false); //nonglobal, no checks
-			cLine = new CEdgeLineParameters(chHyperEdge.getLinestyle(),false,false); //nonglobal no checks
+			cText = new CEdgeTextParameters(oldvhyperedge.getTextProperties(),false,false); //nonglobal, no checks
+			cLine = new CEdgeLineParameters(oldvhyperedge.getLinestyle(),false,false); //nonglobal no checks
 		}
 		
 		tabs = new JTabbedPane();
@@ -155,8 +157,10 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		tabs.addTab("Ansicht", TextContent);
 		
 		VHyperGraph editClone = graphref.clone();
-		editClone.modifyHyperEdges.add(oldvhyperedge,oldmhyperedge);
-		shapeDialog = new CHyperEdgeShapeParameters(oldvhyperedge.getIndex(),editClone);
+		refVHyperEdge = oldvhyperedge.clone();
+		refMHyperEdge = oldmhyperedge.clone();
+		editClone.modifyHyperEdges.add(refVHyperEdge, refMHyperEdge);
+		shapeDialog = new CHyperEdgeShapeParameters(refVHyperEdge.getIndex(),editClone);
 		tabs.addTab("Umriss", shapeDialog.getContent());
 		
 		Container ContentPane = this.getContentPane();
@@ -284,12 +288,12 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		c.insets = new Insets(7,7,7,7);
 		c.gridwidth = 1;
 		
-		if (chHyperEdge==null)
+		if (isNewHyperedge)
 		{
 			Colorfield.setBackground(Color.BLACK);
 		}
 		else
-			Colorfield.setBackground(chHyperEdge.getColor());
+			Colorfield.setBackground(oldvhyperedge.getColor());
 		
 		//Werte einfuegen
 		iEdgeIndex.setValue(oldmhyperedge.index);
@@ -324,10 +328,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 			if (nodelist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
 				NodeChecks[temp] = new JCheckBox(nodelist.get(i));
-				if (chHyperEdge!=null)
-					NodeChecks[temp].setSelected(graphref.getMathGraph().modifyHyperEdges.get(chHyperEdge.getIndex()).containsNode(i));
-				else
-					NodeChecks[temp].setSelected(oldmhyperedge.containsNode(i));					
+				NodeChecks[temp].setSelected(oldmhyperedge.containsNode(i));					
 				CiNodes.add(NodeChecks[temp],c);
 				NodeChecks[temp].addItemListener(this);
 				c.gridy++;
@@ -366,8 +367,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 			if (subgraphlist.elementAt(i)!=null) //Ein Knoten mit dem Index existiert
 			{
 				SubgraphChecks[temp] = new JCheckBox(graphref.getMathGraph().modifySubgraphs.get(i).getName());
-				if (chHyperEdge!=null)
-					SubgraphChecks[temp].setSelected(graphref.getMathGraph().modifySubgraphs.get(i).containsEdge(chHyperEdge.getIndex()));
+				SubgraphChecks[temp].setSelected(graphref.getMathGraph().modifySubgraphs.get(i).containsEdge(oldvhyperedge.getIndex()));
 				CiSubgraphs.add(SubgraphChecks[temp],c);
 				SubgraphChecks[temp].addItemListener(this);
 				c.gridy++;
@@ -389,7 +389,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		if ((iEdgeIndex.getValue()==-1)||(iWidth.getValue()==-1)||(iValue.getValue()==-1))
 		{
 			String message = new String();
-			if (chHyperEdge ==null)
+			if (isNewHyperedge)
 				message = "<html><p>Erstellen der Kante nicht m"+main.CONST.html_oe+"glich.";
 			else
 				message = "<html><p>"+main.CONST.html_Ae+"ndern der Kante nicht m"+main.CONST.html_oe+"glich.";
@@ -412,7 +412,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 			return;
 		}
 		
-		if (chHyperEdge==null) //neuer Kante, index testen
+		if (isNewHyperedge) //neuer Kante, index testen
 		{
 			//Index bereits vergeben ?
 			if (graphref.modifyHyperEdges.get(iEdgeIndex.getValue())!=null) //So einen gibt es schon
@@ -466,7 +466,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		e = cText.modifyHyperEdge(e);
 		e = cLine.modifyHyperEdge(e);
 		//TODO Apply Shape
-		if (chHyperEdge!=null)//Change edge, end block
+		if (!isNewHyperedge)//Change edge, end block
 		{
 			if (oldmhyperedge.index==iEdgeIndex.getValue()) //Index not changed -> Just an EdgeReplace
 				graphref.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,oldmhyperedge.index,GraphConstraints.BLOCK_END,GraphConstraints.HYPEREDGE));
@@ -497,6 +497,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 				Color colour = Color.BLACK;
 				int colourcount = 0;
 				int temp = 0; //zum mitzaehlen
+				VHyperEdge colorsrc = new VHyperEdge(0,0);
 				for (int j=0; j<subgraphlist.size();j++)
 				{
 					if (subgraphlist.elementAt(j)!=null)
@@ -509,15 +510,42 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 							int g=colour.getGreen()*colourcount + newc.getGreen();
 							int r=colour.getRed()*colourcount + newc.getRed();
 							colourcount++;
+							colorsrc.addColor(newc);
 							colour = new Color((r/colourcount),(g/colourcount),(b/colourcount),(a/colourcount));
 						}
 							temp++;
 					}
 				}
 				Colorfield.setBackground(colour);
+				colorsrc.copyColorStatus(refVHyperEdge);
 				Colorfield.repaint();
 				return;
 			}
 		}
+		for (int i=0; i<NodeChecks.length; i++)
+		{
+			if (event.getSource()==NodeChecks[i]) //At least this Node Changed
+			{
+				System.err.print(i+" changed");
+				//Update all once
+				int temp=0; //Compressed index of Nodes
+				for (int j=0; j<nodelist.size();j++) //Real Index of Node
+				{
+					if (nodelist.elementAt(j)!=null)
+					{
+						if (temp==i)
+							System.err.println("#"+j);
+						if (NodeChecks[temp].isSelected()&&(!refMHyperEdge.containsNode(j)))
+								refMHyperEdge.addNode(j);
+						else if ((!NodeChecks[temp].isSelected())&&(refMHyperEdge.containsNode(j)))
+							refMHyperEdge.removeNode(j);
+						temp++;
+					}
+				}
+				shapeDialog.repaint();
+				return;
+			}
+		}
+		//End of Node Checks
 	}
 }

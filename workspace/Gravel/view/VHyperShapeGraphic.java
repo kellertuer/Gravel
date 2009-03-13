@@ -8,10 +8,13 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
+import java.util.Observable;
 import java.util.Vector;
 
 import control.*;
 import model.*;
+import model.Messages.GraphConstraints;
+import model.Messages.GraphMessage;
 
 /**
  * - Implementierung der Darstellung eines Hypergraphen in einer Graphics2D Umgebung
@@ -28,14 +31,14 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	private DragShapeMouseHandler Drag;
 	private ClickMouseHandler Click;
 	private static final long serialVersionUID = 1L;
-	private int actualMouseState;
+	private int actualMouseState, highlightedHyperEdge;
 	
 	/**
 	 * Create a New Graphical representation of an VGraph with a given size
 	 * @param d Size of the Area the VGraphics gets
 	 * @param Graph Graph to be represented
 	 */
-	public VHyperShapeGraphic(Dimension d,VHyperGraph Graph)
+	public VHyperShapeGraphic(Dimension d,VHyperGraph Graph, int hyperedgeindex)
 	{
 		super(d,Graph);
 		//GeneralPreferences als beobachter eintragen
@@ -44,7 +47,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		selColor = new Color(gp.getIntValue("vgraphic.selcolr"),gp.getIntValue("vgraphic.selcolg"),gp.getIntValue("vgraphic.selcolb"));
 		selWidth = gp.getIntValue("vgraphic.selwidth");
 		actualMouseState = NO_MOUSEHANDLING;
-
+		highlightedHyperEdge = hyperedgeindex;
 		vG = Graph;
 		vG.addObserver(this); //Die Graphikumgebung als Observer der Datenstruktur eintragen
 		//TODO: HistoryManager Umschreiben
@@ -62,7 +65,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-		paintDEBUG(g2);
+	//	paintDEBUG(g2);
 		paintMouseModeDetails(g2);
 	}
 	/**
@@ -75,10 +78,59 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		g2.setStroke(vHyperEdgeStyle);
 		while (ei.hasNext()) // drawEdges
 		{
-			VHyperEdge temp = ei.next(); //Grafischer Teil
+			VHyperEdge temp = ei.next();
+			if (temp.getIndex()==highlightedHyperEdge)
+				g2.setColor(temp.getColor());
+			else
+				g2.setColor(Color.GRAY);
+			g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			if (!temp.getShape().isEmpty())
+				g2.draw(temp.getShape().getCurve(.003d));
+		
 			//TODO Draw HyperEdge and only the actual one black the rest gray
 		}
 		//
+	}
+
+	//@override from VCommonGraphic to only draw Nodes from the hyperedge normal and all other Gray
+	protected void paintNodes(Graphics g)
+	{
+		Graphics2D g2 = (Graphics2D) g;
+		Iterator<VNode> nodeiter = vG.modifyNodes.getIterator();
+		MHyperEdge hEdge = vG.getMathGraph().modifyHyperEdges.get(highlightedHyperEdge);
+		if (hEdge==null)
+			return;
+		while (nodeiter.hasNext()) // drawNodes
+		{
+			VNode temp = nodeiter.next();
+
+			if (hEdge.containsNode(temp.getIndex())) //Colored Node?
+				g2.setColor(temp.getColor());
+			else
+				g2.setColor(Color.GRAY); 
+			g2.fillOval(Math.round(temp.getdrawpoint().x*zoomfactor), Math.round(temp.getdrawpoint().y*zoomfactor), Math.round(temp.getSize()*zoomfactor), Math.round(temp.getSize()*zoomfactor));
+			if (temp.isNameVisible())
+			{	
+				g2.setColor(Color.black);					
+				Font f = new Font("Arial",Font.PLAIN, Math.round(temp.getNameSize()*zoomfactor));
+				g2.setFont(f);
+				//mittelpunkt des Textes
+				int x = temp.getPosition().x + Math.round((float)temp.getNameDistance()*(float)Math.cos(Math.toRadians((double)temp.getNameRotation())));
+				int y = temp.getPosition().y - Math.round((float)temp.getNameDistance()*(float)Math.sin(Math.toRadians((double)temp.getNameRotation())));
+				
+				//System.err.println("For "+temp.getNameRotation()+" Degrees  and NameDistance "+temp.getNameDistance()
+				//					+" is ("+temp.getPosition().x+"+("+Math.round((float)temp.getNameDistance()*(float)Math.cos(Math.toRadians((double)temp.getNameRotation())))+") = "+x
+				//					+" and ("+temp.getPosition().y+"+"+Math.round((float)temp.getNameDistance()*(float)Math.sin(Math.toRadians((double)temp.getNameRotation())))+") = "+y);
+			    FontMetrics metrics = g2.getFontMetrics(f);
+			    int hgt = metrics.getAscent()-metrics.getLeading()-metrics.getDescent();
+			    int adv = metrics.stringWidth(vG.getMathGraph().modifyNodes.get(temp.getIndex()).name);
+			    x = Math.round(x*zoomfactor);
+			    y = Math.round(y*zoomfactor);
+			    x -= Math.round(adv/2); y += Math.round(hgt/2);
+				g2.drawString(vG.getMathGraph().modifyNodes.get(temp.getIndex()).name, x,y);
+				
+			}
+		}
 	}
 	
 	private void paintMouseModeDetails(Graphics2D g2)
@@ -98,7 +150,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			Point p2 = Drag.getMouseOffSet();
 			if ((p!=null)&&(p2.x!=0)&&(p2.y!=0)) //Set per Drag
 			{
-				super.drawCP(g2, p,selColor);
+			//	super.drawCP(g2, p,selColor);
 				GeneralPath path = new GeneralPath();
 				path.moveTo(p.x*zoomfactor,p.y*zoomfactor);
 				path.lineTo(p2.x,p2.y);
@@ -107,6 +159,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		}
 	}
 	//DEBUG
+	@SuppressWarnings("unused")
 	private void paintDEBUG(Graphics2D g2)
 	{
 		g2.setColor(Color.black);
@@ -267,5 +320,22 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				return Drag.getMouseOffSet();
 		else
 			return null;
+	}
+	public void update(Observable o, Object arg)
+	{
+		super.update(o, arg);
+		if (arg instanceof GraphMessage)
+		{
+			GraphMessage m = (GraphMessage)arg;
+			if ((Drag!=null)&&(!Drag.dragged())
+					&&(actualMouseState==VCommonGraphic.CIRCLE_MOUSEHANDLING)
+					&&((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) 
+			//Drag just ended -> Set Circle as Shape
+			{
+				vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(Drag.getShape().clone());
+				Drag.resetShape();
+				repaint();
+			}
+		}
 	}
 }
