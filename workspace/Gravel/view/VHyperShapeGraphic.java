@@ -98,7 +98,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		Graphics2D g2 = (Graphics2D) g;
 		Iterator<VNode> nodeiter = vG.modifyNodes.getIterator();
 		MHyperEdge hEdge = vG.getMathGraph().modifyHyperEdges.get(highlightedHyperEdge);
-		System.err.println(hEdge);
+	
 		if (hEdge==null)
 			return;
 		while (nodeiter.hasNext()) // drawNodes

@@ -78,10 +78,12 @@ public class VHyperGraphic extends VCommonGraphic
 		g2.setStroke(vHyperEdgeStyle);
 		while (ei.hasNext()) // drawEdges
 		{
-			VHyperEdge temp = ei.next(); //Grafischer Teil
-			//TODO Draw HyperEdge in their colors
+			VHyperEdge temp = ei.next();
+			g2.setColor(temp.getColor());
+			g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			if (!temp.getShape().isEmpty())
+				g2.draw(temp.getLinestyle().modifyPath(temp.getShape().getCurve(.003d),temp.getWidth(),zoomfactor));
 		}
-		//
 	}
 	/**
 	 * Get the represented Graph for manipulation.

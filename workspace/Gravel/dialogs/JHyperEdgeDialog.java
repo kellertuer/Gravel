@@ -161,6 +161,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		refMHyperEdge = oldmhyperedge.clone();
 		if (!isNewHyperedge)
 			editClone.modifyHyperEdges.remove(refVHyperEdge.getIndex());
+		
 		editClone.modifyHyperEdges.add(refVHyperEdge, refMHyperEdge);
 		refVHyperEdge = editClone.modifyHyperEdges.get(refVHyperEdge.getIndex()); //Because it might be cloned, update reference to clone
 		refMHyperEdge = editClone.getMathGraph().modifyHyperEdges.get(refVHyperEdge.getIndex()); //Because it might be cloned, update reference to clone
@@ -531,7 +532,6 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		{
 			if (event.getSource()==NodeChecks[i]) //At least this Node Changed
 			{
-				System.err.print(i+" changed");
 				//Update all once
 				int temp=0; //Compressed index of Nodes
 				for (int j=0; j<nodelist.size();j++) //Real Index of Node
