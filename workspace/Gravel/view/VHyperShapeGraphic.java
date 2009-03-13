@@ -85,7 +85,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				g2.setColor(Color.GRAY);
 			g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			if (!temp.getShape().isEmpty())
-				g2.draw(temp.getShape().getCurve(.003d));
+				g2.draw(temp.getLinestyle().modifyPath(temp.getShape().getCurve(.003d),temp.getWidth(),zoomfactor));
 		
 			//TODO Draw HyperEdge and only the actual one black the rest gray
 		}
@@ -98,6 +98,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		Graphics2D g2 = (Graphics2D) g;
 		Iterator<VNode> nodeiter = vG.modifyNodes.getIterator();
 		MHyperEdge hEdge = vG.getMathGraph().modifyHyperEdges.get(highlightedHyperEdge);
+		System.err.println(hEdge);
 		if (hEdge==null)
 			return;
 		while (nodeiter.hasNext()) // drawNodes
@@ -111,7 +112,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			g2.fillOval(Math.round(temp.getdrawpoint().x*zoomfactor), Math.round(temp.getdrawpoint().y*zoomfactor), Math.round(temp.getSize()*zoomfactor), Math.round(temp.getSize()*zoomfactor));
 			if (temp.isNameVisible())
 			{	
-				g2.setColor(Color.black);					
+				if (!g2.getColor().equals(Color.GRAY))
+						g2.setColor(Color.black);					
 				Font f = new Font("Arial",Font.PLAIN, Math.round(temp.getNameSize()*zoomfactor));
 				g2.setFont(f);
 				//mittelpunkt des Textes

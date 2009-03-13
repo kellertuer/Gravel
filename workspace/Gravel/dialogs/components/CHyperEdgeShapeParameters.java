@@ -173,6 +173,7 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 	public void repaint()
 	{
 		cont.repaint();
+		
 	}
 	public void caretUpdate(CaretEvent e)
 	{

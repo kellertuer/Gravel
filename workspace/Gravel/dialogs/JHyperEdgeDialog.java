@@ -159,7 +159,12 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		VHyperGraph editClone = graphref.clone();
 		refVHyperEdge = oldvhyperedge.clone();
 		refMHyperEdge = oldmhyperedge.clone();
+		if (!isNewHyperedge)
+			editClone.modifyHyperEdges.remove(refVHyperEdge.getIndex());
 		editClone.modifyHyperEdges.add(refVHyperEdge, refMHyperEdge);
+		refVHyperEdge = editClone.modifyHyperEdges.get(refVHyperEdge.getIndex()); //Because it might be cloned, update reference to clone
+		refMHyperEdge = editClone.getMathGraph().modifyHyperEdges.get(refVHyperEdge.getIndex()); //Because it might be cloned, update reference to clone
+	
 		shapeDialog = new CHyperEdgeShapeParameters(refVHyperEdge.getIndex(),editClone);
 		tabs.addTab("Umriss", shapeDialog.getContent());
 		
