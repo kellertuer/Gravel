@@ -247,7 +247,6 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		}
 		else if (selectedNode.getParent().toString().equals("Untergraphen"))
 		{
-			//System.err.println("")
 			ParentType = USESUBGRAPHS;
 			int index = StringPos2Index(USESUBGRAPHS,selectedPosition);
 			if (vG!=null)

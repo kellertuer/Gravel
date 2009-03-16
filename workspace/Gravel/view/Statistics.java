@@ -251,7 +251,6 @@ public class Statistics extends JPanel implements Observer, ActionListener
 			//ersteres verhindert rekursion im Term zweiteres direkte Rekursion
 			s = replace(s, actKey, new Double(interprete(formeln.get(actKey))).toString());
 		}
-		//System.err.println("...evaluating "+s);
 		return evaluate(s);
 	}
 	/**

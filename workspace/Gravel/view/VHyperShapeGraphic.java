@@ -86,8 +86,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			if (!temp.getShape().isEmpty())
 				g2.draw(temp.getLinestyle().modifyPath(temp.getShape().getCurve(.003d),temp.getWidth(),zoomfactor));
-		
-			//TODO Draw HyperEdge and only the actual one black the rest gray
 		}
 	}
 
@@ -119,9 +117,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				int x = temp.getPosition().x + Math.round((float)temp.getNameDistance()*(float)Math.cos(Math.toRadians((double)temp.getNameRotation())));
 				int y = temp.getPosition().y - Math.round((float)temp.getNameDistance()*(float)Math.sin(Math.toRadians((double)temp.getNameRotation())));
 				
-				//System.err.println("For "+temp.getNameRotation()+" Degrees  and NameDistance "+temp.getNameDistance()
-				//					+" is ("+temp.getPosition().x+"+("+Math.round((float)temp.getNameDistance()*(float)Math.cos(Math.toRadians((double)temp.getNameRotation())))+") = "+x
-				//					+" and ("+temp.getPosition().y+"+"+Math.round((float)temp.getNameDistance()*(float)Math.sin(Math.toRadians((double)temp.getNameRotation())))+") = "+y);
 			    FontMetrics metrics = g2.getFontMetrics(f);
 			    int hgt = metrics.getAscent()-metrics.getLeading()-metrics.getDescent();
 			    int adv = metrics.stringWidth(vG.getMathGraph().modifyNodes.get(temp.getIndex()).name);
@@ -177,6 +172,10 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
 		}
 		s.scale(1/zoomfactor);
+	}
+	public int getMouseHandling()
+	{
+		return actualMouseState;
 	}
 	//MOdified to only Handle those shape stati
 	public void setMouseHandling(int state) {
@@ -255,7 +254,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 					&&((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) 
 			//Drag just ended -> Set Circle as Shape
 			{
-				vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(Drag.getShape().clone());
+				vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(Drag.getShape());
 				Drag.resetShape();
 				repaint();
 			}

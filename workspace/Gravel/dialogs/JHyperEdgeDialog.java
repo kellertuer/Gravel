@@ -122,16 +122,15 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 	private void CreateDialog(VHyperEdge e)
 	{
 		graphref = (VHyperGraph)Gui.getInstance().getVGraph();
-		if (e==null)
+		isNewHyperedge = (e==null);
+		if (isNewHyperedge)
 		{
 			this.setTitle("Neue Hyperkante erstellen");
-			isNewHyperedge=false;
 			cText = new CEdgeTextParameters(null,false,false); //nonglobal, no checks
 			cLine = new CEdgeLineParameters(null,false,false); //nonglobal no checks
 		}
 		else
 		{
-			isNewHyperedge=true;
 			this.setTitle("Eigenschaften der Kante '"+oldmhyperedge.name+"' (#"+e.getIndex()+")");	
 			cText = new CEdgeTextParameters(oldvhyperedge.getTextProperties(),false,false); //nonglobal, no checks
 			cLine = new CEdgeLineParameters(oldvhyperedge.getLinestyle(),false,false); //nonglobal no checks
@@ -442,21 +441,22 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 				graphref.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.HYPEREDGE));
 			graphref.modifyHyperEdges.remove(oldmhyperedge.index);
 		}
-		//hinzufuegen
-		VHyperEdge addEdge = new VHyperEdge(iEdgeIndex.getValue(),iWidth.getValue());
-		 graphref.modifyHyperEdges.add(
-				 addEdge,
-				 new MHyperEdge(addEdge.getIndex(),iValue.getValue(),EdgeName.getText()));		//Gruppen einbauen
+		VHyperEdge addEdge = new VHyperEdge (iEdgeIndex.getValue(), iWidth.getValue(), shapeDialog.getActualEdge().getShape().clone(), new VEdgeText(), new VEdgeLinestyle());
+
+		MHyperEdge mathEdge = new MHyperEdge(addEdge.getIndex(),iValue.getValue(),EdgeName.getText());
 		int temp=0;
 		for (int i=0; i<nodelist.size(); i++)
 		{
 			if (nodelist.elementAt(i)!=null) //Ein Untergraph mit dem Index existiert
 			{
 				if (NodeChecks[temp].isSelected())
-					graphref.getMathGraph().modifyHyperEdges.get(iEdgeIndex.getValue()).addNode(i);
+					mathEdge.addNode(i);
 				temp++; //Position at vector
 			}
 		}
+		addEdge.setWidth(iWidth.getValue());
+		graphref.modifyHyperEdges.add(
+				 addEdge,mathEdge);		//Gruppen einbauen
 		temp=0;
 		for (int i=0; i<subgraphlist.size(); i++)
 		{
@@ -469,7 +469,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		}
 		//Text bauen
 		VHyperEdge e = graphref.modifyHyperEdges.get(iEdgeIndex.getValue());
-		e = cText.modifyHyperEdge(e);
+//TODO Not yet active		e = cText.modifyHyperEdge(e);
 		e = cLine.modifyHyperEdge(e);
 		//TODO Apply Shape
 		if (!isNewHyperedge)//Change edge, end block

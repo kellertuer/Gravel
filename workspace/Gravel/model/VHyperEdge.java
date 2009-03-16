@@ -126,21 +126,6 @@ public class VHyperEdge extends VItem {
 		return new VHyperEdge(getIndex(), width, shape, text.clone(), linestyle.clone());
 	}
 	/**
-	 * getPointonEdge
-	 * returns the point that is at the given part from the Start Point
-	 * So the point is on the edge at edge.lengt * part
-	 * 
-	 * @param part distance in % of the edge length from the start to the point required on the edge
-	 * @return the point at the adge at given part
-	 */
-	public Point getPointonEdge(double part)
-	{	
-		if (shape==null)
-			return null;
-		else
-			return null; //TODO shape.CurveAt((t.lastElement - t.get(0))*part);
-	}
-	/**
 	 * getDirectionatPointonEdge
 	 * returns the Direction the edge has at the point that is at the given part from the Start Point
 	 * So the direction is on the edge at edge.lengt * part

@@ -121,9 +121,6 @@ public abstract class VCommonGraphic extends Component implements Observer
 				int x = temp.getPosition().x + Math.round((float)temp.getNameDistance()*(float)Math.cos(Math.toRadians((double)temp.getNameRotation())));
 				int y = temp.getPosition().y - Math.round((float)temp.getNameDistance()*(float)Math.sin(Math.toRadians((double)temp.getNameRotation())));
 				
-				//System.err.println("For "+temp.getNameRotation()+" Degrees  and NameDistance "+temp.getNameDistance()
-				//					+" is ("+temp.getPosition().x+"+("+Math.round((float)temp.getNameDistance()*(float)Math.cos(Math.toRadians((double)temp.getNameRotation())))+") = "+x
-				//					+" and ("+temp.getPosition().y+"+"+Math.round((float)temp.getNameDistance()*(float)Math.sin(Math.toRadians((double)temp.getNameRotation())))+") = "+y);
 			    FontMetrics metrics = g2.getFontMetrics(f);
 			    int hgt = metrics.getAscent()-metrics.getLeading()-metrics.getDescent();
 			    int adv = metrics.stringWidth(mnodes.get(temp.getIndex()).name);
@@ -256,7 +253,6 @@ public abstract class VCommonGraphic extends Component implements Observer
 			Rectangle r = vp.getViewRect();
 			if ((DragMouseOffSet()!=null)&&(!r.contains(MouseOffSet)))	
 			{		
-				//System.err.print("Move Me : "+r+" and "+MouseOffSet);
 				int xdiff = MouseOffSet.x-r.x-r.width;
 				if (xdiff > 0) //Dann ist die Maus nach rechts rausgewandert
 					r.x += xdiff;

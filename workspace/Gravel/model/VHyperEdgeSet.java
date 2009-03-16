@@ -283,7 +283,7 @@ public class VHyperEdgeSet extends Observable implements Observer {
 	 */
 	private void Colorchange(GraphColorMessage m)
 	{
-		if (m.getModifiedElement()!=GraphConstraints.EDGE)
+		if (m.getModifiedElement()!=GraphConstraints.HYPEREDGE)
 			return; //Does not affect us
 		VHyperEdge e = get(m.getElementID());
 		switch(m.getModificationType()) {

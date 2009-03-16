@@ -124,12 +124,28 @@ public class VHyperEdgeShape {
 			controlPointsHom.add(newp);
 		}
 	}
-	@SuppressWarnings("unchecked")
+	/**
+	 * Return a complete independent Copy of this Shape
+	 */
 	public VHyperEdgeShape clone()
 	{
-		Vector<Double> k = (Vector<Double>) Knots.clone();
-		Vector<Double> w = (Vector<Double>) cpWeight.clone();
-		Vector<Point2D> p = (Vector<Point2D>) controlPoints.clone();
+		Vector<Double> k = new Vector<Double>();
+		Iterator<Double> iter = Knots.iterator();
+		while (iter.hasNext())
+			k.addElement(new Double(iter.next().doubleValue()));
+		
+		Vector<Double> w = new Vector<Double>();
+		iter = cpWeight.iterator();
+		while (iter.hasNext())
+			w.addElement(new Double(iter.next().doubleValue()));
+
+		Vector<Point2D> p = new Vector<Point2D>();
+		Iterator<Point2D> iter2 = controlPoints.iterator();
+		while (iter2.hasNext())
+		{
+			Point2D next = iter2.next();
+			p.addElement((Point2D) next.clone());			
+		}
 		return new VHyperEdgeShape(k,p,w,minDist);
 	}
 	/**
@@ -400,11 +416,11 @@ public class VHyperEdgeShape {
 			{ //Calculate N_k,actualDegree
 				double fac1,fac2;
 				if (Knots.get(k+actualDegree).doubleValue()==Knots.get(k).doubleValue()) //divided by 0 -> per Def 1
-					fac1=1.0;
+					fac1=0.0d;
 				else
 					fac1 = (u-Knots.get(k))/(Knots.get(k+actualDegree)-Knots.get(k));
 				if (Knots.get(k+actualDegree+1).doubleValue()==Knots.get(k+1).doubleValue()) //divided by 0 per Def. 1
-					fac2=1.0;
+					fac2=0.0d;
 				else
 					fac2 = (Knots.get(k+actualDegree+1)-u)/(Knots.get(k+actualDegree +1)-Knots.get(k+1));
 				
@@ -438,16 +454,6 @@ public class VHyperEdgeShape {
 		for (int k=0; k<=degree; k++)
 		{
 			denomin += N.get(k)* cpWeight.get(k+min); //See above shiftet by min
-		}
-		if (denomin==0.0d)
-		{
-			System.err.println(u+" Basis #"+number+" Nominator:"+nomin+" Denominator is zero");
-
-			for (int k=0; k<=degree; k++)
-			{
-				System.err.println("Summand #"+(k+1)+" ist "+N.get(k)+"*"+cpWeight.get(k+min)+" = "+N.get(k)* cpWeight.get(k+min)+""); //See above shiftet by min
-			}
-			return 0.0d;
 		}
 		return (nomin/denomin);
 	}
@@ -654,7 +660,6 @@ public class VHyperEdgeShape {
 	/**
 	 * Projects the point d to a point, whose distance is minimal to d and on the curve
 	 * 
-	 * TODO: Newtn Iteraton, if this is not qcurate enough?
 	 * @param d
 	 * @return
 	 */

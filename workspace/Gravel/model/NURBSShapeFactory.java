@@ -43,14 +43,13 @@ public class NURBSShapeFactory {
 		weights.add(1d);
 		
 		Vector<Point2D> controlPoints = new Vector<Point2D>();
-		Point2D.Double doublePoint = new Point2D.Double(origin.x+radius, origin.y);
-		controlPoints.add(doublePoint); //P0
+		controlPoints.add(new Point2D.Double(origin.x+radius, origin.y)); //P0
 		controlPoints.add(new Point2D.Double(origin.x+radius, origin.y-radius)); //P1, Top right
 		controlPoints.add(new Point2D.Double(origin.x-radius, origin.y-radius)); //P2, Top left
 		controlPoints.add(new Point2D.Double(origin.x-radius, origin.y)); //P3
 		controlPoints.add(new Point2D.Double(origin.x-radius, origin.y+radius)); //P4, bottom left
 		controlPoints.add(new Point2D.Double(origin.x+radius, origin.y+radius)); //P5, bottom right
-		controlPoints.add(doublePoint); //P6 again P0
+		controlPoints.add(new Point2D.Double(origin.x+radius, origin.y)); //P6 again P0
 		return new VHyperEdgeShape(knots,controlPoints,weights,dist);
 	}
 }
