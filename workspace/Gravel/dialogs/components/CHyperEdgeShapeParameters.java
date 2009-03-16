@@ -128,7 +128,7 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 
 		c.gridy++;
 		c.gridx=2;
-		String[] BasicShapes = { "<html>Auswahl</html>", "Kreis", "TODO"};
+		String[] BasicShapes = {"Kreis", "TODO", "mehr", "grundformen"};
 		cBasicShape = new JComboBox(BasicShapes);
 		cBasicShape.setSelectedIndex(0);
 		cBasicShape.setPreferredSize(new Dimension(100, 30));
@@ -306,7 +306,6 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 	        {
 	        	if (cBasicShape.isVisible()) //We are in mode 1
 	        	{
-	        		System.err.println("Switching to Mode 2");
 	        		bModeChange.setText("neue Grundform");
 	        		CircleFields.setVisible(false);
 	        		cBasicShape.setVisible(false);
@@ -316,7 +315,6 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 	        	}
 	        	else
 	        	{
-	        		System.err.println("Stwichting back to Mode 1");
 	        		bModeChange.setText("freie Modifikation (?)");
 	        		FreeModFields.setVisible(false);
 	        		cBasicShape.setVisible(true);
@@ -334,7 +332,7 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 			if ((m.getModifiedElementTypes()==GraphConstraints.SELECTION)
 				&&((m.getModification()&GraphConstraints.UPDATE)==GraphConstraints.UPDATE))
 			{
-				if  (((String)cBasicShape.getSelectedItem()).equals("Kreis"))
+				if  (cBasicShape.isVisible()&&((((String)cBasicShape.getSelectedItem()).equals("Kreis"))))
 				{
 				Vector<Object> params = Editfield.getShapeParameters();
 				Point porig = (Point) params.get(NURBSShapeFactory.CIRCLE_ORIGIN);

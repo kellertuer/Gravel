@@ -538,8 +538,6 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 				{
 					if (nodelist.elementAt(j)!=null)
 					{
-						if (temp==i)
-							System.err.println("#"+j);
 						if (NodeChecks[temp].isSelected()&&(!refMHyperEdge.containsNode(j)))
 								refMHyperEdge.addNode(j);
 						else if ((!NodeChecks[temp].isSelected())&&(refMHyperEdge.containsNode(j)))

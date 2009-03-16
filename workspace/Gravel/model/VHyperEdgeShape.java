@@ -122,7 +122,7 @@ public class VHyperEdgeShape {
 			Point3d newp = new Point3d(p.getX(),p.getY(),weight);
 			newp.set(newp.x*weight, newp.y*weight, weight);
 			controlPointsHom.add(newp);
-		}		
+		}
 	}
 	@SuppressWarnings("unchecked")
 	public VHyperEdgeShape clone()
@@ -241,7 +241,9 @@ public class VHyperEdgeShape {
 	private int findSpan(double u)
 	{
 		if (u==Knots.lastElement())
+		{
 			return Knots.indexOf(Knots.lastElement())-1; //first value of t equal to t.get(m)==t.lastElement - which is m-d		
+		}
 		//Binary Search for the intervall
 		int low = degree; //because the first d+1 are equal too
 		int high = maxKnotIndex-degree; //see above
@@ -397,12 +399,18 @@ public class VHyperEdgeShape {
 			for (int k=max-actualDegree; k<=max; k++)
 			{ //Calculate N_k,actualDegree
 				double fac1,fac2;
-				if ((u==Knots.get(k)&&(Knots.get(k+actualDegree)==Knots.get(k)))) //0 divided by 0
+				if (Knots.get(k+actualDegree).doubleValue()==Knots.get(k).doubleValue()) //divided by 0 -> per Def 1
+				{
+					System.err.println(u+"-"+Knots.get(k)+" (index "+k+") divided by "+Knots.get(k+actualDegree)+" - "+Knots.get(k)+" inices "+(k+actualDegree)+" and "+k);					
 					fac1=1.0;
+				}
 				else
 					fac1 = (u-Knots.get(k))/(Knots.get(k+actualDegree)-Knots.get(k));
-				if ((u==Knots.get(k+actualDegree+1)&&(Knots.get(k+actualDegree+1)==Knots.get(k+1)))) //0 divided by 0
+				if (Knots.get(k+actualDegree+1).doubleValue()==Knots.get(k+1).doubleValue()) //divided by 0 per Def. 1
+				{
+					System.err.println(Knots.get(k+actualDegree+1)+"-"+u+" (index "+(k+actualDegree+1)+") divided by "+Knots.get(k+actualDegree+1)+" - "+Knots.get(k+1)+" inices "+(k+actualDegree+1)+" and "+(k+1));
 					fac2=1.0;
+				}
 				else
 					fac2 = (Knots.get(k+actualDegree+1)-u)/(Knots.get(k+actualDegree +1)-Knots.get(k+1));
 				
@@ -436,6 +444,16 @@ public class VHyperEdgeShape {
 		for (int k=0; k<=degree; k++)
 		{
 			denomin += N.get(k)* cpWeight.get(k+min); //See above shiftet by min
+		}
+		if (denomin==0.0d)
+		{
+			System.err.println(u+" Basis #"+number+" Nominator:"+nomin+" Denominator is zero");
+
+			for (int k=0; k<=degree; k++)
+			{
+				System.err.println("Summand #"+(k+1)+" ist "+N.get(k)+"*"+cpWeight.get(k+min)+" = "+N.get(k)* cpWeight.get(k+min)+""); //See above shiftet by min
+			}
+			return 0.0d;
 		}
 		return (nomin/denomin);
 	}
@@ -652,7 +670,7 @@ public class VHyperEdgeShape {
 		//Find the specific P, which has the most influence at src to move.
 		double min = Double.MAX_VALUE;
 		int Pindex=0;
-		for (int i=0; i<=maxCPIndex; i++)
+		for (int i=0; i<maxCPIndex; i++)
 		{
 			double nodei = 0.0d;
 			for (int j=1; j<=degree; j++)
@@ -674,6 +692,7 @@ public class VHyperEdgeShape {
 				Pk.getY() + direction.getY()/mov		
 		);
 		controlPoints.set(Pindex,Pnew);
+		
 		InitHomogeneous();
 		return true;
 	}

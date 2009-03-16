@@ -57,6 +57,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	{
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		paintgrid(g2);
+		paintMouseModeDetails(g2);
 		paintHyperEdges(g2);
 		paintNodes(g2);
 		if ((Drag!=null)&&(Drag.getSelectionRectangle()!=null))
@@ -66,7 +67,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			g2.draw(Drag.getSelectionRectangle());
 		}
 	//	paintDEBUG(g2);
-		paintMouseModeDetails(g2);
 	}
 	/**
 	 * @param g
@@ -137,17 +137,20 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	
 	private void paintMouseModeDetails(Graphics2D g2)
 	{
-		if (actualMouseState==CIRCLE_MOUSEHANDLING)
+		if ((actualMouseState==CIRCLE_MOUSEHANDLING)||(actualMouseState==SHAPE_MODIFICATION_MOUSEHANDLING))
 		{
-			VHyperEdgeShape tempcircle = ((CircleDragListener)Drag).getShape();
-			if (tempcircle!=null)
+			VHyperEdgeShape tempshape = ((DragShapeMouseHandler)Drag).getShape();
+			if (tempshape!=null)
 			{
-				VHyperEdgeShape draw = tempcircle.clone();
+				VHyperEdgeShape draw = tempshape.clone();
 				draw.scale(zoomfactor);
 				g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 				g2.setColor(selColor);
 				g2.draw(draw.getCurve(0.002d));
-			}
+			}			
+		}
+		if (actualMouseState==CIRCLE_MOUSEHANDLING)
+		{
 			Point p = (Point) Drag.getShapeParameters().get(NURBSShapeFactory.CIRCLE_ORIGIN);
 			Point p2 = Drag.getMouseOffSet();
 			if ((p!=null)&&(p2.x!=0)&&(p2.y!=0)) //Set per Drag
@@ -281,6 +284,13 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				this.addMouseMotionListener(Drag);
 				actualMouseState = state;
 			break;
+			case SHAPE_MODIFICATION_MOUSEHANDLING:
+				Click=null;
+				Drag = new FreeModificationDragListener(this, highlightedHyperEdge);
+				this.addMouseListener(Drag);
+				this.addMouseMotionListener(Drag);
+				actualMouseState = state;
+			break;
 			case NO_MOUSEHANDLING:
 			default:
 				actualMouseState = NO_MOUSEHANDLING;
@@ -329,8 +339,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		if (arg instanceof GraphMessage)
 		{
 			GraphMessage m = (GraphMessage)arg;
-			if ((Drag!=null)&&(!Drag.dragged())
-					&&(actualMouseState==VCommonGraphic.CIRCLE_MOUSEHANDLING)
+			if ((Drag!=null)&&(!Drag.dragged()) //If we have no drag (anymore) and have one of the MOdification-Mousehandlings AND a Block End
+					&&((actualMouseState==CIRCLE_MOUSEHANDLING)||(actualMouseState==SHAPE_MODIFICATION_MOUSEHANDLING))
 					&&((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) 
 			//Drag just ended -> Set Circle as Shape
 			{
