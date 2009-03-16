@@ -37,6 +37,7 @@ public abstract class VCommonGraphic extends Component implements Observer
 	public static final int STD_MOUSEHANDLING = 1;
 	public static final int OCM_MOUSEHANDLING = 2;
 	public static final int CIRCLE_MOUSEHANDLING = 3;
+	public static final int SHAPE_MODIFICATION_MOUSEHANDLING = 4;
 
 	public static final int VGRAPHIC = 1;
 	public static final int VHYPERGRAPHIC = 2;
