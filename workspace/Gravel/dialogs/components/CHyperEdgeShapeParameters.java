@@ -230,7 +230,7 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 
 		c.gridy++;
 		bIncKnots = new JButton("mehr");
-		bIncKnots.setEnabled(false);
+		bIncKnots.addActionListener(this);
 		FreeModFields.add(bIncKnots,c);
 
 		c.gridx++;
@@ -322,6 +322,11 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 	        		actionPerformed(new ActionEvent(cBasicShape,0,"Refresh"));
 	        	}
 	        }
+	        if (e.getSource()==bIncKnots)
+	        {
+	        	HEdgeRef.getShape().refineMiddleKnots();
+	        	Editfield.repaint();
+	        }
 
 	}
 
@@ -334,10 +339,10 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 			{
 				if  (cBasicShape.isVisible()&&((((String)cBasicShape.getSelectedItem()).equals("Kreis"))))
 				{
-				Vector<Object> params = Editfield.getShapeParameters();
-				Point porig = (Point) params.get(NURBSShapeFactory.CIRCLE_ORIGIN);
-				int size = Integer.parseInt(params.get(NURBSShapeFactory.CIRCLE_RADIUS).toString());
-				if (porig==null)
+					Vector<Object> params = Editfield.getShapeParameters();
+					Point porig = (Point) params.get(NURBSShapeFactory.CIRCLE_ORIGIN);
+					int size = Integer.parseInt(params.get(NURBSShapeFactory.CIRCLE_RADIUS).toString());
+					if (porig==null)
 						return;
 				
 				if (porig.x!=iCOrigX.getValue())

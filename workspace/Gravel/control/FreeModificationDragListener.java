@@ -43,7 +43,7 @@ public class FreeModificationDragListener implements DragShapeMouseHandler {
 		if (vhg.modifyHyperEdges.get(hyperedgeindex)==null)
 			return; //Nothing can be done here.
 		HyperEdgeRef = vhg.modifyHyperEdges.get(hyperedgeindex);
-
+		System.err.println(HyperEdgeRef);
 		temporaryShape = HyperEdgeRef.getShape().clone();
 	}
 	

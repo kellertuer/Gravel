@@ -400,17 +400,11 @@ public class VHyperEdgeShape {
 			{ //Calculate N_k,actualDegree
 				double fac1,fac2;
 				if (Knots.get(k+actualDegree).doubleValue()==Knots.get(k).doubleValue()) //divided by 0 -> per Def 1
-				{
-					System.err.println(u+"-"+Knots.get(k)+" (index "+k+") divided by "+Knots.get(k+actualDegree)+" - "+Knots.get(k)+" inices "+(k+actualDegree)+" and "+k);					
 					fac1=1.0;
-				}
 				else
 					fac1 = (u-Knots.get(k))/(Knots.get(k+actualDegree)-Knots.get(k));
 				if (Knots.get(k+actualDegree+1).doubleValue()==Knots.get(k+1).doubleValue()) //divided by 0 per Def. 1
-				{
-					System.err.println(Knots.get(k+actualDegree+1)+"-"+u+" (index "+(k+actualDegree+1)+") divided by "+Knots.get(k+actualDegree+1)+" - "+Knots.get(k+1)+" inices "+(k+actualDegree+1)+" and "+(k+1));
 					fac2=1.0;
-				}
 				else
 					fac2 = (Knots.get(k+actualDegree+1)-u)/(Knots.get(k+actualDegree +1)-Knots.get(k+1));
 				
@@ -520,12 +514,41 @@ public class VHyperEdgeShape {
 	{
 		return x.distance(ProjectionPoint(x))<=variance;
 	}
+	
+	public void refineMiddleKnots()
+	{
+		if (isEmpty())
+			return;
+		Vector<Double> newknots = new Vector<Double>();
+		Iterator<Double> knotIter = Knots.iterator();
+		Double lastvalue = Knots.firstElement();
+		while (knotIter.hasNext())
+		{
+			Double d = knotIter.next();
+			if (lastvalue.doubleValue()!=d.doubleValue()) //We have a real distance between last and this value
+			{
+				newknots.addElement(lastvalue.doubleValue() + (d.doubleValue()-lastvalue.doubleValue())/2.0d);				
+			}
+			
+			lastvalue = d;
+		}
+		RefineKnots(newknots);
+	}
 	/**
 	 * Refine the Curve to add some new knots contained in X from wich each is between t[0] and t[m]
 	 * @param X
 	 */
 	public void RefineKnots(Vector<Double> X)
 	{
+		if (isEmpty())
+			return;
+		Iterator<Double> testI = X.iterator();
+		while (testI.hasNext())
+		{
+			double thisx = testI.next().doubleValue();
+			if ((thisx < Knots.firstElement())||(thisx>Knots.lastElement())) //Out Of Range
+				return;
+		}
 		//Compare The NURBS Book A5.4
 		int a = findSpan(X.firstElement()), b=findSpan(X.lastElement())+1;
 		Vector<Point3d> newPw;
@@ -637,8 +660,9 @@ public class VHyperEdgeShape {
 	 */
 	public double ProjectionPointParameter(Point2D d)
 	{
-		//TODO: Set the value of the intervalls of u heuristically by length of the line
-		double eqdist = .0001; //Find a nice Start-value for u
+		//TODO: Implement a better Projection Stuff, that does not need so much cpu power
+		
+		double eqdist = .0002;
 		double u = Knots.firstElement(),u0 = Knots.firstElement();
 		double mindist = Double.MAX_VALUE;
 		while (u<=Knots.lastElement())
