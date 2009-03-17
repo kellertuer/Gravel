@@ -85,7 +85,11 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				g2.setColor(Color.GRAY);
 			g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			if (!temp.getShape().isEmpty())
-				g2.draw(temp.getLinestyle().modifyPath(temp.getShape().getCurve(.003d),temp.getWidth(),zoomfactor));
+			{
+				VHyperEdgeShape s = temp.getShape().clone();
+				s.scale(zoomfactor);
+				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(0.02d),temp.getWidth(),zoomfactor));
+			}
 		}
 	}
 
@@ -255,9 +259,10 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			//Drag just ended -> Set Circle as Shape
 			{
 				vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(Drag.getShape());
+				vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
 				Drag.resetShape();
-				repaint();
 			}
+			repaint();
 		}
 	}
 }

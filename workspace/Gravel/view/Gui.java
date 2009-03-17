@@ -11,7 +11,10 @@ import java.util.TreeMap;
 
 import javax.swing.*;
 
+import dialogs.components.CHyperEdgeShapeParameters;
 
+
+import model.MHyperEdge;
 import model.VGraph;
 import model.VGraphInterface;
 import model.VHyperGraph;
@@ -34,10 +37,14 @@ public class Gui implements WindowListener
 	private VCommonGraphic graphpart; 
 	private Statistics stats;
 	private GraphTree graphlist;
-	private JToolBar gToolBar;
+	private MainToolbar gToolBar;
 	private MainMenu MenuBar;
 	private static Gui instance;
 	private GeneralPreferences gp;
+	private VHyperShapeGraphic shapePart= null;
+	private CHyperEdgeShapeParameters shapeParameters = null;
+	private JScrollPane mainScroll, treeScroll, shapeScroll;
+	private JSplitPane mainSplit;
 	/**
 	 * gibt die GUI zurück, falls diese existiert.
 	 * <br>Existiert sie nicht, wird eine GUI erstellt und zurückgegeben
@@ -145,7 +152,7 @@ public class Gui implements WindowListener
      * buildmaingrid() baut ein Grid in dem oben eine Buttonliste ist und dadrunter ein
      * SplitPane in dem man die beiden Inhalte, den Graph und den Tree mit Eigenschaften in der Breite variieren kann
      */
-    public void buildmaingrid(Dimension window, Dimension graphsize) 
+    protected void buildmaingrid(Dimension window, Dimension graphsize) 
     {
         mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
@@ -157,13 +164,13 @@ public class Gui implements WindowListener
         	graphpart = new VHyperGraphic(graphsize,(VHyperGraph)MainGraph);        	
         graphpart.setMouseHandling(VCommonGraphic.STD_MOUSEHANDLING);
         //Das Ganze als Scrollpane
-        JScrollPane scrollPane = new JScrollPane(graphpart);
-        scrollPane.setViewportView(graphpart);
-        graphpart.setViewPort(scrollPane.getViewport());
-        scrollPane.setMinimumSize(new Dimension(gp.getIntValue("vgraphic.x"),gp.getIntValue("vgraphic.y")));
-        scrollPane.setPreferredSize(graphsize);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        mainScroll = new JScrollPane(graphpart);
+        mainScroll.setViewportView(graphpart);
+        graphpart.setViewPort(mainScroll.getViewport());
+        mainScroll.setMinimumSize(new Dimension(gp.getIntValue("vgraphic.x"),gp.getIntValue("vgraphic.y")));
+        mainScroll.setPreferredSize(graphsize);
+        mainScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        mainScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         graphpart.setSize(graphsize);
         graphpart.validate();
         
@@ -177,23 +184,89 @@ public class Gui implements WindowListener
         graphlist = new GraphTree(MainGraph);
         
         //Das Ganze als Scrollpane
-        JScrollPane scrollPane2 = new JScrollPane(graphlist);
-        scrollPane2.setMinimumSize(new Dimension(gp.getIntValue("window.x")-gp.getIntValue("vgraphic.x"),gp.getIntValue("window.y")-gp.getIntValue("vgraphic.y")));
+        treeScroll = new JScrollPane(graphlist);
+        treeScroll.setMinimumSize(new Dimension(gp.getIntValue("window.x")-gp.getIntValue("vgraphic.x"),gp.getIntValue("window.y")-gp.getIntValue("vgraphic.y")));
         
         //Unter die GraphList noch die Statistik
         stats = new Statistics(graphpart);
-        JSplitPane rightside = new JSplitPane(JSplitPane.VERTICAL_SPLIT,scrollPane2,stats);
+        JSplitPane rightside = new JSplitPane(JSplitPane.VERTICAL_SPLIT,treeScroll,stats);
         rightside.setPreferredSize(new Dimension(window.width-graphsize.width,window.height-graphsize.height));
         rightside.setResizeWeight(1.0);
         rightside.validate();
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                                   scrollPane,rightside/*graphlist*/);
-        splitPane.setDividerLocation(0.66);
-        splitPane.setResizeWeight(1.0);
-        mainPanel.add(splitPane,BorderLayout.CENTER);
+        mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                                   mainScroll,rightside/*graphlist*/);
+        mainSplit.setDividerLocation(0.66);
+        mainSplit.setResizeWeight(1.0);
+        mainPanel.add(mainSplit,BorderLayout.CENTER);
         mainPanel.setMinimumSize(window);
         mainPanel.setPreferredSize(window);
         mainPanel.doLayout();
+        shapePart= null;
+    	shapeParameters = null;
+    }
+    /**
+     * buildmaingrid() baut ein Grid in dem oben eine Buttonliste ist und dadrunter ein
+     * SplitPane in dem man die beiden Inhalte, den Graph und den Tree mit Eigenschaften in der Breite variieren kann
+     */
+    public void rebuildmaingrid(boolean applyChange) 
+    {
+    	if ((shapePart!=null)&&(shapeParameters!=null)&&applyChange)
+    	{
+    		int index = shapeParameters.getActualEdge().getIndex();
+    		MHyperEdge mhe = shapePart.getGraph().getMathGraph().modifyHyperEdges.get(index);
+    		((VHyperGraph)MainGraph).modifyHyperEdges.replace(shapeParameters.getActualEdge(), mhe);
+    	}
+    	mainPanel.remove(mainSplit);
+        //Unter die GraphList noch die Statistik
+        JSplitPane rightside = new JSplitPane(JSplitPane.VERTICAL_SPLIT,treeScroll,stats);
+        rightside.setPreferredSize(new Dimension(mainPanel.getBounds().getSize().width - graphpart.getBounds().getSize().width,mainPanel.getBounds().getSize().height - graphpart.getBounds().getSize().height));
+        rightside.setResizeWeight(1.0);
+        rightside.validate();
+        mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                                   mainScroll,rightside/*graphlist*/);
+        mainSplit.setDividerLocation(0.66);
+        mainSplit.setResizeWeight(1.0);
+        mainPanel.add(mainSplit,BorderLayout.CENTER);
+        mainPanel.doLayout();
+        gToolBar.changeVGraph(graphpart);
+        getParentWindow().validate();
+        shapePart = null;
+    	shapeParameters = null;
+    }
+    /**
+     * buildmaingrid() baut ein Grid in dem oben eine Buttonliste ist und dadrunter ein
+     * SplitPane in dem man die beiden Inhalte, den Graph und den Tree mit Eigenschaften in der Breite variieren kann
+     */
+    public void InitShapeModification(int edge) 
+    {
+   	   if (MainGraph.getType()!=VGraphInterface.HYPERGRAPH)
+    		return; //Only for HyperGraphs that...
+   	   if (((VHyperGraph)MainGraph).modifyHyperEdges.get(edge)==null)
+   		   return; //Have the specific Edge in themselves
+   	   mainPanel.remove(mainSplit);
+   	   	shapePart = new VHyperShapeGraphic(graphpart.getBounds().getSize(), ((VHyperGraph)MainGraph).clone(), edge);
+        //Das Ganze als Scrollpane
+        shapeScroll = new JScrollPane(shapePart);
+        shapeScroll.setViewportView(shapePart);
+        shapePart.setViewPort(shapeScroll.getViewport());
+        shapeScroll.setMinimumSize(new Dimension(shapePart.getBounds().getSize()));
+        shapeScroll.setPreferredSize(shapePart.getBounds().getSize());
+        shapeScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        shapeScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        shapePart.setSize(graphpart.getBounds().getSize());
+        shapePart.validate();
+        gToolBar.changeVGraph(shapePart);
+                
+        //Das Ganze als Scrollpane
+        shapeParameters = new CHyperEdgeShapeParameters(edge,shapePart);
+        mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                                   shapeScroll,shapeParameters.getContent());
+        mainSplit.setDividerLocation(shapePart.getBounds().width);
+        mainSplit.setDividerLocation(0.66);
+        mainSplit.setResizeWeight(1.0);
+        mainPanel.add(mainSplit,BorderLayout.CENTER);
+        mainPanel.doLayout();
+        getParentWindow().validate();
     }
     /**
      * Show About-Dialog

@@ -205,7 +205,7 @@ public class VHyperEdge extends VItem {
 		linestyle = plinestyle;
 	}
 	/**
-	 * Get the Shape
+	 * Set the Shape, You should notify the vGraph about this change
 	 * @param s the new Shape
 	 */
 	public void setShape(VHyperEdgeShape s) {

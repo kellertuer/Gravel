@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -23,7 +24,9 @@ import javax.swing.KeyStroke;
 
 import model.VGraph;
 import model.VGraphInterface;
+import model.VHyperEdge;
 import model.VHyperGraph;
+import model.VItem;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
@@ -51,6 +54,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 	JMenuItem mFExit, mFNew, mFOpen, mFWinPrefs,mFSave, mFSaveAs, mFExport;
 	JCheckBoxMenuItem mVShowBP;
 	JRadioButtonMenuItem mVModusNormal,mVModusOCM, mVZoom1,mVZoom2,mVZoom3;
+	JMenuItem mVModusShape;
 	JMenuItem mVGrid, mVGDirCh, mVGLoopCh, mVGMultipleCh;
 	JMenuItem mEdDelSelection,mEdModifySelection, mEdArrangeSelection;
 	JMenuItem mEdUndo, mEdRedo;
@@ -295,6 +299,15 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         mVModusOCM.addActionListener(this);
         if (!isMac) mVModusOCM.setMnemonic(KeyEvent.VK_O);
         mEdModus.add(mVModusOCM);
+        if (!isGraph)
+        {
+        	mVModusShape = new JMenuItem("Hyperkantenumriss...");
+        	mVModusShape.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_6, MenuAccModifier));
+        	mVModusShape.addActionListener(this);
+        	if (!isMac) mVModusShape.setMnemonic(KeyEvent.VK_S);
+        	mVModusShape.setEnabled(getIndexofSingeSelectedHyperEdge() > 0);
+        	mEdModus.add(mVModusShape);
+        }
         ButtonGroup group = new ButtonGroup();
         group.add(mVModusNormal);
         group.add(mVModusOCM);
@@ -394,7 +407,27 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			}
 		}
 	}
-	
+	private int getIndexofSingeSelectedHyperEdge()
+	{
+   		//Check whether exactely one edge is selected
+		Iterator<VHyperEdge> HEIt = ((VHyperGraphic)graphpart).getGraph().modifyHyperEdges.getIterator();
+		int selindex = -1;
+		while (HEIt.hasNext())
+		{
+			VHyperEdge actual = HEIt.next();
+			if ((actual.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
+			{
+				if (selindex!=-1) //we already had one
+					selindex=0;
+				else
+					selindex = actual.getIndex();
+			}
+		} //so if selindex is -1 we have no selection, if its 0 we had at least one
+		if (selindex > 0)
+			return selindex;
+		else
+			return -1;
+	}
 	public void actionPerformed(ActionEvent e) 
 	{
 		if (e.getSource() instanceof JMenuItem) 
@@ -431,6 +464,24 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     	    } else
     	    if (item == mVModusOCM)
         	  	graphpart.setMouseHandling(VCommonGraphic.OCM_MOUSEHANDLING);
+    	    else if (item==mVModusShape)
+    	    {
+    	    	if (mVModusShape.getText().equals("Hyperkantenumriss..."))
+    	    	{
+    	    		mVModusShape.setText("<html><p>Umriss "+main.CONST.html_ue+"bernehmen</p>");
+    	    		mVModusOCM.setEnabled(false);
+    	    		mVModusNormal.setEnabled(false);
+    	    		if (((VHyperGraphic)graphpart).getGraph().modifyHyperEdges.get(getIndexofSingeSelectedHyperEdge())!=null)
+    	    			Gui.getInstance().InitShapeModification(getIndexofSingeSelectedHyperEdge());
+    	    	}
+    	    	else if (mVModusShape.getText().equals("<html><p>Umriss "+main.CONST.html_ue+"bernehmen</p>"))
+    	    	{
+    	    		mVModusOCM.setEnabled(false);
+    	    		mVModusNormal.setEnabled(false);
+    	    		mVModusShape.setText("Hyperkantenumruss...");
+    	    		Gui.getInstance().rebuildmaingrid(true);
+    	    	}   	
+    	    }
         	else if (item == mVZoom1)
         		graphpart.setZoom(50);
         	else if (item == mVZoom2)
@@ -553,6 +604,10 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			mEdDelSelection.setEnabled(hasGraphSelection());		
 			mEdModifySelection.setEnabled(hasGraphSelection());		
 			mEdArrangeSelection.setEnabled(hasGraphSelection());
+		}
+		if (graphpart.getType()==VCommonGraphic.VHYPERGRAPHIC)
+		{
+    		mVModusShape.setEnabled(getIndexofSingeSelectedHyperEdge() > 0);
 		}
 		if (graphpart.getType()!=VCommonGraphic.VGRAPHIC)
 			return;

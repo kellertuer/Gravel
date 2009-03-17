@@ -29,6 +29,7 @@ public interface GraphConstraints {
 	public static final int TRANSLATION = 8;
 	public static final int REPLACEMENT = 16;
 	public static final int INDEXCHANGED = 32;
+	public static final int HYPEREDGESHAPE = 64;	
 	//Special Stati for Block Updates
 	public static final int BLOCK_START = 512;
 	public static final int BLOCK_END = 1024;

@@ -23,6 +23,7 @@ public class MainToolbar extends JToolBar implements ActionListener
 {	
 	private static final long serialVersionUID = 1L;
 	private VCommonGraphic vG;
+	private ZoomComponent internalZoomC;
 	/**
 	 * Init Toolbar, that is  added as an Control-Element to a VGraphic
 	 * @param g VGraphic it controls
@@ -46,11 +47,16 @@ public class MainToolbar extends JToolBar implements ActionListener
 		c.anchor = GridBagConstraints.EAST;
 		c.gridy = 0;
 		c.gridx = 3;		
-        ZoomComponent zoom = new ZoomComponent();
-		vG.addPiece("Zoom", zoom);
-	    this.add(zoom.getContent(),c);   
+        internalZoomC = new ZoomComponent();
+		vG.addPiece("Zoom", internalZoomC);
+	    this.add(internalZoomC.getContent(),c);   
 	}
-	
+	public void changeVGraph(VCommonGraphic newvg)
+	{
+		vG.removePiece("Zoom");
+		vG = newvg;
+		vG.addPiece("Zoom",internalZoomC);		
+	}
 	public void actionPerformed(ActionEvent e) 
 	{	
 	}

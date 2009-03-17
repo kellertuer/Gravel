@@ -8,20 +8,27 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
 import dialogs.IntegerTextField;
 
+import view.Gui;
 import view.VCommonGraphic;
 import view.VHyperShapeGraphic;
 
@@ -55,7 +62,6 @@ import model.Messages.GraphMessage;
  */
 public class CHyperEdgeShapeParameters implements CaretListener, ActionListener, Observer {
 
-	private VHyperShapeGraphic Editfield;
 	private Container cont;
 	private IntegerTextField iDistance;
 	private JComboBox cBasicShape;
@@ -67,10 +73,11 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 	private JLabel knots, degree, Todo;
 	private JButton bIncKnots, bDecKnots, bIncDegree, bDecDegree;
 	
-	private JButton bModeChange;
+	private JButton bModeChange, bOk, bCancel;
 
 	private int HEdgeRefIndex; //Reference to the HyperEdge in the Graph that is edited here
 	private VHyperGraph HGraphRef; //Reference to the edited Graph, should be a copy of the Graph from the main GUI because the user might cancel this dialog 
+	private VHyperShapeGraphic HShapeGraphicRef;
 
 	private Container CircleFields, FreeModFields;
 	/**
@@ -82,13 +89,14 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 	 * @param index index of the hyperedge whose shape should be modified
 	 * @param vhg corresponding hypergraph
 	 */
-	public CHyperEdgeShapeParameters(int index, VHyperGraph vhg)
+	public CHyperEdgeShapeParameters(int index, VHyperShapeGraphic vhg)
 	{
-		if (vhg.modifyHyperEdges.get(index)==null)
+		if (vhg.getGraph().modifyHyperEdges.get(index)==null)
 			return;
 		HEdgeRefIndex = index;
-		HGraphRef = vhg;
-		vhg.addObserver(this);
+		HGraphRef = vhg.getGraph();
+		HGraphRef.addObserver(this);
+		HShapeGraphicRef = vhg;
 		cont = new Container();
 		cont.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -96,24 +104,6 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 		c.anchor = GridBagConstraints.WEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		c.gridwidth=2;
-		c.gridheight=4;
-		Dimension d = new Dimension(400,400);
-		Editfield = new VHyperShapeGraphic(d,vhg,index);
-		Editfield.setMouseHandling(VHyperShapeGraphic.NO_MOUSEHANDLING);
-        //Das Ganze als Scrollpane
-        JScrollPane scrollPane = new JScrollPane(Editfield);
-        scrollPane.setViewportView(Editfield);
-        Editfield.setViewPort(scrollPane.getViewport());
-        scrollPane.setMinimumSize(d);
-        scrollPane.setPreferredSize(d);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        Editfield.setSize(d);
-        Editfield.validate();
-		cont.add(scrollPane,c);
-		c.gridy = 0;
-		c.gridx = 2;
 		c.gridwidth=1;
 		c.gridheight=1;
 		//INput fields besides the Display
@@ -127,7 +117,7 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 		cont.add(iDistance,c);
 
 		c.gridy++;
-		c.gridx=2;
+		c.gridx=0;
 		String[] BasicShapes = {"Kreis", "TODO", "mehr", "grundformen"};
 		cBasicShape = new JComboBox(BasicShapes);
 		cBasicShape.setSelectedIndex(0);
@@ -141,7 +131,7 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 		cont.add(cBasicShape,c);
 		
 		c.gridy++;
-		c.gridx=2;
+		c.gridx=0;
 		c.gridwidth=2;
 		c.insets = new Insets(30,7,0,7);
 		
@@ -153,21 +143,51 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 		cont.add(CircleFields,c);
 		CircleFields.setVisible(false);
 		
+		//Container for the fields of the second mode
 		buildFreeModPanel();
 		cont.add(FreeModFields,c);
 		FreeModFields.setVisible(false);
 		
 		c.gridy++;
-		c.gridx=2;
+		c.gridx=0;
 		c.gridwidth=2;
 		
-		c.anchor = GridBagConstraints.SOUTHWEST;
+		c.anchor = GridBagConstraints.SOUTH;
 		bModeChange = new JButton("freie Modifikation (?)"); //Name suchen!
-		bModeChange.setEnabled(HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
+		bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 		bModeChange.addActionListener(this);
 		cont.add(bModeChange,c);
+
+		c.gridy++;
+		c.gridx=0;
+		c.gridwidth=1;
 		
-		//Container for the fields of the second mode
+		c.anchor = GridBagConstraints.SOUTHWEST;
+		bCancel = new JButton("Abbrechen");
+		bCancel.addActionListener(this);
+		cont.add(bCancel,c);
+		//Handling Escape as Cancel
+		//Add ESC-Handling
+		InputMap iMap = Gui.getInstance().getParentWindow().getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+
+		ActionMap aMap = Gui.getInstance().getParentWindow().getRootPane().getActionMap();
+		aMap.put("escape", new AbstractAction()
+			{
+				private static final long serialVersionUID = 1L;
+
+				public void actionPerformed(ActionEvent e)
+				{
+					bCancel.doClick();
+				}
+		 	});
+		c.gridx++;
+		c.anchor = GridBagConstraints.SOUTHEAST;
+		bOk = new JButton("Anwenden");
+		bOk.addActionListener(this);
+		bOk.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
+		cont.add(bOk,c);
+		Gui.getInstance().getParentWindow().getRootPane().setDefaultButton(bOk);
 		
 		cont.validate();
 		actionPerformed(new ActionEvent(bModeChange,0,"Refresh"));
@@ -291,24 +311,33 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 				param.add(NURBSShapeFactory.CIRCLE_RADIUS, iCRad.getValue());
 				param.add(NURBSShapeFactory.DISTANCE_TO_NODE,iDistance.getValue()); //TODO-Std Value			
 				HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).setShape(NURBSShapeFactory.CreateShape("Circle",param));
-				//TODO Change to VHyperEdge Update but up to now just for redraw
-				HGraphRef.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));			
+				HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
 			}
 		}
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-	        if (e.getSource()==cBasicShape)//ComboBox
+	        if ((e.getSource()==bCancel)||(e.getSource()==bOk))
+	        {
+	    		InputMap iMap = Gui.getInstance().getParentWindow().getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+	    		iMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+
+	    		ActionMap aMap = Gui.getInstance().getParentWindow().getRootPane().getActionMap();
+	    		aMap.remove("escape");
+	    		Gui.getInstance().getParentWindow().getRootPane().setDefaultButton(null); //Remove again
+	    		Gui.getInstance().rebuildmaingrid(e.getSource()==bOk);
+	        }
+	        else if (e.getSource()==cBasicShape)//ComboBox
 	        {
 	        	String Shape = (String)cBasicShape.getSelectedItem();
 	        	if (Shape.equals("Kreis"))
 	        	{
-	        		Editfield.setMouseHandling(VCommonGraphic.CIRCLE_MOUSEHANDLING);
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CIRCLE_MOUSEHANDLING);
 	        		CircleFields.setVisible(true);
 	        	}
 	        	else
 	        	{
-	        		Editfield.setMouseHandling(VCommonGraphic.NO_MOUSEHANDLING);
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.NO_MOUSEHANDLING);
 	        		CircleFields.setVisible(false);
 	        	}
 	        }
@@ -321,7 +350,7 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 	        		cBasicShape.setVisible(false);
 	        		BasicShape.setVisible(false);
 	        		FreeModFields.setVisible(true);
-	        		Editfield.setMouseHandling(VCommonGraphic.SHAPE_MODIFICATION_MOUSEHANDLING);
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_MODIFICATION_MOUSEHANDLING);
 	        	}
 	        	else
 	        	{
@@ -335,7 +364,7 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 	        if (e.getSource()==bIncKnots)
 	        {
 	        	HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().refineMiddleKnots();
-	        	Editfield.setMouseHandling(Editfield.getMouseHandling()); //ReInit Drag/Click
+	        	HShapeGraphicRef.setMouseHandling(HShapeGraphicRef.getMouseHandling()); //ReInit Drag/Click
 	        }
 
 	}
@@ -344,17 +373,20 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 		if (arg instanceof GraphMessage) //All Other GraphUpdates are handled in VGRaphCommons
 		{
 			GraphMessage m = (GraphMessage) arg;
-			if ((m.getModifiedElementTypes()==GraphConstraints.SELECTION)
-				&&((m.getModification()&GraphConstraints.UPDATE)==GraphConstraints.UPDATE))
+			if ((m.getModifiedElementTypes()==GraphConstraints.HYPEREDGE)
+				&&((m.getModification()&GraphConstraints.HYPEREDGESHAPE)==GraphConstraints.HYPEREDGESHAPE))
 			{
 				if  (cBasicShape.isVisible()&&((((String)cBasicShape.getSelectedItem()).equals("Kreis"))))
 				{
-					Vector<Object> params = Editfield.getShapeParameters();
+					Vector<Object> params = HShapeGraphicRef.getShapeParameters();
 					Point porig = (Point) params.get(NURBSShapeFactory.CIRCLE_ORIGIN);
 					int size = Integer.parseInt(params.get(NURBSShapeFactory.CIRCLE_RADIUS).toString());
-					if (porig==null)
+					if (porig==null) //There is no Shape-Stuff anymore but we have to update the Button for Mode again
+					{
+						bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
+						bOk.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 						return;
-				
+					}				
 				if (porig.x!=iCOrigX.getValue())
 				{//Update without evoking this caretUpdate
 					iCOrigX.removeCaretListener(this);
@@ -377,6 +409,7 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 			}
 			//Update Activity of Button
 			bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
+			bOk.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 		}	
 	}
 }

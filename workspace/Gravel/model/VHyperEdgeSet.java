@@ -129,7 +129,7 @@ public class VHyperEdgeSet extends Observable implements Observer {
 					t.copyColorStatus(e);
 					vHyperEdges.add(e);
 					setChanged();
-					notifyObservers(new GraphMessage(GraphConstraints.HYPEREDGE,e.getIndex(), GraphConstraints.REPLACEMENT,GraphConstraints.HYPEREDGE));	
+					notifyObservers(new GraphMessage(GraphConstraints.HYPEREDGE,e.getIndex(), GraphConstraints.REPLACEMENT|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));	
 					break;
 				}
 			}

@@ -17,16 +17,12 @@ import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.ButtonGroup;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -71,7 +67,6 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		
 	private CEdgeLineParameters cLine;
 	private CEdgeTextParameters cText;
-	private CHyperEdgeShapeParameters shapeDialog;
 	private Container MainContent, TextContent;
 
 	private JTabbedPane tabs;
@@ -164,9 +159,6 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		editClone.modifyHyperEdges.add(refVHyperEdge, refMHyperEdge);
 		refVHyperEdge = editClone.modifyHyperEdges.get(refVHyperEdge.getIndex()); //Because it might be cloned, update reference to clone
 		refMHyperEdge = editClone.getMathGraph().modifyHyperEdges.get(refVHyperEdge.getIndex()); //Because it might be cloned, update reference to clone
-	
-		shapeDialog = new CHyperEdgeShapeParameters(refVHyperEdge.getIndex(),editClone);
-		tabs.addTab("Umriss", shapeDialog.getContent());
 		
 		Container ContentPane = this.getContentPane();
 		ContentPane.setLayout(new GridBagLayout());
@@ -441,7 +433,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 				graphref.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.HYPEREDGE));
 			graphref.modifyHyperEdges.remove(oldmhyperedge.index);
 		}
-		VHyperEdge addEdge = new VHyperEdge (iEdgeIndex.getValue(), iWidth.getValue(), shapeDialog.getActualEdge().getShape().clone(), new VEdgeText(), new VEdgeLinestyle());
+		VHyperEdge addEdge = new VHyperEdge (iEdgeIndex.getValue(), iWidth.getValue(),new VHyperEdgeShape(), new VEdgeText(), new VEdgeLinestyle());
 
 		MHyperEdge mathEdge = new MHyperEdge(addEdge.getIndex(),iValue.getValue(),EdgeName.getText());
 		int temp=0;
@@ -545,7 +537,6 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 						temp++;
 					}
 				}
-				shapeDialog.repaint();
 				return;
 			}
 		}

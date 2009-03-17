@@ -66,7 +66,7 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 		setChanged();
 		notifyObservers(
 			new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.HYPEREDGE, //Changed
-							GraphConstraints.REMOVAL|GraphConstraints.BLOCK_START, //Status 
+							GraphConstraints.REMOVAL|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.BLOCK_START, //Status 
 							GraphConstraints.NODE|GraphConstraints.HYPEREDGE|GraphConstraints.SELECTION) //Affected		
 			);
 		Iterator<VNode> n = modifyNodes.getIterator();
@@ -96,7 +96,7 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 		setChanged();
 		notifyObservers(
 			new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.HYPEREDGE, //Changed
-							GraphConstraints.REMOVAL|GraphConstraints.BLOCK_END, //Status 
+							GraphConstraints.REMOVAL|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.BLOCK_END, //Status 
 							GraphConstraints.NODE|GraphConstraints.HYPEREDGE|GraphConstraints.SELECTION) //Affected		
 		);		
 	}
@@ -122,7 +122,7 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 		setChanged();
 		notifyObservers(
 				new GraphMessage(GraphConstraints.NODE|GraphConstraints.HYPEREDGE, //Type
-								GraphConstraints.TRANSLATION, //Status 
+								GraphConstraints.TRANSLATION|GraphConstraints.HYPEREDGESHAPE, //Status 
 								GraphConstraints.NODE|GraphConstraints.HYPEREDGE|GraphConstraints.SELECTION|GraphConstraints.SUBGRAPH) //Affected		
 			);
 	}

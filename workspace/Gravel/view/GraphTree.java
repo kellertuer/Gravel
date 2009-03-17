@@ -50,7 +50,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	//Menuesachen
 	int selectedPosition; //selecktierte Position im 
 	int ParentType; //Vater
-	JMenuItem Text,Properties, Delete, SCrop;
+	JMenuItem Text,Properties, Delete, SCrop, HyperEdgeShape;
 	JPopupMenu Menu;
 	//Für updates
 	/**
@@ -93,9 +93,16 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		Properties.addActionListener(this);
 		Delete = new JMenuItem("L"+main.CONST.utf8_oe+"schen");
 		Delete.addActionListener(this);
+		if (Graph.getType()==VGraphInterface.HYPERGRAPH)
+		{
+			HyperEdgeShape = new JMenuItem("Umriss bearbeiten");
+			HyperEdgeShape.addActionListener(this);			
+		}
 		Menu = new JPopupMenu();
 		Menu.add(Text);
 		Menu.add(Properties);
+		if (Graph.getType()==VGraphInterface.HYPERGRAPH)
+			Menu.add(HyperEdgeShape);
 		Menu.add(Delete);
 		this.setModel(Daten);
 		this.setVisible(true);
@@ -291,6 +298,10 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				}
 				default : {return;}
 			}
+		}
+		else if (e.getSource()==HyperEdgeShape)
+		{ //Only Happens in Hypergraohs, because this item is not exitent else
+			Gui.getInstance().InitShapeModification(StringPos2Index(USEEDGES,selectedPosition));
 		}
 		else if (e.getSource()==Delete)
 		{
