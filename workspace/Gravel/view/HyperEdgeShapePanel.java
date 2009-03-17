@@ -20,9 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
@@ -36,19 +34,23 @@ import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
 /**
- * This Class represents all GUI-Elements for manipulating the 
- * Shape of a single hyperedge,
- * including its Creation, modification and check for validity
+ * This Class represents all GUI-Elements, e.g. Parameters / Buttons,
+ * for manipulating the Shape of a single hyperedge (the drawing is in the
+ * initially passed VHyperShapeGraphic
+ * 
+ * this includes its CreationParameters, e.g. a Circle 
+ * - Modification Parameters and Modi (TODO)
+ * - Validation of the Shape (distance to each Node of the VHyperEdge, and whether they are all inside the Shape TODO)
  * 
  * Therefore the interaction is split into 2 seperate steps:
  * 1) Create a Basic Shape, e.g. a circle, polygon or Interpolation Points
  * 2) Modify the Shape by
- *  
  *  -- dragging specific Shape-Areas,
  *  -- In- and Decreasing both knots and degree
  *  	(perhaps select a pasrt of the shape and in/decrease knots there?)
-
- *  Despite that this second mode has the possibility to bet set to expert mode, where you can drag ControlPoints
+ *  -- Rotation, Scaling Shifting of the whole Shape (or selections? Is that possible?)
+ *  
+ *  TODO Despite that a second mode has the possibility to bet set to expert mode, where you can drag ControlPoints
  *		(and perhaps change their weight by double click?)  
  * 
  * Based on a single Hyperedgeindex and the corresponding VHyperGraph the
@@ -289,11 +291,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	{
 		return cont;
 	}
-	public void repaint()
-	{
-		cont.repaint();
-		
-	}
+
 	public void caretUpdate(CaretEvent e)
 	{
 		
@@ -378,7 +376,6 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 					Vector<Object> params = HShapeGraphicRef.getShapeParameters();
 					Point porig = (Point) params.get(NURBSShapeFactory.CIRCLE_ORIGIN);
 					int size = Integer.parseInt(params.get(NURBSShapeFactory.CIRCLE_RADIUS).toString());
-					System.err.println("Got From HSpaheGraphic"+porig+", "+size);
 					if (porig==null) //There is no Shape-Stuff anymore but we have to update the Button for Mode again
 					{//Update Activity of Button, because the last one is without new info.
 						bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
