@@ -55,7 +55,12 @@ public class MainToolbar extends JToolBar implements ActionListener
 	{
 		vG.removePiece("Zoom");
 		vG = newvg;
-		vG.addPiece("Zoom",internalZoomC);		
+		vG.addPiece("Zoom",internalZoomC);
+		validate();
+	}
+	public void validate()
+	{
+		internalZoomC.setZoom(internalZoomC.getZoom());
 	}
 	public void actionPerformed(ActionEvent e) 
 	{	

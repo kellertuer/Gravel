@@ -51,8 +51,8 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 {
 	private static final long serialVersionUID = 1L;
 
-	private MHyperEdge oldmhyperedge, refMHyperEdge;
-	private VHyperEdge oldvhyperedge, refVHyperEdge;
+	private MHyperEdge oldmhyperedge;
+	private VHyperEdge oldvhyperedge;
 	boolean isNewHyperedge;
 	private Vector<String> nodelist; //Zum rueckwaerts nachschauen des Indexes
 	private JCheckBox[] NodeChecks;
@@ -151,14 +151,6 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		tabs.addTab("Ansicht", TextContent);
 		
 		VHyperGraph editClone = graphref.clone();
-		refVHyperEdge = oldvhyperedge.clone();
-		refMHyperEdge = oldmhyperedge.clone();
-		if (!isNewHyperedge)
-			editClone.modifyHyperEdges.remove(refVHyperEdge.getIndex());
-		
-		editClone.modifyHyperEdges.add(refVHyperEdge, refMHyperEdge);
-		refVHyperEdge = editClone.modifyHyperEdges.get(refVHyperEdge.getIndex()); //Because it might be cloned, update reference to clone
-		refMHyperEdge = editClone.getMathGraph().modifyHyperEdges.get(refVHyperEdge.getIndex()); //Because it might be cloned, update reference to clone
 		
 		Container ContentPane = this.getContentPane();
 		ContentPane.setLayout(new GridBagLayout());
@@ -433,7 +425,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 				graphref.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.HYPEREDGE));
 			graphref.modifyHyperEdges.remove(oldmhyperedge.index);
 		}
-		VHyperEdge addEdge = new VHyperEdge (iEdgeIndex.getValue(), iWidth.getValue(),new VHyperEdgeShape(), new VEdgeText(), new VEdgeLinestyle());
+		VHyperEdge addEdge = new VHyperEdge (iEdgeIndex.getValue(), iWidth.getValue(), oldvhyperedge.getShape().clone(), new VEdgeText(), new VEdgeLinestyle());
 
 		MHyperEdge mathEdge = new MHyperEdge(addEdge.getIndex(),iValue.getValue(),EdgeName.getText());
 		int temp=0;
@@ -515,31 +507,9 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 					}
 				}
 				Colorfield.setBackground(colour);
-				colorsrc.copyColorStatus(refVHyperEdge);
 				Colorfield.repaint();
 				return;
 			}
 		}
-		for (int i=0; i<NodeChecks.length; i++)
-		{
-			if (event.getSource()==NodeChecks[i]) //At least this Node Changed
-			{
-				//Update all once
-				int temp=0; //Compressed index of Nodes
-				for (int j=0; j<nodelist.size();j++) //Real Index of Node
-				{
-					if (nodelist.elementAt(j)!=null)
-					{
-						if (NodeChecks[temp].isSelected()&&(!refMHyperEdge.containsNode(j)))
-								refMHyperEdge.addNode(j);
-						else if ((!NodeChecks[temp].isSelected())&&(refMHyperEdge.containsNode(j)))
-							refMHyperEdge.removeNode(j);
-						temp++;
-					}
-				}
-				return;
-			}
-		}
-		//End of Node Checks
 	}
 }

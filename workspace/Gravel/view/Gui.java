@@ -218,6 +218,7 @@ public class Gui implements WindowListener
     	}
     	mainPanel.remove(mainSplit);
         //Unter die GraphList noch die Statistik
+    	graphpart.setViewPort(shapeScroll.getViewport());
         JSplitPane rightside = new JSplitPane(JSplitPane.VERTICAL_SPLIT,treeScroll,stats);
         rightside.setPreferredSize(new Dimension(mainPanel.getBounds().getSize().width - graphpart.getBounds().getSize().width,mainPanel.getBounds().getSize().height - graphpart.getBounds().getSize().height));
         rightside.setResizeWeight(1.0);
@@ -248,7 +249,7 @@ public class Gui implements WindowListener
         //Das Ganze als Scrollpane
         shapeScroll = new JScrollPane(shapePart);
         shapeScroll.setViewportView(shapePart);
-        shapePart.setViewPort(shapeScroll.getViewport());
+        shapePart.setViewPort(mainScroll.getViewport());
         shapeScroll.setMinimumSize(new Dimension(shapePart.getBounds().getSize()));
         shapeScroll.setPreferredSize(shapePart.getBounds().getSize());
         shapeScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -261,8 +262,10 @@ public class Gui implements WindowListener
         shapeParameters = new CHyperEdgeShapeParameters(edge,shapePart);
         mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                    shapeScroll,shapeParameters.getContent());
-        mainSplit.setDividerLocation(shapePart.getBounds().width);
-        mainSplit.setDividerLocation(0.66);
+        mainSplit.setDividerLocation(mainSplit.getSize().width
+                - mainSplit.getInsets().right
+                - mainSplit.getDividerSize()
+                - shapeParameters.getContent().getBounds().width);
         mainSplit.setResizeWeight(1.0);
         mainPanel.add(mainSplit,BorderLayout.CENTER);
         mainPanel.doLayout();
