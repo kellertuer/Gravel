@@ -1,4 +1,4 @@
-package dialogs.components;
+package view;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -28,9 +28,6 @@ import javax.swing.event.CaretListener;
 
 import dialogs.IntegerTextField;
 
-import view.Gui;
-import view.VCommonGraphic;
-import view.VHyperShapeGraphic;
 
 import model.NURBSShapeFactory;
 import model.VHyperEdge;
@@ -60,7 +57,7 @@ import model.Messages.GraphMessage;
  * @since 0.4
  *
  */
-public class CHyperEdgeShapeParameters implements CaretListener, ActionListener, Observer {
+public class HyperEdgeShapePanel implements CaretListener, ActionListener, Observer {
 
 	private Container cont;
 	private IntegerTextField iDistance;
@@ -89,7 +86,7 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 	 * @param index index of the hyperedge whose shape should be modified
 	 * @param vhg corresponding hypergraph
 	 */
-	public CHyperEdgeShapeParameters(int index, VHyperShapeGraphic vhg)
+	public HyperEdgeShapePanel(int index, VHyperShapeGraphic vhg)
 	{
 		if (vhg.getGraph().modifyHyperEdges.get(index)==null)
 			return;
@@ -374,17 +371,19 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 		{
 			GraphMessage m = (GraphMessage) arg;
 			if ((m.getModifiedElementTypes()==GraphConstraints.HYPEREDGE)
-				&&((m.getModification()&GraphConstraints.HYPEREDGESHAPE)==GraphConstraints.HYPEREDGESHAPE))
+				&&(m.getModification()==(GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)))
 			{
 				if  (cBasicShape.isVisible()&&((((String)cBasicShape.getSelectedItem()).equals("Kreis"))))
 				{
 					Vector<Object> params = HShapeGraphicRef.getShapeParameters();
 					Point porig = (Point) params.get(NURBSShapeFactory.CIRCLE_ORIGIN);
 					int size = Integer.parseInt(params.get(NURBSShapeFactory.CIRCLE_RADIUS).toString());
+					System.err.println("Got From HSpaheGraphic"+porig+", "+size);
 					if (porig==null) //There is no Shape-Stuff anymore but we have to update the Button for Mode again
-					{
+					{//Update Activity of Button, because the last one is without new info.
 						bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 						bOk.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
+
 						return;
 					}				
 				if (porig.x!=iCOrigX.getValue())
@@ -407,9 +406,6 @@ public class CHyperEdgeShapeParameters implements CaretListener, ActionListener,
 				}
 				}
 			}
-			//Update Activity of Button
-			bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
-			bOk.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 		}	
 	}
 }

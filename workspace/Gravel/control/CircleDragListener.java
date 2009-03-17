@@ -133,9 +133,9 @@ public class CircleDragListener implements DragShapeMouseHandler {
 			CircleOrigin=null;
 			size = 0;
 			if (vg!=null)
-				vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.BLOCK_END));
+				vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 			else if (vhg!=null)
-				vhg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.BLOCK_END));			
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 		}
 		CircleOrigin=null;
 		size = 0;
@@ -175,9 +175,9 @@ public class CircleDragListener implements DragShapeMouseHandler {
 				notify=vhg;
 
 			if (firstdrag) //If wirst drag - start Block
-				notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE,GraphConstraints.SELECTION));
+				notify.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 			else		//continnue Block
-				notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE,GraphConstraints.SELECTION));
+				notify.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 		}
 		MouseOffSet = e.getPoint();
 		firstdrag = false;

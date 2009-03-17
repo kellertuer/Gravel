@@ -11,7 +11,6 @@ import java.util.TreeMap;
 
 import javax.swing.*;
 
-import dialogs.components.CHyperEdgeShapeParameters;
 
 
 import model.MHyperEdge;
@@ -42,7 +41,7 @@ public class Gui implements WindowListener
 	private static Gui instance;
 	private GeneralPreferences gp;
 	private VHyperShapeGraphic shapePart= null;
-	private CHyperEdgeShapeParameters shapeParameters = null;
+	private HyperEdgeShapePanel shapeParameters = null;
 	private JScrollPane mainScroll, treeScroll, shapeScroll;
 	private JSplitPane mainSplit;
 	/**
@@ -259,7 +258,7 @@ public class Gui implements WindowListener
         gToolBar.changeVGraph(shapePart);
                 
         //Das Ganze als Scrollpane
-        shapeParameters = new CHyperEdgeShapeParameters(edge,shapePart);
+        shapeParameters = new HyperEdgeShapePanel(edge,shapePart);
         mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                    shapeScroll,shapeParameters.getContent());
         mainSplit.setDividerLocation(mainSplit.getSize().width

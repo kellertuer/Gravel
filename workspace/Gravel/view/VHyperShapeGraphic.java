@@ -138,7 +138,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		if ((actualMouseState==CIRCLE_MOUSEHANDLING)||(actualMouseState==SHAPE_MODIFICATION_MOUSEHANDLING))
 		{
 			VHyperEdgeShape tempshape = ((DragShapeMouseHandler)Drag).getShape();
-			if (tempshape!=null)
+			if ((tempshape!=null)&&(Drag.dragged()))
 			{
 				VHyperEdgeShape draw = tempshape.clone();
 				draw.scale(zoomfactor);
