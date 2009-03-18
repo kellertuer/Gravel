@@ -72,32 +72,32 @@ public class VHyperGraphic extends VCommonGraphic
 		Vector<Object> Params = new Vector<Object>();
 		Params.setSize(NURBSShapeFactory.MAX_INDEX);
 		Vector<Point2D> Q = new Vector<Point2D>();
-		Q.add(new Point2D.Double(60,40));
-		Q.add(new Point2D.Double(90,80));
-		Q.add(new Point2D.Double(70,80));
-		Q.add(new Point2D.Double(90,120));
-		Q.add(new Point2D.Double(120,130));
-		Q.add(new Point2D.Double(60,200));
-		Q.add(new Point2D.Double(20,100));
-		Q.add(new Point2D.Double(40,30));
-		Q.add(new Point2D.Double(60,40));
+		Q.add(new Point2D.Double(80,5));
+		Q.add(new Point2D.Double(90,60));
+		Q.add(new Point2D.Double(70,60));
+		Q.add(new Point2D.Double(90,100));
+		Q.add(new Point2D.Double(120,90));
+		Q.add(new Point2D.Double(60,180));
+		Q.add(new Point2D.Double(20,80));
+		Q.add(new Point2D.Double(40,10));
+		Q.add(new Point2D.Double(80,5));
 		Params.set(NURBSShapeFactory.IP_POINTS,Q.clone());
-		Params.set(NURBSShapeFactory.DEGREE,4);
+		Params.set(NURBSShapeFactory.DEGREE,5);
 		Params.set(NURBSShapeFactory.DISTANCE_TO_NODE,0);
 		VHyperEdgeShape s = NURBSShapeFactory.CreateShape("global interpolation",Params);
 		s.scale(zoomfactor);
 		g2.setColor(Color.BLACK);
-		g2.setStroke(new BasicStroke(2*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		g2.setStroke(new BasicStroke(0.8f*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		g2.draw(s.getCurve(0.002d));
-		for (int i=0; i<Q.size(); i++)
+		for (int i=0; i<Q.size()-1; i++)
 		{
-			drawCP(g2, new Point(Math.round((float)Q.get(i).getX()), Math.round((float)Q.get(i).getY())), Color.pink);
+			drawCP(g2, new Point(Math.round((float)Q.get(i).getX()), Math.round((float)Q.get(i).getY())), Color.blue);
 			g2.setColor(Color.black);					
 			Font f = new Font("Arial",Font.PLAIN, Math.round(12*zoomfactor));
 			g2.setFont(f);
 			//mittelpunkt des Textes
 			int x = Math.round((float)Q.get(i).getX());
-			int y = Math.round((float)Q.get(i).getY());
+			int y = Math.round((float)Q.get(i).getY())+10;
 			
 		    FontMetrics metrics = g2.getFontMetrics(f);
 		    int hgt = metrics.getAscent()-metrics.getLeading()-metrics.getDescent();

@@ -86,8 +86,6 @@ public class NURBSShapeFactory {
 		double d = 0d;
 		for (int i=1; i<=maxIPIndex; i++)
 			d += Math.sqrt(q.get(i).distance(q.get(i-1)));
-		for (int i=0; i<=maxIPIndex; i++)
-			System.err.println("Q["+i+"] is"+q.get(i));
 		Vector<Double> lgspoints = new Vector<Double>();
 		lgspoints.setSize(q.size());
 		lgspoints.set(0,0d);
@@ -95,8 +93,6 @@ public class NURBSShapeFactory {
 		for (int i=1; i<maxIPIndex; i++)
 			lgspoints.set(i, lgspoints.get(i-1).doubleValue() + Math.sqrt(q.get(i).distance(q.get(i-1)))/d);
 		//At the lgspoints we evaluate the Curve, get an LGS, that is totally positive and banded
-		Vector<Double> ukclone = (Vector<Double>) lgspoints.clone();
-		//Determine the Knotvektor depending on Q (or lgspoints) to get a nice distirbution for interpolation
 		Vector<Double> Knots = new Vector<Double>();
 		Knots.setSize(maxKnotIndex+1); //Because there are 0,...,macKnotIndex Knots
 		for (int i=0; i<=degree; i++)
@@ -181,8 +177,6 @@ public class NURBSShapeFactory {
 			ControlPoints.set(i,new Point2D.Double(thisPointX,thisPointY));
 		}
 		temp.setCurveTo(Knots, ControlPoints, weights);
-		for (int i=0; i<=maxIPIndex; i++)
-			System.err.println("Curve at ["+ukclone.get(i)+"] is"+temp.NURBSCurveAt(ukclone.get(i)));
 		return temp;
 	}
 
