@@ -340,6 +340,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	{
 		bRotation.setSelected(false);
 		bTranslation.setSelected(false);
+		bScaling.setSelected(false);
 	}
 	public void actionPerformed(ActionEvent e) {
 	        if ((e.getSource()==bCancel)||(e.getSource()==bOk))

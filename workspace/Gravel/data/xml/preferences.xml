@@ -45,7 +45,7 @@
 		<value name="loadfileonstart" type="Boolean">false</value>
 	</group>
 	<group name="grid">
-		<value name="enabled" type="Boolean">true</value>
+		<value name="enabled" type="Boolean">false</value>
 		<value name="orientated" type="Boolean">true</value>
 		<value name="synchron" type="Boolean">false</value>
 		<value name="x" type="Integer">50</value>
@@ -56,11 +56,11 @@
 		<value name="trackSelection" type="Boolean">false</value>
 	</group>
 	<group name="node">
-		<value name="name" type="String">v_{$ID}</value>
+		<value name="name" type="String">$ID</value>
 		<value name="name_distance" type="Integer">18</value>
 		<value name="name_rotation" type="Integer">270</value>
 		<value name="name_size" type="Integer">12</value>
-		<value name="name_visible" type="Boolean">false</value>
+		<value name="name_visible" type="Boolean">true</value>
 		<value name="size" type="Integer">9</value>
 	</group>
 	<group name="pref">

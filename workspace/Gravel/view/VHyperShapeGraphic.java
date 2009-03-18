@@ -68,7 +68,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-		paintDEBUG(g2);
 	}
 	/**
 	 * @param g

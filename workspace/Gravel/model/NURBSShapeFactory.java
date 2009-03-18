@@ -10,19 +10,33 @@ public class NURBSShapeFactory {
 	public final static int CIRCLE_RADIUS = 2;
 	
 	public final static int DISTANCE_TO_NODE = 3;
-	public final static int MAX_INDEX = 4;
 	
+	public final static int IP_POINTS = 4;
+	public final static int DEGREE = 5;
+	public final static int MAX_INDEX = 6;
+	
+	@SuppressWarnings("unchecked")
 	public static VHyperEdgeShape CreateShape(String type, Vector<Object> Parameters)
 	{
 		int distance;
 		try	{distance = Integer.parseInt(Parameters.get(DISTANCE_TO_NODE).toString());}
-		catch (Exception e) {return null;}
+		catch (Exception e) {return new VHyperEdgeShape();} //EmptyShape
 		if (type.toLowerCase().equals("circle"))
 		{
 			int radius;
 			try	{radius = Integer.parseInt(Parameters.get(CIRCLE_RADIUS).toString());}
-			catch (Exception e) {return null;}
+			catch (Exception e) {return new VHyperEdgeShape();} //Empty Shape
 			return CreateCircle((Point) Parameters.get(CIRCLE_ORIGIN), radius, distance);
+		}
+		else if (type.toLowerCase().equals("global interpolation"))
+		{
+			Vector<Point2D> IP_Points;
+			try {IP_Points = (Vector<Point2D>) Parameters.get(IP_POINTS);}
+			catch (Exception e) {return new VHyperEdgeShape();} //Empty Shape
+			int degree;
+			try	{degree = Integer.parseInt(Parameters.get(DEGREE).toString());}
+			catch (Exception e) {return new VHyperEdgeShape();}
+			return CreateInterpolation(IP_Points, degree);
 		}
 		return null;
 	}
@@ -52,4 +66,113 @@ public class NURBSShapeFactory {
 		controlPoints.add(new Point2D.Double(origin.x+radius, origin.y)); //P6 again P0
 		return new VHyperEdgeShape(knots,controlPoints,weights,dist);
 	}
+
+	/**
+  	  * Create and return a Smooth NURBS-Curve of degree degree through the given Interpolation Points
+  	  * 
+	  * @param q The Interpolation-Points
+	  * @param degree the degree
+	  * @return
+	 */
+	private static VHyperEdgeShape CreateInterpolation(Vector<Point2D> q, int degree)
+	{
+		//Based on Algorithm 9.1 from the NURBS-Book
+		
+		int maxIPIndex = q.size()-1; //So we have the InterpolationPoints q.get(0) to q.get(maxIPIndex)
+		int maxKnotIndex = maxIPIndex+degree+1;//So we have Knots with indices from Zero to MaxKnotIndex
+		
+		//First determine the Points, where we interpolate depending to the Interpolation-Points
+		//This Part uses the cetripetal Aproach
+		double d = 0d;
+		for (int i=1; i<=maxIPIndex; i++)
+			d += Math.sqrt(q.get(i).distance(q.get(i-1)));
+		for (int i=0; i<=maxIPIndex; i++)
+			System.err.println("Q["+i+"] is"+q.get(i));
+		Vector<Double> lgspoints = new Vector<Double>();
+		lgspoints.setSize(q.size());
+		lgspoints.set(0,0d);
+		lgspoints.set(maxIPIndex, 1d);
+		for (int i=1; i<maxIPIndex; i++)
+			lgspoints.set(i, lgspoints.get(i-1).doubleValue() + Math.sqrt(q.get(i).distance(q.get(i-1)))/d);
+		//At the lgspoints we evaluate the Curve, get an LGS, that is totally positive and banded
+		Vector<Double> ukclone = (Vector<Double>) lgspoints.clone();
+		//Determine the Knotvektor depending on Q (or lgspoints) to get a nice distirbution for interpolation
+		Vector<Double> Knots = new Vector<Double>();
+		Knots.setSize(maxKnotIndex+1); //Because there are 0,...,macKnotIndex Knots
+		for (int i=0; i<=degree; i++)
+		{
+			Knots.set(i,0d); //First degree+1 Entries are zero
+			Knots.set(maxKnotIndex-i,1d); //Last p+1 Entries are 1
+		}
+		for (int j=1; j<=maxIPIndex-degree; j++) //middle values
+		{
+			double value = 0d;
+			for (int i=j; i<=j+degree-1; i++)
+			{
+				value += lgspoints.get(i);
+			}
+			value /= degree;
+			Knots.set(j+degree, value);
+		}
+		Vector<Point2D> ControlPoints = new Vector<Point2D>(); //The Resulting ConrolPointVecotr
+		ControlPoints.setSize(maxIPIndex+1);
+		Vector<Double> weights = new Vector<Double>();
+		weights.setSize(maxIPIndex+1);
+		for (int i=0; i<=maxIPIndex; i++)
+		{
+			weights.set(i,1.0d);
+			ControlPoints.set(i,new Point(0,0)); //Zero Initialization
+		}
+		
+		VHyperEdgeShape temp = new VHyperEdgeShape(Knots, ControlPoints,weights,0); //Temporary Shape for the BasisFunctions
+		//Compute the basis-Function-Values and set them as row of a Matrix
+		double[][] LGS = new double[maxIPIndex+1][maxIPIndex+1]; //Already zero initialized;
+		for (int i=0; i<=maxIPIndex; i++) //For each Row
+		{
+			int firstnonzero = temp.findSpan(lgspoints.get(i));
+			Vector<Double> nonZeroBasisValues = temp.BasisBSpline(lgspoints.get(i));
+			for (int j=0; j<=degree; j++) //Set all nonzero Row values
+			{
+					LGS[i][j+firstnonzero-degree] = nonZeroBasisValues.get(j);
+			}
+		}
+		//Now Solve the LGS for X to get P_i X-Coordinate and then for Y 
+		//Because this matrix is totally positive and semibandwith less than p - gauss without pivoting is possible
+		
+		for (int j=1; j<=maxIPIndex; j++) //each Column Gaussian Elimination, beginning with the second
+		{
+			for (int i=j; i<=maxIPIndex; i++) //Each row below diag
+			{
+				double fac = LGS[i][j-1] / LGS[j-1][j-1]; //Bringing all below diag to zero
+				double rhsX = q.get(i).getX(); //Right hand side X
+				double rhsY = q.get(i).getY(); //Right hand side Y
+				rhsX = rhsX - q.get(j-1).getX()*fac;
+				rhsY = rhsY - q.get(j-1).getX()*fac;
+				q.set(i, new Point2D.Double(rhsX,rhsY));
+				for (int k=j; k<=maxIPIndex; k++)
+					LGS[i][k] = LGS[i][k] - fac*LGS[j-1][k];
+			}
+		}
+		//Now Bot right hand sides qX and qY are calculated and LGS is an upper triangular Matrix
+		//backward insertion and Calculation of ControlPoints
+		for (int i=maxIPIndex; i>=0; i--)
+		{
+			double thisPointX=0d, thisPointY=0d;
+			thisPointX = q.get(i).getX();
+			thisPointY = q.get(i).getY();
+			for (int j=i+1; j<=maxIPIndex; j++)
+			{
+				thisPointX -= LGS[i][j]*q.get(j).getX();
+				thisPointY -= LGS[i][j]*q.get(j).getY();
+			}
+			thisPointX /=LGS[i][i];
+   			thisPointY /=LGS[i][i];
+			ControlPoints.set(i,new Point2D.Double(thisPointX,thisPointY));
+		}
+		temp.setCurveTo(Knots, ControlPoints, weights);
+		for (int i=0; i<=maxIPIndex; i++)
+			System.err.println("Curve at ["+ukclone.get(i)+"] is"+temp.NURBSCurveAt(ukclone.get(i)));
+		return temp;
+	}
+
 }

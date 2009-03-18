@@ -74,7 +74,8 @@ public class VHyperEdgeShape {
 		maxCPIndex = CPoints.size()-1;
 		maxKnotIndex = Knots.size()-1;
 		degree = Knots.size()-controlPoints.size()-1;
-		InitHomogeneous();
+		if (!isEmpty())
+			InitHomogeneous();
 	}
 	/**
 	 * Private Constructor to (re)create with Homogeneous ControlPointVector
@@ -274,7 +275,7 @@ public class VHyperEdgeShape {
 	 * @param u
 	 * @return
 	 */
-	private int findSpan(double u)
+	public int findSpan(double u)
 	{
 		if (u==Knots.lastElement())
 		{
@@ -416,7 +417,7 @@ public class VHyperEdgeShape {
 	 * @param u
 	 * @return All nonzero Values of BSpline-Basis-Functions at u
 	 */
-	private Vector<Double> BasisBSpline(double u)
+	public Vector<Double> BasisBSpline(double u)
 	{
 		//Calculate all Needed Values
 		int max = findSpan(u); //Only constant function that is nonzero

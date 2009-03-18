@@ -5,9 +5,11 @@ import history.GraphHistoryManager;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 //import javax.swing.*;
 import java.util.Iterator;
 import java.util.Observable;
+import java.util.Vector;
 
 import control.*;
 import model.*;
@@ -66,6 +68,41 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setColor(selColor);
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
+		}
+		Vector<Object> Params = new Vector<Object>();
+		Params.setSize(NURBSShapeFactory.MAX_INDEX);
+		Vector<Point2D> Q = new Vector<Point2D>();
+		Q.add(new Point2D.Double(60,40));
+		Q.add(new Point2D.Double(90,80));
+		Q.add(new Point2D.Double(70,80));
+		Q.add(new Point2D.Double(20,40));
+		Q.add(new Point2D.Double(200,100));
+		Params.set(NURBSShapeFactory.IP_POINTS,Q.clone());
+		Params.set(NURBSShapeFactory.DEGREE,3);
+		Params.set(NURBSShapeFactory.DISTANCE_TO_NODE,0);
+		VHyperEdgeShape s = NURBSShapeFactory.CreateShape("global interpolation",Params);
+		s.scale(zoomfactor);
+		g2.setColor(Color.BLACK);
+		g2.setStroke(new BasicStroke(2*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		g2.draw(s.getCurve(0.002d));
+		for (int i=0; i<Q.size(); i++)
+		{
+			drawCP(g2, new Point(Math.round((float)Q.get(i).getX()), Math.round((float)Q.get(i).getY())), Color.pink);
+			g2.setColor(Color.black);					
+			Font f = new Font("Arial",Font.PLAIN, Math.round(12*zoomfactor));
+			g2.setFont(f);
+			//mittelpunkt des Textes
+			int x = Math.round((float)Q.get(i).getX());
+			int y = Math.round((float)Q.get(i).getY());
+			
+		    FontMetrics metrics = g2.getFontMetrics(f);
+		    int hgt = metrics.getAscent()-metrics.getLeading()-metrics.getDescent();
+		    int adv = metrics.stringWidth("Q"+i);
+		    x = Math.round(x*zoomfactor);
+		    y = Math.round(y*zoomfactor);
+		    x -= Math.round(adv/2); y += Math.round(hgt/2);
+			g2.drawString("Q"+i, x,y);
+
 		}
 	}
 	/**
