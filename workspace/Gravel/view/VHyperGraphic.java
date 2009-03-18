@@ -75,10 +75,14 @@ public class VHyperGraphic extends VCommonGraphic
 		Q.add(new Point2D.Double(60,40));
 		Q.add(new Point2D.Double(90,80));
 		Q.add(new Point2D.Double(70,80));
-		Q.add(new Point2D.Double(20,40));
-		Q.add(new Point2D.Double(200,100));
+		Q.add(new Point2D.Double(90,120));
+		Q.add(new Point2D.Double(120,130));
+		Q.add(new Point2D.Double(60,200));
+		Q.add(new Point2D.Double(20,100));
+		Q.add(new Point2D.Double(40,30));
+		Q.add(new Point2D.Double(60,40));
 		Params.set(NURBSShapeFactory.IP_POINTS,Q.clone());
-		Params.set(NURBSShapeFactory.DEGREE,3);
+		Params.set(NURBSShapeFactory.DEGREE,4);
 		Params.set(NURBSShapeFactory.DISTANCE_TO_NODE,0);
 		VHyperEdgeShape s = NURBSShapeFactory.CreateShape("global interpolation",Params);
 		s.scale(zoomfactor);

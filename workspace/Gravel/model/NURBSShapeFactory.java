@@ -138,35 +138,46 @@ public class NURBSShapeFactory {
 		}
 		//Now Solve the LGS for X to get P_i X-Coordinate and then for Y 
 		//Because this matrix is totally positive and semibandwith less than p - gauss without pivoting is possible
-		
-		for (int j=1; j<=maxIPIndex; j++) //each Column Gaussian Elimination, beginning with the second
+		for (int i=0; i<=maxIPIndex; i++) //Calculate LGS = LR
 		{
-			for (int i=j; i<=maxIPIndex; i++) //Each row below diag
-			{
-				double fac = LGS[i][j-1] / LGS[j-1][j-1]; //Bringing all below diag to zero
-				double rhsX = q.get(i).getX(); //Right hand side X
-				double rhsY = q.get(i).getY(); //Right hand side Y
-				rhsX = rhsX - q.get(j-1).getX()*fac;
-				rhsY = rhsY - q.get(j-1).getX()*fac;
-				q.set(i, new Point2D.Double(rhsX,rhsY));
-				for (int k=j; k<=maxIPIndex; k++)
-					LGS[i][k] = LGS[i][k] - fac*LGS[j-1][k];
+			for (int j=i; j<=maxIPIndex; j++)
+			{	
+				for (int k=1; k<=i-1; k++)
+				{
+	               LGS[i][j] -= LGS[i][k] * LGS[k][j];
+				}
 			}
-		}
-		//Now Bot right hand sides qX and qY are calculated and LGS is an upper triangular Matrix
-		//backward insertion and Calculation of ControlPoints
-		for (int i=maxIPIndex; i>=0; i--)
-		{
-			double thisPointX=0d, thisPointY=0d;
-			thisPointX = q.get(i).getX();
-			thisPointY = q.get(i).getY();
 			for (int j=i+1; j<=maxIPIndex; j++)
 			{
-				thisPointX -= LGS[i][j]*q.get(j).getX();
-				thisPointY -= LGS[i][j]*q.get(j).getY();
+				for (int k=1; k<=i-1; k++)
+				{
+				   LGS[j][i] -= LGS[j][k] * LGS[k][i];
+				}
+	            LGS[j][i] /= LGS[i][i];
 			}
-			thisPointX /=LGS[i][i];
-   			thisPointY /=LGS[i][i];
+		}
+		//Forward Computation of P
+		for (int i=0; i<=maxIPIndex; i++)
+		{
+			double thisX = q.get(i).getX(), thisY = q.get(i).getY();
+			for (int k=0; k<i; k++)
+			{
+				thisX -= LGS[i][k]*ControlPoints.get(k).getX();
+				thisY -= LGS[i][k]*ControlPoints.get(k).getY();
+			}
+			ControlPoints.set(i, new Point2D.Double(thisX,thisY));
+		}
+	//	And Backward with R
+		for (int i=maxIPIndex; i>=0; i--)
+		{
+			double thisPointX=ControlPoints.get(i).getX(), thisPointY=ControlPoints.get(i).getY();
+			for (int k=i+1; k<=maxIPIndex; k++)
+				{
+					thisPointX -= LGS[i][k]*ControlPoints.get(k).getX();
+					thisPointY -= LGS[i][k]*ControlPoints.get(k).getY();
+				}
+			thisPointX /= LGS[i][i];
+			thisPointY /= LGS[i][i];
 			ControlPoints.set(i,new Point2D.Double(thisPointX,thisPointY));
 		}
 		temp.setCurveTo(Knots, ControlPoints, weights);
