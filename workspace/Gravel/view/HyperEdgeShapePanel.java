@@ -24,6 +24,8 @@ import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
+import control.ShapeModificationDragListener;
+
 import dialogs.IntegerTextField;
 
 
@@ -73,11 +75,11 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	private JButton bIncKnots, bDecKnots, bIncDegree, bDecDegree;
 	
 	private JButton bModeChange, bOk, bCancel;
-
+	private JButton bRotation;
 	private int HEdgeRefIndex; //Reference to the HyperEdge in the Graph that is edited here
 	private VHyperGraph HGraphRef; //Reference to the edited Graph, should be a copy of the Graph from the main GUI because the user might cancel this dialog 
 	private VHyperShapeGraphic HShapeGraphicRef;
-
+	
 	private Container CircleFields, FreeModFields;
 	/**
 	 * Create the Dialog for an hyperedge with index i
@@ -196,6 +198,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	{
 		return HGraphRef.modifyHyperEdges.get(HEdgeRefIndex);
 	}
+	
 	private void buildCirclePanel()
 	{
 		CircleFields = new Container();
@@ -278,6 +281,13 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 
 		c.gridy++;
 		c.gridx=0;
+		c.gridwidth=1;
+		bRotation = new JButton("R");
+		bRotation.addActionListener(this);
+		FreeModFields.add(bRotation,c);
+		
+		c.gridy++;
+		c.gridx=0;
 		c.gridwidth=2;
 		Todo = new JLabel("<html><p><i>TODO:</i><br>Drehen,<br>Skalieren,<br>Verschieben,<br>Erweitern-Buttons<br>bzw. Icons,...</p></html>");
 		FreeModFields.add(Todo,c);
@@ -345,11 +355,11 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        		cBasicShape.setVisible(false);
 	        		BasicShape.setVisible(false);
 	        		FreeModFields.setVisible(true);
-	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_MODIFICATION_MOUSEHANDLING);
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);
 	        	}
 	        	else
 	        	{
-	        		bModeChange.setText("freie Modifikation (?)");
+	        		bModeChange.setText("Freie Bearbeitung");
 	        		FreeModFields.setVisible(false);
 	        		cBasicShape.setVisible(true);
 	        		BasicShape.setVisible(true);
@@ -360,6 +370,19 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        {
 	        	HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().refineMiddleKnots();
 	        	HShapeGraphicRef.setMouseHandling(HShapeGraphicRef.getMouseHandling()); //ReInit Drag/Click
+	        }
+	        if (e.getSource()==bRotation)
+	        {
+	        	if (bRotation.isSelected())
+	        	{
+	        		bRotation.setSelected(false);
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
+	        	}
+	        	else
+	        	{
+	        		bRotation.setSelected(true);
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_ROTATE_MOUSEHANDLING);	        		
+	        	}
 	        }
 
 	}

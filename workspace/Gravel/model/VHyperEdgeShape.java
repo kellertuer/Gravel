@@ -218,6 +218,26 @@ public class VHyperEdgeShape {
 		this.setCurveTo(Knots,Q,cpWeight);
 	}
 	/**
+	 * Rotate the Curve - due to Rotation Invariance, only the ControlPoints need to be moved
+	 * Center of Rotation is the Origin (0,0)
+	 * 
+	 * @param degree Amount of rotation - The Rotation is anticlockwise (for positive degree)
+	 */
+	public void rotate(double degree)
+	{
+		Vector<Point2D> Q = new Vector<Point2D>();
+		Iterator<Point2D> bi = controlPoints.iterator();
+		while (bi.hasNext())
+		{
+			Point2D p = bi.next(); //Next Point
+			double rad = degree*Math.PI/180d;
+			double x = p.getX()*Math.cos(rad) + p.getY()*Math.sin(rad);
+			double y = -p.getX()*Math.sin(rad) + p.getY()*Math.cos(rad);
+			Q.add(new Point2D.Double(x,y));
+		}
+		this.setCurveTo(Knots,Q,cpWeight);
+	}
+	/**
 	 * Get the Curve as a piecewise approximated linear Java Path
 	 * @param stepsize Size in the Intervall two points on the path differ
 	 * TODO: Vary that value to an maximum distance thwo points on the path should have (as Bezier-Paths do)

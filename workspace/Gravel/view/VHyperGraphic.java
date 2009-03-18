@@ -85,7 +85,7 @@ public class VHyperGraphic extends VCommonGraphic
 			{
 				VHyperEdgeShape s = temp.getShape().clone();
 				s.scale(zoomfactor);
-				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(0.02d),temp.getWidth(),zoomfactor));
+				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(0.02d/(double)zoomfactor),temp.getWidth(),zoomfactor));
 			}
 		}
 	}

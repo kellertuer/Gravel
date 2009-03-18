@@ -29,7 +29,7 @@ public class FreeModificationDragListener implements DragShapeMouseHandler {
 	VCommonGraphic vgc;
 	VHyperEdge HyperEdgeRef;
 	GeneralPreferences gp;
-	Point MouseOffSet;
+	Point MouseOffSet = new Point(0,0);;
 	boolean firstdrag = true;
 	double DragStartProjection = Double.NaN;
 	VHyperEdgeShape temporaryShape=null;
@@ -39,7 +39,6 @@ public class FreeModificationDragListener implements DragShapeMouseHandler {
 		vgc = g;
 		vhg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
-		MouseOffSet = new Point(0,0);
 		if (vhg.modifyHyperEdges.get(hyperedgeindex)==null)
 			return; //Nothing can be done here.
 		HyperEdgeRef = vhg.modifyHyperEdges.get(hyperedgeindex);

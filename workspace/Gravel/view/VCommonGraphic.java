@@ -30,14 +30,20 @@ import model.Messages.GraphMessage;
 public abstract class VCommonGraphic extends Component implements Observer
 {
 	/**
-	 * 
+	 * These are Different MODI a VCommonGraphic may depend its controlers on
 	 */
 	private static final long serialVersionUID = 1L;
 	public static final int NO_MOUSEHANDLING = 0;
 	public static final int STD_MOUSEHANDLING = 1;
 	public static final int OCM_MOUSEHANDLING = 2;
-	public static final int CIRCLE_MOUSEHANDLING = 3;
-	public static final int SHAPE_MODIFICATION_MOUSEHANDLING = 4;
+	public static final int CIRCLE_MOUSEHANDLING = 4;
+	public static final int CURVEPOINT_MOVEMENT_MOUSEHANDLING = 8;
+
+	public static final int SHAPE_ROTATE_MOUSEHANDLING = 16;
+	public static final int SHAPE_SCALE_MOUSEHANDLING = 32;
+	public static final int SHAPE_MOVE_MOUSEHANDLING = 64;
+	public static final int SHAPE = SHAPE_ROTATE_MOUSEHANDLING|SHAPE_SCALE_MOUSEHANDLING|SHAPE_MOVE_MOUSEHANDLING;
+;
 
 	public static final int VGRAPHIC = 1;
 	public static final int VHYPERGRAPHIC = 2;
