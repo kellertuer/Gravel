@@ -41,8 +41,8 @@ public abstract class VCommonGraphic extends Component implements Observer
 
 	public static final int SHAPE_ROTATE_MOUSEHANDLING = 16;
 	public static final int SHAPE_SCALE_MOUSEHANDLING = 32;
-	public static final int SHAPE_MOVE_MOUSEHANDLING = 64;
-	public static final int SHAPE = SHAPE_ROTATE_MOUSEHANDLING|SHAPE_SCALE_MOUSEHANDLING|SHAPE_MOVE_MOUSEHANDLING;
+	public static final int SHAPE_TRANSLATE_MOUSEHANDLING = 64;
+	public static final int SHAPE = SHAPE_ROTATE_MOUSEHANDLING|SHAPE_SCALE_MOUSEHANDLING|SHAPE_TRANSLATE_MOUSEHANDLING;
 ;
 
 	public static final int VGRAPHIC = 1;

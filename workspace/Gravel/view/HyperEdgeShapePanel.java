@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -75,7 +76,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	private JButton bIncKnots, bDecKnots, bIncDegree, bDecDegree;
 	
 	private JButton bModeChange, bOk, bCancel;
-	private JButton bRotation;
+	private JButton bRotation,bTranslation, bScaling;
 	private int HEdgeRefIndex; //Reference to the HyperEdge in the Graph that is edited here
 	private VHyperGraph HGraphRef; //Reference to the edited Graph, should be a copy of the Graph from the main GUI because the user might cancel this dialog 
 	private VHyperShapeGraphic HShapeGraphicRef;
@@ -248,34 +249,40 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		c.anchor = GridBagConstraints.WEST;
 		c.gridy = 0;
 		c.gridx = 0;
-		c.gridwidth=1;
+		c.gridwidth=2;
 		c.gridheight=1;
 
 		knots = new JLabel("Knotenvektor");
 		FreeModFields.add(knots,c);
 
-		c.gridy++;
-		bIncKnots = new JButton("mehr");
+		c.gridx++;
+		c.gridwidth=1;
+		bIncKnots = new JButton("+");
 		bIncKnots.addActionListener(this);
 		FreeModFields.add(bIncKnots,c);
 
 		c.gridx++;
-		bDecKnots = new JButton("weniger");
+		bDecKnots = new JButton("-");
+		bDecKnots.setSize(new Dimension(17,17));
 		bDecKnots.setEnabled(false);
 		FreeModFields.add(bDecKnots,c);
 		
 		c.gridy++;
 		c.gridx=0;
+		c.gridwidth=2;
 		degree = new JLabel("Polynomgrad: "+3); //TODO get Initial Std Polynomdegree
 		FreeModFields.add(degree,c);
 		
-		c.gridy++;
-		bIncDegree = new JButton("<html>erh"+main.CONST.html_oe+"hen</html>");
+		c.gridx++;
+		c.gridwidth=1;
+		bIncDegree = new JButton("+");
+		bIncDegree.setSize(new Dimension(17,17));
 		bIncDegree.setEnabled(false);
 		FreeModFields.add(bIncDegree,c);
 		
 		c.gridx++;
-		bDecDegree = new JButton("verringern");
+		bDecDegree = new JButton("-");
+		bDecDegree.setSize(new Dimension(17,17));
 		bDecDegree.setEnabled(false);
 		FreeModFields.add(bDecDegree,c);
 
@@ -283,14 +290,23 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		c.gridx=0;
 		c.gridwidth=1;
 		bRotation = new JButton("R");
+		bRotation.setSize(new Dimension(17,17));
 		bRotation.addActionListener(this);
 		FreeModFields.add(bRotation,c);
-		
-		c.gridy++;
-		c.gridx=0;
-		c.gridwidth=2;
-		Todo = new JLabel("<html><p><i>TODO:</i><br>Drehen,<br>Skalieren,<br>Verschieben,<br>Erweitern-Buttons<br>bzw. Icons,...</p></html>");
-		FreeModFields.add(Todo,c);
+
+		c.gridx++;
+		c.gridwidth=1;
+		bTranslation = new JButton("T");
+		bTranslation.setSize(new Dimension(17,17));
+		bTranslation.addActionListener(this);
+		FreeModFields.add(bTranslation,c);
+
+		c.gridx++;
+		c.gridwidth=1;
+		bScaling = new JButton("S");
+		bScaling.setSize(new Dimension(17,17));
+		bScaling.addActionListener(this);
+		FreeModFields.add(bScaling,c);
 
 	}
 	/**
@@ -320,7 +336,11 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			}
 		}
 	}
-	
+	private void deselectButtons()
+	{
+		bRotation.setSelected(false);
+		bTranslation.setSelected(false);
+	}
 	public void actionPerformed(ActionEvent e) {
 	        if ((e.getSource()==bCancel)||(e.getSource()==bOk))
 	        {
@@ -380,8 +400,37 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        	}
 	        	else
 	        	{
+	        		deselectButtons();
 	        		bRotation.setSelected(true);
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_ROTATE_MOUSEHANDLING);	        		
+	        	}
+	        }
+	        if (e.getSource()==bTranslation)
+	        {
+	        	if (bTranslation.isSelected())
+	        	{
+	        		bTranslation.setSelected(false);
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
+	        	}
+	        	else
+	        	{
+	        		deselectButtons();
+	        		bTranslation.setSelected(true);
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_TRANSLATE_MOUSEHANDLING);	        		
+	        	}
+	        }
+	        if (e.getSource()==bScaling)
+	        {
+	        	if (bScaling.isSelected())
+	        	{
+	        		bScaling.setSelected(false);
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
+	        	}
+	        	else
+	        	{
+	        		deselectButtons();
+	        		bScaling.setSelected(true);
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SCALE_MOUSEHANDLING);	        		
 	        	}
 	        }
 
@@ -394,7 +443,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			if ((m.getModifiedElementTypes()==GraphConstraints.HYPEREDGE)
 				&&(m.getModification()==(GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)))
 			{
-				if  (cBasicShape.isVisible()&&((((String)cBasicShape.getSelectedItem()).equals("Kreis"))))
+				if  (cBasicShape.isVisible()&&(CircleFields.isVisible())) //We're in mode one with circles
 				{
 					Vector<Object> params = HShapeGraphicRef.getShapeParameters();
 					Point porig = (Point) params.get(NURBSShapeFactory.CIRCLE_ORIGIN);

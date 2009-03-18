@@ -41,18 +41,15 @@ import view.VHyperGraphic;
  *  - Rotation: The beginning Position of a Drag is used as rotation Center and the angle
  *    is computed by Difference to the Zero-Degree-Line, that is from the Center to the left
  *    
- *  - Movement of the whole Shape
+ *  - Translation of the whole Shape
  *  	Where the Movement vector of the Drag is applied as movement to the Shape
  *  
  *  - Scaling
- *    (a) The distance from the Drag Start Point divided by 10 is used as scaling factor and the
- *        Drag Start Point is the Origin of Scaling. Each Direction, X and Y are scaled
- *    (b) The Distance from Drag Start Point divided by 10 is used
- *        for scaling for X and Y direction seperately
- *   
- *  - Extending - hm the whle Shape is extended by the amount of the Dragged Distance
- *    (perhaps thats better han Scaling (a))
- *    (perhaps apply that also to Slacing b)
+ *     The distance from the Drag Start Point in Relation to the size of the Shape is used
+ *     for calculation of the scaling factor
+ *     
+ *     Perhaps a second scaling would be nice where X and Y are treaded seperately to
+ *     change not only size but aspect ratio of the shape
  *  
  * @author Ronny Bergmann
  *
@@ -61,6 +58,8 @@ public class ShapeModificationDragListener implements DragShapeMouseHandler {
 	
 	public final static int NO_MODIFICATION = 0;
 	public final static int ROTATION = 1;
+	public final static int TRANSLATION = 2;
+	public final static int SCALING = 4;
 	private VHyperGraph vhg = null;
 	private VCommonGraphic vgc;
 	private GeneralPreferences gp;
@@ -212,12 +211,28 @@ public class ShapeModificationDragListener implements DragShapeMouseHandler {
 			Point2D exactPointInGraph = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100d),(double)e.getPoint().y/((double)vgc.getZoom()/100d));
 			Point2D DragMov = new Point2D.Double(exactPointInGraph.getX()-DragOrigin.getX(), exactPointInGraph.getY()-DragOrigin.getY());
 			//Handle this Movement-Vector depending on the specific state we're in 
+			temporaryShape = DragBeginShape.clone();
 			switch(ModificationState)
 			{
 				case ROTATION:
-					temporaryShape = DragBeginShape.clone();
 					temporaryShape.translate(-DragOrigin.getX(),-DragOrigin.getY()); //Origin
 					temporaryShape.rotate(getDegreefromDirection(DragMov)); //Rotate
+					temporaryShape.translate(DragOrigin.getX(),DragOrigin.getY()); //Back
+				break;
+				case TRANSLATION:
+					temporaryShape.translate(DragMov.getX(),DragMov.getY()); //Origin
+				break;
+				case SCALING:
+					//Factor is depending on Distance
+					double dist = DragMov.distance(0d,0d);
+					//And increases size if getX() > 0 else decreases and depends on scale of shape so it does not
+					//involve massive scaling by small mouse movement
+					Point2D min = DragBeginShape.getMin();
+					Point2D max = DragBeginShape.getMax();					
+					double origsizefactor = (max.getX()-min.getX()+max.getY()-min.getY())/2.0d;
+					double factor = (origsizefactor + Math.signum(DragMov.getX())*dist)/origsizefactor;
+					temporaryShape.translate(-DragOrigin.getX(),-DragOrigin.getY()); //Origin
+					temporaryShape.scale(factor);
 					temporaryShape.translate(DragOrigin.getX(),DragOrigin.getY()); //Back
 				break;
 				default: break; //If there is no state, e.g. NO_MODIFICATION, do nothing

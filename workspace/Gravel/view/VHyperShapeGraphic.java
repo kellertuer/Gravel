@@ -213,7 +213,23 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				this.addMouseListener(Drag);
 				this.addMouseMotionListener(Drag);
 				actualMouseState = state;
-				break;
+			break;
+			case SHAPE_TRANSLATE_MOUSEHANDLING:
+				Click=null;
+				Drag = new ShapeModificationDragListener(this, highlightedHyperEdge);
+				((ShapeModificationDragListener)Drag).setModificationState(ShapeModificationDragListener.TRANSLATION);
+				this.addMouseListener(Drag);
+				this.addMouseMotionListener(Drag);
+				actualMouseState = state;
+			break;
+			case SHAPE_SCALE_MOUSEHANDLING:
+				Click=null;
+				Drag = new ShapeModificationDragListener(this, highlightedHyperEdge);
+				((ShapeModificationDragListener)Drag).setModificationState(ShapeModificationDragListener.SCALING);
+				this.addMouseListener(Drag);
+				this.addMouseMotionListener(Drag);
+				actualMouseState = state;
+			break;
 			case NO_MOUSEHANDLING:
 			default:
 				actualMouseState = NO_MOUSEHANDLING;
