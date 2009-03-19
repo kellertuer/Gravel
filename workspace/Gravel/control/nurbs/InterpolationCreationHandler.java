@@ -53,7 +53,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 	boolean firstdrag = true;
 	Point2D DragOrigin = null;
 	Vector<Point2D> InterpolationPoints;
-	int degree;
+	int degree, actualInsertionIndex=-1;
 	VHyperEdgeShape lastshape=null;
 
 	public InterpolationCreationHandler(VHyperGraphic g)
@@ -126,6 +126,18 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 			DragOrigin=null;
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 		}
+		actualInsertionIndex = -1;
+	}
+	private boolean containsPoint(Point2D p)
+	{
+		Iterator<Point2D> iter = InterpolationPoints.iterator();
+		while (iter.hasNext())
+		{
+			Point2D actualPoint = iter.next();
+			if (actualPoint.distance(p)<=0.00002d)
+				return true;
+		}
+		return false;
 	}
 	//One every Click a potental Drag is initialized but firstdrag = true signals, that no Drag-Movement happened yet
 	public void mousePressed(MouseEvent e) {
@@ -154,26 +166,38 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 			Point2D exactPointInGraph  = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100d),(double)e.getPoint().y/((double)vgc.getZoom()/100)); //Rausrechnen des zooms;
 			if (firstdrag) //Add StartDragpoint
 			{
+				if (containsPoint(DragOrigin))
+				{
+					internalReset();
+					return;
+				}
 				if(InterpolationPoints.size()==0) //No Point yet->add this point twice - start & end
 				{
 					InterpolationPoints.add((Point2D.Double) DragOrigin.clone()); 
-					InterpolationPoints.add(DragOrigin); 
+					InterpolationPoints.add(DragOrigin);
+					actualInsertionIndex = 1;
 				}
 				else //Else add as prelast element
 				{
 					int size = InterpolationPoints.size();
 					InterpolationPoints.add(size-1,DragOrigin);
+					actualInsertionIndex = size-1;
 				}
 				UpdateShape();
-			}
-			if (!lastshape.isEmpty())
-				lastshape.movePoint(DragOrigin,exactPointInGraph);
-			else
-				System.err.println("Somehow...Empty.");
-			if (firstdrag) //If wirst drag - start Block
 				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
-			else		//continnue Block
+			}
+			else
+			{
+				if ((!lastshape.isEmpty()))
+				{
+					if (!containsPoint(exactPointInGraph))
+					{
+						InterpolationPoints.set(actualInsertionIndex,exactPointInGraph);
+						UpdateShape();
+					}
+				}
 				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+			}
 		}
 		MouseOffSet = e.getPoint();
 		firstdrag = false;
@@ -195,6 +219,8 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 	public void mouseClicked(MouseEvent e)
 	{
 		Point2D.Double newPoint = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100d),(double)e.getPoint().y/((double)vgc.getZoom()/100)); //Rausrechnen des zooms
+		if (containsPoint(newPoint))
+			return;
 		if(InterpolationPoints.size()==0) //No Point yet->add this point twice - start & end
 		{
 			InterpolationPoints.add((Point2D.Double) newPoint.clone()); 

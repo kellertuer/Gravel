@@ -176,6 +176,7 @@ public class NURBSShapeFactory {
 			thisPointY /= LGS[i][i];
 			ControlPoints.set(i,new Point2D.Double(thisPointX,thisPointY));
 		}
+		System.err.println("Created with"+Knots.size()+" Knots, "+ControlPoints.size()+" CPs and "+weights.size()+"weights");
 		temp.setCurveTo(Knots, ControlPoints, weights);
 		return temp;
 	}

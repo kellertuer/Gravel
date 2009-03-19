@@ -266,7 +266,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		Degree = new JLabel("<html><p>Polynomgrad</p></html>");
 		InterpolationFields.add(Degree,c);
 		c.gridx++;
-		CircleFields.add(iDegree,c);
+		InterpolationFields.add(iDegree,c);
 	}
 	
 	private void buildFreeModPanel()
@@ -473,7 +473,44 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        }
 
 	}
-
+	private void updateCircleFields()
+	{
+		Vector<Object> params = HShapeGraphicRef.getShapeParameters();
+		Point porig = (Point) params.get(NURBSShapeFactory.CIRCLE_ORIGIN);
+		int size = Integer.parseInt(params.get(NURBSShapeFactory.CIRCLE_RADIUS).toString());
+		if (porig==null) //There is no Shape-Stuff anymore but we have to update the Button for Mode again
+		{
+			return;
+		}				
+		if (porig.x!=iCOrigX.getValue())
+		{//Update without evoking this caretUpdate
+			iCOrigX.removeCaretListener(this);
+			iCOrigX.setValue(porig.x);
+			iCOrigX.addCaretListener(this);
+		}
+		if (porig.y!=iCOrigY.getValue())
+		{
+			iCOrigY.removeCaretListener(this);
+			iCOrigY.setValue(porig.y);
+			iCOrigY.addCaretListener(this);
+		}
+		if (size!=iCRad.getValue())
+		{
+			iCRad.removeCaretListener(this);
+			iCRad.setValue(size);
+			iCRad.addCaretListener(this);					
+		}
+	}
+	
+	private void updateIPFields()
+	{
+		Vector<Object> params = HShapeGraphicRef.getShapeParameters();
+		int deg = Integer.parseInt(params.get(NURBSShapeFactory.DEGREE).toString());
+		iDegree.removeCaretListener(this);
+		iDegree.setValue(deg);
+		iDegree.addCaretListener(this);
+		
+	}
 	public void update(Observable o, Object arg) {
 		if (arg instanceof GraphMessage) //All Other GraphUpdates are handled in VGRaphCommons
 		{
@@ -481,38 +518,16 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			if ((m.getModifiedElementTypes()==GraphConstraints.HYPEREDGE)
 				&&(m.getModification()==(GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)))
 			{
-				if  (cBasicShape.isVisible()&&(CircleFields.isVisible())) //We're in mode one with circles
+				if  (cBasicShape.isVisible()) //We're in mode one with circles
 				{
-					Vector<Object> params = HShapeGraphicRef.getShapeParameters();
-					Point porig = (Point) params.get(NURBSShapeFactory.CIRCLE_ORIGIN);
-					int size = Integer.parseInt(params.get(NURBSShapeFactory.CIRCLE_RADIUS).toString());
-					if (porig==null) //There is no Shape-Stuff anymore but we have to update the Button for Mode again
-					{//Update Activity of Button, because the last one is without new info.
-						bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
-						bOk.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
-
-						return;
-					}				
-				if (porig.x!=iCOrigX.getValue())
-				{//Update without evoking this caretUpdate
-					iCOrigX.removeCaretListener(this);
-					iCOrigX.setValue(porig.x);
-					iCOrigX.addCaretListener(this);
-				}
-				if (porig.y!=iCOrigY.getValue())
-				{
-					iCOrigY.removeCaretListener(this);
-					iCOrigY.setValue(porig.y);
-					iCOrigY.addCaretListener(this);
-				}
-				if (size!=iCRad.getValue())
-				{
-					iCRad.removeCaretListener(this);
-					iCRad.setValue(size);
-					iCRad.addCaretListener(this);					
-				}
+					if (CircleFields.isVisible())
+						updateCircleFields();
+					else if (InterpolationFields.isVisible())
+						updateIPFields();
 				}
 			}
+			bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
+			bOk.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 		}	
 	}
 }
