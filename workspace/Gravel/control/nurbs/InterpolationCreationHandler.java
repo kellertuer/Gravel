@@ -92,11 +92,6 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 			return;
 		}
 		lastshape = NURBSShapeFactory.CreateShape("global interpolation", getShapeParameters());
-		for (int i=0; i<InterpolationPoints.size(); i++)
-		{
-			System.err.print(InterpolationPoints.get(i)+" | ");
-		}
-		System.err.println(" : ");
 	}
 
 	public void setShapeParameters(Vector<Object> p)
@@ -221,6 +216,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 		Point2D.Double newPoint = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100d),(double)e.getPoint().y/((double)vgc.getZoom()/100)); //Rausrechnen des zooms
 		if (containsPoint(newPoint))
 			return;
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 		if(InterpolationPoints.size()==0) //No Point yet->add this point twice - start & end
 		{
 			InterpolationPoints.add((Point2D.Double) newPoint.clone()); 
@@ -232,8 +228,6 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 			InterpolationPoints.add(size-1,newPoint);
 		}
 		UpdateShape();
-		System.err.println(lastshape.isEmpty());
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 	}	
 	public Point getMouseOffSet() {
