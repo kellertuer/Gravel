@@ -1,4 +1,4 @@
-package control;
+package control.nurbs;
 
 import io.GeneralPreferences;
 
@@ -8,6 +8,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Vector;
+
 
 import model.VHyperEdge;
 import model.VHyperEdgeShape;
@@ -24,7 +25,7 @@ import view.VHyperGraphic;
  * @author Ronny Bergmann
  *
  */
-public class FreeModificationDragListener implements DragShapeMouseHandler {
+public class FreeModificationHandler implements ShapeMouseHandler {
 	VHyperGraph vhg;
 	VCommonGraphic vgc;
 	VHyperEdge HyperEdgeRef;
@@ -34,7 +35,7 @@ public class FreeModificationDragListener implements DragShapeMouseHandler {
 	double DragStartProjection = Double.NaN;
 	VHyperEdgeShape temporaryShape=null;
 	
-	public FreeModificationDragListener(VHyperGraphic g, int hyperedgeindex)
+	public FreeModificationHandler(VHyperGraphic g, int hyperedgeindex)
 	{
 		vgc = g;
 		vhg = g.getGraph();

@@ -1,6 +1,8 @@
-package control;
+package control.nurbs;
 
 import java.util.Vector;
+
+import control.DragMouseHandler;
 
 import model.VHyperEdgeShape;
 
@@ -13,7 +15,7 @@ import model.VHyperEdgeShape;
  * @author Ronny Bergmann
  *
  */
-public interface DragShapeMouseHandler extends DragMouseHandler 
+public interface ShapeMouseHandler extends DragMouseHandler 
 {
 	/**
 	 * Set Shape to an empty/null object

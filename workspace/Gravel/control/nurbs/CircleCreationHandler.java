@@ -1,4 +1,4 @@
-package control;
+package control.nurbs;
 
 import io.GeneralPreferences;
 
@@ -13,6 +13,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.QuadCurve2D;
 import java.util.Iterator;
 import java.util.Vector;
+
 
 import model.MEdge;
 import model.NURBSShapeFactory;
@@ -42,7 +43,7 @@ import view.VHyperGraphic;
  * @author Ronny Bergmann
  *
  */
-public class CircleDragListener implements DragShapeMouseHandler {
+public class CircleCreationHandler implements ShapeMouseHandler {
 	VGraph vg = null;
 	VHyperGraph vhg = null;
 	VCommonGraphic vgc;
@@ -53,7 +54,7 @@ public class CircleDragListener implements DragShapeMouseHandler {
 	int size = 0;
 	VHyperEdgeShape lastcircle=null;
 
-	public CircleDragListener(VGraphic g)
+	public CircleCreationHandler(VGraphic g)
 	{
 		vgc = g;
 		vg = g.getGraph();
@@ -61,7 +62,7 @@ public class CircleDragListener implements DragShapeMouseHandler {
 		MouseOffSet = new Point(0,0);
 	}
 	
-	public CircleDragListener(VHyperGraphic g)
+	public CircleCreationHandler(VHyperGraphic g)
 	{
 		vgc = g;
 		vhg = g.getGraph();

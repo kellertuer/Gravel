@@ -1,4 +1,4 @@
-package control;
+package control.nurbs;
 
 import io.GeneralPreferences;
 
@@ -14,6 +14,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.util.Iterator;
 import java.util.Vector;
+
 
 import model.MEdge;
 import model.NURBSShapeFactory;
@@ -54,7 +55,7 @@ import view.VHyperGraphic;
  * @author Ronny Bergmann
  *
  */
-public class ShapeModificationDragListener implements DragShapeMouseHandler {
+public class ShapeModificationHandler implements ShapeMouseHandler {
 	
 	public final static int NO_MODIFICATION = 0;
 	public final static int ROTATION = 1;
@@ -78,7 +79,7 @@ public class ShapeModificationDragListener implements DragShapeMouseHandler {
 	 * @param g
 	 * @param hyperedgeindex the specific edge to be modified
 	 */
-	public ShapeModificationDragListener(VHyperGraphic g, int hyperedgeindex)
+	public ShapeModificationHandler(VHyperGraphic g, int hyperedgeindex)
 	{
 		vgc = g;
 		vhg = g.getGraph();

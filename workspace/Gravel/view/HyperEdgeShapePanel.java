@@ -25,7 +25,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import control.ShapeModificationDragListener;
+import control.nurbs.ShapeModificationHandler;
 
 import dialogs.IntegerTextField;
 
