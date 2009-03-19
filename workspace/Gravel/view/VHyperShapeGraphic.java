@@ -135,7 +135,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	
 	private void paintMouseModeDetails(Graphics2D g2)
 	{
-		if ((actualMouseState&(CIRCLE_MOUSEHANDLING|CURVEPOINT_MOVEMENT_MOUSEHANDLING|SHAPE))> 0)
+		if ((actualMouseState&(CIRCLE_MOUSEHANDLING|CURVEPOINT_MOVEMENT_MOUSEHANDLING|SHAPE|INTERPOLATION_MOUSEHANDLING))> 0)
 		{
 			VHyperEdgeShape tempshape = ((ShapeMouseHandler)ShapeModifier).getShape();
 			if ((tempshape!=null)&&(ShapeModifier.dragged()))
@@ -146,6 +146,17 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				g2.setColor(selColor);
 				g2.draw(draw.getCurve(0.05d/(double)zoomfactor)); //draw only a preview
 			}			
+		}
+		if (actualMouseState==INTERPOLATION_MOUSEHANDLING)
+		{
+			Vector<Point2D> IP = (Vector<Point2D>) ShapeModifier.getShapeParameters().get(NURBSShapeFactory.IP_POINTS);
+			Iterator<Point2D> iter = IP.iterator();
+			while (iter.hasNext())
+			{
+				Point2D p = iter.next();
+				Point p2 = new Point(Math.round((float)p.getX()),Math.round((float)p.getY()));
+				this.drawCP(g2, p2, Color.BLUE);
+			}
 		}
 		if ((actualMouseState==CIRCLE_MOUSEHANDLING)||((actualMouseState&SHAPE) > 0))
 		{
@@ -192,6 +203,12 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		{
 			case CIRCLE_MOUSEHANDLING:
 				ShapeModifier = new CircleCreationHandler(this);
+				this.addMouseListener(ShapeModifier);
+				this.addMouseMotionListener(ShapeModifier);
+				actualMouseState = state;
+			break;
+			case INTERPOLATION_MOUSEHANDLING:
+				ShapeModifier = new InterpolationCreationHandler(this);
 				this.addMouseListener(ShapeModifier);
 				this.addMouseMotionListener(ShapeModifier);
 				actualMouseState = state;
@@ -243,7 +260,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		this.removeMouseListener(ShapeModifier);
 		this.removeMouseMotionListener(ShapeModifier);
 		ShapeModifier = null;
-		Click = null;
 	}
 	public Vector<Object> getShapeParameters()
 	{
@@ -271,7 +287,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		{
 			GraphMessage m = (GraphMessage)arg;
 			if ((ShapeModifier!=null)&&(!ShapeModifier.dragged()) //If we have no drag (anymore) and have one of the MOdification-Mousehandlings AND a Block End
-					&&((actualMouseState&CIRCLE_MOUSEHANDLING|CURVEPOINT_MOVEMENT_MOUSEHANDLING|SHAPE_ROTATE_MOUSEHANDLING)>0)
+					&&((actualMouseState&CIRCLE_MOUSEHANDLING|CURVEPOINT_MOVEMENT_MOUSEHANDLING|SHAPE|INTERPOLATION_MOUSEHANDLING)>0)
 					&&((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) 
 			//Drag just ended -> Set Circle as Shape
 			{

@@ -246,11 +246,13 @@ public class VHyperEdgeShape {
 	 */
 	public GeneralPath getCurve(double stepsize) //Adapt to a length on the curve?
 	{
+		GeneralPath path = new GeneralPath();
+		if (isEmpty())
+			return path;
 		//Intervallborders
 		double first = Knots.firstElement();
 		double last = Knots.lastElement();
 		double actual = first;
-		GeneralPath path = new GeneralPath();
 		Point2D.Double f = NURBSCurveAt(first);
 		path.moveTo((new Double(f.x)).floatValue(), (new Double(f.y)).floatValue());
 		actual+=stepsize;

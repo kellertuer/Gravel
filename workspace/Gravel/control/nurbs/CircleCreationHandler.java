@@ -100,9 +100,9 @@ public class CircleCreationHandler implements ShapeMouseHandler {
 			size = rad;
 			buildCircle();
 			if (vg!=null) //Normal Graph
-				vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE,GraphConstraints.SELECTION));
+				vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 			else if (vhg!=null) //Hypergraph
-				vhg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE,GraphConstraints.SELECTION));
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGESHAPE));
 		}
 	}
 	public VHyperEdgeShape getShape()

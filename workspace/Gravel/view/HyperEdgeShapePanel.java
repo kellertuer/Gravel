@@ -68,11 +68,14 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	private IntegerTextField iDistance;
 	private JComboBox cBasicShape;
 	private JLabel Distance, BasicShape;
-	
+	//Circle Fields
 	private JLabel CircleOriginX, CircleOriginY, CircleRadius;
 	private IntegerTextField iCOrigX, iCOrigY, iCRad;
-
-	private JLabel knots, degree, Todo;
+	//Interpolation Fields
+	private JLabel Degree;
+	private IntegerTextField iDegree;
+	//FreeModFields
+	private JLabel knots, degree;
 	private JButton bIncKnots, bDecKnots, bIncDegree, bDecDegree;
 	
 	private JButton bModeChange, bOk, bCancel;
@@ -81,7 +84,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	private VHyperGraph HGraphRef; //Reference to the edited Graph, should be a copy of the Graph from the main GUI because the user might cancel this dialog 
 	private VHyperShapeGraphic HShapeGraphicRef;
 	
-	private Container CircleFields, FreeModFields;
+	private Container CircleFields, InterpolationFields, FreeModFields;
 	/**
 	 * Create the Dialog for an hyperedge with index i
 	 * and the corresponding VHyperGraph
@@ -120,7 +123,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 
 		c.gridy++;
 		c.gridx=0;
-		String[] BasicShapes = {"Kreis", "TODO", "mehr", "grundformen"};
+		String[] BasicShapes = {"Kreis", "Interpolation", "mehr", "grundformen"};
 		cBasicShape = new JComboBox(BasicShapes);
 		cBasicShape.setSelectedIndex(0);
 		cBasicShape.setPreferredSize(new Dimension(100, 30));
@@ -145,7 +148,13 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		cont.add(CircleFields,c);
 		CircleFields.setVisible(false);
 		
+		buildInterpolationPanel();
+		cont.add(InterpolationFields,c);
+		InterpolationFields.setVisible(false);
+
+		//
 		//Container for the fields of the second mode
+		//
 		buildFreeModPanel();
 		cont.add(FreeModFields,c);
 		FreeModFields.setVisible(false);
@@ -213,7 +222,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		c.gridheight=1;
 		iCOrigX = new IntegerTextField();
 		iCOrigX.addCaretListener(this);;
-		iCOrigX.setPreferredSize(new Dimension(80, 20));
+		iCOrigX.setPreferredSize(new Dimension(100, 20));
 		CircleOriginX = new JLabel("<html><p>Mittelpunkt X</p></html>");
 		CircleFields.add(CircleOriginX,c);
 		c.gridx++;
@@ -223,7 +232,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		c.gridx=0;
 		iCOrigY = new IntegerTextField();
 		iCOrigY.addCaretListener(this);;
-		iCOrigY.setPreferredSize(new Dimension(80, 20));
+		iCOrigY.setPreferredSize(new Dimension(100, 20));
 		CircleOriginY = new JLabel("<html><p>Mittelpunkt Y</p></html>");
 		CircleFields.add(CircleOriginY,c);
 		c.gridx++;
@@ -238,6 +247,26 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		CircleFields.add(CircleRadius,c);
 		c.gridx++;
 		CircleFields.add(iCRad,c);
+	}
+
+	private void buildInterpolationPanel()
+	{
+		InterpolationFields = new Container();
+		InterpolationFields.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(5,7,5,7);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridy = 0;
+		c.gridx = 0;
+		c.gridwidth=1;
+		c.gridheight=1;
+		iDegree = new IntegerTextField();
+		iDegree.addCaretListener(this);;
+		iDegree.setPreferredSize(new Dimension(80, 20));
+		Degree = new JLabel("<html><p>Polynomgrad</p></html>");
+		InterpolationFields.add(Degree,c);
+		c.gridx++;
+		CircleFields.add(iDegree,c);
 	}
 	
 	private void buildFreeModPanel()
@@ -355,13 +384,21 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        }
 	        else if (e.getSource()==cBasicShape)//ComboBox
 	        {
+	        	CircleFields.setVisible(false);
+	        	InterpolationFields.setVisible(false);
 	        	String Shape = (String)cBasicShape.getSelectedItem();
 	        	if (Shape.equals("Kreis"))
 	        	{
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CIRCLE_MOUSEHANDLING);
 	        		CircleFields.setVisible(true);
 	        	}
+	        	else if (Shape.equals("Interpolation"))
+	        	{
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.INTERPOLATION_MOUSEHANDLING);
+	        		InterpolationFields.setVisible(true);
+	        	}
 	        	else
+
 	        	{
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.NO_MOUSEHANDLING);
 	        		CircleFields.setVisible(false);
