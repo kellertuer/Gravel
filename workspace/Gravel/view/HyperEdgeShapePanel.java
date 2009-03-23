@@ -10,6 +10,8 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
+import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
@@ -30,9 +32,12 @@ import control.nurbs.ShapeModificationHandler;
 import dialogs.IntegerTextField;
 
 
+import model.MHyperEdge;
 import model.NURBSShapeFactory;
 import model.VHyperEdge;
+import model.VHyperEdgeShape;
 import model.VHyperGraph;
+import model.VNode;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
@@ -72,7 +77,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	private JLabel CircleOriginX, CircleOriginY, CircleRadius;
 	private IntegerTextField iCOrigX, iCOrigY, iCRad;
 	//Interpolation Fields
-	private JLabel Degree;
+	private JLabel Degree, IPInfo;
 	private IntegerTextField iDegree;
 	//FreeModFields
 	private JLabel knots, degree;
@@ -115,6 +120,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		iDistance = new IntegerTextField();
 		iDistance.addCaretListener(this);;
 		iDistance.setPreferredSize(new Dimension(100, 20));
+		iDistance.setValue(15);
 		//TODO Change to a Slider with actual Value in the middle and the possibility to vary that by -+10?
 		Distance = new JLabel("<html><p>Mindestabstand<br><font size=\"-2\">Knoten \u2194 Umriss</font></p></html>");
 		cont.add(Distance,c);
@@ -123,7 +129,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 
 		c.gridy++;
 		c.gridx=0;
-		String[] BasicShapes = {"Kreis", "Interpolation", "mehr", "grundformen"};
+		String[] BasicShapes = {"Kreis", "Interpolation", "konvexe Hülle"};
 		cBasicShape = new JComboBox(BasicShapes);
 		cBasicShape.setSelectedIndex(0);
 		cBasicShape.setPreferredSize(new Dimension(100, 30));
@@ -263,10 +269,18 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		iDegree = new IntegerTextField();
 		iDegree.addCaretListener(this);;
 		iDegree.setPreferredSize(new Dimension(80, 20));
+		iDegree.setValue(4);
 		Degree = new JLabel("<html><p>Polynomgrad</p></html>");
 		InterpolationFields.add(Degree,c);
 		c.gridx++;
 		InterpolationFields.add(iDegree,c);
+		c.gridy++;
+		c.gridx=0;
+		c.gridwidth=3;
+		c.gridheight=2;
+		IPInfo = new JLabel("<html><p>&nbsp;</p></html>");
+
+		InterpolationFields.add(IPInfo,c);
 	}
 	
 	private void buildFreeModPanel()
@@ -347,6 +361,41 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		return cont;
 	}
 
+	private void CalculateConvexHullShape()
+	{
+		Iterator<VNode> nodeiter = HGraphRef.modifyNodes.getIterator();
+		MHyperEdge me = HGraphRef.getMathGraph().modifyHyperEdges.get(HEdgeRefIndex);
+		Vector<Point2D> nodepos = new Vector<Point2D>();
+		Vector<Integer> nodesizes = new Vector<Integer>();
+		while (nodeiter.hasNext())
+		{
+			VNode n = nodeiter.next();
+			if (me.containsNode(n.getIndex()))
+			{
+				nodepos.add(new Point2D.Double(n.getPosition().x,n.getPosition().y));
+				nodesizes.add(n.getSize());
+			}
+		}
+		Vector<Object> params = new Vector<Object>();
+		params.setSize(NURBSShapeFactory.MAX_INDEX);
+		params.set(NURBSShapeFactory.DEGREE,iDegree.getValue());
+		params.set(NURBSShapeFactory.POINTS, nodepos);
+		params.set(NURBSShapeFactory.SIZES, nodesizes);
+		params.set(NURBSShapeFactory.DISTANCE_TO_NODE, iDistance.getValue());
+		VHyperEdgeShape s = NURBSShapeFactory.CreateShape("convex hull", params);
+		if (s.isEmpty())
+		{
+			IPInfo.setText("<html><p>Polynomgrad "+iDegree.getValue()+" ist zu hoch.</p></html>");
+			return;
+		}
+		else
+			IPInfo.setText("<html><p>&nbsp;</p></html>");
+		HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+		HShapeGraphicRef.setShapeParameters(params);
+		HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).setShape(s);
+		HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
+	}
+	
 	public void caretUpdate(CaretEvent e)
 	{
 		
@@ -363,6 +412,21 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 				HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).setShape(NURBSShapeFactory.CreateShape("Circle",param));
 				HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
 			}
+		}
+		if ((e.getSource()==iDegree)&&(iDegree.getValue()>0))
+		{
+	       	String Shape = (String)cBasicShape.getSelectedItem();
+	       	if (Shape.equals("Interpolation"))
+        	{
+	       		Vector<Object> param = HShapeGraphicRef.getShapeParameters();
+	       		param.set(NURBSShapeFactory.DEGREE, iDegree.getValue());
+	       		HShapeGraphicRef.setShapeParameters(param);
+        	}
+        	else if (Shape.equals("konvexe Hülle"))
+        	{
+        		CalculateConvexHullShape();
+        	}
+	       	updateInfo();
 		}
 	}
 	private void deselectButtons()
@@ -397,11 +461,17 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.INTERPOLATION_MOUSEHANDLING);
 	        		InterpolationFields.setVisible(true);
 	        	}
+	        	else if (Shape.equals("konvexe Hülle"))
+	        	{
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.NO_MOUSEHANDLING);
+	        		CalculateConvexHullShape();
+	        		InterpolationFields.setVisible(true);
+	        	}
 	        	else
-
 	        	{
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.NO_MOUSEHANDLING);
 	        		CircleFields.setVisible(false);
+	        		InterpolationFields.setVisible(false);
 	        	}
 	        }
 	        if (e.getSource()==bModeChange)
@@ -410,6 +480,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        	{
 	        		bModeChange.setText("neue Grundform");
 	        		CircleFields.setVisible(false);
+	        		InterpolationFields.setVisible(false);
 	        		cBasicShape.setVisible(false);
 	        		BasicShape.setVisible(false);
 	        		FreeModFields.setVisible(true);
@@ -471,7 +542,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SCALE_MOUSEHANDLING);	        		
 	        	}
 	        }
-
+	        getContent().repaint();
 	}
 	private void updateCircleFields()
 	{
@@ -506,10 +577,37 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	{
 		Vector<Object> params = HShapeGraphicRef.getShapeParameters();
 		int deg = Integer.parseInt(params.get(NURBSShapeFactory.DEGREE).toString());
+		if (iDegree.getValue()==deg)
+			return;
 		iDegree.removeCaretListener(this);
 		iDegree.setValue(deg);
 		iDegree.addCaretListener(this);
+		updateInfo();
+	}
+	private void updateInfo()
+	{
+		Vector<Object> params = HShapeGraphicRef.getShapeParameters();
+		int deg=0;
+		try
+		{ deg = Integer.parseInt(params.get(NURBSShapeFactory.DEGREE).toString());}
+		catch (Exception e)
+		{return;}
+		Vector<Point2D> p=null;
+		try
+		{
+			p = (Vector<Point2D>) params.get(NURBSShapeFactory.POINTS);
+		}
+		catch (Exception e)
+		{
+			return;
+		}
+		if (p==null)
+			return;
 		
+		if (p.size()<=deg)
+			IPInfo.setText("<html><p>Zu wenig Punkte f"+main.CONST.html_ue+"r Polynomgrad "+deg+".</p></html>");
+		else
+			IPInfo.setText("");
 	}
 	public void update(Observable o, Object arg) {
 		if (arg instanceof GraphMessage) //All Other GraphUpdates are handled in VGRaphCommons
@@ -526,6 +624,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 						updateIPFields();
 				}
 			}
+			if (!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty())
+				IPInfo.setText("<html><p>&nbsp;</p></html>");
 			bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 			bOk.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 		}	

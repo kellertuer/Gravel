@@ -217,11 +217,14 @@ public class NURBSShapeFactory {
 		{
 			double thisX = ConvexHull.get(i).getX();
 			double thisY = ConvexHull.get(i).getY();
+			int pos = nodes.indexOf(ConvexHull.get(i));
 			Point2D direction = new Point2D.Double(thisX-mid.getX(), thisY-mid.getY());
 			double length = direction.distance(0d,0d);
-			ConvexHull.set(i, new Point2D.Double(thisX + direction.getX()/length*distance, thisY + direction.getY()/length*distance));
+			ConvexHull.set(i, new Point2D.Double(thisX + direction.getX()/length*(distance+sizes.get(pos)), thisY + direction.getY()/length*(distance+sizes.get(pos))));
 		}
 		ConvexHull.add((Point2D) ConvexHull.firstElement().clone());
+		if (ConvexHull.size()<=degree)
+			return new VHyperEdgeShape();
 		return CreateInterpolation(ConvexHull, degree);
 	}
 	

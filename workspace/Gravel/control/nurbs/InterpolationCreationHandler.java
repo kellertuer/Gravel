@@ -53,7 +53,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 	boolean firstdrag = true;
 	Point2D DragOrigin = null;
 	Vector<Point2D> InterpolationPoints;
-	int degree, actualInsertionIndex=-1;
+	int degree, actualInsertionIndex=-1, nodedist;
 	VHyperEdgeShape lastshape=null;
 
 	public InterpolationCreationHandler(VHyperGraphic g)
@@ -63,6 +63,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 		gp = GeneralPreferences.getInstance();
 		MouseOffSet = new Point(0,0);
 		degree = 5; //TODO: Std Value?
+		nodedist = 20;
 		InterpolationPoints = new Vector<Point2D>();
 	}
 	
@@ -75,15 +76,6 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 	{
 		lastshape=null;
 	}
-	public Vector<Object> getShapeParameters()
-	{
-		Vector<Object> param = new Vector<Object>();
-		param.setSize(NURBSShapeFactory.MAX_INDEX);
-		param.set(NURBSShapeFactory.DEGREE, degree);
-		param.set(NURBSShapeFactory.DISTANCE_TO_NODE,20); //TODO-Std Value
-		param.set(NURBSShapeFactory.POINTS, InterpolationPoints);
-		return param;
-	}
 	private void UpdateShape()
 	{
 		if (InterpolationPoints.size()<=degree)
@@ -93,18 +85,37 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 		}
 		lastshape = NURBSShapeFactory.CreateShape("global interpolation", getShapeParameters());
 	}
-
 	public void setShapeParameters(Vector<Object> p)
 	{
 		if (dragged())
 			return;
-		VHyperEdgeShape d = NURBSShapeFactory.CreateShape("global interpolation", p);
-		if (!d.isEmpty())
-		{
-			lastshape = d;
-			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.SELECTION));
-		}
+		int tempdegree;
+		try	{tempdegree = Integer.parseInt(p.get(NURBSShapeFactory.DEGREE).toString());}
+		catch (Exception e) {return;} //Empty Shape
+		int tempnd;
+		try	{tempnd = Integer.parseInt(p.get(NURBSShapeFactory.DISTANCE_TO_NODE).toString());}
+		catch (Exception e) {return;} //Empty Shape
+		Vector<Point2D> tempIP;
+		try {tempIP = (Vector<Point2D>) p.get(NURBSShapeFactory.POINTS);}
+		catch (Exception e) {return;} //Empty Shape
+		
+		InterpolationPoints = tempIP;
+		degree = tempdegree;
+		nodedist = tempnd;
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+		UpdateShape();
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 	}
+	public Vector<Object> getShapeParameters()
+	{
+		Vector<Object> param = new Vector<Object>();
+		param.setSize(NURBSShapeFactory.MAX_INDEX);
+		param.set(NURBSShapeFactory.DEGREE, degree);
+		param.set(NURBSShapeFactory.DISTANCE_TO_NODE,nodedist); //TODO-Std Value
+		param.set(NURBSShapeFactory.POINTS, InterpolationPoints);
+		return param;
+	}
+
 	public VHyperEdgeShape getShape()
 	{
 		return lastshape;

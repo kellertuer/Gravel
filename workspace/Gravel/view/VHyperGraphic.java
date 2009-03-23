@@ -70,7 +70,6 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-		paintDEBUG(g2);
 	}
 	/**
 	 * @param g
@@ -92,37 +91,6 @@ public class VHyperGraphic extends VCommonGraphic
 				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(0.02d/(double)zoomfactor),temp.getWidth(),zoomfactor));
 			}
 		}
-	}
-	
-	private void paintDEBUG(Graphics2D g2)
-	{
-		int nodecount = vG.getMathGraph().modifyNodes.cardinality();
-		if (nodecount<4)
-			return;
-		//Else comput convex hull of all nodes
-		Vector<Point2D> nodepos = new Vector<Point2D>();
-		Vector<Integer> nodesizes = new Vector<Integer>();
-		Iterator<VNode> nodeiter = vG.modifyNodes.getIterator();
-		while (nodeiter.hasNext())
-		{
-			VNode nextnode = nodeiter.next();
-			nodepos.add(new Point2D.Double(nextnode.getPosition().x, nextnode.getPosition().y));
-			nodesizes.add(nextnode.getSize());
-		}
-		Vector<Object> params = new Vector<Object>();
-		params.setSize(NURBSShapeFactory.MAX_INDEX);
-		params.set(NURBSShapeFactory.DEGREE,3);
-		params.set(NURBSShapeFactory.POINTS, nodepos);
-		params.set(NURBSShapeFactory.SIZES, nodesizes);
-		params.set(NURBSShapeFactory.DISTANCE_TO_NODE, 15);
-		VHyperEdgeShape s = NURBSShapeFactory.CreateShape("convex hull", params);
-		s.scale(zoomfactor);
-		g2.setColor(Color.BLUE);
-		g2.setStroke(new BasicStroke(1*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		g2.draw(s.getCurve(0.02d/(double)zoomfactor));
-		g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		g2.setColor(Color.MAGENTA);
-		g2.draw(p);
 	}
 	/**
 	 * Get the represented Graph for manipulation.
