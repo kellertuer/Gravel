@@ -2,6 +2,7 @@ package model;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.util.Iterator;
 import java.util.Vector;
 
 public class NURBSShapeFactory {
@@ -11,9 +12,10 @@ public class NURBSShapeFactory {
 	
 	public final static int DISTANCE_TO_NODE = 3;
 	
-	public final static int IP_POINTS = 4;
+	public final static int POINTS = 4;
 	public final static int DEGREE = 5;
-	public final static int MAX_INDEX = 6;
+	public final static int SIZES = 6;
+	public final static int MAX_INDEX = 7;
 	
 	@SuppressWarnings("unchecked")
 	public static VHyperEdgeShape CreateShape(String type, Vector<Object> Parameters)
@@ -31,12 +33,25 @@ public class NURBSShapeFactory {
 		else if (type.toLowerCase().equals("global interpolation"))
 		{
 			Vector<Point2D> IP_Points;
-			try {IP_Points = (Vector<Point2D>) Parameters.get(IP_POINTS);}
+			try {IP_Points = (Vector<Point2D>) Parameters.get(POINTS);}
 			catch (Exception e) {return new VHyperEdgeShape();} //Empty Shape
 			int degree;
 			try	{degree = Integer.parseInt(Parameters.get(DEGREE).toString());}
 			catch (Exception e) {return new VHyperEdgeShape();}
 			return CreateInterpolation(IP_Points, degree);
+		}
+		else if (type.toLowerCase().equals("convex hull"))
+		{
+			Vector<Point2D> nodes;
+			try {nodes = (Vector<Point2D>) Parameters.get(POINTS);}
+			catch (Exception e) {return new VHyperEdgeShape();} //Empty Shape
+			Vector<Integer> Sizes;
+			try {Sizes = (Vector<Integer>) Parameters.get(SIZES);}
+			catch (Exception e) {return new VHyperEdgeShape();} //Empty Shape
+			int degree;
+			try	{degree = Integer.parseInt(Parameters.get(DEGREE).toString());}
+			catch (Exception e) {return new VHyperEdgeShape();}
+			return CreateConvexHullPolygon(nodes, Sizes, degree, distance);
 		}
 		return null;
 	}
@@ -180,4 +195,130 @@ public class NURBSShapeFactory {
 		return temp;
 	}
 
+	/**
+	 * Based on Grahams Scan this Method creates a convex hull and calculates Interpolation-Points that are at least
+	 * The size of a node plus the minimal Distance away from the node 
+	 * 
+	 */
+	private static VHyperEdgeShape CreateConvexHullPolygon(Vector<Point2D> nodes, Vector<Integer> sizes, int degree, int distance)
+	{
+		if (nodes.size()<2) //mindestens 3 Knoten nötig
+			return new VHyperEdgeShape();
+		Vector<Point2D> ConvexHull = GrahamsScan(nodes);
+		//Move each point by Size+distance away from center of convex Hull
+		double midX=0d, midY=0d;
+		for (int i=0; i<ConvexHull.size(); i++)
+		{
+			midX += ConvexHull.get(i).getX();
+			midY += ConvexHull.get(i).getY();
+		}
+		Point2D.Double mid = new Point2D.Double(midX/(double)ConvexHull.size(), midY/(double)ConvexHull.size());
+		for (int i=0; i<ConvexHull.size(); i++) //Move Each Point of the Convex Hull
+		{
+			double thisX = ConvexHull.get(i).getX();
+			double thisY = ConvexHull.get(i).getY();
+			Point2D direction = new Point2D.Double(thisX-mid.getX(), thisY-mid.getY());
+			double length = direction.distance(0d,0d);
+			ConvexHull.set(i, new Point2D.Double(thisX + direction.getX()/length*distance, thisY + direction.getY()/length*distance));
+		}
+		ConvexHull.add((Point2D) ConvexHull.firstElement().clone());
+		return CreateInterpolation(ConvexHull, degree);
+	}
+	
+	public static Vector<Point2D> GrahamsScan(Vector<Point2D> nodes)
+	{
+		//Find Pivot Point with lowest Y Coordinate. If there are two, take the one with lowest X
+		Point2D pivot = new Point2D.Double(Double.MAX_VALUE,Double.MAX_VALUE);
+		Iterator<Point2D> iter = nodes.iterator();
+		while (iter.hasNext())
+		{
+			Point2D pnext = iter.next();
+			if (pnext.getY()<pivot.getY()) //new smallest
+				pivot = (Point2D) pnext.clone();
+			else if ((pnext.getY()==pivot.getY())&&(pnext.getX()<pivot.getX()))
+				pivot = (Point2D) pnext.clone();					
+		}
+		//Sort the Points nextP-P by angle with the X-Axis, which is between 0 and 180
+		//Not so fast implemented but that is not so important, i think
+		Vector<Point2D> sortedByAngle = new Vector<Point2D>();
+		iter = nodes.iterator();
+		while (iter.hasNext())
+		{
+			Point2D pnext = iter.next();
+			Point2D direction = new Point2D.Double(pnext.getX()-pivot.getX(), pnext.getY()-pivot.getY());
+			double deg = getDegreefromDirection(direction);
+			//Sort em in
+			Iterator<Point2D> sortiter = sortedByAngle.iterator();
+			double cmpdeg = Double.MIN_VALUE;
+			int index=0;
+			while ((sortiter.hasNext())&&(cmpdeg<=deg))
+			{
+				Point2D pcomp = sortiter.next();
+				Point2D cmpdir = new Point2D.Double(pcomp.getX()-pivot.getX(), pcomp.getY()-pivot.getY());
+				cmpdeg = getDegreefromDirection(cmpdir);
+				if (cmpdeg==deg) //Equal Degree, add before cmp by distance
+				{
+					if (cmpdir.distance(0d,0d)<=direction.distance(0d,0d))
+						cmpdeg = deg + 1; //break
+					else
+						cmpdeg = deg - 1; //continue;
+				}
+				if (cmpdeg<=deg)
+				index++;
+			}
+			sortedByAngle.add(index,pnext);
+		}
+		Vector<Point2D> result = new Vector<Point2D>();
+		result.setSize(2);
+		//Add the first two Elements
+		result.set(0, sortedByAngle.get(0));
+		result.set(1, sortedByAngle.get(1));
+		
+		for (int i=2; i < sortedByAngle.size(); i++)
+		{
+			while ((result.size()>=2)
+					&&(CrossProduct(result.get(result.size()-2), result.lastElement(), sortedByAngle.get(i))<=0))
+				result.remove(result.size()-1);
+
+			result.add(sortedByAngle.get(i));
+		}		 
+		return result;
+	}
+	private static double CrossProduct(Point2D p1, Point2D p2, Point2D p3)
+	{
+       return (p2.getX() - p1.getX())*(p3.getY() - p1.getY()) - (p3.getX() - p1.getX())*(p2.getY() - p1.getY());
+	}
+	private static double getDegreefromDirection(Point2D dir)
+	{
+		//Compute Degree with inverted Y Axis due to Computergraphics
+		double x = dir.getX(), y=-dir.getY();
+		double length = dir.distance(0d,0d);
+		if (x==0d) //90 or 270 Degree
+		{
+			if (y<0d) //Up
+				return 90d;
+			else if (y>0d) //Down
+				return 270d;
+			else
+				return 0d;
+		}
+		if (y==0d) //0 or 180 Degree
+		{
+			if (x<0d) //Left
+				return 180d;
+			else //right
+				return 0d;
+		}
+		//Now both are nonzero, 
+		if (x>0d)
+			if (y<0d) //  1. Quadrant
+				return Math.asin(Math.abs(y)/length)*180.d/Math.PI; //In Degree
+			else //y>0  , 4. Quadrant
+				return Math.acos(Math.abs(y)/length)*180.d/Math.PI + 270d; //In Degree
+		else //x<0 left side
+			if (y<0d) //2. Quadrant
+				return 180.0d - Math.asin(Math.abs(y)/length)*180.d/Math.PI; //In Degree
+			else //y>0, 3. Quadrant
+				return 270.0d - Math.acos(Math.abs(y)/length)*180.d/Math.PI; //In Degree
+	}
 }

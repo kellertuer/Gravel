@@ -149,7 +149,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		}
 		if (actualMouseState==INTERPOLATION_MOUSEHANDLING)
 		{
-			Vector<Point2D> IP = (Vector<Point2D>) ShapeModifier.getShapeParameters().get(NURBSShapeFactory.IP_POINTS);
+			Vector<Point2D> IP = (Vector<Point2D>) ShapeModifier.getShapeParameters().get(NURBSShapeFactory.POINTS);
 			Iterator<Point2D> iter = IP.iterator();
 			while (iter.hasNext())
 			{

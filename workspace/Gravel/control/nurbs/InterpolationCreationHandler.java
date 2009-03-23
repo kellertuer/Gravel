@@ -81,7 +81,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 		param.setSize(NURBSShapeFactory.MAX_INDEX);
 		param.set(NURBSShapeFactory.DEGREE, degree);
 		param.set(NURBSShapeFactory.DISTANCE_TO_NODE,20); //TODO-Std Value
-		param.set(NURBSShapeFactory.IP_POINTS, InterpolationPoints);
+		param.set(NURBSShapeFactory.POINTS, InterpolationPoints);
 		return param;
 	}
 	private void UpdateShape()
