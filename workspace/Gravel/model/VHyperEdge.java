@@ -145,9 +145,7 @@ public class VHyperEdge extends VItem {
 			return false;
 		else
 		{
-			return shape.isPointOnCurve(new Point2D.Double(p.x,p.y), variance);
-			//TODO: Use COnvex Hull instead of Bounding Box? Or even a better thing?
-			
+			return shape.isPointOnCurve(new Point2D.Double(p.x,p.y), variance);			
 		}
 	}
 	/**

@@ -47,8 +47,8 @@ import model.Messages.GraphMessage;
  * initially passed VHyperShapeGraphic
  * 
  * this includes its CreationParameters, e.g. a Circle 
- * - Modification Parameters and Modi (TODO)
- * - Validation of the Shape (distance to each Node of the VHyperEdge, and whether they are all inside the Shape TODO)
+ * TODO Modification Parameters and Modi
+ * TODO Validation of the Shape (distance to each Node of the VHyperEdge, and whether they are all inside the Shape)
  * 
  * Therefore the interaction is split into 2 seperate steps:
  * 1) Create a Basic Shape, e.g. a circle, polygon or Interpolation Points
@@ -58,7 +58,7 @@ import model.Messages.GraphMessage;
  *  	(perhaps select a pasrt of the shape and in/decrease knots there?)
  *  -- Rotation, Scaling Shifting of the whole Shape (or selections? Is that possible?)
  *  
- *  TODO Despite that a second mode has the possibility to bet set to expert mode, where you can drag ControlPoints
+ *  TODO Use a second mode with possibility to be set to expert mode, where you can drag ControlPoints
  *		(and perhaps change their weight by double click?)  
  * 
  * Based on a single Hyperedgeindex and the corresponding VHyperGraph the
@@ -120,7 +120,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		iDistance = new IntegerTextField();
 		iDistance.addCaretListener(this);;
 		iDistance.setPreferredSize(new Dimension(100, 20));
-		iDistance.setValue(15);
+		iDistance.setValue(15); //TODO-Std Value
 		//TODO Change to a Slider with actual Value in the middle and the possibility to vary that by -+10?
 		Distance = new JLabel("<html><p>Mindestabstand<br><font size=\"-2\">Knoten \u2194 Umriss</font></p></html>");
 		cont.add(Distance,c);
@@ -313,7 +313,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		c.gridy++;
 		c.gridx=0;
 		c.gridwidth=2;
-		degree = new JLabel("Polynomgrad: "+3); //TODO get Initial Std Polynomdegree
+		degree = new JLabel("Polynomgrad: "+iDegree.getValue());
 		FreeModFields.add(degree,c);
 		
 		c.gridx++;
@@ -408,7 +408,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 				param.setSize(NURBSShapeFactory.MAX_INDEX);
 				param.add(NURBSShapeFactory.CIRCLE_ORIGIN, new Point(iCOrigX.getValue(), iCOrigY.getValue()));
 				param.add(NURBSShapeFactory.CIRCLE_RADIUS, iCRad.getValue());
-				param.add(NURBSShapeFactory.DISTANCE_TO_NODE,iDistance.getValue()); //TODO-Std Value			
+				param.add(NURBSShapeFactory.DISTANCE_TO_NODE,iDistance.getValue()); 			
 				HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).setShape(NURBSShapeFactory.CreateShape("Circle",param));
 				HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
 			}

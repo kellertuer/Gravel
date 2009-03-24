@@ -107,7 +107,7 @@ public class MHyperEdgeSet extends Observable implements Observer {
 			MHyperEdge temp = ihe.next();
 			BitSet check = (BitSet) temp.getEndNodes().clone(); //Get a Clone o the BitSet
 			check.and(s);
-			if (check.cardinality()==s.cardinality())
+			if (check.cardinality()==temp.getEndNodes().cardinality()) //The logical and did not remove any node so check equals s
 				return temp;
 		}
 		return null;

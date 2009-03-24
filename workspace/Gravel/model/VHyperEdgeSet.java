@@ -191,7 +191,10 @@ public class VHyperEdgeSet extends Observable implements Observer {
 			VHyperEdge act = hei.next();
 			//Actual Edge is not the same object as parameter and has same shape
 			if ((!act.equals(edge))&&(act.getShape().CurveEquals(edge.getShape())))
+			{
+				if ((!act.getShape().isEmpty())||(!edge.getShape().isEmpty())) //One of them is nonempty
 				return act.getIndex();
+			}
 		}
 		return 0;
 	}

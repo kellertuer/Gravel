@@ -241,7 +241,8 @@ public class VHyperEdgeShape {
 	/**
 	 * Get the Curve as a piecewise approximated linear Java Path
 	 * @param stepsize Size in the Intervall two points on the path differ
-	 * TODO: Vary that value to an maximum distance thwo points on the path should have (as Bezier-Paths do)
+	 * TODO: Impprove VHyperEdgeShape-Path-Creation
+	 * 
 	 * @return
 	 */
 	public GeneralPath getCurve(double stepsize) //Adapt to a length on the curve?
@@ -484,7 +485,7 @@ public class VHyperEdgeShape {
 	 * Compares this Curve to another (minDist does not matter)
 	 * if alle values of t,b,w are equal it returns true, else false
 	 * 
-	 * TODO: Check whether there's a way to check for equality if these values are different
+	 * TODO: Check whether there's a way to check for equality if these values are different ?
 	 * @param s another Shape
 	 * @return true if Shape s is equal to this else false
 	 */

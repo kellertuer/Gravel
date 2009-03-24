@@ -149,7 +149,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	    	if (actual.isNameVisible()) //draw name
 			{	
 				s.write("{$"+formname(vg.getMathGraph().modifyNodes.get(actual.getIndex()).name)+"$};");
-				//TODO Text
+				//TODO TikZ-Export - Text
 				//{\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(vg.getNodeName(actual.index))+"}}");
 			}
 	    	else

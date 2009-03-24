@@ -439,6 +439,11 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 			}
 		}
 		addEdge.setWidth(iWidth.getValue());
+		if (graphref.modifyHyperEdges.getIndexWithSimilarShape(addEdge) > 0)
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung der Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Eine Kante mit gleichem Umriss existiertt.</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);
+			return;	
+		}
 		graphref.modifyHyperEdges.add(
 				 addEdge,mathEdge);		//Gruppen einbauen
 		temp=0;
@@ -453,9 +458,8 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		}
 		//Text bauen
 		VHyperEdge e = graphref.modifyHyperEdges.get(iEdgeIndex.getValue());
-//TODO Not yet active		e = cText.modifyHyperEdge(e);
+		//TODO Not yet active		e = cText.modifyHyperEdge(e);
 		e = cLine.modifyHyperEdge(e);
-		//TODO Apply Shape
 		if (!isNewHyperedge)//Change edge, end block
 		{
 			if (oldmhyperedge.index==iEdgeIndex.getValue()) //Index not changed -> Just an EdgeReplace

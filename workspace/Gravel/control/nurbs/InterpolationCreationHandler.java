@@ -63,7 +63,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 		gp = GeneralPreferences.getInstance();
 		MouseOffSet = new Point(0,0);
 		degree = 5; //TODO: Std Value?
-		nodedist = 20;
+		nodedist = 20; //TODO-Std Value
 		InterpolationPoints = new Vector<Point2D>();
 	}
 	
@@ -111,7 +111,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 		Vector<Object> param = new Vector<Object>();
 		param.setSize(NURBSShapeFactory.MAX_INDEX);
 		param.set(NURBSShapeFactory.DEGREE, degree);
-		param.set(NURBSShapeFactory.DISTANCE_TO_NODE,nodedist); //TODO-Std Value
+		param.set(NURBSShapeFactory.DISTANCE_TO_NODE,nodedist);
 		param.set(NURBSShapeFactory.POINTS, InterpolationPoints);
 		return param;
 	}

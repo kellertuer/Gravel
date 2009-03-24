@@ -68,12 +68,6 @@ public abstract class VCommonGraphic extends Component implements Observer
 		gp.addObserver(this);
 		this.setSize(d);
 		this.setBounds(0, 0, d.width, d.height);
-		if (vG.getType()==VGraphInterface.GRAPH)
-		{
-			//TODO Move to outer when finished refactoring History
-			vGh = new GraphHistoryManager((VGraph)vG);
-		}
-
 		zoomfactor = 1.0f;
 		gridx = gp.getIntValue("grid.x");
 		gridy = gp.getIntValue("grid.y");
