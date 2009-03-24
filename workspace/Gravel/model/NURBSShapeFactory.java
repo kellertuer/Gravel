@@ -205,27 +205,46 @@ public class NURBSShapeFactory {
 		if (nodes.size()<2) //mindestens 3 Knoten nötig
 			return new VHyperEdgeShape();
 		Vector<Point2D> ConvexHull = GrahamsScan(nodes);
-		//Move each point by Size+distance away from center of convex Hull
-		double midX=0d, midY=0d;
+		Vector<Point2D> IPoints = new Vector<Point2D>();
 		for (int i=0; i<ConvexHull.size(); i++)
+		//Compute 3 Points for each Point of the convex hull to expand by minDist + individual node size
 		{
-			midX += ConvexHull.get(i).getX();
-			midY += ConvexHull.get(i).getY();
-		}
-		Point2D.Double mid = new Point2D.Double(midX/(double)ConvexHull.size(), midY/(double)ConvexHull.size());
-		for (int i=0; i<ConvexHull.size(); i++) //Move Each Point of the Convex Hull
-		{
+			double prevX, prevY;
+			if (i==0)
+			{
+				prevX = ConvexHull.lastElement().getX(); prevY = ConvexHull.lastElement().getY();
+			}
+			else
+			{
+				prevX = ConvexHull.get(i-1).getX(); prevY = ConvexHull.get(i-1).getY();				
+			}
+			double postX,postY;
+			if (i==(ConvexHull.size()-1))
+			{
+				postX = ConvexHull.firstElement().getX(); postY = ConvexHull.firstElement().getY();
+			}
+			else
+			{
+				postX = ConvexHull.get(i+1).getX(); postY = ConvexHull.get(i+1).getY();				
+			}
 			double thisX = ConvexHull.get(i).getX();
 			double thisY = ConvexHull.get(i).getY();
 			int pos = nodes.indexOf(ConvexHull.get(i));
-			Point2D direction = new Point2D.Double(thisX-mid.getX(), thisY-mid.getY());
-			double length = direction.distance(0d,0d);
-			ConvexHull.set(i, new Point2D.Double(thisX + direction.getX()/length*(distance+sizes.get(pos)), thisY + direction.getY()/length*(distance+sizes.get(pos))));
+			Point2D direction1 = new Point2D.Double(prevX-thisX, prevY-thisY);
+			double dir1l = direction1.distance(0d,0d);
+			Point2D direction2 = new Point2D.Double(postX-thisX, postY-thisY);
+			double dir2l = direction2.distance(0d,0d);
+//			Point2D direction3 = new Point2D.Double(direction1.getX()+direction2.getX(), direction1.getY()+direction2.getY());
+//			double dir3l = direction3.distance(0d,0d);
+			IPoints.add(new Point2D.Double(thisX - direction1.getX()/dir1l*(distance+(double)sizes.get(pos)/2d), thisY - direction1.getY()/dir1l*(distance+(double)sizes.get(pos)/2d)));
+			IPoints.add(new Point2D.Double(thisX - direction2.getX()/dir2l*(distance+(double)sizes.get(pos)/2d), thisY - direction2.getY()/dir2l*(distance+(double)sizes.get(pos)/2d)));
+//			IPoints.add(new Point2D.Double(thisX - direction3.getX()/dir3l*(distance+(double)sizes.get(pos)/2d), thisY - direction3.getY()/dir3l*(distance+(double)sizes.get(pos)/2d)));
 		}
-		ConvexHull.add((Point2D) ConvexHull.firstElement().clone());
-		if (ConvexHull.size()<=degree)
+		IPoints.add((Point2D) IPoints.firstElement().clone());
+		IPoints = GrahamsScan(IPoints); //Make convex again
+		if (IPoints.size()<=degree)
 			return new VHyperEdgeShape();
-		return CreateInterpolation(ConvexHull, degree);
+		return CreateInterpolation(IPoints, degree);
 	}
 	
 	public static Vector<Point2D> GrahamsScan(Vector<Point2D> nodes)
