@@ -234,14 +234,14 @@ public class NURBSShapeFactory {
 			double dir1l = direction1.distance(0d,0d);
 			Point2D direction2 = new Point2D.Double(postX-thisX, postY-thisY);
 			double dir2l = direction2.distance(0d,0d);
-//			Point2D direction3 = new Point2D.Double(direction1.getX()+direction2.getX(), direction1.getY()+direction2.getY());
-//			double dir3l = direction3.distance(0d,0d);
+			Point2D direction3 = new Point2D.Double(direction1.getX()+direction2.getX(), direction1.getY()+direction2.getY());
+			double dir3l = direction3.distance(0d,0d);
 			IPoints.add(new Point2D.Double(thisX - direction1.getX()/dir1l*(distance+(double)sizes.get(pos)/2d), thisY - direction1.getY()/dir1l*(distance+(double)sizes.get(pos)/2d)));
 			IPoints.add(new Point2D.Double(thisX - direction2.getX()/dir2l*(distance+(double)sizes.get(pos)/2d), thisY - direction2.getY()/dir2l*(distance+(double)sizes.get(pos)/2d)));
-//			IPoints.add(new Point2D.Double(thisX - direction3.getX()/dir3l*(distance+(double)sizes.get(pos)/2d), thisY - direction3.getY()/dir3l*(distance+(double)sizes.get(pos)/2d)));
+			IPoints.add(new Point2D.Double(thisX - direction3.getX()/dir3l*(distance+(double)sizes.get(pos)/2d), thisY - direction3.getY()/dir3l*(distance+(double)sizes.get(pos)/2d)));
 		}
-		IPoints.add((Point2D) IPoints.firstElement().clone());
 		IPoints = GrahamsScan(IPoints); //Make convex again
+		IPoints.add((Point2D) IPoints.firstElement().clone());
 		if (IPoints.size()<=degree)
 			return new VHyperEdgeShape();
 		return CreateInterpolation(IPoints, degree);
