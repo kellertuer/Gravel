@@ -27,13 +27,13 @@ import javax.vecmath.Point3d;
  */
 public class VHyperEdgeShape {
 
-	private Vector<Double> Knots;
-	private Vector<Double> cpWeight;
+	protected Vector<Double> Knots;
+	protected Vector<Double> cpWeight;
 	public Vector<Point2D> controlPoints; //ControlPoints
-	private Vector<Point3d> controlPointsHom; //b in homogeneous coordinates multiplied by weight
+	protected Vector<Point3d> controlPointsHom; //b in homogeneous coordinates multiplied by weight
 
-	private int minDist;
-	private int maxKnotIndex, //The Knots are numbered 0,1,...,maxKnotIndex
+	protected int minDist;
+	protected int maxKnotIndex, //The Knots are numbered 0,1,...,maxKnotIndex
 				maxCPIndex, //The ControlPoints are numbered 0,1,...,maxCPIndex
 				degree; //Order of the piecewise polynomials - depends on the maxIndices Above: degree = maxKnotIndex-maxCPindex-1
 
@@ -263,7 +263,7 @@ public class VHyperEdgeShape {
 			path.lineTo((new Double(f.x)).floatValue(), (new Double(f.y)).floatValue());
 			actual+=stepsize;
 		}
-		path.closePath();
+		//TODO reenable path.closePath();
 		
 		return path;
 	}
