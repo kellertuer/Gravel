@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
+import java.util.Stack;
 import java.util.Vector;
 
 import javax.vecmath.Point3d;
@@ -240,31 +241,47 @@ public class VHyperEdgeShape {
 	}
 	/**
 	 * Get the Curve as a piecewise approximated linear Java Path
-	 * @param stepsize Size in the Intervall two points on the path differ
+	 * @param maxdist Size in the Intervall two points on the path differ
 	 * TODO: Impprove VHyperEdgeShape-Path-Creation
 	 * 
 	 * @return
 	 */
-	public GeneralPath getCurve(double stepsize) //Adapt to a length on the curve?
+	public GeneralPath getCurve(double maxdist) //Adapt to a length on the curve?
 	{
 		GeneralPath path = new GeneralPath();
 		if (isEmpty())
 			return path;
-		//Intervallborders
-		double first = Knots.firstElement();
-		double last = Knots.lastElement();
-		double actual = first;
-		Point2D.Double f = NURBSCurveAt(first);
-		path.moveTo((new Double(f.x)).floatValue(), (new Double(f.y)).floatValue());
-		actual+=stepsize;
-		while (actual<=last)
+		Stack<Point2D> calculatedPoints = new Stack<Point2D>();
+		Stack<Double> calculatedParameters = new Stack<Double>();
+		//Startpoint
+		double actualu = Knots.firstElement();
+		Point2D actualPoint = this.NURBSCurveAt(actualu);
+		path.moveTo((float)actualPoint.getX(), (float)actualPoint.getY());
+		//Init Stack with the endpoint
+		calculatedParameters.push(Knots.lastElement());
+		calculatedPoints.push(NURBSCurveAt(calculatedParameters.peek().doubleValue()));
+		calculatedParameters.push((Knots.lastElement()+Knots.firstElement())/2d); //Middle, because start and end ar equal
+		calculatedPoints.push(NURBSCurveAt(calculatedParameters.peek().doubleValue()));
+		//
+		//Calculate values in between as long as they are not near enough
+		//
+		while(!calculatedPoints.empty())
 		{
-			f = NURBSCurveAt(actual);
-			path.lineTo((new Double(f.x)).floatValue(), (new Double(f.y)).floatValue());
-			actual+=stepsize;
+			Point2D comparePoint = calculatedPoints.peek();
+			double compareu = calculatedParameters.peek();
+			if (actualPoint.distance(comparePoint) <= maxdist) //these two are near enough
+			{
+				actualPoint = calculatedPoints.pop();
+				actualu = calculatedParameters.pop();
+				path.lineTo((float)actualPoint.getX(), (float)actualPoint.getY());
+			}
+			else //Not near enough - take middle between them and push that
+			{
+				double middleu = (compareu+actualu)/2d;
+				calculatedPoints.push(NURBSCurveAt(middleu));
+				calculatedParameters.push(middleu);
+			}
 		}
-		//TODO reenable path.closePath();
-		
 		return path;
 	}
 	public boolean isEmpty()

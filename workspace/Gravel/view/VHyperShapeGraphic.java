@@ -88,7 +88,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			{
 				VHyperEdgeShape s = temp.getShape().clone();
 				s.scale(zoomfactor);
-				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(0.02d),temp.getWidth(),zoomfactor));
+				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(5d/(double)zoomfactor),temp.getWidth(),zoomfactor));
 			}
 		}
 	}
@@ -144,7 +144,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				draw.scale(zoomfactor);
 				g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 				g2.setColor(selColor);
-				g2.draw(draw.getCurve(0.05d/(double)zoomfactor)); //draw only a preview
+				g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
 			}			
 		}
 		if (actualMouseState==INTERPOLATION_MOUSEHANDLING)

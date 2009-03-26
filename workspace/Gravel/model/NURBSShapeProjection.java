@@ -43,6 +43,10 @@ public class NURBSShapeProjection
 		{
 			System.err.println("Exlclude this part");
 		}
+		else if (min==alpha)
+		{
+			System.err.println("Minimum should be one of the endpoints.");
+		}
 		else
 		{
 			
@@ -116,13 +120,13 @@ public class NURBSShapeProjection
 			double thisp = 0.0d;
 			for (int i=0; (i<=k)&&(i<=n); i++)
 			{
-				System.err.print("\n k="+k+" ");
+//				System.err.print("\n k="+k+" ");
 				int j = k-i; //So that the sum i+j=k - that way we get every sum of i+j that is k
 				if (j<=n)
 				{ //Compute Pi^T*Pj^
 					double scp = c.controlPoints.get(i).getX()*c.controlPoints.get(j).getX() + c.controlPoints.get(i).getY()*c.controlPoints.get(j).getY();
-					System.err.print("i="+i+" j="+j+"  alpha_ij="+alpha(i,j,n)+" scp="+scp);
-					System.err.print(" Adding "+(alpha(i,j,n)*c.cpWeight.get(i)*c.cpWeight.get(j)*scp)+" ... ");
+//					System.err.print("i="+i+" j="+j+"  alpha_ij="+alpha(i,j,n)+" scp="+scp);
+//					System.err.print(" Adding "+(alpha(i,j,n)*c.cpWeight.get(i)*c.cpWeight.get(j)*scp)+" ... ");
 					thisp += alpha(i,j,n)*c.cpWeight.get(i)*c.cpWeight.get(j)*scp;
 				}
 			}

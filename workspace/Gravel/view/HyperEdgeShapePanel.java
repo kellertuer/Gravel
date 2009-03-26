@@ -624,7 +624,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 						updateIPFields();
 				}
 			}
-			if (!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty())
+			if ((HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape()!=null)&&(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty()))
 				IPInfo.setText("<html><p>&nbsp;</p></html>");
 			bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 			bOk.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());

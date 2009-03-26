@@ -441,7 +441,12 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		addEdge.setWidth(iWidth.getValue());
 		if (graphref.modifyHyperEdges.getIndexWithSimilarShape(addEdge) > 0)
 		{
-			JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung der Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Eine Kante mit gleichem Umriss existiertt.</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung der Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Eine Kante mit gleichem (nichtleeren) Umriss existiert.</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);
+			return;	
+		}
+		else if (graphref.getMathGraph().modifyHyperEdges.get(mathEdge.getEndNodes())!=null)
+		{
+			JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung der Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Eine Kante mit der gleichen Knotenmenge existiert.</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);
 			return;	
 		}
 		graphref.modifyHyperEdges.add(
