@@ -125,8 +125,8 @@ public class NURBSShapeProjection
 				if (j<=n)
 				{ //Compute Pi^T*Pj^
 					double scp = c.controlPoints.get(i).getX()*c.controlPoints.get(j).getX() + c.controlPoints.get(i).getY()*c.controlPoints.get(j).getY();
-//					System.err.print("i="+i+" j="+j+"  alpha_ij="+alpha(i,j,n)+" scp="+scp);
-//					System.err.print(" Adding "+(alpha(i,j,n)*c.cpWeight.get(i)*c.cpWeight.get(j)*scp)+" ... ");
+					System.err.println("i="+i+" j="+j+"  alpha_ij="+alpha(i,j,n)+" scp="+scp);
+					System.err.println(" Adding "+(alpha(i,j,n)*c.cpWeight.get(i)*c.cpWeight.get(j)*scp)+" ... ");
 					thisp += alpha(i,j,n)*c.cpWeight.get(i)*c.cpWeight.get(j)*scp;
 				}
 			}

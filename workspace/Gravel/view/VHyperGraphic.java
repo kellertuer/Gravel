@@ -69,7 +69,7 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-	//	paintDEBUG(g2);
+	paintDEBUG(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
@@ -78,15 +78,18 @@ public class VHyperGraphic extends VCommonGraphic
 		Vector<Point2D> points = new Vector<Point2D>();
 		points.add(new Point2D.Double(50d,150d));	points.add(new Point2D.Double(150d,400d));
 		points.add(new Point2D.Double(300d,25d));
-		points.add(new Point2D.Double(350d,150d));
+//		points.add(new Point2D.Double(350d,150d));
 		points.add(new Point2D.Double(450d,30d));
 		Vector<Double> knots = new Vector<Double>();
 		knots.add(0d);knots.add(0d);knots.add(0d);knots.add(0d);
-		knots.add(0.5d);
 		knots.add(1d);knots.add(1d);knots.add(1d);knots.add(1d);
 		VHyperEdgeShape c = new  VHyperEdgeShape(knots,points,weights,3);
 		g2.setStroke(new BasicStroke(2,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		g2.draw(c.getCurve(5d/(double)zoomfactor));
+		for (int i=0; i<c.controlPoints.size(); i++)
+		{
+			drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())), Color.magenta);
+		}
 		Point2D p = new Point2D.Double(80d,170d);
 		drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),Color.magenta);
 		NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
