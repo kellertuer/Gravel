@@ -34,7 +34,7 @@ public class NURBSShapeProjection
 		double min = Double.MAX_VALUE;
 		for (int i=0; i<ControlPoints.size(); i++)
 		{
-			System.err.print(ControlPoints.get(i)+"  ");
+			System.err.print("("+i+") "+ControlPoints.get(i)+"  with weight "+weights.get(i)+"\n");			
 			if (ControlPoints.get(i)<min)
 				min = ControlPoints.get(i);
 		}
@@ -64,6 +64,7 @@ public class NURBSShapeProjection
 				{
 					System.err.println("Prop2 not given");
 					prop2=false;
+					break;
 				}
 			}
 			if (prop2)
@@ -98,49 +99,127 @@ public class NURBSShapeProjection
 	 */
 	private void initObjSquDist(VHyperEdgeShape c, Point2D p)
 	{
+		if (!isInBezierForm(c))
+			return;
 		c.translate(-p.getX(),-p.getY());
-		int n = c.maxCPIndex;
-		//Compute new weights
-		weights = new Vector<Double>();
-		for (int k=0; k<=(2*n); k++) //For each k compute
-		{
-			double thisw = 0.0d;
-			for (int i=0; (i<=k)&&(i<=n); i++)
-			{
-				int j = k-i; //So that the sum i+j=k - that way we get every sum of i+j that is k
-				if (j<=n)
-					thisw += alpha(i,j,n)*c.cpWeight.get(i)*c.cpWeight.get(j);
-			}
-			weights.add(thisw);
-		}
-		//With the new weights we also can compute the new CP
+		//Further donted as FV
+		double FirstValue = c.Knots.firstElement(); //In a pure Bezier-Curve on [0,1] this i 0, 
+		//Futher denoted as LV
+		double LastValue = c.Knots.lastElement(); //this is 1
+		
+		int Degree = c.maxCPIndex; //Old Degree of the given Bezier Curve
+		System.err.println("Degree: "+Degree+"   and of the product: "+(2*Degree)+" so the tP and tQ have "+(3*Degree+2)+" elements");
+		
+		Vector<Double> tP,tQ;
 		ControlPoints = new Vector<Double>();
-		for (int k=0; k<=(2*n); k++) //For each k compute
-		{
-			double thisp = 0.0d;
-			for (int i=0; (i<=k)&&(i<=n); i++)
+		weights = new Vector<Double>();
+		for (int i=0; i<=(2*Degree); i++)
+		{	//Compute new weights \hat w_i of the product with  i \in {0,...,2n}
+			//i also determines the number of ones in the Intervall for tP and tQ we may choose			
+			//Init tP and  tQ
+			tP = new Vector<Double>();
+			tQ = new Vector<Double>();
+			//Init tP with maximum number of FV, that is the min (n+1+i, 2n+1), because there are never more than 2n+1 FV
+			//Analog tQ as the max(n+1,i+1) because it starts with least possible zeros and ends with the max (2n+1)
+			for (int j=0; j<(3*Degree+2); j++) //This is the length of P and Q
 			{
-//				System.err.print("\n k="+k+" ");
-				int j = k-i; //So that the sum i+j=k - that way we get every sum of i+j that is k
-				if (j<=n)
-				{ //Compute Pi^T*Pj^
-					double scp = c.controlPoints.get(i).getX()*c.controlPoints.get(j).getX() + c.controlPoints.get(i).getY()*c.controlPoints.get(j).getY();
-//					System.err.print("i="+i+" j="+j+"  alpha_ij="+alpha(i,j,n)+" scp="+scp);
-//					System.err.print(" Adding "+(alpha(i,j,n)*c.cpWeight.get(i)*c.cpWeight.get(j)*scp)+" ... ");
-					thisp += alpha(i,j,n)*c.cpWeight.get(i)*c.cpWeight.get(j)*scp;
-				}
+				if (j<Math.min(Degree+1+i,2*Degree+1)) //All befor this max to FV all other to LV
+					tP.add(FirstValue);
+				else
+					tP.add(LastValue);
+				if (j<Math.max(Degree+1,i+1)) //All brfore this to FV all behind to LV
+					tQ.add(FirstValue);
+				else
+					tQ.add(LastValue);
 			}
-			ControlPoints.add(thisp/weights.get(k));
+			double dix = 0.0d, diy = 0.0d; //actualCoefficient
+			double diw = 0.0d;
+			//Now for each i there exist Degree+1 - |i-n| cases (Symmetric to n, because 0,...,2n is always odd)
+			int numberOfCases = Degree+1 - Math.abs(i-Degree);
+			for (int cases=0; cases < numberOfCases; cases++)
+			{
+				//This one case has combinatorial multiplicity:
+				int realcases = cases; //Shift becase after i=Degree the first cases are missing
+				if (i>Degree)
+					realcases += (i-Degree); //After i=Degree first the case, that all p are FV is not possible anymore. this is for the binomial corrected here
+				long mult = binomial(2*Degree-i, Degree-realcases)*binomial(i,realcases);
+				//For each of the cases of t^P/t^Q compute the projection parameters alpha,
+				//that project t^P onto the old t-Vector, and t^Q onto the old t
+				double foronepx = 0.0d, foronepy = 0.0d; //actualCoefficient
+				double foronepw = 0.0d;
+				for (int j1=0; j1<c.controlPoints.size(); j1++)
+				{
+					for (int j2=0; j2<c.controlPoints.size(); j2++)
+					{
+						double alpha1 = alpha(j1,Degree+1,c.Knots,tP,i);
+						double alpha2 = alpha(j2,Degree+1,c.Knots,tQ,i);
+						System.err.println("("+i+") "+alpha1+"*"+alpha2+" "+c.controlPoints.get(j1)+" "+c.controlPoints.get(j2));
+						foronepx += c.controlPoints.get(j1).getX()*alpha1*c.controlPoints.get(j2).getX()*alpha2;
+						foronepy += c.controlPoints.get(j1).getY()*alpha1*c.controlPoints.get(j2).getY()*alpha2;
+						foronepw += c.cpWeight.get(j1).doubleValue()*alpha1*c.cpWeight.get(j2).doubleValue()*alpha2;
+						System.err.println(foronepx+"  "+foronepy+"  "+foronepw);
+					}
+				}
+				dix += foronepx*mult;
+				diy += foronepy*mult;
+				diw += foronepw*mult;
+				//Change the t^P and t^Q, so that t^P its first LV set to FV and t^Q its last FV set to LV
+				int changeindex = 0;
+				while (tP.get(changeindex).doubleValue()==FirstValue)
+					changeindex++;
+				tP.set(changeindex-1, LastValue);
+				changeindex = 0;
+				while (tQ.get(changeindex).doubleValue()==FirstValue)
+					changeindex++;
+				tQ.set(changeindex, FirstValue);
+			} //End Cases
+			dix /= binomial(2*Degree,Degree);
+			diy /= binomial(2*Degree,Degree);
+			diw /= binomial(2*Degree,Degree);
+			ControlPoints.add(dix + diy);
+			weights.add(diw);
+		}	//End i
+	}
+	private double alpha(int j, int k, Vector<Double> tau, Vector<Double> t, int i)
+	{
+		if (k==1)
+		{ //Formular after 1.2 with i=j, t=tau x=t.get(i)
+			if ((tau.get(j)<=t.get(i))&&(t.get(i)<tau.get(j+1)))
+				return 1;
+			else
+				return 0;
+		}	
+		else if ((i+k-1)>=t.size())
+		{
+			System.err.println("TODO: Check! "+j+" "+k+" "+i);
+			return 0;
+		}
+		else
+			return w(j,k,tau,t.get(i+k-1))*alpha(j,k-1,tau,t,i) + (1-w(j+1,k,tau,t.get(i+k-1)))*alpha(j+1,k-1,tau,t,i);
+	}
+	/**
+	 * w from Formular (1.2) of K. Mørten
+	 * TODO: Optimize for Bezier Curves
+	 * @param i
+	 * @param k
+	 * @param t
+	 * @param x
+	 * @return
+	 */
+	private double w(int i, int k, Vector<Double> t, double x)
+	{
+		if (t.get(i)<t.get(i+k-1)) //i is the first value and k+i the last, they are different so not zero
+		{
+			System.err.println("w_"+i+","+k+" is "+(x-t.get(i))/(t.get(i+k-1)-t.get(i)));
+			return (x-t.get(i))/(t.get(i+k-1)-t.get(i));			
+		}
+		else
+		{
+		//	System.err.println("w_"+i+","+k+" is zero");
+			return 0.0d;
 		}
 	}
-	private double alpha(int i, int j, int n)
-	{
-		long a = binomial(n,i);
-		long b = binomial(n,j);
-		long c = binomial(2*n,i+j);
-		double alpha = (double)(a*b)/(double)c;
-		return alpha;
-	}
+
 	// return integer nearest to x
 	long nint(double x)
 	{

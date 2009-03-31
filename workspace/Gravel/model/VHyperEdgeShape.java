@@ -19,7 +19,6 @@ import javax.vecmath.Point3d;
  * - Min and Max of the Bounding Box of the ControlPolygon
  * - Addition (Refinement of Knots)
  *
- * - TODO Get&Set single CPs (when they're moved)
  * - TODO (needed?) get&set knots &weights
  * - TODO In/Decrease Degree of the polynonials 
  * 
@@ -241,8 +240,9 @@ public class VHyperEdgeShape {
 	}
 	/**
 	 * Get the Curve as a piecewise approximated linear Java Path
-	 * @param maxdist Size in the Intervall two points on the path differ
-	 * TODO: Impprove VHyperEdgeShape-Path-Creation
+	 * @param maxdist is the maximum distance of two consecutive Points in the resulting Path
+	 * If you set this value too high, the computation time will increase significantly, if you set it too low
+	 * the path only roughly represents your curve
 	 * 
 	 * @return
 	 */
