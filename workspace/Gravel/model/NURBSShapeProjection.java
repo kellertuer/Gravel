@@ -3,6 +3,8 @@ package model;
 import java.awt.geom.Point2D;
 import java.util.Vector;
 
+import javax.vecmath.Point3d;
+
 /**
  * This Class is used for the projection and point inversion on NURBS Curves
  * Initialized with a NURBS Curve and a point the Class provides both the projection Point and
@@ -25,9 +27,12 @@ public class NURBSShapeProjection
 	public NURBSShapeProjection(VHyperEdgeShape c, Point2D p)
 	{
 		if (!isInBezierForm(c))
+		{
 			System.err.println("TODO: Split");
+			return;
+		}
 		else
-		initObjSquDist(c.clone(),p);
+			initObjSquDist(c.clone(),p);
 		double alpha = Math.min(p.distanceSq(c.controlPoints.firstElement()), p.distanceSq(c.controlPoints.lastElement()));
 		System.err.println("Initial alpha: "+alpha+" Radius"+Math.sqrt(alpha));
 		//Check whether all are outside compute min
@@ -220,6 +225,79 @@ public class NURBSShapeProjection
 		}
 	}
 
+	/**
+	 * Split a given NURBS-Curve into its rational Bezier-Segments
+	 * @param c
+	 * @return
+	 */
+	public Vector<VHyperEdgeShape> DecomposeCurve(VHyperEdgeShape c)
+	{
+		int m = c.maxCPIndex+1;
+		int a = c.degree;
+		int b = c.degree+1;
+		Vector<VHyperEdgeShape> BezierSegments = new Vector<VHyperEdgeShape>();
+		Vector<Point3d> bezierCP = new Vector<Point3d>();
+		Vector<Point3d> nextbezierCP = new Vector<Point3d>();
+		nextbezierCP.setSize(c.degree+1);
+		for (int i=0; i<=c.degree; i++)
+			bezierCP.add(c.controlPointsHom.get(i));
+		while (b<m)
+		{
+			int i=b;
+			while ((b < m)&&(c.Knots.get(b+1).doubleValue()==c.Knots.get(b).doubleValue()))
+				b++;
+			int multiplicity = b-i+1; //Multiplicity of actual Knot
+			if (multiplicity < c.degree) //Refine it until it is p
+			{
+				double numer = c.Knots.get(b).doubleValue() - c.Knots.get(a).doubleValue(); //Numerator of the alphas 
+				Vector<Double> alpha = new Vector<Double>();
+				alpha.setSize(c.degree-multiplicity);
+				for (int j=c.degree; j>multiplicity; j--)
+					alpha.set(j-multiplicity-1, numer/(c.Knots.get(a+j).doubleValue()-c.Knots.get(a).doubleValue()));
+				int insertionMultiplicity = c.degree-multiplicity;
+				for (int j=1; j<=insertionMultiplicity; j++) //Insert Knot as often as needed
+				{
+					int save = insertionMultiplicity - j;
+					int s = multiplicity+j; //These many new Points
+					for (int k=c.degree; k>=s; k--) //
+					{
+						Point3d p1 = (Point3d) bezierCP.get(k).clone();
+						Point3d p2 = (Point3d) bezierCP.get(k-1).clone();
+						p1.scale(alpha.get(k-s)); p2.scale(1-alpha.get(k-s));						
+						p1.add(p2);
+						bezierCP.set(k,p1);
+					}
+					if (b<m) //then the last cp is also a CP of the next bezier segment
+						nextbezierCP.set(save, bezierCP.get(c.degree));
+				}
+			} //End of refinement
+			//Save actual
+			Vector<Double> bezierKnots = new Vector<Double>();
+			for (int k=0; k<=c.degree; k++)
+				bezierKnots.add(c.Knots.get(a));
+			for (int k=0; k<=c.degree; k++)
+				bezierKnots.add(c.Knots.get(b));
+			BezierSegments.add(new VHyperEdgeShape(bezierKnots, bezierCP, c.minDist));
+			if (b<m) //init next
+			{
+				bezierCP = nextbezierCP;
+				nextbezierCP = new Vector<Point3d>();
+				nextbezierCP.setSize(c.degree+1);
+				for (int k=(c.degree-multiplicity); k<=c.degree; k++)
+					bezierCP.set(k, c.controlPointsHom.get(b-c.degree+k));
+				a = b;
+				b++;
+			}
+		}
+		//save last
+		Vector<Double> bezierKnots = new Vector<Double>();
+		for (int k=0; k<=c.degree; k++)
+			bezierKnots.add(c.Knots.get(a));
+		for (int k=0; k<=c.degree; k++)
+			bezierKnots.add(c.Knots.get(b));
+		BezierSegments.add(new VHyperEdgeShape(bezierKnots, bezierCP, c.minDist));
+		return BezierSegments;
+	}
 	// return integer nearest to x
 	long nint(double x)
 	{

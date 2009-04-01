@@ -83,7 +83,7 @@ public class VHyperEdgeShape {
 	 * @param pPw
 	 * @param dist
 	 */
-	private VHyperEdgeShape(Vector<Double> knots, Vector<Point3d> pPw, int dist)
+	protected VHyperEdgeShape(Vector<Double> knots, Vector<Point3d> pPw, int dist)
 	{
 		Knots = new Vector<Double>();
 		cpWeight = new Vector<Double>();
@@ -99,7 +99,7 @@ public class VHyperEdgeShape {
 				controlPoints.set(i,new Point2D.Double(pPw.get(i).x,pPw.get(i).y));
 			else
 				controlPoints.set(i,new Point2D.Double(pPw.get(i).x/pPw.get(i).z,pPw.get(i).y/pPw.get(i).z));
-			cpWeight.add(i,stw);
+			cpWeight.set(i,stw);
 		}
 		minDist = dist;
 		Knots = knots;

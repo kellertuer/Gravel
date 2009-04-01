@@ -74,21 +74,42 @@ public class VHyperGraphic extends VCommonGraphic
 	private void paintDEBUG(Graphics2D g2)
 	{
 		Vector<Double> weights = new Vector<Double>();
-		weights.add(.5);weights.add(.5);weights.add(.4);weights.add(.7); weights.add(.8);
+		weights.add(.5);weights.add(.5);weights.add(.4);weights.add(.7); weights.add(.8); weights.add(.5);
 		Vector<Point2D> points = new Vector<Point2D>();
 		points.add(new Point2D.Double(50d,150d));	points.add(new Point2D.Double(150d,400d));
 		points.add(new Point2D.Double(300d,25d));
-//		points.add(new Point2D.Double(350d,150d));
+		points.add(new Point2D.Double(350d,150d));
 		points.add(new Point2D.Double(450d,30d));
+		points.add(new Point2D.Double(450d,80d));
 		Vector<Double> knots = new Vector<Double>();
 		knots.add(0d);knots.add(0d);knots.add(0d);knots.add(0d);
+		knots.add(.33d);
+		knots.add(.66d);
 		knots.add(1d);knots.add(1d);knots.add(1d);knots.add(1d);
 		VHyperEdgeShape c = new  VHyperEdgeShape(knots,points,weights,3);
 		g2.setStroke(new BasicStroke(2,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		g2.draw(c.getCurve(5d/(double)zoomfactor));
+		VHyperEdgeShape cs = c.clone();
+		cs.scale(zoomfactor);
+		g2.draw(cs.getCurve(5d/(double)zoomfactor));
 		Point2D p = new Point2D.Double(80d,170d);
 		drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),Color.magenta);
 		NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
+
+		Vector<VHyperEdgeShape> parts = proj.DecomposeCurve(c);
+		for (int i=0; i<parts.size(); i++)
+		{
+			System.err.println(parts.size());
+			if (i%2==0)
+				g2.setColor(selColor.GREEN.brighter());
+			else
+				g2.setColor(selColor);
+
+			VHyperEdgeShape s = parts.get(i).clone();
+			s.translate(0,10d);
+			s.scale(zoomfactor);
+			g2.draw(s.getCurve(5d/(double)zoomfactor));
+		}
+			
 	}
 	/**
 	 * @param g
