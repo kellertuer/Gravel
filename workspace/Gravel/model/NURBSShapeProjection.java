@@ -1,6 +1,9 @@
 package model;
 
 import java.awt.geom.Point2D;
+import java.util.AbstractQueue;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Vector;
 
 import javax.vecmath.Point3d;
@@ -21,60 +24,166 @@ import javax.vecmath.Point3d;
 public class NURBSShapeProjection
 {
 	VHyperEdgeShape curve;
-	VHyperEdgeShape[] bezierparts;
 	Point2D p;
-	Vector<Double> weights, ControlPoints;
+	//Values of the just handled qadrated bezier curve
+	Vector<Double> qcWeights, qcControlPoints;
+	int qcDegree;
+	double umin, umax;
+	
+	double resultu;
+	
 	public NURBSShapeProjection(VHyperEdgeShape c, Point2D p)
 	{
+		curve = c.clone();
+		this.p = p;
+		Queue<VHyperEdgeShape> Parts = new LinkedList<VHyperEdgeShape>();
 		if (!isInBezierForm(c))
 		{
-			System.err.println("TODO: Split");
-			return;
+			Vector<VHyperEdgeShape> partsf = DecomposeCurve(c);
+			for (int i=0; i<partsf.size(); i++)
+				Parts.offer(partsf.get(i));
 		}
 		else
-			initObjSquDist(c.clone(),p);
+			Parts.offer(c.clone());
 		double alpha = Math.min(p.distanceSq(c.controlPoints.firstElement()), p.distanceSq(c.controlPoints.lastElement()));
-		System.err.println("Initial alpha: "+alpha+" Radius"+Math.sqrt(alpha));
-		//Check whether all are outside compute min
-		double min = Double.MAX_VALUE;
-		for (int i=0; i<ControlPoints.size(); i++)
+		Vector<Double> candidates = new Vector<Double>(); //because we may have more than one candidate Span 
+		while (!Parts.isEmpty()) 
+			//Wander through all parts, if a part is splitted, its new parts are added at the end of
+			//The Quere, so that they hopefully are out of range of the circle and get discarded then 
+			//
 		{
-			System.err.print("("+i+") "+ControlPoints.get(i)+"  with weight "+weights.get(i)+"\n");			
-			if (ControlPoints.get(i)<min)
-				min = ControlPoints.get(i);
-		}
-		System.err.println("   \n");
-		if (min>alpha)
-		{
-			System.err.println("Exlclude this part");
-		}
-		else if (min==alpha)
-		{
-			System.err.println("Minimum should be one of the endpoints.");
-		}
-		else
-		{
-			
-			System.err.println("Inside, checking for Prop2");
-			int k=0; //None found
-			boolean prop2=true;
-			double lastP = ControlPoints.firstElement();
-			while (((k+2)<ControlPoints.size())&&(lastP > ControlPoints.get(k+1)))
-				k++;
-			System.err.println("First Min "+k+" if there is no max before end, prop 2 given");
-				//First Minimum found in ControlPoints, so all the values after k must be increasing
-			for (int i=k; i<ControlPoints.size()-1; i++)
+			VHyperEdgeShape actualPart = Parts.poll();	
+			CalculateSquareDistanceFunction(actualPart.clone(),p);
+			double partAlpha = Math.min(p.distanceSq(actualPart.controlPoints.firstElement()), p.distanceSq(actualPart.controlPoints.lastElement()));
+			if (partAlpha<alpha)
+				alpha = partAlpha;
+	//		System.err.print("Next alpha: "+alpha+" Radius"+Math.sqrt(alpha)+" on ["+
+	//				actualPart.Knots.firstElement()+","+actualPart.Knots.lastElement()+"].");
+
+			//Check whether all are outside compute min
+			double min = Double.MAX_VALUE;
+			for (int i=0; i<qcControlPoints.size(); i++)
 			{
-				if (ControlPoints.get(i)>=ControlPoints.get(i+1)) //nonincreasing
+				if (qcControlPoints.get(i)<min)
+					min = qcControlPoints.get(i);
+			}
+			if (min>partAlpha)
+			{	//System.err.println(min+" "+alpha+" (out)");// - outside");
+			}
+			else if (min==partAlpha)
+			{
+				if (partAlpha < alpha)
 				{
-					System.err.println("Prop2 not given");
-					prop2=false;
-					break;
+					alpha = partAlpha;
+					if (p.distanceSq(actualPart.controlPoints.firstElement()) < p.distanceSq(actualPart.controlPoints.lastElement()))
+						candidates.add(actualPart.Knots.firstElement());
+					else
+						candidates.add(actualPart.Knots.lastElement());
 				}
 			}
-			if (prop2)
-				System.err.println("Griven");
+			else
+			{
+				if (min>0)
+					alpha = min;
+				//System.err.println(" - inside");
+				int k=0; //None found
+				boolean prop2=true;
+				double lastP = qcControlPoints.firstElement();
+					while (((k+2)<qcControlPoints.size())&&(lastP > qcControlPoints.get(k+1)))
+					{
+						lastP = qcControlPoints.get(k+1);
+						k++;
+					}
+				for (int i=k; i<qcControlPoints.size()-1; i++)
+				{
+					if (qcControlPoints.get(i)>=qcControlPoints.get(i+1)) //nonincreasing
+					{
+						prop2=false;
+						break;
+					}
+				}
+				if (!prop2) //Split in the middle
+				{
+					double refinement = (actualPart.Knots.firstElement() + actualPart.Knots.lastElement())/2d;
+					System.err.println("Prop2 not given refining "+refinement+" on ["+actualPart.Knots.firstElement()+" "+actualPart.Knots.lastElement()+"]");
+					Vector<Double> ref = new Vector<Double>();
+					ref.add(refinement);
+					actualPart.RefineKnots(ref);
+					Vector<VHyperEdgeShape> newParts = DecomposeCurve(actualPart);
+					for (int i=0; i<newParts.size(); i++)
+						Parts.offer(newParts.get(i));
+				}
+				else //Newton Iteration on this part
+				{
+					umin = actualPart.Knots.firstElement();
+					umax = actualPart.Knots.lastElement();
+					double candidate_u = NewtonIteration(actualPart.clone(), (umin+umax)/2d, p);
+					candidates.add(candidate_u);
+//					System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
+					double newdistsq = curve.NURBSCurveAt(candidate_u).distanceSq(p);
+					if (alpha > newdistsq)
+						alpha = newdistsq;
+				}
+			} //End INside
+		} //End while
+		double min = Double.MAX_VALUE;
+		for (int i=0; i<candidates.size(); i++)
+		{
+			Point2D pcmp = curve.NURBSCurveAt(candidates.get(i));
+			if (pcmp.distance(p)<min)
+			{
+				resultu = candidates.get(i);
+				min = pcmp.distance(p);
+			}
 		}
+	}
+	public double getResultParameter()
+	{
+		return resultu;
+	}
+	public Point2D getResultPoint()
+	{
+		return curve.NURBSCurveAt(resultu);
+	}
+	private double NewtonIteration(VHyperEdgeShape c, double startvalue, Point2D p)
+	{
+		//System.err.println("Start: "+startvalue);
+		//End criteria
+		double epsilon1 = 0.00002d;
+		double epsilon2 = 0.0003d;
+		//So now we 
+		boolean running = true;
+		Point2D.Double Value = (Point2D.Double) c.NURBSCurveAt(startvalue);
+		Point2D.Double firstDeriv = (Point2D.Double) c.DerivateCurveAt(1,startvalue);
+		Point2D.Double secondDeriv = (Point2D.Double) c.DerivateCurveAt(2,startvalue);
+		Point2D.Double diff = new Point2D.Double(Value.x-p.getX(), Value.y-p.getY());
+		double u=startvalue;
+		int iterations=0;
+		while (running)
+		{
+			iterations++;
+			double nominator = firstDeriv.x*diff.x + firstDeriv.y*diff.y;
+			double denominator = secondDeriv.x*diff.x + secondDeriv.y*diff.y + firstDeriv.distanceSq(0d,0d);
+			double unext = u - nominator/denominator;
+			if (unext > c.Knots.lastElement()) //Out of Range
+				unext = c.Knots.lastElement();
+			  if (unext < c.Knots.firstElement()) //Out of Range
+				  unext = c.Knots.firstElement();
+			  //System.err.print(" u="+unext);
+			  Value = (Point2D.Double) c.NURBSCurveAt(unext);
+			  firstDeriv = (Point2D.Double) c.DerivateCurveAt(1,unext);
+			  secondDeriv = (Point2D.Double) c.DerivateCurveAt(2,unext);
+			  diff = new Point2D.Double(Value.x-p.getX(), Value.y-p.getY());
+			  double coincidence = diff.distance(0d,0d);
+			  double movement = Math.abs(nominator/denominator);
+			  double movementu = Math.abs(unext-u)*Math.sqrt(firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y);
+			  u=unext;            
+			  //System.err.println(" Criteria: "+coincidence+" and "+movement+" and "+movementu);
+			  if ((coincidence<=epsilon1)||(movement<=epsilon2)||(movementu<=epsilon1))
+				  running=false;
+		  }
+		  System.err.print(" #"+iterations);
+		  return u;
 	}
 	/**
 	 * Returns true if and only if the given NURBS-Curve is a rational Bezier curve, that is, 
@@ -102,7 +211,7 @@ public class NURBSShapeProjection
 	/**
 	 * 
 	 */
-	private void initObjSquDist(VHyperEdgeShape c, Point2D p)
+	private void CalculateSquareDistanceFunction(VHyperEdgeShape c, Point2D p)
 	{
 		if (!isInBezierForm(c))
 			return;
@@ -113,11 +222,11 @@ public class NURBSShapeProjection
 		double LastValue = c.Knots.lastElement(); //this is 1
 		
 		int Degree = c.maxCPIndex; //Old Degree of the given Bezier Curve
-		System.err.println("Degree: "+Degree+"   and of the product: "+(2*Degree)+" so the tP and tQ have "+(3*Degree+2)+" elements");
+//		System.err.println("Degree: "+Degree+"   and of the product: "+(2*Degree)+" so the tP and tQ have "+(3*Degree+2)+" elements");
 		
 		Vector<Double> tP,tQ;
-		ControlPoints = new Vector<Double>();
-		weights = new Vector<Double>();
+		qcControlPoints = new Vector<Double>();
+		qcWeights = new Vector<Double>();
 		for (int i=0; i<=(2*Degree); i++)
 		{	//Compute new weights \hat w_i of the product with  i \in {0,...,2n}
 			//i also determines the number of ones in the Intervall for tP and tQ we may choose			
@@ -158,11 +267,10 @@ public class NURBSShapeProjection
 					{
 						double alpha1 = alpha(j1,Degree+1,c.Knots,tP,i);
 						double alpha2 = alpha(j2,Degree+1,c.Knots,tQ,i);
-						System.err.println("("+i+") "+alpha1+"*"+alpha2+" "+c.controlPoints.get(j1)+" "+c.controlPoints.get(j2));
+//						System.err.println("("+i+") "+alpha1+"*"+alpha2+" "+c.controlPoints.get(j1)+" "+c.controlPoints.get(j2));
 						foronepx += c.controlPoints.get(j1).getX()*alpha1*c.controlPoints.get(j2).getX()*alpha2;
 						foronepy += c.controlPoints.get(j1).getY()*alpha1*c.controlPoints.get(j2).getY()*alpha2;
 						foronepw += c.cpWeight.get(j1).doubleValue()*alpha1*c.cpWeight.get(j2).doubleValue()*alpha2;
-						System.err.println(foronepx+"  "+foronepy+"  "+foronepw);
 					}
 				}
 				dix += foronepx*mult;
@@ -181,9 +289,13 @@ public class NURBSShapeProjection
 			dix /= binomial(2*Degree,Degree);
 			diy /= binomial(2*Degree,Degree);
 			diw /= binomial(2*Degree,Degree);
-			ControlPoints.add(dix + diy);
-			weights.add(diw);
+			qcControlPoints.add(dix + diy);
+			qcWeights.add(diw);
 		}	//End i
+		//Update Degree
+		qcDegree = 2*Degree;
+		umin = c.Knots.firstElement().doubleValue();
+		umax = c.Knots.lastElement().doubleValue();
 	}
 	private double alpha(int j, int k, Vector<Double> tau, Vector<Double> t, int i)
 	{
@@ -215,7 +327,7 @@ public class NURBSShapeProjection
 	{
 		if (t.get(i)<t.get(i+k-1)) //i is the first value and k+i the last, they are different so not zero
 		{
-			System.err.println("w_"+i+","+k+" is "+(x-t.get(i))/(t.get(i+k-1)-t.get(i)));
+//			System.err.println("w_"+i+","+k+" is "+(x-t.get(i))/(t.get(i+k-1)-t.get(i)));
 			return (x-t.get(i))/(t.get(i+k-1)-t.get(i));			
 		}
 		else
@@ -298,7 +410,6 @@ public class NURBSShapeProjection
 		BezierSegments.add(new VHyperEdgeShape(bezierKnots, bezierCP, c.minDist));
 		return BezierSegments;
 	}
-	// return integer nearest to x
 	long nint(double x)
 	{
 		if (x < 0.0) return (long) Math.ceil(x - 0.5);

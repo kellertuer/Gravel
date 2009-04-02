@@ -335,31 +335,19 @@ public class VHyperEdgeShape {
 	 * @param u
 	 * @return
 	 */
-	public Point2D DerivateCurveAt(int pDegree, double u)
+	public Point2D DerivateCurveAt(int derivate, double u)
 	{
-		if (pDegree==0)
+		if (derivate==0)
 			return NURBSCurveAt(u);
 		Vector<Point3d> DerivatesBSpline = new Vector<Point3d>();
-		DerivatesBSpline.setSize(pDegree+1);
-		int actdeg = 1;
-		while (actdeg<=pDegree) //Generate all Values of lower derivates at Point u in homogeneous BSpline-Points
-		{
-			Vector<Point3d> theirCP = CPofDerivate(actdeg);
-			Vector<Double> theirt = new Vector<Double>();
-			for (int i=actdeg; i<=maxKnotIndex-actdeg; i++)
-				theirt.add(i-actdeg,Knots.get(i));
-			VHyperEdgeShape theirCurve = new VHyperEdgeShape(theirt,theirCP,0);
-			Point3d derivp= theirCurve.deBoer3D(u);
-			DerivatesBSpline.set(actdeg,derivp); 
-			actdeg++;
-		}
+		DerivatesBSpline = DerivateValues(derivate, u);
 		Vector<Point2D> DerivatesNURBS = new Vector<Point2D>();
-		DerivatesNURBS.setSize(pDegree);
+		DerivatesNURBS.setSize(derivate);
 		DerivatesNURBS.set(0,NURBSCurveAt(u));
-		for (int k=1; k<=pDegree; k++)
+		for (int k=1; k<=derivate; k++)
 		{ //Calculate kth Derivate
 			Point2D.Double thisdeg = new Point2D.Double(DerivatesBSpline.get(k).x,DerivatesBSpline.get(k).y);
-			double denominator = DerivatesBSpline.get(k).z;
+			double denominator = deBoer3D(u).z;
 			for (int i=1; i<=k; i++)
 			{
 				double factor = binomial(k,i)*DerivatesBSpline.get(i).z;
@@ -374,7 +362,99 @@ public class VHyperEdgeShape {
 			}
 			DerivatesNURBS.add(k, new Point2D.Double(thisdeg.x,thisdeg.y));
 		}
-		return DerivatesNURBS.elementAt(pDegree);
+		return DerivatesNURBS.elementAt(derivate);
+	}
+	private Vector<Point3d> DerivateValues(int derivate, double u)
+	{
+		int du = Math.min(degree, derivate);
+		Vector<Point3d> CK = new Vector<Point3d>();
+		int span = findSpan(u);
+		CK.setSize(derivate+1);
+		for (int k=degree+1; k<=derivate; k++)
+			CK.set(k,new Point3d(0d,0d,0d)); //All higher derivates zero
+		double[][] nders = DersBasisFuns(du,u);
+		for (int k=0; k<=du; k++) //compute kth value
+		{
+			CK.set(k, new Point3d(0d,0d,0d));
+			for (int j=0; j<=degree; j++)
+			{
+				Point3d Addition = (Point3d) controlPointsHom.get(span-degree+j).clone();
+				Addition.scale(nders[k][j]);
+				CK.get(k).add(Addition);
+			}
+		}
+		return CK;
+	}
+	private double[][] DersBasisFuns(int derivate, double u)
+	{
+		//Adapted Alg 2.3 - U=Knots, p=degree, n=derivate 
+		double[][] derivates = new double[derivate+1][degree+1];
+		double[][] ndu = new double[degree+1][degree+1];
+		ndu[0][0]=1d;
+		int i = findSpan(u);
+		double[] left = new double[degree+1]; double[] right = new double[degree+1];
+		for (int j=1; j<=degree; j++)
+		{
+			left[j] = u-Knots.get(i+1-j);
+			right[j] = Knots.get(i+j)-u;
+			double saved=0d;
+			for (int r=0; r<j; r++)
+			{
+				ndu[j][r] = right[r+1]+left[j-r];
+				double temp = ndu[r][j-1]/ndu[j][r];
+				ndu[r][j] = saved+right[r+1]*temp;
+				saved = left[j-r]*temp;
+			}
+			ndu[j][j] = saved;
+		}
+		for (int j=0; j<=degree; j++) //Load Basis Funs
+			derivates[0][j] = ndu[j][degree];
+		//Compute Derivates
+		for (int r=0; r<=degree; r++)
+		{
+			int s1=0, s2=1;
+			double[][] a = new double[2][derivate+1];
+			a[0][0] = 1d;
+			for (int k=1; k<=derivate; k++)
+			{
+				double d=0d; int rk = r-k, degk = degree-k;
+				if (r>=k)
+				{
+					a[s2][0] = a[s1][0]/ndu[degk+1][rk];
+					d = a[s2][0]*ndu[rk][degk];
+				}
+				int j1,j2;
+				if (rk>=-1)
+					j1=1;
+				else
+					j1=-rk;
+				if (r-1<=degk)
+					j2=k-1;
+				else
+					j2=degree-r;
+				for (int j=j1; j<=j2; j++)
+				{
+					a[s2][j] = (a[s1][j]+a[s1][j-1])/ndu[degk+1][rk+j];
+					d += a[s2][j]*ndu[rk+j][degk];	
+				}
+				if (r<= degk)
+				{
+					a[s2][k] = -a[s1][k-1]/ndu[degk+1][r];
+					d += a[s2][k]*ndu[r][degk];
+				}
+				derivates[k][r] = d;
+				int j=s1; s1=s2; s2=j; //Switch rows
+			}
+		}
+		//Multiply throguh to correct factors to eq 2.9
+		int r=degree;
+		for (int k=1; k<=derivate; k++)
+		{
+			for (int j=0; j<=degree; j++)
+				derivates[k][j] *=r;
+			r *= (degree-k);
+		}
+		return derivates;
 	}
 	/**
 	 * Calulation of Alpha, refer to deBoer-Algorithm
@@ -666,33 +746,6 @@ public class VHyperEdgeShape {
 	public void removeKnot(double knotval)
 	{
 		
-	}
-	/**
-	 * Little Helping Function: Compute Controloints of the Derivate
-	 * of given degree based on the ControlPoints in this Curve here 
-	 * @param pDegree th degree-th Derivate
-	 * @return ControlPoints are returned
-	 */
-	private Vector<Point3d> CPofDerivate(int pDegree)
-	{
-		Vector<Point3d> result = new Vector<Point3d>();
-		if (pDegree==0)
-		{
-			for (int i=0; i<controlPointsHom.size(); i++)
-				result.add((Point3d) controlPointsHom.get(i).clone());
-			return result;
-		}
-		Vector<Point3d> degm1 = CPofDerivate(pDegree-1);
-		//Compute from those the actually wanted ones
-		for (int i=0; i<degm1.size()-1; i++) //one less
-		{
-			double factor = (degree-pDegree+1)/(Knots.get(i+degree+1)-Knots.get(i+pDegree));
-			Point3d next = (Point3d) degm1.get(i+1).clone();
-			next.sub(degm1.get(i));
-			next.scale(factor);
-			result.add(next);
-		}
-		return result;		
 	}
 	public Point2D ProjectionPoint(Point2D d)
 	{

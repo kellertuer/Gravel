@@ -74,7 +74,8 @@ public class VHyperGraphic extends VCommonGraphic
 	private void paintDEBUG(Graphics2D g2)
 	{
 		Vector<Double> weights = new Vector<Double>();
-		weights.add(.5);weights.add(.5);weights.add(.4);weights.add(.7); weights.add(.8); weights.add(.5);
+		weights.add(.5);weights.add(.5);weights.add(.4);
+		weights.add(.7); weights.add(.8); weights.add(.5);
 		Vector<Point2D> points = new Vector<Point2D>();
 		points.add(new Point2D.Double(50d,150d));	points.add(new Point2D.Double(150d,400d));
 		points.add(new Point2D.Double(300d,25d));
@@ -91,26 +92,28 @@ public class VHyperGraphic extends VCommonGraphic
 		VHyperEdgeShape cs = c.clone();
 		cs.scale(zoomfactor);
 		g2.draw(cs.getCurve(5d/(double)zoomfactor));
-		Point2D p = new Point2D.Double(80d,170d);
-		drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),Color.magenta);
-		NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
-
-		Vector<VHyperEdgeShape> parts = proj.DecomposeCurve(c);
-		for (int i=0; i<parts.size(); i++)
+		Vector<Point> projectionpoints = new Vector<Point>();
+//		projectionpoints.add(new Point(50,100));
+//		projectionpoints.add(new Point(80,170));
+		Iterator<VNode> iter = vG.modifyNodes.getIterator();
+		while (iter.hasNext())
 		{
-			System.err.println(parts.size());
-			if (i%2==0)
-				g2.setColor(selColor.GREEN.brighter());
-			else
-				g2.setColor(selColor);
-
-			VHyperEdgeShape s = parts.get(i).clone();
-			s.translate(0,10d);
-			s.scale(zoomfactor);
-			g2.draw(s.getCurve(5d/(double)zoomfactor));
+			VNode actual = iter.next();
+			projectionpoints.add(actual.getPosition());
 		}
-			
+		for (int j=0; j<projectionpoints.size(); j++)
+		{
+			Point p = projectionpoints.get(j);
+			NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
+			drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),Color.magenta);
+			drawCP(g2,new Point(Math.round((float)proj.getResultPoint().getX()), Math.round((float)proj.getResultPoint().getY())), Color.ORANGE);
+			g2.setColor(Color.orange);
+			g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
+					Math.round((float)proj.getResultPoint().getX()*zoomfactor), Math.round((float)proj.getResultPoint().getY()*zoomfactor));
+		}
+		System.err.println("");
 	}
+	
 	/**
 	 * @param g
 	 */
