@@ -5,6 +5,8 @@ import history.GraphHistoryManager;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 //import javax.swing.*;
 import java.util.Iterator;
@@ -81,7 +83,7 @@ public class VHyperGraphic extends VCommonGraphic
 		points.add(new Point2D.Double(300d,25d));
 		points.add(new Point2D.Double(350d,150d));
 		points.add(new Point2D.Double(450d,30d));
-		points.add(new Point2D.Double(450d,80d));
+		points.add(new Point2D.Double(480d,80d));
 		Vector<Double> knots = new Vector<Double>();
 		knots.add(0d);knots.add(0d);knots.add(0d);knots.add(0d);
 		knots.add(.33d);
@@ -93,8 +95,6 @@ public class VHyperGraphic extends VCommonGraphic
 		cs.scale(zoomfactor);
 		g2.draw(cs.getCurve(5d/(double)zoomfactor));
 		Vector<Point> projectionpoints = new Vector<Point>();
-//		projectionpoints.add(new Point(50,100));
-//		projectionpoints.add(new Point(80,170));
 		Iterator<VNode> iter = vG.modifyNodes.getIterator();
 		while (iter.hasNext())
 		{
@@ -111,7 +111,6 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
 					Math.round((float)proj.getResultPoint().getX()*zoomfactor), Math.round((float)proj.getResultPoint().getY()*zoomfactor));
 		}
-		System.err.println("");
 	}
 	
 	/**

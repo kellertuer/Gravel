@@ -46,6 +46,9 @@ public class NURBSShapeProjection
 		else
 			Parts.offer(c.clone());
 		double alpha = Math.min(p.distanceSq(c.controlPoints.firstElement()), p.distanceSq(c.controlPoints.lastElement()));
+		if (p.distanceSq(c.controlPoints.firstElement()) > p.distanceSq(c.controlPoints.lastElement()))
+			resultu=1.0d;
+		
 		Vector<Double> candidates = new Vector<Double>(); //because we may have more than one candidate Span 
 		while (!Parts.isEmpty()) 
 			//Wander through all parts, if a part is splitted, its new parts are added at the end of
@@ -57,8 +60,7 @@ public class NURBSShapeProjection
 			double partAlpha = Math.min(p.distanceSq(actualPart.controlPoints.firstElement()), p.distanceSq(actualPart.controlPoints.lastElement()));
 			if (partAlpha<alpha)
 				alpha = partAlpha;
-	//		System.err.print("Next alpha: "+alpha+" Radius"+Math.sqrt(alpha)+" on ["+
-	//				actualPart.Knots.firstElement()+","+actualPart.Knots.lastElement()+"].");
+//			System.err.print(alpha+" on ["+actualPart.Knots.firstElement()+","+actualPart.Knots.lastElement()+"].");
 
 			//Check whether all are outside compute min
 			double min = Double.MAX_VALUE;
@@ -67,25 +69,16 @@ public class NURBSShapeProjection
 				if (qcControlPoints.get(i)<min)
 					min = qcControlPoints.get(i);
 			}
-			if (min>partAlpha)
-			{	//System.err.println(min+" "+alpha+" (out)");// - outside");
+			if (min>alpha)
+			{	//System.err.println(min+" out)");// - outside");
 			}
 			else if (min==partAlpha)
 			{
-				if (partAlpha < alpha)
-				{
-					alpha = partAlpha;
-					if (p.distanceSq(actualPart.controlPoints.firstElement()) < p.distanceSq(actualPart.controlPoints.lastElement()))
-						candidates.add(actualPart.Knots.firstElement());
-					else
-						candidates.add(actualPart.Knots.lastElement());
-				}
+				//System.err.println("Endknot candidate");
 			}
 			else
 			{
-				if (min>0)
-					alpha = min;
-				//System.err.println(" - inside");
+		//		System.err.print(" - inside");
 				int k=0; //None found
 				boolean prop2=true;
 				double lastP = qcControlPoints.firstElement();
@@ -105,7 +98,8 @@ public class NURBSShapeProjection
 				if (!prop2) //Split in the middle
 				{
 					double refinement = (actualPart.Knots.firstElement() + actualPart.Knots.lastElement())/2d;
-					System.err.println("Prop2 not given refining "+refinement+" on ["+actualPart.Knots.firstElement()+" "+actualPart.Knots.lastElement()+"]");
+					if ((actualPart.Knots.lastElement()-actualPart.Knots.firstElement())<0.002d)
+						System.err.println((actualPart.Knots.firstElement()-actualPart.Knots.lastElement())+" addin "+refinement+" on ["+actualPart.Knots.firstElement()+" "+actualPart.Knots.lastElement()+"]");
 					Vector<Double> ref = new Vector<Double>();
 					ref.add(refinement);
 					actualPart.RefineKnots(ref);
@@ -119,7 +113,7 @@ public class NURBSShapeProjection
 					umax = actualPart.Knots.lastElement();
 					double candidate_u = NewtonIteration(actualPart.clone(), (umin+umax)/2d, p);
 					candidates.add(candidate_u);
-//					System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
+			//		System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
 					double newdistsq = curve.NURBSCurveAt(candidate_u).distanceSq(p);
 					if (alpha > newdistsq)
 						alpha = newdistsq;
@@ -177,12 +171,19 @@ public class NURBSShapeProjection
 			  double coincidence = diff.distance(0d,0d);
 			  double movement = Math.abs(nominator/denominator);
 			  double movementu = Math.abs(unext-u)*Math.sqrt(firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y);
-			  u=unext;            
-			  //System.err.println(" Criteria: "+coincidence+" and "+movement+" and "+movementu);
+			  if (iterations>50) //it sould converge fast so here we should change sth
+			  {
+				  u = (u+unext)/2;
+				  System.err.println("#"+iterations+"Criteria: "+coincidence+" and "+movement+" and "+movementu);
+				  iterations=0;
+			  }
+			  else
+				   u=unext;            
 			  if ((coincidence<=epsilon1)||(movement<=epsilon2)||(movementu<=epsilon1))
 				  running=false;
 		  }
-		  System.err.print(" #"+iterations);
+		  if (iterations>15)
+			  System.err.print(" #"+iterations);
 		  return u;
 	}
 	/**
