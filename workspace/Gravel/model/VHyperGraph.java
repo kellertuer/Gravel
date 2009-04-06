@@ -7,6 +7,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -321,14 +322,27 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 	 * 
 	 * @param p a point
 	 * @param variation the variation m may be away from the edge
-	 * @return the first edge in range, if there is one, else null
+	 * @return the first edge in range, if there is one, else
 	 */
 	public VHyperEdge getEdgeinRangeOf(Point m, double variation) {
+		System.err.print("Edge in Range?");
 		Iterator<VHyperEdge> n = modifyHyperEdges.getIterator();
 		while (n.hasNext()) {
 			VHyperEdge temp = n.next();
-			temp.clone(); //Hrhr
-			//TODO VHyperGraph:getEdgeinRangeOf:Check for the Point in Range of Curve
+			System.err.print("Checking #"+temp.getIndex());
+			if (!temp.getShape().isEmpty())
+			{
+				NURBSShapeProjection projection = new NURBSShapeProjection(temp.getShape(),m);
+				Point2D OnCurve = projection.getResultPoint();
+			
+				if (OnCurve.distance(m)<=variation)
+				{
+					System.err.print("on!\n");
+					return temp;
+				}
+				else
+					System.err.println("Not on!\n");
+			}
 		}
 		return null; // keinen gefunden
 	}

@@ -6,14 +6,14 @@ import history.GraphHistoryManager;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 //import javax.swing.*;
-import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.Observable;
-import java.util.TimeZone;
 import java.util.Vector;
+
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 import control.*;
 import model.*;
@@ -131,13 +131,21 @@ public class VHyperGraphic extends VCommonGraphic
 		while (ei.hasNext()) // drawEdges
 		{
 			VHyperEdge temp = ei.next();
-			g2.setColor(temp.getColor());
-			g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			if (!temp.getShape().isEmpty())
 			{
 				VHyperEdgeShape s = temp.getShape().clone();
 				s.scale(zoomfactor);
-				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(5d/(double)zoomfactor),temp.getWidth(),zoomfactor));
+				GeneralPath p = s.getCurve(5d/(double)zoomfactor);
+				if ((((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)||((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))&&((temp.getSelectedStatus()&VItem.SOFT_DESELECTED)!=VItem.SOFT_DESELECTED))
+				{
+					//Falls die Kante Selektiert ist (und nicht temporär deselektiert, zeichne drunter eine etwas dickere Kante in der selectioncolor
+					g2.setColor(selColor);
+					g2.setStroke(new BasicStroke(Math.round((temp.getWidth()+selWidth)*zoomfactor),BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+					g2.draw(temp.getLinestyle().modifyPath(p,temp.getWidth()+selWidth,zoomfactor));
+				}
+				g2.setColor(temp.getColor());
+				g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+				g2.draw(temp.getLinestyle().modifyPath(p,temp.getWidth(),zoomfactor));
 			}
 		}
 	}
