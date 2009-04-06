@@ -101,8 +101,7 @@ public class FreeModificationHandler implements ShapeMouseHandler {
 			//Update temporary Shape
 			MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed
 			Point2D exactPointInGraph = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100),(double)e.getPoint().y/((double)vgc.getZoom()/100)); //Rausrechnen des zooms
-			Point2D.Double t = temporaryShape.NURBSCurveAt(DragStartProjection);
-			temporaryShape.movePoint(t, exactPointInGraph);
+			temporaryShape.movePoint(DragStartProjection, exactPointInGraph);
 
 			if (firstdrag) //If wirst drag - start Block
 				vhg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE,GraphConstraints.SELECTION));

@@ -98,8 +98,8 @@ public class NURBSShapeProjection
 				if (!prop2) //Split in the middle
 				{
 					double refinement = (actualPart.Knots.firstElement() + actualPart.Knots.lastElement())/2d;
-					if ((actualPart.Knots.lastElement()-actualPart.Knots.firstElement())<0.002d)
-						System.err.println((actualPart.Knots.firstElement()-actualPart.Knots.lastElement())+" addin "+refinement+" on ["+actualPart.Knots.firstElement()+" "+actualPart.Knots.lastElement()+"]");
+//					if ((actualPart.Knots.lastElement()-actualPart.Knots.firstElement())<0.002d)
+//						System.err.println((actualPart.Knots.firstElement()-actualPart.Knots.lastElement())+" addin "+refinement+" on ["+actualPart.Knots.firstElement()+" "+actualPart.Knots.lastElement()+"]");
 					Vector<Double> ref = new Vector<Double>();
 					ref.add(refinement);
 					actualPart.RefineKnots(ref);
@@ -113,7 +113,7 @@ public class NURBSShapeProjection
 					umax = actualPart.Knots.lastElement();
 					double candidate_u = NewtonIteration(actualPart.clone(), (umin+umax)/2d, p);
 					candidates.add(candidate_u);
-			//		System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
+//					System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
 					double newdistsq = curve.NURBSCurveAt(candidate_u).distanceSq(p);
 					if (alpha > newdistsq)
 						alpha = newdistsq;
@@ -266,8 +266,8 @@ public class NURBSShapeProjection
 				{
 					for (int j2=0; j2<c.controlPoints.size(); j2++)
 					{
-						double alpha1 = alpha(j1,Degree+1,c.Knots,tP,i);
-						double alpha2 = alpha(j2,Degree+1,c.Knots,tQ,i);
+						double alpha1 = alpha(j1,Degree,c.Knots,tP,i);
+						double alpha2 = alpha(j2,Degree,c.Knots,tQ,i);
 //						System.err.println("("+i+") "+alpha1+"*"+alpha2+" "+c.controlPoints.get(j1)+" "+c.controlPoints.get(j2));
 						foronepx += c.controlPoints.get(j1).getX()*alpha1*c.controlPoints.get(j2).getX()*alpha2;
 						foronepy += c.controlPoints.get(j1).getY()*alpha1*c.controlPoints.get(j2).getY()*alpha2;
@@ -298,42 +298,44 @@ public class NURBSShapeProjection
 		umin = c.Knots.firstElement().doubleValue();
 		umax = c.Knots.lastElement().doubleValue();
 	}
+	/**
+	 * 
+	 * @param j
+	 * @param k the Degree
+	 * @param tau
+	 * @param t
+	 * @param i index of the 
+	 * @return
+	 */
 	private double alpha(int j, int k, Vector<Double> tau, Vector<Double> t, int i)
 	{
-		if (k==1)
+		if (k==0)
 		{ //Formular after 1.2 with i=j, t=tau x=t.get(i)
 			if ((tau.get(j)<=t.get(i))&&(t.get(i)<tau.get(j+1)))
 				return 1;
 			else
 				return 0;
 		}	
-		else if ((i+k-1)>=t.size())
-		{
-			System.err.println("TODO: Check! "+j+" "+k+" "+i);
-			return 0;
-		}
 		else
-			return w(j,k,tau,t.get(i+k-1))*alpha(j,k-1,tau,t,i) + (1-w(j+1,k,tau,t.get(i+k-1)))*alpha(j+1,k-1,tau,t,i);
+			return w(j,k,tau,t.get(i+k))*alpha(j,k-1,tau,t,i) + (1-w(j+1,k,tau,t.get(i+k)))*alpha(j+1,k-1,tau,t,i);
 	}
 	/**
 	 * w from Formular (1.2) of K. Mørten
 	 * TODO: Optimize for Bezier Curves
 	 * @param i
-	 * @param k
+	 * @param k the Degree
 	 * @param t
 	 * @param x
 	 * @return
 	 */
 	private double w(int i, int k, Vector<Double> t, double x)
 	{
-		if (t.get(i)<t.get(i+k-1)) //i is the first value and k+i the last, they are different so not zero
+		if (t.get(i)<t.get(i+k)) //i is the first value and k+i the last, they are different so not zero
 		{
-//			System.err.println("w_"+i+","+k+" is "+(x-t.get(i))/(t.get(i+k-1)-t.get(i)));
-			return (x-t.get(i))/(t.get(i+k-1)-t.get(i));			
+			return (x-t.get(i))/(t.get(i+k)-t.get(i));			
 		}
 		else
 		{
-		//	System.err.println("w_"+i+","+k+" is zero");
 			return 0.0d;
 		}
 	}

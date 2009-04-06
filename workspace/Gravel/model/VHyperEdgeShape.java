@@ -36,7 +36,6 @@ public class VHyperEdgeShape {
 	protected int maxKnotIndex, //The Knots are numbered 0,1,...,maxKnotIndex
 				maxCPIndex, //The ControlPoints are numbered 0,1,...,maxCPIndex
 				degree; //Order of the piecewise polynomials - depends on the maxIndices Above: degree = maxKnotIndex-maxCPindex-1
-
 	/**
 	 * Create an empty shape so nothing ever happens but its at least not null
 	 */
@@ -749,7 +748,8 @@ public class VHyperEdgeShape {
 	}
 	public Point2D ProjectionPoint(Point2D d)
 	{
-		return NURBSCurveAt(ProjectionPointParameter(d));
+		NURBSShapeProjection projection = new NURBSShapeProjection(this,d);
+		return projection.getResultPoint();
 	}
 	/**
 	 * Projects the point d to a point, whose distance is minimal to d and on the curve
@@ -759,23 +759,8 @@ public class VHyperEdgeShape {
 	 */
 	public double ProjectionPointParameter(Point2D d)
 	{
-		//TODO: Implement a better Projection Stuff, that does not need so much cpu power
-		
-		double eqdist = .0002;
-		double u = Knots.firstElement(),u0 = Knots.firstElement();
-		double mindist = Double.MAX_VALUE;
-		while (u<=Knots.lastElement())
-		{
-			Point2D p = NURBSCurveAt(u);
-			double thisdist = p.distance(d);
-			if (thisdist<mindist)
-			{
-				u0=u;
-				mindist=thisdist;
-			}
-			u+=eqdist;
-		}
-		return u0;
+		NURBSShapeProjection projection = new NURBSShapeProjection(this,d);
+		return projection.getResultParameter();
 	}
 	/**
 	 * If the first Point lies on the Curve (given a specific variance, e.g. 2.0
@@ -784,12 +769,9 @@ public class VHyperEdgeShape {
 	 * @param dest
 	 * @return
 	 */
-	public boolean movePoint(Point2D src, Point2D dest)
+	public void movePoint(double position, Point2D dest)
 	{
-		double udash = ProjectionPointParameter(src);
-		Point2D.Double ProjPoint = NURBSCurveAt(udash);
-		if (src.distance(ProjPoint)>=2.0d)
-			return false; //No Movement
+		Point2D src = NURBSCurveAt(position);
 		//Find the specific P, which has the most influence at src to move.
 		double min = Double.MAX_VALUE;
 		int Pindex=0;
@@ -801,15 +783,15 @@ public class VHyperEdgeShape {
 				nodei = nodei + (double)Knots.get(i+j);
 			}
 			nodei = nodei/degree;
-			if (Math.abs(udash-nodei)<min)
+			if (Math.abs(position-nodei)<min)
 			{
 				Pindex=i;
-				min = Math.abs(udash-nodei);
+				min = Math.abs(position-nodei);
 			}
 		}
 		Point2D Pk = controlPoints.get(Pindex);		
 		Point2D direction = new Point2D.Double(dest.getX()-src.getX(),dest.getY()-src.getY());
-		double mov = BasisR(udash,Pindex);
+		double mov = BasisR(position,Pindex);
 		Point2D.Double Pnew = new Point2D.Double(
 				Pk.getX() + direction.getX()/mov,
 				Pk.getY() + direction.getY()/mov		
@@ -817,7 +799,6 @@ public class VHyperEdgeShape {
 		controlPoints.set(Pindex,Pnew);
 		
 		InitHomogeneous();
-		return true;
 	}
 	// return integer nearest to x
 	long nint(double x)
