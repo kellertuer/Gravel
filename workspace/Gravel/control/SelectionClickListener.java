@@ -54,7 +54,6 @@ public class SelectionClickListener implements MouseListener {
 		{
 			r = vhg.modifyNodes.getFirstinRangeOf(pointInGraph);
 			t = vhg.getEdgeinRangeOf(pointInGraph, 2.0*((float)vgc.getZoom()/100));
-			System.err.println(t);
 			notify=vhg;
 		}
 		else

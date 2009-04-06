@@ -325,23 +325,16 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 	 * @return the first edge in range, if there is one, else
 	 */
 	public VHyperEdge getEdgeinRangeOf(Point m, double variation) {
-		System.err.print("Edge in Range?");
 		Iterator<VHyperEdge> n = modifyHyperEdges.getIterator();
 		while (n.hasNext()) {
 			VHyperEdge temp = n.next();
-			System.err.print("Checking #"+temp.getIndex());
 			if (!temp.getShape().isEmpty())
 			{
 				NURBSShapeProjection projection = new NURBSShapeProjection(temp.getShape(),m);
 				Point2D OnCurve = projection.getResultPoint();
 			
-				if (OnCurve.distance(m)<=variation)
-				{
-					System.err.print("on!\n");
+				if (OnCurve.distance(m)<=(variation+(double)temp.width))
 					return temp;
-				}
-				else
-					System.err.println("Not on!\n");
 			}
 		}
 		return null; // keinen gefunden
