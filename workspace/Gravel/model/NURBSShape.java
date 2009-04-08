@@ -31,8 +31,8 @@ import javax.vecmath.Point3d;
  */
 public class NURBSShape {
 
-	private final int CLAMPED = 0;
-	private final int UNCLAMPED = 1;
+	public final int CLAMPED = 0;
+	public final static int UNCLAMPED = 1;
 	protected Vector<Double> Knots;
 	protected Vector<Double> cpWeight;
 	public Vector<Point2D> controlPoints; //ControlPoints, TODO: Set protected after DEBUG
@@ -121,15 +121,21 @@ public class NURBSShape {
 			InitHomogeneous();
 	}
 	/**
+	 * Return the type of NURBS-Curve that is contained in here
+	 * @return
+	 */
+	public int getType()
+	{
+		return NURBSType;
+	}
+	/**
 	 * Check whether the given Knots, ControlPoints and weight specify a correct NURBS-Curve
 	 * (1) #CP = #weights
 	 * (2) clamped or unclamped Curve
 	 * (3) For the Degree enough knots
-	 * 
 	 * @param pKnots
 	 * @param CPoints
 	 * @param weights
-	 * 
 	 * @return the type of curve if it is valid, else -1
 	 */
 	private int validate(Vector<Double> pKnots, Vector<Point2D> CPoints, Vector<Double> weights)
@@ -309,6 +315,58 @@ public class NURBSShape {
 		this.setCurveTo(Knots,Q,cpWeight);
 	}
 	/**
+	 * Return the clamped Subcurve between the parameters u1 and u2
+	 * This is realized by knot insertion at u1 and u2 until the multiplicity in these
+	 * points equals Degree+1 and cutting off all parts ouside of [u1,u2] of the Knotvector
+	 * @param u1
+	 * @param u2
+	 * @return
+	 */
+	public NURBSShape ClampedSubCurve(double u1, double u2)
+	{
+		int Start = findSpan(u1);
+		int End = findSpan(u2);
+		if (u2==Knots.get(maxKnotIndex-degree)) //Last possible Value the Curve is evaluated
+			End++;
+		if ((Start==-1)||(End==-1)||(u1>=u2)) //Ohne u out of range or invalid interval
+			return new NURBSShape(); //Return amepty Shape
+		
+		//Raise both endvalues to multiplicity d to get an clamped curve
+		int multStart = 0;
+		while (Knots.get(degree+multStart).doubleValue()==u1)
+			multStart++;
+		int multEnd = 0;
+		while (Knots.get(maxKnotIndex-degree-multEnd).doubleValue()==u2)
+			multEnd++;
+		Vector<Double> Refinement = new Vector<Double>();
+		for (int i=0; i<=degree-multStart; i++)
+			Refinement.add(Knots.get(degree).doubleValue());
+		for (int i=0; i<=degree-multEnd; i++)
+			Refinement.add(Knots.get(maxKnotIndex-degree).doubleValue());
+		//Nun wird der Start- und der Endpunkt
+		NURBSShape subcurve = clone();
+		subcurve.RefineKnots(Refinement); //Now it interpolates subcurve(u1) and subcurve(u2)
+		Vector<Point2D> newCP = new Vector<Point2D>();
+		Vector<Double> newWeight= new Vector<Double>();
+		for (int i=Start; i<(End+degree+1-multStart); i++)
+		{
+			newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
+			newWeight.add(subcurve.cpWeight.get(i).doubleValue());
+		}
+		//Copy needed Knots
+		int index = 0;
+		Vector<Double> newKnots = new Vector<Double>();
+		while (subcurve.Knots.get(index)<u1)
+			index++;
+		while (subcurve.Knots.get(index)<=u2)
+		{
+			newKnots.add(subcurve.Knots.get(index).doubleValue());
+			index++;
+		}
+//		System.err.println("#Knots "+Knots.size()+" reduced to"+newKnots.size()+", #CP "+controlPoints.size()+" reduced to"+newCP.size()+" and Degree is "+degree+"->"+(newKnots.size()-newCP.size()-1));
+		return new NURBSShape(newKnots,newCP,newWeight);
+	}
+	/**
 	 * Get the Curve as a piecewise approximated linear Java Path
 	 * @param maxdist is the maximum distance of two consecutive Points in the resulting Path
 	 * If you set this value too high, the computation time will increase significantly, if you set it too low
@@ -325,13 +383,13 @@ public class NURBSShape {
 		Stack<Double> calculatedParameters = new Stack<Double>();
 		//Startpoint
 		double actualu = Knots.get(degree);
-		Point2D actualPoint = this.NURBSCurveAt(actualu);
+		Point2D actualPoint = this.CurveAt(actualu);
 		path.moveTo((float)actualPoint.getX(), (float)actualPoint.getY());
 		//Init Stack with the endpoint
-		calculatedParameters.push(Knots.get(maxKnotIndex-degree));
-		calculatedPoints.push(NURBSCurveAt(calculatedParameters.peek().doubleValue()));
+		calculatedParameters.push(Knots.get(maxKnotIndex-degree)); //Last value, that can be evaluated
+		calculatedPoints.push(CurveAt(calculatedParameters.peek().doubleValue()));
 		calculatedParameters.push((Knots.get(maxKnotIndex-degree)+Knots.get(degree))/2d); //Middle, because start and end ar equal
-		calculatedPoints.push(NURBSCurveAt(calculatedParameters.peek().doubleValue()));
+		calculatedPoints.push(CurveAt(calculatedParameters.peek().doubleValue()));
 		//
 		//Calculate values in between as long as they are not near enough
 		//
@@ -348,7 +406,7 @@ public class NURBSShape {
 			else //Not near enough - take middle between them and push that
 			{
 				double middleu = (compareu+actualu)/2d;
-				calculatedPoints.push(NURBSCurveAt(middleu));
+				calculatedPoints.push(CurveAt(middleu));
 				calculatedParameters.push(middleu);
 			}
 		}
@@ -395,7 +453,7 @@ public class NURBSShape {
 	 * @param u
 	 * @return
 	 */
-	public Point2D.Double NURBSCurveAt(double u)
+	public Point2D.Double CurveAt(double u)
 	{	
 		Point3d erg = deBoer3D(u); //Result in homogeneous Values on Our Points		
 		if (erg.z==0) //
@@ -413,12 +471,12 @@ public class NURBSShape {
 	public Point2D DerivateCurveAt(int derivate, double u)
 	{
 		if (derivate==0)
-			return NURBSCurveAt(u);
+			return CurveAt(u);
 		Vector<Point3d> DerivatesBSpline = new Vector<Point3d>();
 		DerivatesBSpline = DerivateValues(derivate, u);
 		Vector<Point2D> DerivatesNURBS = new Vector<Point2D>();
 		DerivatesNURBS.setSize(derivate);
-		DerivatesNURBS.set(0,NURBSCurveAt(u));
+		DerivatesNURBS.set(0,CurveAt(u));
 		for (int k=1; k<=derivate; k++)
 		{ //Calculate kth Derivate
 			Point2D.Double thisdeg = new Point2D.Double(DerivatesBSpline.get(k).x,DerivatesBSpline.get(k).y);
@@ -855,7 +913,7 @@ public class NURBSShape {
 	 */
 	public void movePoint(double position, Point2D dest)
 	{
-		Point2D src = NURBSCurveAt(position);
+		Point2D src = CurveAt(position);
 		//Find the specific P, which has the most influence at src to move.
 		double min = Double.MAX_VALUE;
 		int Pindex=0;

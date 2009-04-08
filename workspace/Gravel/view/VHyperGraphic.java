@@ -78,16 +78,17 @@ public class VHyperGraphic extends VCommonGraphic
 	private void paintDEBUG(Graphics2D g2)
 	{
 		Vector<Double> knots = new Vector<Double>();
-		for (int i=0; i<=11; i++)
-			knots.add(((double)i-3d)/5d);
+		for (int i=0; i<=12; i++)
+			knots.add(((double)i-3d)/6d);
 		
 		Vector<Point2D> points = new Vector<Point2D>();
 		Vector<Double> weights = new Vector<Double>();
-		points.add(new Point2D.Double(30d,80d)); weights.add(.8);
-		points.add(new Point2D.Double(50d,120d)); weights.add(.7);
-		points.add(new Point2D.Double(150d,250d)); weights.add(1d);
-		points.add(new Point2D.Double(300d,75d)); weights.add(2d);
-		points.add(new Point2D.Double(200d,130d));weights.add(3d);
+		points.add(new Point2D.Double(30d,5d)); weights.add(.8);
+		points.add(new Point2D.Double(50d,45d)); weights.add(.7);
+		points.add(new Point2D.Double(150d,275d)); weights.add(1d);
+		points.add(new Point2D.Double(300d,75d)); weights.add(1d);
+		points.add(new Point2D.Double(400d,5d)); weights.add(2d);
+		points.add(new Point2D.Double(200d,95d));weights.add(3d);
 		for (int i=0; i<3; i++)
 		{
 			points.add((Point2D)points.get(i).clone());
@@ -104,30 +105,33 @@ public class VHyperGraphic extends VCommonGraphic
 		NURBSShape cs = c.clone();
 		cs.scale(zoomfactor);
 		g2.draw(cs.getCurve(5d/(double)zoomfactor));
-		
-//		Vector<Point> projectionpoints = new Vector<Point>();
-//		Iterator<VNode> iter = vG.modifyNodes.getIterator();
-//		while (iter.hasNext())
-//		{
-//			VNode actual = iter.next();
-//			projectionpoints.add(actual.getPosition());
-//		}
+		for (int i=0; i<c.controlPoints.size(); i++)
+		{
+			drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())),Color.cyan.darker());
+		}
+		Vector<Point> projectionpoints = new Vector<Point>();
+		Iterator<VNode> iter = vG.modifyNodes.getIterator();
+		while (iter.hasNext())
+		{
+			VNode actual = iter.next();
+			projectionpoints.add(actual.getPosition());
+		}
 //TODO: Measure again after Optimization of the Square Computation
-//	    long time = System.currentTimeMillis();
-//		for (int j=0; j<projectionpoints.size(); j++)
-//		{
-//			Point p = projectionpoints.get(j);
-//			NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
-//			drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),Color.magenta);
-//			drawCP(g2,new Point(Math.round((float)proj.getResultPoint().getX()), Math.round((float)proj.getResultPoint().getY())), Color.ORANGE);
-//			g2.setColor(Color.orange);
-//			g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
-//					Math.round((float)proj.getResultPoint().getX()*zoomfactor), Math.round((float)proj.getResultPoint().getY()*zoomfactor));
-//		}
-//        time = -time + System.currentTimeMillis();
-//        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-//        SimpleDateFormat sdf = new SimpleDateFormat("ss:SSS");
-//        System.out.println("#"+projectionpoints.size()+" "+sdf.format(time)+" Sekunden");  
+	    long time = System.currentTimeMillis();
+		for (int j=0; j<projectionpoints.size(); j++)
+		{
+			Point p = projectionpoints.get(j);
+			NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
+			drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),Color.magenta);
+			drawCP(g2,new Point(Math.round((float)proj.getResultPoint().getX()), Math.round((float)proj.getResultPoint().getY())), Color.ORANGE);
+			g2.setColor(Color.orange);
+			g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
+					Math.round((float)proj.getResultPoint().getX()*zoomfactor), Math.round((float)proj.getResultPoint().getY()*zoomfactor));
+		}
+        time = -time + System.currentTimeMillis();
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+        SimpleDateFormat sdf = new SimpleDateFormat("ss:SSS");
+        System.out.println("#"+projectionpoints.size()+" "+sdf.format(time)+" Sekunden");  
 	}
 	
 	/**

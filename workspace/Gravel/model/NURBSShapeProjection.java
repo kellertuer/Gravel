@@ -33,6 +33,10 @@ public class NURBSShapeProjection
 	
 	public NURBSShapeProjection(NURBSShape c, Point2D p)
 	{
+		c = c.clone(); //Secure parameter
+		//If it is unclamped - clamp it!
+		if ((c.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
+			c = c.ClampedSubCurve(c.Knots.get(c.degree), c.Knots.get(c.maxKnotIndex-c.degree));
 		curve = c.clone();
 		this.p = p;
 		Queue<NURBSShape> Parts = new LinkedList<NURBSShape>();
@@ -113,7 +117,7 @@ public class NURBSShapeProjection
 					double candidate_u = NewtonIteration(actualPart.clone(), (umin+umax)/2d, p);
 					candidates.add(candidate_u);
 //					System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
-					double newdistsq = curve.NURBSCurveAt(candidate_u).distanceSq(p);
+					double newdistsq = curve.CurveAt(candidate_u).distanceSq(p);
 					if (alpha > newdistsq)
 						alpha = newdistsq;
 				}
@@ -122,7 +126,7 @@ public class NURBSShapeProjection
 		double min = Double.MAX_VALUE;
 		for (int i=0; i<candidates.size(); i++)
 		{
-			Point2D pcmp = curve.NURBSCurveAt(candidates.get(i));
+			Point2D pcmp = curve.CurveAt(candidates.get(i));
 			if (pcmp.distance(p)<min)
 			{
 				resultu = candidates.get(i);
@@ -136,7 +140,7 @@ public class NURBSShapeProjection
 	}
 	public Point2D getResultPoint()
 	{
-		return curve.NURBSCurveAt(resultu);
+		return curve.CurveAt(resultu);
 	}
 	private double NewtonIteration(NURBSShape c, double startvalue, Point2D p)
 	{
@@ -146,7 +150,7 @@ public class NURBSShapeProjection
 		double epsilon2 = 0.0003d;
 		//So now we 
 		boolean running = true;
-		Point2D.Double Value = (Point2D.Double) c.NURBSCurveAt(startvalue);
+		Point2D.Double Value = (Point2D.Double) c.CurveAt(startvalue);
 		Point2D.Double firstDeriv = (Point2D.Double) c.DerivateCurveAt(1,startvalue);
 		Point2D.Double secondDeriv = (Point2D.Double) c.DerivateCurveAt(2,startvalue);
 		Point2D.Double diff = new Point2D.Double(Value.x-p.getX(), Value.y-p.getY());
@@ -163,7 +167,7 @@ public class NURBSShapeProjection
 			  if (unext < c.Knots.firstElement()) //Out of Range
 				  unext = c.Knots.firstElement();
 			  //System.err.print(" u="+unext);
-			  Value = (Point2D.Double) c.NURBSCurveAt(unext);
+			  Value = (Point2D.Double) c.CurveAt(unext);
 			  firstDeriv = (Point2D.Double) c.DerivateCurveAt(1,unext);
 			  secondDeriv = (Point2D.Double) c.DerivateCurveAt(2,unext);
 			  diff = new Point2D.Double(Value.x-p.getX(), Value.y-p.getY());
@@ -345,7 +349,7 @@ public class NURBSShapeProjection
 	 * @return
 	 */
 	public Vector<NURBSShape> DecomposeCurve(NURBSShape c)
-	{
+	{			
 		int m = c.maxCPIndex+1;
 		int a = c.degree;
 		int b = c.degree+1;
