@@ -116,13 +116,18 @@ public class VHyperGraphic extends VCommonGraphic
 			VNode actual = iter.next();
 			projectionpoints.add(actual.getPosition());
 		}
-//TODO: Measure again after Optimization of the Square Computation
+		//TODO: Measure again after Optimization of the Square Computation
 	    long time = System.currentTimeMillis();
-		for (int j=0; j<projectionpoints.size(); j++)
+	    System.err.print("#"+projectionpoints.size()+" ");
+	    for (int j=0; j<projectionpoints.size(); j++)
 		{
 			Point p = projectionpoints.get(j);
 			NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
-			drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),Color.magenta);
+			double dist = p.distance(proj.getResultPoint());
+			Color cross = Color.magenta;
+			if (dist<=2.0*zoomfactor)
+				cross = Color.green.darker().darker();
+			drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),cross);
 			drawCP(g2,new Point(Math.round((float)proj.getResultPoint().getX()), Math.round((float)proj.getResultPoint().getY())), Color.ORANGE);
 			g2.setColor(Color.orange);
 			g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
@@ -131,7 +136,7 @@ public class VHyperGraphic extends VCommonGraphic
         time = -time + System.currentTimeMillis();
         TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
         SimpleDateFormat sdf = new SimpleDateFormat("ss:SSS");
-        System.out.println("#"+projectionpoints.size()+" "+sdf.format(time)+" Sekunden");  
+        System.err.println(" "+sdf.format(time)+" Sekunden");  
 	}
 	
 	/**

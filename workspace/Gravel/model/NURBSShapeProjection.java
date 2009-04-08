@@ -33,7 +33,7 @@ public class NURBSShapeProjection
 	
 	public NURBSShapeProjection(NURBSShape c, Point2D p)
 	{
-		c = c.clone(); //Secure parameter
+		c = c.clone();
 		//If it is unclamped - clamp it!
 		if ((c.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
 			c = c.ClampedSubCurve(c.Knots.get(c.degree), c.Knots.get(c.maxKnotIndex-c.degree));
@@ -85,11 +85,11 @@ public class NURBSShapeProjection
 				int k=0; //None found
 				boolean prop2=true;
 				double lastP = qcControlPoints.firstElement();
-					while (((k+2)<qcControlPoints.size())&&(lastP > qcControlPoints.get(k+1)))
-					{
-						lastP = qcControlPoints.get(k+1);
-						k++;
-					}
+				while (((k+2)<qcControlPoints.size())&&(lastP > qcControlPoints.get(k+1)))
+				{
+					lastP = qcControlPoints.get(k+1);
+					k++;
+				}
 				for (int i=k; i<qcControlPoints.size()-1; i++)
 				{
 					if (qcControlPoints.get(i)>=qcControlPoints.get(i+1)) //nonincreasing
@@ -114,7 +114,8 @@ public class NURBSShapeProjection
 				{
 					umin = actualPart.Knots.firstElement();
 					umax = actualPart.Knots.lastElement();
-					double candidate_u = NewtonIteration(actualPart.clone(), (umin+umax)/2d, p);
+					double startvalue = umin + (double)qcControlPoints.indexOf(min)/((double)qcControlPoints.size()-1)*(umax-umin);
+					double candidate_u = NewtonIteration(actualPart.clone(), startvalue, p);
 					candidates.add(candidate_u);
 //					System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
 					double newdistsq = curve.CurveAt(candidate_u).distanceSq(p);
@@ -164,8 +165,8 @@ public class NURBSShapeProjection
 			double unext = u - nominator/denominator;
 			if (unext > c.Knots.lastElement()) //Out of Range
 				unext = c.Knots.lastElement();
-			  if (unext < c.Knots.firstElement()) //Out of Range
-				  unext = c.Knots.firstElement();
+			if (unext < c.Knots.firstElement()) //Out of Range
+				unext = c.Knots.firstElement();
 			  //System.err.print(" u="+unext);
 			  Value = (Point2D.Double) c.CurveAt(unext);
 			  firstDeriv = (Point2D.Double) c.DerivateCurveAt(1,unext);
@@ -174,10 +175,14 @@ public class NURBSShapeProjection
 			  double coincidence = diff.distance(0d,0d);
 			  double movement = Math.abs(nominator/denominator);
 			  double movementu = Math.abs(unext-u)*Math.sqrt(firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y);
+			  if (iterations==25)
+				  System.err.print("\n--"+u+" -- ");
+			  else if (iterations>25)
+				  System.err.print(" "+u+" -- ");
 			  if (iterations>50) //it sould converge fast so here we should change sth
 			  {
 				  u = (u+unext)/2;
-				  System.err.println("#"+iterations+"Criteria: "+coincidence+" and "+movement+" and "+movementu);
+				  System.err.println("# "+iterations+"Criteria: "+coincidence+" and "+movement+" and "+movementu);
 				  iterations=0;
 			  }
 			  else

@@ -61,7 +61,7 @@
 		<value name="name_rotation" type="Integer">270</value>
 		<value name="name_size" type="Integer">12</value>
 		<value name="name_visible" type="Boolean">false</value>
-		<value name="size" type="Integer">9</value>
+		<value name="size" type="Integer">4</value>
 	</group>
 	<group name="pref">
 		<value name="saveonexit" type="Boolean">true</value>
