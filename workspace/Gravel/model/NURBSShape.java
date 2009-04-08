@@ -10,36 +10,39 @@ import java.util.Vector;
 import javax.vecmath.Point3d;
 
 /**
- * This Class represents the Shape of an individual VHyperEdge
- * Its shape is based on NURBS and a minimal distance it should have from each node
- * This Minimum Distance is used to evaluate the validity of the Shape
+ * This Class represents the Shape of an individual VHyperEdge in form of a NURBS
+ * The nonuniform rational B-Spline may be
+ * - clamped, that ist with a knot vektor t0=...=td and tm-d = ... = tm, so that the endpoints are interpolated
+ * - unclamped, that is without those multiplicities, so that some intervals of the knotvektor are not in the curve
+ *
+ *
  * @see VHyperEdge
  * 
  * Other Methods are
  * - Min and Max of the Bounding Box of the ControlPolygon
  * - Addition (Refinement of Knots)
- *
- * - TODO (needed?) get&set knots &weights
- * - TODO In/Decrease Degree of the polynonials 
+ * - TODO Removal of knots (with or without tollerance? i think wihout because there is undo - soon)
+ * - TODO ?get&set knots &weights?
+ * - TODO ?In/Decrease Degree of the polynonials?
+ * 
  * 
  * @author Ronny Bergmann
  *
  */
-public class VHyperEdgeShape {
+public class NURBSShape {
 
 	protected Vector<Double> Knots;
 	protected Vector<Double> cpWeight;
 	public Vector<Point2D> controlPoints; //ControlPoints
 	protected Vector<Point3d> controlPointsHom; //b in homogeneous coordinates multiplied by weight
 
-	protected int minDist;
 	protected int maxKnotIndex, //The Knots are numbered 0,1,...,maxKnotIndex
 				maxCPIndex, //The ControlPoints are numbered 0,1,...,maxCPIndex
 				degree; //Order of the piecewise polynomials - depends on the maxIndices Above: degree = maxKnotIndex-maxCPindex-1
 	/**
 	 * Create an empty shape so nothing ever happens but its at least not null
 	 */
-	public VHyperEdgeShape()
+	public NURBSShape()
 	{
 		Knots = new Vector<Double>();
 		cpWeight = new Vector<Double>();
@@ -54,9 +57,8 @@ public class VHyperEdgeShape {
 	 * @param weights weights of the CP 
 	 * @param dist minimal distance the curve should have from each node (whose are not saved here)
 	 */
-	public VHyperEdgeShape(Vector<Double> pKnots, Vector<Point2D> CPoints, Vector<Double> weights, int dist)//, int degree)
+	public NURBSShape(Vector<Double> pKnots, Vector<Point2D> CPoints, Vector<Double> weights)//, int degree)
 	{
-		minDist = dist;
 		setCurveTo(pKnots,CPoints,weights);
 	}
 	/**
@@ -82,7 +84,7 @@ public class VHyperEdgeShape {
 	 * @param pPw
 	 * @param dist
 	 */
-	protected VHyperEdgeShape(Vector<Double> knots, Vector<Point3d> pPw, int dist)
+	protected NURBSShape(Vector<Double> knots, Vector<Point3d> pPw)
 	{
 		Knots = new Vector<Double>();
 		cpWeight = new Vector<Double>();
@@ -100,7 +102,6 @@ public class VHyperEdgeShape {
 				controlPoints.set(i,new Point2D.Double(pPw.get(i).x/pPw.get(i).z,pPw.get(i).y/pPw.get(i).z));
 			cpWeight.set(i,stw);
 		}
-		minDist = dist;
 		Knots = knots;
 		maxCPIndex = controlPoints.size()-1;
 		maxKnotIndex = Knots.size()-1;
@@ -127,7 +128,7 @@ public class VHyperEdgeShape {
 	/**
 	 * Return a complete independent Copy of this Shape
 	 */
-	public VHyperEdgeShape clone()
+	public NURBSShape clone()
 	{
 		Vector<Double> k = new Vector<Double>();
 		Iterator<Double> iter = Knots.iterator();
@@ -146,7 +147,7 @@ public class VHyperEdgeShape {
 			Point2D next = iter2.next();
 			p.addElement((Point2D) next.clone());			
 		}
-		return new VHyperEdgeShape(k,p,w,minDist);
+		return new NURBSShape(k,p,w);
 	}
 	/**
 	 * Get Maximum (bottom right edge) of the CP bunding box
@@ -585,7 +586,7 @@ public class VHyperEdgeShape {
 	 * @param s another Shape
 	 * @return true if Shape s is equal to this else false
 	 */
-	public boolean CurveEquals(VHyperEdgeShape s)
+	public boolean CurveEquals(NURBSShape s)
 	{
 		if ((s.controlPoints.size()!=controlPoints.size())||(Knots.size()!=s.Knots.size()))
 			return false;
@@ -797,7 +798,10 @@ public class VHyperEdgeShape {
 				Pk.getY() + direction.getY()/mov		
 		);
 		controlPoints.set(Pindex,Pnew);
-		
+		if (Pindex==0)
+			controlPoints.set(controlPoints.size()-1, (Point2D) Pnew.clone());
+		else if (Pindex==(controlPoints.size()-1))
+			controlPoints.set(0, (Point2D) Pnew.clone());
 		InitHomogeneous();
 	}
 	// return integer nearest to x

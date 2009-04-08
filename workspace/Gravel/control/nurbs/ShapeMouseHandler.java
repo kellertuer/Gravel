@@ -4,7 +4,7 @@ import java.util.Vector;
 
 import control.DragMouseHandler;
 
-import model.VHyperEdgeShape;
+import model.NURBSShape;
 
 /**
  * mouse drag handling for all mouse modes implementing shape modfication 
@@ -38,5 +38,5 @@ public interface ShapeMouseHandler extends DragMouseHandler
 	 * Get Shape for drawing, if not null, else null is returned
 	 * @return
 	 */
-	public VHyperEdgeShape getShape();	
+	public NURBSShape getShape();	
 }

@@ -22,7 +22,7 @@ import model.VEdge;
 import model.VGraph;
 import model.VGraphInterface;
 import model.VHyperEdge;
-import model.VHyperEdgeShape;
+import model.NURBSShape;
 import model.VHyperGraph;
 import model.VItem;
 import model.VNode;
@@ -67,7 +67,7 @@ public class ShapeModificationHandler implements ShapeMouseHandler {
 	private Point MouseOffSet = new Point(0,0);
 	private Point2D.Double DragOrigin;
 	private boolean firstdrag = true;
-	private VHyperEdgeShape temporaryShape=null, DragBeginShape = null;
+	private NURBSShape temporaryShape=null, DragBeginShape = null;
 	VHyperEdge HyperEdgeRef;
 
 	private int ModificationState = NO_MODIFICATION;
@@ -112,7 +112,7 @@ public class ShapeModificationHandler implements ShapeMouseHandler {
 	public void setShapeParameters(Vector<Object> p)
 	{} //see above
 
-	public VHyperEdgeShape getShape()
+	public NURBSShape getShape()
 	{
 		return temporaryShape;
 	}

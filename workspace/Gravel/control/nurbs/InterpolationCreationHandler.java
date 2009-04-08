@@ -22,7 +22,7 @@ import model.VEdge;
 import model.VGraph;
 import model.VGraphInterface;
 import model.VHyperEdge;
-import model.VHyperEdgeShape;
+import model.NURBSShape;
 import model.VHyperGraph;
 import model.VItem;
 import model.VNode;
@@ -54,7 +54,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 	Point2D DragOrigin = null;
 	Vector<Point2D> InterpolationPoints;
 	int degree, actualInsertionIndex=-1, nodedist;
-	VHyperEdgeShape lastshape=null;
+	NURBSShape lastshape=null;
 
 	public InterpolationCreationHandler(VHyperGraphic g)
 	{
@@ -80,7 +80,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 	{
 		if (InterpolationPoints.size()<=degree)
 		{
-			lastshape = new VHyperEdgeShape();
+			lastshape = new NURBSShape();
 			return;
 		}
 		lastshape = NURBSShapeFactory.CreateShape("global interpolation", getShapeParameters());
@@ -116,7 +116,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 		return param;
 	}
 
-	public VHyperEdgeShape getShape()
+	public NURBSShape getShape()
 	{
 		return lastshape;
 	}

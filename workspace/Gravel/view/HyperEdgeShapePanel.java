@@ -35,7 +35,7 @@ import dialogs.IntegerTextField;
 import model.MHyperEdge;
 import model.NURBSShapeFactory;
 import model.VHyperEdge;
-import model.VHyperEdgeShape;
+import model.NURBSShape;
 import model.VHyperGraph;
 import model.VNode;
 import model.Messages.GraphConstraints;
@@ -382,7 +382,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		params.set(NURBSShapeFactory.POINTS, nodepos);
 		params.set(NURBSShapeFactory.SIZES, nodesizes);
 		params.set(NURBSShapeFactory.DISTANCE_TO_NODE, iDistance.getValue());
-		VHyperEdgeShape s = NURBSShapeFactory.CreateShape("convex hull", params);
+		NURBSShape s = NURBSShapeFactory.CreateShape("convex hull", params);
 		if (s.isEmpty())
 		{
 			IPInfo.setText("<html><p>Polynomgrad "+iDegree.getValue()+" ist zu hoch.</p></html>");

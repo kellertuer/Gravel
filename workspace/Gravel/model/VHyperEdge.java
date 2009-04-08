@@ -30,7 +30,7 @@ public class VHyperEdge extends VItem {
 	protected int width;
 	private VEdgeText text;
 	private VEdgeLinestyle linestyle;
-	private VHyperEdgeShape shape;
+	private NURBSShape shape;
 	/**
 	 * Constructor that initializes the Arrow-Part of the Edge with the GeneralPreferences Standard
 	 * 
@@ -43,7 +43,7 @@ public class VHyperEdge extends VItem {
 		width=w;
 		text = new VEdgeText();
 		linestyle = new VEdgeLinestyle();
-		shape = new VHyperEdgeShape();
+		shape = new NURBSShape();
 	}
 	/**
 	 * Create an Edge with specific Arrow, Text and LineStyle Elements
@@ -53,7 +53,7 @@ public class VHyperEdge extends VItem {
 	 * @param t Text-Specifications of the edge
 	 * @param l Linestyle values of the Edge
 	 */
-	public VHyperEdge(int i,int w, VHyperEdgeShape s, VEdgeText t, VEdgeLinestyle l)
+	public VHyperEdge(int i,int w, NURBSShape s, VEdgeText t, VEdgeLinestyle l)
 	{
 		super(i);
 		width=w;
@@ -206,14 +206,14 @@ public class VHyperEdge extends VItem {
 	 * Set the Shape, You should notify the vGraph about this change
 	 * @param s the new Shape
 	 */
-	public void setShape(VHyperEdgeShape s) {
+	public void setShape(NURBSShape s) {
 		shape = s;
 	}
 	/**
 	 * Get the actual Shape
 	 * @return the arrow
 	 */
-	public VHyperEdgeShape getShape() {
+	public NURBSShape getShape() {
 		return shape;
 	}
 }

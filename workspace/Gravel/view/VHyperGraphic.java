@@ -79,30 +79,41 @@ public class VHyperGraphic extends VCommonGraphic
 	{
 		Vector<Double> weights = new Vector<Double>();
 		weights.add(.5);weights.add(.5);weights.add(.4);
-		weights.add(.7); weights.add(.8); weights.add(.5);
+		weights.add(.7);weights.add(.7);
+		weights.add(.4); weights.add(.5);weights.add(.5);
 		Vector<Point2D> points = new Vector<Point2D>();
-		points.add(new Point2D.Double(50d,150d));	points.add(new Point2D.Double(150d,400d));
-		points.add(new Point2D.Double(300d,25d));
-		points.add(new Point2D.Double(350d,150d));
-		points.add(new Point2D.Double(450d,30d));
-		points.add(new Point2D.Double(480d,80d));
+		points.add(new Point2D.Double(30d,80d));//0		
+		points.add(new Point2D.Double(50d,120d));//1
+		points.add(new Point2D.Double(150d,250d));//2
+		points.add(new Point2D.Double(300d,75d));//3
+		points.add(new Point2D.Double(200d,130d));//4
+		points.add(new Point2D.Double(300d,75d));//5
+		double tx = -(points.get(1).getX()-points.get(0).getX());  
+		double ty = -(points.get(1).getY()-points.get(0).getY());  
+		points.add(new Point2D.Double(tx,ty));
+		points.add((Point2D) points.get(0).clone());
 		Vector<Double> knots = new Vector<Double>();
-		knots.add(0d);knots.add(0d);knots.add(0d);knots.add(0d);
-		knots.add(.33d);
-		knots.add(.66d);
-		knots.add(1d);knots.add(1d);knots.add(1d);knots.add(1d);
-		VHyperEdgeShape c = new  VHyperEdgeShape(knots,points,weights,3);
+		knots.add(0d);knots.add(.05d);knots.add(.075d);knots.add(.1d);
+		knots.add(.2);knots.add(.4);knots.add(.6);knots.add(.8);
+		knots.add(.925d);knots.add(.95d);knots.add(.975d);knots.add(1d);
+		for (int i=0; i<points.size(); i++)
+		{
+			float gv = 0f;
+			drawCP(g2,new Point(Math.round((float)points.get(i).getX()),Math.round((float)points.get(i).getY())),new Color(gv,gv,gv));
+		}
+		g2.setColor(Color.black);
+		NURBSShape c = new  NURBSShape(knots,points,weights);
 		g2.setStroke(new BasicStroke(2,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		VHyperEdgeShape cs = c.clone();
+		NURBSShape cs = c.clone();
 		cs.scale(zoomfactor);
 		g2.draw(cs.getCurve(5d/(double)zoomfactor));
-		Vector<Point> projectionpoints = new Vector<Point>();
-		Iterator<VNode> iter = vG.modifyNodes.getIterator();
-		while (iter.hasNext())
-		{
-			VNode actual = iter.next();
-			projectionpoints.add(actual.getPosition());
-		}
+//		Vector<Point> projectionpoints = new Vector<Point>();
+//		Iterator<VNode> iter = vG.modifyNodes.getIterator();
+//		while (iter.hasNext())
+//		{
+//			VNode actual = iter.next();
+//			projectionpoints.add(actual.getPosition());
+//		}
 //TODO: Measure again after Optimization of the Square Computation
 //	    long time = System.currentTimeMillis();
 //		for (int j=0; j<projectionpoints.size(); j++)
@@ -133,7 +144,7 @@ public class VHyperGraphic extends VCommonGraphic
 			VHyperEdge temp = ei.next();
 			if (!temp.getShape().isEmpty())
 			{
-				VHyperEdgeShape s = temp.getShape().clone();
+				NURBSShape s = temp.getShape().clone();
 				s.scale(zoomfactor);
 				GeneralPath p = s.getCurve(5d/(double)zoomfactor);
 				if ((((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)||((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))&&((temp.getSelectedStatus()&VItem.SOFT_DESELECTED)!=VItem.SOFT_DESELECTED))

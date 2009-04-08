@@ -86,7 +86,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			if (!temp.getShape().isEmpty())
 			{
-				VHyperEdgeShape s = temp.getShape().clone();
+				NURBSShape s = temp.getShape().clone();
 				s.scale(zoomfactor);
 				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(5d/(double)zoomfactor),temp.getWidth(),zoomfactor));
 			}
@@ -137,10 +137,10 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	{
 		if ((actualMouseState&(CIRCLE_MOUSEHANDLING|CURVEPOINT_MOVEMENT_MOUSEHANDLING|SHAPE|INTERPOLATION_MOUSEHANDLING))> 0)
 		{
-			VHyperEdgeShape tempshape = ((ShapeMouseHandler)ShapeModifier).getShape();
+			NURBSShape tempshape = ((ShapeMouseHandler)ShapeModifier).getShape();
 			if ((tempshape!=null)&&(ShapeModifier.dragged()))
 			{
-				VHyperEdgeShape draw = tempshape.clone();
+				NURBSShape draw = tempshape.clone();
 				draw.scale(zoomfactor);
 				g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 				g2.setColor(selColor);
@@ -173,7 +173,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
-		VHyperEdgeShape s =  vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().clone();
+		NURBSShape s =  vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().clone();
 		s.scale(zoomfactor);
 		Iterator<Point2D> pi = s.controlPoints.iterator();
 		while (pi.hasNext())

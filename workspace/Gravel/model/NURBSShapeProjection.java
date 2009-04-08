@@ -22,7 +22,7 @@ import javax.vecmath.Point3d;
  */
 public class NURBSShapeProjection
 {
-	VHyperEdgeShape curve;
+	NURBSShape curve;
 	Point2D p;
 	//Values of the just handled qadrated bezier curve
 	Vector<Double> qcWeights, qcControlPoints;
@@ -31,14 +31,14 @@ public class NURBSShapeProjection
 	
 	double resultu;
 	
-	public NURBSShapeProjection(VHyperEdgeShape c, Point2D p)
+	public NURBSShapeProjection(NURBSShape c, Point2D p)
 	{
 		curve = c.clone();
 		this.p = p;
-		Queue<VHyperEdgeShape> Parts = new LinkedList<VHyperEdgeShape>();
+		Queue<NURBSShape> Parts = new LinkedList<NURBSShape>();
 		if (!isInBezierForm(c))
 		{
-			Vector<VHyperEdgeShape> partsf = DecomposeCurve(c);
+			Vector<NURBSShape> partsf = DecomposeCurve(c);
 			for (int i=0; i<partsf.size(); i++)
 				Parts.offer(partsf.get(i));
 		}
@@ -54,7 +54,7 @@ public class NURBSShapeProjection
 			//The Quere, so that they hopefully are out of range of the circle and get discarded then 
 			//
 		{
-			VHyperEdgeShape actualPart = Parts.poll();	
+			NURBSShape actualPart = Parts.poll();	
 			CalculateSquareDistanceFunction(actualPart.clone(),p);
 			double partAlpha = Math.min(p.distanceSq(actualPart.controlPoints.firstElement()), p.distanceSq(actualPart.controlPoints.lastElement()));
 			if (partAlpha<alpha)
@@ -102,7 +102,7 @@ public class NURBSShapeProjection
 					Vector<Double> ref = new Vector<Double>();
 					ref.add(refinement);
 					actualPart.RefineKnots(ref);
-					Vector<VHyperEdgeShape> newParts = DecomposeCurve(actualPart);
+					Vector<NURBSShape> newParts = DecomposeCurve(actualPart);
 					for (int i=0; i<newParts.size(); i++)
 						Parts.offer(newParts.get(i));
 				}
@@ -138,7 +138,7 @@ public class NURBSShapeProjection
 	{
 		return curve.NURBSCurveAt(resultu);
 	}
-	private double NewtonIteration(VHyperEdgeShape c, double startvalue, Point2D p)
+	private double NewtonIteration(NURBSShape c, double startvalue, Point2D p)
 	{
 		//System.err.println("Start: "+startvalue);
 		//End criteria
@@ -191,7 +191,7 @@ public class NURBSShapeProjection
 	 * @param c
 	 * @return
 	 */
-	private boolean isInBezierForm(VHyperEdgeShape c)
+	private boolean isInBezierForm(NURBSShape c)
 	{
 		int deg = c.degree;
 		double a = c.Knots.firstElement();		
@@ -211,7 +211,7 @@ public class NURBSShapeProjection
 	/**
 	 * 
 	 */
-	private void CalculateSquareDistanceFunction(VHyperEdgeShape c, Point2D p)
+	private void CalculateSquareDistanceFunction(NURBSShape c, Point2D p)
 	{
 		if (!isInBezierForm(c))
 			return;
@@ -344,12 +344,12 @@ public class NURBSShapeProjection
 	 * @param c
 	 * @return
 	 */
-	public Vector<VHyperEdgeShape> DecomposeCurve(VHyperEdgeShape c)
+	public Vector<NURBSShape> DecomposeCurve(NURBSShape c)
 	{
 		int m = c.maxCPIndex+1;
 		int a = c.degree;
 		int b = c.degree+1;
-		Vector<VHyperEdgeShape> BezierSegments = new Vector<VHyperEdgeShape>();
+		Vector<NURBSShape> BezierSegments = new Vector<NURBSShape>();
 		Vector<Point3d> bezierCP = new Vector<Point3d>();
 		Vector<Point3d> nextbezierCP = new Vector<Point3d>();
 		nextbezierCP.setSize(c.degree+1);
@@ -391,7 +391,7 @@ public class NURBSShapeProjection
 				bezierKnots.add(c.Knots.get(a));
 			for (int k=0; k<=c.degree; k++)
 				bezierKnots.add(c.Knots.get(b));
-			BezierSegments.add(new VHyperEdgeShape(bezierKnots, bezierCP, c.minDist));
+			BezierSegments.add(new NURBSShape(bezierKnots, bezierCP));
 			if (b<m) //init next
 			{
 				bezierCP = nextbezierCP;
@@ -409,7 +409,7 @@ public class NURBSShapeProjection
 			bezierKnots.add(c.Knots.get(a));
 		for (int k=0; k<=c.degree; k++)
 			bezierKnots.add(c.Knots.get(b));
-		BezierSegments.add(new VHyperEdgeShape(bezierKnots, bezierCP, c.minDist));
+		BezierSegments.add(new NURBSShape(bezierKnots, bezierCP));
 		return BezierSegments;
 	}
 	long nint(double x)

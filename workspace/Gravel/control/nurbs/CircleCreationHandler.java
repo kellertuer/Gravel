@@ -21,7 +21,7 @@ import model.VEdge;
 import model.VGraph;
 import model.VGraphInterface;
 import model.VHyperEdge;
-import model.VHyperEdgeShape;
+import model.NURBSShape;
 import model.VHyperGraph;
 import model.VItem;
 import model.VNode;
@@ -52,7 +52,7 @@ public class CircleCreationHandler implements ShapeMouseHandler {
 	boolean firstdrag = true;
 	Point CircleOrigin = null;
 	int size = 0;
-	VHyperEdgeShape lastcircle=null;
+	NURBSShape lastcircle=null;
 
 	public CircleCreationHandler(VGraphic g)
 	{
@@ -105,7 +105,7 @@ public class CircleCreationHandler implements ShapeMouseHandler {
 				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGESHAPE));
 		}
 	}
-	public VHyperEdgeShape getShape()
+	public NURBSShape getShape()
 	{
 		return lastcircle;
 	}

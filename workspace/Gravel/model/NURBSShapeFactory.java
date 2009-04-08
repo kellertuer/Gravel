@@ -18,45 +18,45 @@ public class NURBSShapeFactory {
 	public final static int MAX_INDEX = 7;
 	
 	@SuppressWarnings("unchecked")
-	public static VHyperEdgeShape CreateShape(String type, Vector<Object> Parameters)
+	public static NURBSShape CreateShape(String type, Vector<Object> Parameters)
 	{
 		int distance;
 		try	{distance = Integer.parseInt(Parameters.get(DISTANCE_TO_NODE).toString());}
-		catch (Exception e) {return new VHyperEdgeShape();} //EmptyShape
+		catch (Exception e) {return new NURBSShape();} //EmptyShape
 		if (type.toLowerCase().equals("circle"))
 		{
 			int radius;
 			try	{radius = Integer.parseInt(Parameters.get(CIRCLE_RADIUS).toString());}
-			catch (Exception e) {return new VHyperEdgeShape();} //Empty Shape
+			catch (Exception e) {return new NURBSShape();} //Empty Shape
 			return CreateCircle((Point) Parameters.get(CIRCLE_ORIGIN), radius, distance);
 		}
 		else if (type.toLowerCase().equals("global interpolation"))
 		{
 			Vector<Point2D> IP_Points;
 			try {IP_Points = (Vector<Point2D>) Parameters.get(POINTS);}
-			catch (Exception e) {return new VHyperEdgeShape();} //Empty Shape
+			catch (Exception e) {return new NURBSShape();} //Empty Shape
 			int degree;
 			try	{degree = Integer.parseInt(Parameters.get(DEGREE).toString());}
-			catch (Exception e) {return new VHyperEdgeShape();}
+			catch (Exception e) {return new NURBSShape();}
 			return CreateInterpolation(IP_Points, degree);
 		}
 		else if (type.toLowerCase().equals("convex hull"))
 		{
 			Vector<Point2D> nodes;
 			try {nodes = (Vector<Point2D>) Parameters.get(POINTS);}
-			catch (Exception e) {return new VHyperEdgeShape();} //Empty Shape
+			catch (Exception e) {return new NURBSShape();} //Empty Shape
 			Vector<Integer> Sizes;
 			try {Sizes = (Vector<Integer>) Parameters.get(SIZES);}
-			catch (Exception e) {return new VHyperEdgeShape();} //Empty Shape
+			catch (Exception e) {return new NURBSShape();} //Empty Shape
 			int degree;
 			try	{degree = Integer.parseInt(Parameters.get(DEGREE).toString());}
-			catch (Exception e) {return new VHyperEdgeShape();}
+			catch (Exception e) {return new NURBSShape();}
 			return CreateConvexHullPolygon(nodes, Sizes, degree, distance);
 		}
 		return null;
 	}
 	
-	private static VHyperEdgeShape CreateCircle(Point origin, int radius, int dist)
+	private static NURBSShape CreateCircle(Point origin, int radius, int dist)
 	{
 		//See L. Piegl, W. Tiller: A Menagerie of rational B-Spline Circles
 		Vector<Double> knots = new Vector<Double>();
@@ -79,7 +79,7 @@ public class NURBSShapeFactory {
 		controlPoints.add(new Point2D.Double(origin.x-radius, origin.y+radius)); //P4, bottom left
 		controlPoints.add(new Point2D.Double(origin.x+radius, origin.y+radius)); //P5, bottom right
 		controlPoints.add(new Point2D.Double(origin.x+radius, origin.y)); //P6 again P0
-		return new VHyperEdgeShape(knots,controlPoints,weights,dist);
+		return new NURBSShape(knots,controlPoints,weights);
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class NURBSShapeFactory {
 	  * @param degree the degree
 	  * @return
 	 */
-	private static VHyperEdgeShape CreateInterpolation(Vector<Point2D> q, int degree)
+	private static NURBSShape CreateInterpolation(Vector<Point2D> q, int degree)
 	{
 		//Based on Algorithm 9.1 from the NURBS-Book
 		
@@ -135,7 +135,7 @@ public class NURBSShapeFactory {
 			ControlPoints.set(i,new Point(0,0)); //Zero Initialization
 		}
 		
-		VHyperEdgeShape temp = new VHyperEdgeShape(Knots, ControlPoints,weights,0); //Temporary Shape for the BasisFunctions
+		NURBSShape temp = new NURBSShape(Knots, ControlPoints,weights); //Temporary Shape for the BasisFunctions
 		//Compute the basis-Function-Values and set them as row of a Matrix
 		double[][] LGS = new double[maxIPIndex+1][maxIPIndex+1]; //Already zero initialized;
 		for (int i=0; i<=maxIPIndex; i++) //For each Row
@@ -200,10 +200,10 @@ public class NURBSShapeFactory {
 	 * The size of a node plus the minimal Distance away from the node 
 	 * 
 	 */
-	private static VHyperEdgeShape CreateConvexHullPolygon(Vector<Point2D> nodes, Vector<Integer> sizes, int degree, int distance)
+	private static NURBSShape CreateConvexHullPolygon(Vector<Point2D> nodes, Vector<Integer> sizes, int degree, int distance)
 	{
 		if (nodes.size()<2) //mindestens 3 Knoten nötig
-			return new VHyperEdgeShape();
+			return new NURBSShape();
 		Vector<Point2D> ConvexHull = GrahamsScan(nodes);
 		Vector<Point2D> IPoints = new Vector<Point2D>();
 		for (int i=0; i<ConvexHull.size(); i++)
@@ -243,7 +243,7 @@ public class NURBSShapeFactory {
 		IPoints = GrahamsScan(IPoints); //Make convex again
 		IPoints.add((Point2D) IPoints.firstElement().clone());
 		if (IPoints.size()<=degree)
-			return new VHyperEdgeShape();
+			return new NURBSShape();
 		return CreateInterpolation(IPoints, degree);
 	}
 	

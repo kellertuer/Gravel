@@ -11,7 +11,7 @@ import java.util.Vector;
 
 
 import model.VHyperEdge;
-import model.VHyperEdgeShape;
+import model.NURBSShape;
 import model.VHyperGraph;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
@@ -33,7 +33,7 @@ public class FreeModificationHandler implements ShapeMouseHandler {
 	Point MouseOffSet = new Point(0,0);;
 	boolean firstdrag = true;
 	double DragStartProjection = Double.NaN;
-	VHyperEdgeShape temporaryShape=null;
+	NURBSShape temporaryShape=null;
 	
 	public FreeModificationHandler(VHyperGraphic g, int hyperedgeindex)
 	{
@@ -50,7 +50,7 @@ public class FreeModificationHandler implements ShapeMouseHandler {
 	{ //No Selections possible here
 		return null;
 	}
-	public VHyperEdgeShape getShape()
+	public NURBSShape getShape()
 	{
 		return temporaryShape;
 	}
