@@ -371,14 +371,14 @@ public class NURBSShape {
 				return -1;
 		if ((NURBSType&UNCLAMPED)==UNCLAMPED) //Unclamped Curve, starts with Knots.get(d) ends with maxCPIndex-d
 		{
-			if ((u<Knots.get(degree)||(u>Knots.get(maxCPIndex-degree))))
+			if ((u<Knots.get(degree)||(u>Knots.get(maxKnotIndex-degree))))
 					return -1;			
 		}
-		if (u==Knots.lastElement()) //Special case because the last intervall is not open to the right
-			return Knots.indexOf(Knots.lastElement())-1; //first value of t equal to t.get(m)==t.lastElement - which is m-d		
 		//Binary Search for the intervall
 		int low = degree; //because the first d+1 are equal too
 		int high = maxKnotIndex-degree; //see above
+		if (u==Knots.get(high)) //Special case because the last intervall is not open to the right
+			return high-1; //So t_{m-d} belongs just as endpoint to the curve Part [t_m-d-1,t_m-d]
 		int mid = Math.round((low+high)/2);
 		while ((u<Knots.get(mid)) || (u>=Knots.get(mid+1)))
 		{ 

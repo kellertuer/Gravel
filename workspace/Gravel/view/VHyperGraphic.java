@@ -73,29 +73,26 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-	//	paintDEBUG(g2);
+		paintDEBUG(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
-		Vector<Double> weights = new Vector<Double>();
-		weights.add(.5);weights.add(.5);weights.add(.4);
-		weights.add(.7);weights.add(.7);
-		weights.add(.4); weights.add(.5);weights.add(.5);
-		Vector<Point2D> points = new Vector<Point2D>();
-		points.add(new Point2D.Double(30d,80d));//0		
-		points.add(new Point2D.Double(50d,120d));//1
-		points.add(new Point2D.Double(150d,250d));//2
-		points.add(new Point2D.Double(300d,75d));//3
-		points.add(new Point2D.Double(200d,130d));//4
-		points.add(new Point2D.Double(300d,75d));//5
-		double tx = -(points.get(1).getX()-points.get(0).getX());  
-		double ty = -(points.get(1).getY()-points.get(0).getY());  
-		points.add(new Point2D.Double(tx,ty));
-		points.add((Point2D) points.get(0).clone());
 		Vector<Double> knots = new Vector<Double>();
-		knots.add(0d);knots.add(.05d);knots.add(.075d);knots.add(.1d);
-		knots.add(.2);knots.add(.4);knots.add(.6);knots.add(.8);
-		knots.add(.925d);knots.add(.95d);knots.add(.975d);knots.add(1d);
+		for (int i=0; i<=11; i++)
+			knots.add(((double)i-3d)/5d);
+		
+		Vector<Point2D> points = new Vector<Point2D>();
+		Vector<Double> weights = new Vector<Double>();
+		points.add(new Point2D.Double(30d,80d)); weights.add(.8);
+		points.add(new Point2D.Double(50d,120d)); weights.add(.7);
+		points.add(new Point2D.Double(150d,250d)); weights.add(1d);
+		points.add(new Point2D.Double(300d,75d)); weights.add(2d);
+		points.add(new Point2D.Double(200d,130d));weights.add(3d);
+		for (int i=0; i<3; i++)
+		{
+			points.add((Point2D)points.get(i).clone());
+			weights.add(weights.get(i).doubleValue());
+		}
 		for (int i=0; i<points.size(); i++)
 		{
 			float gv = 0f;
@@ -107,6 +104,7 @@ public class VHyperGraphic extends VCommonGraphic
 		NURBSShape cs = c.clone();
 		cs.scale(zoomfactor);
 		g2.draw(cs.getCurve(5d/(double)zoomfactor));
+		
 //		Vector<Point> projectionpoints = new Vector<Point>();
 //		Iterator<VNode> iter = vG.modifyNodes.getIterator();
 //		while (iter.hasNext())
