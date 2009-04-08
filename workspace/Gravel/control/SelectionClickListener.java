@@ -67,21 +67,23 @@ public class SelectionClickListener implements MouseListener {
 		else if (t!=null)
 			selectedItem = t;
 
-		if (selectedItem==null)
-		{
-			notify.deselect();		
-			return;
-		}
 		if (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.SHIFT_MASK) // if not Shift Click
 		{
-				if ((selectedItem.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED)
-					selectedItem.setSelectedStatus(VItem.SELECTED);
-				else
-					selectedItem.deselect();
-				notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
+			if (selectedItem==null)
+				return;
+			if ((selectedItem.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED)
+				selectedItem.setSelectedStatus(VItem.SELECTED);
+			else
+				selectedItem.deselect();
+			notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
 		}
 		else if (e.getModifiers() == MouseEvent.BUTTON1_MASK) //Single Click
 		{			
+			if (selectedItem==null) //Left click on background -> Deselect
+			{
+				notify.deselect();		
+				return;
+			}
 			if ((selectedItem.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED) //Element not selected
 			{
 				notify.deselect();

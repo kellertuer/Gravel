@@ -31,58 +31,46 @@ import javax.vecmath.Point3d;
  */
 public class NURBSShape {
 
+	private final int CLAMPED = 0;
+	private final int UNCLAMPED = 1;
 	protected Vector<Double> Knots;
 	protected Vector<Double> cpWeight;
-	public Vector<Point2D> controlPoints; //ControlPoints
+	public Vector<Point2D> controlPoints; //ControlPoints, TODO: Set protected after DEBUG
 	protected Vector<Point3d> controlPointsHom; //b in homogeneous coordinates multiplied by weight
-
+	private int NURBSType; //May be clamped or unclamped	
 	protected int maxKnotIndex, //The Knots are numbered 0,1,...,maxKnotIndex
 				maxCPIndex, //The ControlPoints are numbered 0,1,...,maxCPIndex
 				degree; //Order of the piecewise polynomials - depends on the maxIndices Above: degree = maxKnotIndex-maxCPindex-1
 	/**
-	 * Create an empty shape so nothing ever happens but its at least not null
+	 * Create an empty NURBSShape,
+	 * which has no controlpoints, weights nor knots
+	 * this is never rendered anywhere and is used to indicate that 
+	 * either nothing was done yet or the last try to get a shape went wrong
 	 */
 	public NURBSShape()
 	{
-		Knots = new Vector<Double>();
-		cpWeight = new Vector<Double>();
-		controlPoints = new Vector<Point2D>();
-		maxCPIndex=0; maxKnotIndex=0; degree=0;
-		controlPointsHom = new Vector<Point3d>();
+		clear();
 	}
 	/**
-	 * Init an HyperEdgeShape with
-	 * @param pKnots nots of the NURBS
+	 * Init an NURBSShape.
+	 * An NURBSShape is defined by a knotvektor (Knots or t), 
+	 * its ControlPoints (CPoints or P_i),
+	 * and weights for the ControlPoints that specify the influence of an individual ControlPoint to the curve
+	 * 
+	 * First a potential Degree (d) is computet (#Knots - #ControlPoints-1) and then the validity is checked, so if
+	 * it is closed (first d+1 Knots are equal and last d+1 are also equal, kntot-vector is nondecreasing)
+	 * @param pKnots Knots of the NURBS
 	 * @param cpoints Controlpoints of the NURBS
-	 * @param weights weights of the CP 
-	 * @param dist minimal distance the curve should have from each node (whose are not saved here)
+	 * @param weights weights of the P_i 
 	 */
 	public NURBSShape(Vector<Double> pKnots, Vector<Point2D> CPoints, Vector<Double> weights)//, int degree)
 	{
 		setCurveTo(pKnots,CPoints,weights);
 	}
 	/**
-	 * Set the Curve to another NURBS
-	 * @param pKnots
-	 * @param CPoints
-	 * @param weights
-	 */
-	public void setCurveTo(Vector<Double> pKnots, Vector<Point2D> CPoints, Vector<Double> weights)
-	{
-		Knots = pKnots;
-		controlPoints = CPoints;
-		cpWeight = weights;
-		maxCPIndex = CPoints.size()-1;
-		maxKnotIndex = Knots.size()-1;
-		degree = Knots.size()-controlPoints.size()-1;
-		if (!isEmpty())
-			InitHomogeneous();
-	}
-	/**
 	 * Private Constructor to (re)create with Homogeneous ControlPointVector
 	 * @param knots
 	 * @param pPw
-	 * @param dist
 	 */
 	protected NURBSShape(Vector<Double> knots, Vector<Point3d> pPw)
 	{
@@ -107,6 +95,88 @@ public class NURBSShape {
 		maxKnotIndex = Knots.size()-1;
 		degree = Knots.size()-controlPoints.size()-1;
 		InitHomogeneous();		
+	}
+	/**
+	 * Set the Curve to another NURBS
+	 * @param pKnots
+	 * @param CPoints
+	 * @param weights
+	 */
+	public void setCurveTo(Vector<Double> pKnots, Vector<Point2D> CPoints, Vector<Double> weights)
+	{
+		int result = validate(pKnots, CPoints, weights);
+		if (result==-1)
+		{
+			clear();
+			return;
+		}
+		NURBSType = result;
+		Knots = pKnots;
+		controlPoints = CPoints;
+		cpWeight = weights;
+		maxCPIndex = CPoints.size()-1;
+		maxKnotIndex = Knots.size()-1;
+		degree = Knots.size()-controlPoints.size()-1;
+		if (!isEmpty())
+			InitHomogeneous();
+	}
+	/**
+	 * Check whether the given Knots, ControlPoints and weight specify a correct NURBS-Curve
+	 * (1) #CP = #weights
+	 * (2) clamped or unclamped Curve
+	 * (3) For the Degree enough knots
+	 * 
+	 * @param pKnots
+	 * @param CPoints
+	 * @param weights
+	 * 
+	 * @return the type of curve if it is valid, else -1
+	 */
+	private int validate(Vector<Double> pKnots, Vector<Point2D> CPoints, Vector<Double> weights)
+	{
+		if ((pKnots.size()==0)&&(CPoints.size()==0)&&(weights.size()==0))
+			return -1;
+		if (CPoints.size()!=weights.size())
+			return -1;
+		for (int i=1; i<pKnots.size()-1; i++)
+		{
+			if (pKnots.get(i)<pKnots.get(i-1))
+				return -1; //Not nondecreasing
+		}
+		int d = pKnots.size()-CPoints.size()-1;
+		if (d<1)
+			return -1;
+		boolean clamped = true;
+		if (pKnots.size() >= 2*d+2)
+		{
+			//Check for clamped Curve
+			double first = pKnots.firstElement(), last=pKnots.lastElement();
+			for (int i=1; i<=d; i++)
+			{
+				if (pKnots.get(i)!=first)
+					clamped = false;
+				if (pKnots.get(pKnots.size()-1-i)!=last)
+					clamped = false;
+			}
+		}
+		else
+			clamped = false;
+		if (clamped)
+			return CLAMPED;
+		//Check for unclamped needed?
+		else
+			return UNCLAMPED;
+	}
+	/**
+	 * Empty this shape and set it to nonexistent
+	 */
+	private void clear()
+	{
+		Knots = new Vector<Double>();
+		cpWeight = new Vector<Double>();
+		controlPoints = new Vector<Point2D>();
+		maxCPIndex=0; maxKnotIndex=0; degree=0;
+		controlPointsHom = new Vector<Point3d>();
 	}
 	/**
 	 * Initialization of the internal homogeneous Vector
@@ -254,13 +324,13 @@ public class NURBSShape {
 		Stack<Point2D> calculatedPoints = new Stack<Point2D>();
 		Stack<Double> calculatedParameters = new Stack<Double>();
 		//Startpoint
-		double actualu = Knots.firstElement();
+		double actualu = Knots.get(degree);
 		Point2D actualPoint = this.NURBSCurveAt(actualu);
 		path.moveTo((float)actualPoint.getX(), (float)actualPoint.getY());
 		//Init Stack with the endpoint
-		calculatedParameters.push(Knots.lastElement());
+		calculatedParameters.push(Knots.get(maxKnotIndex-degree));
 		calculatedPoints.push(NURBSCurveAt(calculatedParameters.peek().doubleValue()));
-		calculatedParameters.push((Knots.lastElement()+Knots.firstElement())/2d); //Middle, because start and end ar equal
+		calculatedParameters.push((Knots.get(maxKnotIndex-degree)+Knots.get(degree))/2d); //Middle, because start and end ar equal
 		calculatedPoints.push(NURBSCurveAt(calculatedParameters.peek().doubleValue()));
 		//
 		//Calculate values in between as long as they are not near enough
@@ -297,10 +367,15 @@ public class NURBSShape {
 	 */
 	public int findSpan(double u)
 	{
-		if (u==Knots.lastElement())
+		if ((u<Knots.firstElement())||(u>Knots.lastElement())) //Out of range for all types
+				return -1;
+		if ((NURBSType&UNCLAMPED)==UNCLAMPED) //Unclamped Curve, starts with Knots.get(d) ends with maxCPIndex-d
 		{
-			return Knots.indexOf(Knots.lastElement())-1; //first value of t equal to t.get(m)==t.lastElement - which is m-d		
+			if ((u<Knots.get(degree)||(u>Knots.get(maxCPIndex-degree))))
+					return -1;			
 		}
+		if (u==Knots.lastElement()) //Special case because the last intervall is not open to the right
+			return Knots.indexOf(Knots.lastElement())-1; //first value of t equal to t.get(m)==t.lastElement - which is m-d		
 		//Binary Search for the intervall
 		int low = degree; //because the first d+1 are equal too
 		int high = maxKnotIndex-degree; //see above
@@ -369,6 +444,8 @@ public class NURBSShape {
 		int du = Math.min(degree, derivate);
 		Vector<Point3d> CK = new Vector<Point3d>();
 		int span = findSpan(u);
+		if (u==-1)
+			return null;
 		CK.setSize(derivate+1);
 		for (int k=degree+1; k<=derivate; k++)
 			CK.set(k,new Point3d(0d,0d,0d)); //All higher derivates zero
@@ -392,6 +469,8 @@ public class NURBSShape {
 		double[][] ndu = new double[degree+1][degree+1];
 		ndu[0][0]=1d;
 		int i = findSpan(u);
+		if (i==-1)
+			return null;
 		double[] left = new double[degree+1]; double[] right = new double[degree+1];
 		for (int j=1; j<=degree; j++)
 		{
@@ -475,11 +554,13 @@ public class NURBSShape {
 	 * This method works for 2d homogeneous or 3d Stuff.
 	 *
 	 * @param u Point u \in [0,1], which result we want
-	 * @return a 3d-Value of the Point in the Curve.
+	 * @return a 3d-Value of the Point in the Curve or null if u is out of range
 	 */
 	private Point3d deBoer3D(double u)
 	{
 		int i = findSpan(u);
+		if (i==-1)
+			return null;
 		Vector<Point3d> fixedj = new Vector<Point3d>();
 		fixedj.setSize(degree+1); //for values 0,...,d, because only d+1 Basis Functions are nonzero
 		//Init with the Points
@@ -678,6 +759,8 @@ public class NURBSShape {
 		}
 		//Compare The NURBS Book A5.4
 		int a = findSpan(X.firstElement()), b=findSpan(X.lastElement())+1;
+		if ((a==-1)||(b==0))
+			return; //Out of range
 		Vector<Point3d> newPw;
 		newPw = new Vector<Point3d>();
 		newPw.setSize(controlPointsHom.size()+X.size());
