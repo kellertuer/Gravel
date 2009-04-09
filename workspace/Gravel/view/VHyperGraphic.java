@@ -109,34 +109,34 @@ public class VHyperGraphic extends VCommonGraphic
 		{
 			drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())),Color.cyan.darker());
 		}
-		Vector<Point> projectionpoints = new Vector<Point>();
-		Iterator<VNode> iter = vG.modifyNodes.getIterator();
-		while (iter.hasNext())
-		{
-			VNode actual = iter.next();
-			projectionpoints.add(actual.getPosition());
-		}
-		//TODO: Measure again after Optimization of the Square Computation
-	    long time = System.currentTimeMillis();
-	    System.err.print("#"+projectionpoints.size()+" ");
-	    for (int j=0; j<projectionpoints.size(); j++)
-		{
-			Point p = projectionpoints.get(j);
-			NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
-			double dist = p.distance(proj.getResultPoint());
-			Color cross = Color.magenta;
-			if (dist<=2.0*zoomfactor)
-				cross = Color.green.darker().darker();
-			drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),cross);
-			drawCP(g2,new Point(Math.round((float)proj.getResultPoint().getX()), Math.round((float)proj.getResultPoint().getY())), Color.ORANGE);
-			g2.setColor(Color.orange);
-			g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
-					Math.round((float)proj.getResultPoint().getX()*zoomfactor), Math.round((float)proj.getResultPoint().getY()*zoomfactor));
-		}
-        time = -time + System.currentTimeMillis();
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-        SimpleDateFormat sdf = new SimpleDateFormat("ss:SSS");
-        System.err.println(" "+sdf.format(time)+" Sekunden");  
+//		Vector<Point> projectionpoints = new Vector<Point>();
+//		Iterator<VNode> iter = vG.modifyNodes.getIterator();
+//		while (iter.hasNext())
+//		{
+//			VNode actual = iter.next();
+//			projectionpoints.add(actual.getPosition());
+//		}
+//		//TODO: Measure again after Optimization of the Square Computation
+//	    long time = System.currentTimeMillis();
+//	    System.err.print("#"+projectionpoints.size()+" ");
+//	    for (int j=0; j<projectionpoints.size(); j++)
+//		{
+//			Point p = projectionpoints.get(j);
+//			NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
+//			double dist = p.distance(proj.getResultPoint());
+//			Color cross = Color.magenta;
+//			if (dist<=2.0*zoomfactor)
+//				cross = Color.green.darker().darker();
+//			drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),cross);
+//			drawCP(g2,new Point(Math.round((float)proj.getResultPoint().getX()), Math.round((float)proj.getResultPoint().getY())), Color.ORANGE);
+//			g2.setColor(Color.orange);
+//			g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
+//					Math.round((float)proj.getResultPoint().getX()*zoomfactor), Math.round((float)proj.getResultPoint().getY()*zoomfactor));
+//		}
+//        time = -time + System.currentTimeMillis();
+//        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+//        SimpleDateFormat sdf = new SimpleDateFormat("ss:SSS");
+//        System.err.println(" "+sdf.format(time)+" Sekunden");  
 	}
 	
 	/**

@@ -92,7 +92,6 @@ public class NURBSShapeFactory {
 	private static NURBSShape CreateInterpolation(Vector<Point2D> q, int degree)
 	{
 		//Based on Algorithm 9.1 from the NURBS-Book
-		
 		int maxIPIndex = q.size()-1; //So we have the InterpolationPoints q.get(0) to q.get(maxIPIndex)
 		int maxKnotIndex = maxIPIndex+degree+1;//So we have Knots with indices from Zero to MaxKnotIndex
 		
@@ -125,6 +124,22 @@ public class NURBSShapeFactory {
 			value /= degree;
 			Knots.set(j+degree, value);
 		}
+		//maxIPIndex is m-d and is unchanged by 1
+		//last d-1 values greater than 1
+		for (int j=maxIPIndex-degree+2; j<=maxIPIndex+1; j++)
+		{
+			double value = 0d;
+			for (int i=j-1; i<=maxIPIndex; i++)
+			{
+				value += lgspoints.get(i);
+			}
+			value /= maxIPIndex-j+2;
+			Knots.set(j+degree,value+1);
+		}
+		//Copy these Spans to the first d-1 ones
+		for (int j=degree-1; j>=0; j--)
+			Knots.set(j, Knots.get(j+1) - (Knots.get(maxKnotIndex-j)-Knots.get(maxKnotIndex-j)));
+		
 		Vector<Point2D> ControlPoints = new Vector<Point2D>(); //The Resulting ConrolPointVecotr
 		ControlPoints.setSize(maxIPIndex+1);
 		Vector<Double> weights = new Vector<Double>();
@@ -142,10 +157,14 @@ public class NURBSShapeFactory {
 		{
 			int firstnonzero = temp.findSpan(lgspoints.get(i));
 			Vector<Double> nonZeroBasisValues = temp.BasisBSpline(lgspoints.get(i));
+//			for (int k=0; k<firstnonzero-degree; k++)
+//				System.err.print("0\t");
 			for (int j=0; j<=degree; j++) //Set all nonzero Row values
 			{
 					LGS[i][j+firstnonzero-degree] = nonZeroBasisValues.get(j);
+	//				System.err.print(nonZeroBasisValues.get(j)+"\t");
 			}
+	//		System.err.println("");
 		}
 		//Now Solve the LGS for X to get P_i X-Coordinate and then for Y 
 		//Because this matrix is totally positive and semibandwith less than p - gauss without pivoting is possible
@@ -191,10 +210,8 @@ public class NURBSShapeFactory {
 			thisPointY /= LGS[i][i];
 			ControlPoints.set(i,new Point2D.Double(thisPointX,thisPointY));
 		}
-		temp.setCurveTo(Knots, ControlPoints, weights);
-		return temp;
+		return new NURBSShape(Knots, ControlPoints,weights); //Temporary Shape for the BasisFunctions
 	}
-
 	/**
 	 * Based on Grahams Scan this Method creates a convex hull and calculates Interpolation-Points that are at least
 	 * The size of a node plus the minimal Distance away from the node 

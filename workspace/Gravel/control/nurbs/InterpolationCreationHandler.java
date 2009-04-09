@@ -53,7 +53,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 	boolean firstdrag = true;
 	Point2D DragOrigin = null;
 	Vector<Point2D> InterpolationPoints;
-	int degree, actualInsertionIndex=-1, nodedist;
+	int degree, nodedist;
 	NURBSShape lastshape=null;
 
 	public InterpolationCreationHandler(VHyperGraphic g)
@@ -83,7 +83,14 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 			lastshape = new NURBSShape();
 			return;
 		}
-		lastshape = NURBSShapeFactory.CreateShape("global interpolation", getShapeParameters());
+		Vector<Point2D> localIP = new Vector<Point2D>();
+		for (int i=0; i<InterpolationPoints.size(); i++)
+			localIP.add((Point2D)InterpolationPoints.get(i).clone());
+		for (int i=0; i<degree; i++)
+			localIP.add((Point2D)InterpolationPoints.get(i).clone());
+		Vector<Object> param = getShapeParameters();
+		param.set(NURBSShapeFactory.POINTS, localIP);
+		lastshape = NURBSShapeFactory.CreateShape("global interpolation", param);
 	}
 	public void setShapeParameters(Vector<Object> p)
 	{
@@ -132,7 +139,6 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 			DragOrigin=null;
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 		}
-		actualInsertionIndex = -1;
 	}
 	private boolean containsPoint(Point2D p)
 	{
@@ -177,18 +183,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 					internalReset();
 					return;
 				}
-				if(InterpolationPoints.size()==0) //No Point yet->add this point twice - start & end
-				{
-					InterpolationPoints.add((Point2D.Double) DragOrigin.clone()); 
-					InterpolationPoints.add(DragOrigin);
-					actualInsertionIndex = 1;
-				}
-				else //Else add as prelast element
-				{
-					int size = InterpolationPoints.size();
-					InterpolationPoints.add(size-1,DragOrigin);
-					actualInsertionIndex = size-1;
-				}
+				InterpolationPoints.add(DragOrigin);
 				UpdateShape();
 				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 			}
@@ -198,7 +193,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 				{
 					if (!containsPoint(exactPointInGraph))
 					{
-						InterpolationPoints.set(actualInsertionIndex,exactPointInGraph);
+						InterpolationPoints.set(InterpolationPoints.size()-1,exactPointInGraph);
 						UpdateShape();
 					}
 				}
@@ -228,16 +223,7 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 		if (containsPoint(newPoint))
 			return;
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
-		if(InterpolationPoints.size()==0) //No Point yet->add this point twice - start & end
-		{
 			InterpolationPoints.add((Point2D.Double) newPoint.clone()); 
-			InterpolationPoints.add(newPoint); 
-		}
-		else //Else add as prelast element
-		{
-			int size = InterpolationPoints.size();
-			InterpolationPoints.add(size-1,newPoint);
-		}
 		UpdateShape();
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 	}	

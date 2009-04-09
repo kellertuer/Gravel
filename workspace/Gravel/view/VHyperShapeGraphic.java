@@ -89,6 +89,9 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				NURBSShape s = temp.getShape().clone();
 				s.scale(zoomfactor);
 				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(5d/(double)zoomfactor),temp.getWidth(),zoomfactor));
+				//DEBUG
+				for (int i=0; i<s.controlPoints.size(); i++)
+					drawCP(g2,new Point(Math.round((float)temp.getShape().controlPoints.get(i).getX()),Math.round((float)temp.getShape().controlPoints.get(i).getY())),Color.ORANGE);
 			}
 		}
 	}

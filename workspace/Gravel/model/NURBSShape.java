@@ -192,13 +192,15 @@ public class NURBSShape {
 	{
 		controlPointsHom = new Vector<Point3d>();
 		Iterator<Point2D> ib =  controlPoints.iterator();
+		int i=0;
 		while (ib.hasNext()) //Modify to be 3D Coordinates (homogeneous 2D)
 		{
 			Point2D p = ib.next();
-			double weight = cpWeight.get(controlPoints.indexOf(p));
+			double weight = cpWeight.get(i);
 			Point3d newp = new Point3d(p.getX(),p.getY(),weight);
 			newp.set(newp.x*weight, newp.y*weight, weight);
 			controlPointsHom.add(newp);
+			i++;
 		}
 	}
 	/**
