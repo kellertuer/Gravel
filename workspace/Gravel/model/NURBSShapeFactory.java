@@ -85,27 +85,32 @@ public class NURBSShapeFactory {
 	/**
   	  * Create and return a Smooth NURBS-Curve of degree degree through the given Interpolation Points
   	  * 
-	  * @param q The Interpolation-Points
+	  * @param IP The Interpolation-Points
 	  * @param degree the degree
 	  * @return
 	 */
 	private static NURBSShape CreateInterpolation(Vector<Point2D> q, int degree)
 	{
 		//Based on Algorithm 9.1 from the NURBS-Book
-		int maxIPIndex = q.size()-1; //So we have the InterpolationPoints q.get(0) to q.get(maxIPIndex)
-		int maxKnotIndex = maxIPIndex+degree+1;//So we have Knots with indices from Zero to MaxKnotIndex
-		
-		//First determine the Points, where we interpolate depending to the Interpolation-Points
-		//This Part uses the cetripetal Aproach
+		//close IP to a closed curve
+		Vector<Point2D> IP = new Vector<Point2D>();
+		for (int i=0; i<q.size(); i++)
+			IP.add((Point2D) q.get(i).clone());
+		IP.add((Point2D) q.firstElement().clone());
+		int maxIPIndex = IP.size()-1; //highest IP Index
+		int maxKnotIndex = maxIPIndex+degree+1;//highest KnotIndex in the resulting NURBS-Curve
+		if (maxIPIndex < 2*degree) //we have less then 2*degree IP -> no interpolatin possible
+			return new NURBSShape();
+		//Determine Points to evaluate for IP with cetripetal Aproach
 		double d = 0d;
 		for (int i=1; i<=maxIPIndex; i++)
-			d += Math.sqrt(q.get(i).distance(q.get(i-1)));
+			d += Math.sqrt(IP.get(i).distance(IP.get(i-1)));
 		Vector<Double> lgspoints = new Vector<Double>();
-		lgspoints.setSize(q.size());
+		lgspoints.setSize(IP.size());
 		lgspoints.set(0,0d);
 		lgspoints.set(maxIPIndex, 1d);
 		for (int i=1; i<maxIPIndex; i++)
-			lgspoints.set(i, lgspoints.get(i-1).doubleValue() + Math.sqrt(q.get(i).distance(q.get(i-1)))/d);
+			lgspoints.set(i, lgspoints.get(i-1).doubleValue() + Math.sqrt(IP.get(i).distance(IP.get(i-1)))/d);
 		//At the lgspoints we evaluate the Curve, get an LGS, that is totally positive and banded
 		Vector<Double> Knots = new Vector<Double>();
 		Knots.setSize(maxKnotIndex+1); //Because there are 0,...,macKnotIndex Knots
@@ -124,21 +129,21 @@ public class NURBSShapeFactory {
 			value /= degree;
 			Knots.set(j+degree, value);
 		}
-		//maxIPIndex is m-d and is unchanged by 1
-		//last d-1 values greater than 1
-		for (int j=maxIPIndex-degree+2; j<=maxIPIndex+1; j++)
+		//Change Endknots to unclamped
+		//first degree values before zero
+		for (int j=degree-1; j>=0; j--) //from first that should less than zero to the lowest value
 		{
-			double value = 0d;
-			for (int i=j-1; i<=maxIPIndex; i++)
-			{
-				value += lgspoints.get(i);
-			}
-			value /= maxIPIndex-j+2;
-			Knots.set(j+degree,value+1);
+			double lastval = Knots.get(j+1);
+			double correspInterval = Knots.get(maxKnotIndex-degree - (degree-1-j)) - Knots.get(maxKnotIndex-degree - (degree-1-j) -1);
+			Knots.set(j, lastval - correspInterval);
 		}
-		//Copy these Spans to the first d-1 ones
-		for (int j=degree-1; j>=0; j--)
-			Knots.set(j, Knots.get(j+1) - (Knots.get(maxKnotIndex-j)-Knots.get(maxKnotIndex-j)));
+		//last degree values following One
+		for (int j=0; j<degree; j++) //from first that should less than zero to the lowest value
+		{
+			double lastval = Knots.get(maxKnotIndex-degree+j);
+			double correspInterval = Knots.get(degree+j+1) - Knots.get(degree+j);
+			Knots.set(maxKnotIndex-degree+j+1,lastval + correspInterval);
+		}
 		
 		Vector<Point2D> ControlPoints = new Vector<Point2D>(); //The Resulting ConrolPointVecotr
 		ControlPoints.setSize(maxIPIndex+1);
@@ -189,7 +194,7 @@ public class NURBSShapeFactory {
 		//Forward Computation of P
 		for (int i=0; i<=maxIPIndex; i++)
 		{
-			double thisX = q.get(i).getX(), thisY = q.get(i).getY();
+			double thisX = IP.get(i).getX(), thisY = IP.get(i).getY();
 			for (int k=0; k<i; k++)
 			{
 				thisX -= LGS[i][k]*ControlPoints.get(k).getX();
@@ -258,7 +263,6 @@ public class NURBSShapeFactory {
 			IPoints.add(new Point2D.Double(thisX - direction3.getX()/dir3l*(distance+(double)sizes.get(pos)/2d), thisY - direction3.getY()/dir3l*(distance+(double)sizes.get(pos)/2d)));
 		}
 		IPoints = GrahamsScan(IPoints); //Make convex again
-		IPoints.add((Point2D) IPoints.firstElement().clone());
 		if (IPoints.size()<=degree)
 			return new NURBSShape();
 		return CreateInterpolation(IPoints, degree);

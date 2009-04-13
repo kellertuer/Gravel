@@ -78,19 +78,12 @@ public class InterpolationCreationHandler implements ShapeMouseHandler {
 	}
 	private void UpdateShape()
 	{
-		if (InterpolationPoints.size()<=degree)
+		if (InterpolationPoints.size()<=2*degree)
 		{
 			lastshape = new NURBSShape();
 			return;
 		}
-		Vector<Point2D> localIP = new Vector<Point2D>();
-		for (int i=0; i<InterpolationPoints.size(); i++)
-			localIP.add((Point2D)InterpolationPoints.get(i).clone());
-		for (int i=0; i<degree; i++)
-			localIP.add((Point2D)InterpolationPoints.get(i).clone());
-		Vector<Object> param = getShapeParameters();
-		param.set(NURBSShapeFactory.POINTS, localIP);
-		lastshape = NURBSShapeFactory.CreateShape("global interpolation", param);
+		lastshape = NURBSShapeFactory.CreateShape("global interpolation", getShapeParameters());
 	}
 	public void setShapeParameters(Vector<Object> p)
 	{

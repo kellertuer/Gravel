@@ -941,10 +941,20 @@ public class NURBSShape {
 				Pk.getY() + direction.getY()/mov		
 		);
 		controlPoints.set(Pindex,Pnew);
-		if (Pindex==0)
-			controlPoints.set(controlPoints.size()-1, (Point2D) Pnew.clone());
-		else if (Pindex==(controlPoints.size()-1))
-			controlPoints.set(0, (Point2D) Pnew.clone());
+		if ((getType()&UNCLAMPED)==UNCLAMPED)
+		{
+			if (Pindex<degree) //first degree ones
+				controlPoints.set(maxCPIndex-degree+Pindex+1, (Point2D) Pnew.clone());
+			else if (Pindex > maxCPIndex-degree) // degree ones
+				controlPoints.set(Pindex-1- maxCPIndex+degree, (Point2D) Pnew.clone());
+		}
+		else if ((getType()&CLAMPED)==CLAMPED)
+		{
+			if (Pindex==0) //first -> move last
+				controlPoints.set(maxCPIndex, (Point2D) Pnew.clone());
+			else if (Pindex==maxCPIndex) // last->move first
+				controlPoints.set(0, (Point2D) Pnew.clone());
+		}
 		InitHomogeneous();
 	}
 	// return integer nearest to x
