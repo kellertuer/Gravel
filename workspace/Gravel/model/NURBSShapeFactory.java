@@ -114,11 +114,8 @@ public class NURBSShapeFactory {
 		//At the lgspoints we evaluate the Curve, get an LGS, that is totally positive and banded
 		Vector<Double> Knots = new Vector<Double>();
 		Knots.setSize(maxKnotIndex+1); //Because there are 0,...,macKnotIndex Knots
-		for (int i=0; i<=degree; i++)
-		{
-			Knots.set(i,0d); //First degree+1 Entries are zero
-			Knots.set(maxKnotIndex-i,1d); //Last p+1 Entries are 1
-		}
+			Knots.set(degree,0d); //First degree+1 Entries are zero
+			Knots.set(maxKnotIndex-degree,1d); //Last p+1 Entries are 1
 		for (int j=1; j<=maxIPIndex-degree; j++) //middle values
 		{
 			double value = 0d;
@@ -162,14 +159,10 @@ public class NURBSShapeFactory {
 		{
 			int firstnonzero = temp.findSpan(lgspoints.get(i));
 			Vector<Double> nonZeroBasisValues = temp.BasisBSpline(lgspoints.get(i));
-//			for (int k=0; k<firstnonzero-degree; k++)
-//				System.err.print("0\t");
 			for (int j=0; j<=degree; j++) //Set all nonzero Row values
 			{
 					LGS[i][j+firstnonzero-degree] = nonZeroBasisValues.get(j);
-	//				System.err.print(nonZeroBasisValues.get(j)+"\t");
 			}
-	//		System.err.println("");
 		}
 		//Now Solve the LGS for X to get P_i X-Coordinate and then for Y 
 		//Because this matrix is totally positive and semibandwith less than p - gauss without pivoting is possible
@@ -215,6 +208,8 @@ public class NURBSShapeFactory {
 			thisPointY /= LGS[i][i];
 			ControlPoints.set(i,new Point2D.Double(thisPointX,thisPointY));
 		}
+//		for (int i=0; i<degree; i++) //Thios not really interpolates the last degree points.
+//			ControlPoints.set(maxIPIndex-degree+1+i, (Point2D) ControlPoints.get(i).clone());
 		return new NURBSShape(Knots, ControlPoints,weights); //Temporary Shape for the BasisFunctions
 	}
 	/**
