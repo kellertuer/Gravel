@@ -89,14 +89,14 @@ public class NURBSShapeFactory {
 	  * @param degree the degree
 	  * @return
 	 */
-	private static NURBSShape CreateInterpolation(Vector<Point2D> q, int degree)
+	public static NURBSShape CreateInterpolation(Vector<Point2D> q, int degree)
 	{
 		//Based on Algorithm 9.1 from the NURBS-Book
 		//close IP to a closed curve
 		Vector<Point2D> IP = new Vector<Point2D>();
 		for (int i=0; i<q.size(); i++)
 			IP.add((Point2D) q.get(i).clone());
-		IP.add((Point2D) q.firstElement().clone());
+//		IP.add((Point2D) q.firstElement().clone());
 		int maxIPIndex = IP.size()-1; //highest IP Index
 		int maxKnotIndex = maxIPIndex+degree+1;//highest KnotIndex in the resulting NURBS-Curve
 		if (maxIPIndex < 2*degree) //we have less then 2*degree IP -> no interpolatin possible
@@ -133,6 +133,7 @@ public class NURBSShapeFactory {
 			double lastval = Knots.get(j+1);
 			double correspInterval = Knots.get(maxKnotIndex-degree - (degree-1-j)) - Knots.get(maxKnotIndex-degree - (degree-1-j) -1);
 			Knots.set(j, lastval - correspInterval);
+//			Knots.set(j, 0d);
 		}
 		//last degree values following One
 		for (int j=0; j<degree; j++) //from first that should less than zero to the lowest value
@@ -140,8 +141,8 @@ public class NURBSShapeFactory {
 			double lastval = Knots.get(maxKnotIndex-degree+j);
 			double correspInterval = Knots.get(degree+j+1) - Knots.get(degree+j);
 			Knots.set(maxKnotIndex-degree+j+1,lastval + correspInterval);
+//			Knots.set(maxKnotIndex-degree+j+1,1d);
 		}
-		
 		Vector<Point2D> ControlPoints = new Vector<Point2D>(); //The Resulting ConrolPointVecotr
 		ControlPoints.setSize(maxIPIndex+1);
 		Vector<Double> weights = new Vector<Double>();
@@ -208,8 +209,6 @@ public class NURBSShapeFactory {
 			thisPointY /= LGS[i][i];
 			ControlPoints.set(i,new Point2D.Double(thisPointX,thisPointY));
 		}
-//		for (int i=0; i<degree; i++) //Thios not really interpolates the last degree points.
-//			ControlPoints.set(maxIPIndex-degree+1+i, (Point2D) ControlPoints.get(i).clone());
 		return new NURBSShape(Knots, ControlPoints,weights); //Temporary Shape for the BasisFunctions
 	}
 	/**

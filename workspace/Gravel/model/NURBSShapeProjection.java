@@ -270,16 +270,17 @@ public class NURBSShapeProjection
 				//that project t^P onto the old t-Vector, and t^Q onto the old t
 				double foronepx = 0.0d, foronepy = 0.0d; //actualCoefficient
 				double foronepw = 0.0d;
+				double[] alphaP = alphaVec(Degree, c.Knots, tP,i);
+				double[] alphaQ = alphaVec(Degree, c.Knots, tQ,i);
 				for (int j1=0; j1<c.controlPoints.size(); j1++)
 				{
 					for (int j2=0; j2<c.controlPoints.size(); j2++)
 					{
-						double alpha1 = alpha(j1,Degree,c.Knots,tP,i);
-						double alpha2 = alpha(j2,Degree,c.Knots,tQ,i);
-//						System.err.println("("+i+") "+alpha1+"*"+alpha2+" "+c.controlPoints.get(j1)+" "+c.controlPoints.get(j2));
-						foronepx += c.controlPoints.get(j1).getX()*alpha1*c.controlPoints.get(j2).getX()*alpha2;
-						foronepy += c.controlPoints.get(j1).getY()*alpha1*c.controlPoints.get(j2).getY()*alpha2;
-						foronepw += c.cpWeight.get(j1).doubleValue()*alpha1*c.cpWeight.get(j2).doubleValue()*alpha2;
+						if (((alphaP[j1]!=0d)&&(alphaP[j1]!=1d))||((alphaQ[j2]!=0d)&&(alphaQ[j2]!=1d)))
+							System.err.print(""+(alphaP[j1])+" and "+(alphaQ[j2])+" \n");
+						foronepx += c.controlPoints.get(j1).getX()*alphaP[j1]*c.controlPoints.get(j2).getX()*alphaQ[j2];
+						foronepy += c.controlPoints.get(j1).getY()*alphaP[j1]*c.controlPoints.get(j2).getY()*alphaQ[j2];
+						foronepw += c.cpWeight.get(j1).doubleValue()*alphaP[j1]*c.cpWeight.get(j2).doubleValue()*alphaQ[j2];
 					}
 				}
 				dix += foronepx*mult;
@@ -307,18 +308,49 @@ public class NURBSShapeProjection
 		umax = c.Knots.lastElement().doubleValue();
 	}
 	/**
-	 * 
-	 * @param j
+	 * Computes the discrete B-Spline Coefficients of the projection-curve coefficient i from tau to t
+	 * and a given index i
+	 * @param k the Degree
+	 * @param tau
+	 * @param t
+	 * @param i index of the Coefficient these discrete stuff is needed for
+	**/
+	private double[] alphaVec(int k, Vector<Double> tau, Vector<Double> t, int i)
+	{
+		System.err.println("\n Degree: "+k+" Coeff "+i);
+		double[] temp = new double[2*k+1]; //0...2k
+		for (int j=0; j<=2*k; j++) //Init for degree 0
+		{
+			if ((tau.get(j)<=t.get(i))&&(t.get(i)<tau.get(j+1)))
+				temp[j] = 1;
+			else
+				temp[j] = 0;	
+		}
+		for (int deg=1; deg<=k; deg++) //Compute up to degree k
+		{
+			for (int j=0; j<=2*k-deg; j++) //For each higher degree one coefficient in the end less
+			{
+				temp[j] = w(j,deg,tau,t.get(i+deg))*temp[j] + (1-w(j+1,deg,tau,t.get(i+deg)))*temp[j+1];
+			}
+		}
+		double[] result = new double[k+1];
+		for (int j=0; j<=k; j++)
+			result[j] = temp[j];
+		return result;
+	}
+	/**
+	 * @param j element of the discrete alphas
 	 * @param k the Degree
 	 * @param tau
 	 * @param t
 	 * @param i index of the 
-	 * @return
+	 * @return alpha_j,i,tau,t(i)
+	 * @deprecated use the nonrecursive alphaVec-Funktion
 	 */
 	private double alpha(int j, int k, Vector<Double> tau, Vector<Double> t, int i)
 	{
 		if (k==0)
-		{ //Formular after 1.2 with i=j, t=tau x=t.get(i)
+		{ //Formular after 1.2 with i=j, t=tau x=t.get(i) with shiftet k by 1
 			if ((tau.get(j)<=t.get(i))&&(t.get(i)<tau.get(j+1)))
 				return 1;
 			else

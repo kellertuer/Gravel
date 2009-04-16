@@ -33,12 +33,12 @@ public class NURBSShape {
 
 	public final int CLAMPED = 0;
 	public final static int UNCLAMPED = 1;
-	protected Vector<Double> Knots;
+	public Vector<Double> Knots;
 	protected Vector<Double> cpWeight;
 	public Vector<Point2D> controlPoints; //ControlPoints, TODO: Set protected after DEBUG
 	protected Vector<Point3d> controlPointsHom; //b in homogeneous coordinates multiplied by weight
 	private int NURBSType; //May be clamped or unclamped	
-	protected int maxKnotIndex, //The Knots are numbered 0,1,...,maxKnotIndex
+	public int maxKnotIndex, //The Knots are numbered 0,1,...,maxKnotIndex
 				maxCPIndex, //The ControlPoints are numbered 0,1,...,maxCPIndex
 				degree; //Order of the piecewise polynomials - depends on the maxIndices Above: degree = maxKnotIndex-maxCPindex-1
 	/**
