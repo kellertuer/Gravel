@@ -317,7 +317,6 @@ public class NURBSShapeProjection
 	**/
 	private double[] alphaVec(int k, Vector<Double> tau, Vector<Double> t, int i)
 	{
-		System.err.println("\n Degree: "+k+" Coeff "+i);
 		double[] temp = new double[2*k+1]; //0...2k
 		for (int j=0; j<=2*k; j++) //Init for degree 0
 		{

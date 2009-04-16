@@ -114,8 +114,11 @@ public class NURBSShapeFactory {
 		//At the lgspoints we evaluate the Curve, get an LGS, that is totally positive and banded
 		Vector<Double> Knots = new Vector<Double>();
 		Knots.setSize(maxKnotIndex+1); //Because there are 0,...,macKnotIndex Knots
-			Knots.set(degree,0d); //First degree+1 Entries are zero
-			Knots.set(maxKnotIndex-degree,1d); //Last p+1 Entries are 1
+		for (int i=0; i<=degree; i++)
+		{
+			Knots.set(i,0d); //First degree+1 Entries are zero
+			Knots.set(maxKnotIndex-i,1d); //Last p+1 Entries are 1
+		}
 		for (int j=1; j<=maxIPIndex-degree; j++) //middle values
 		{
 			double value = 0d;
@@ -126,23 +129,21 @@ public class NURBSShapeFactory {
 			value /= degree;
 			Knots.set(j+degree, value);
 		}
-		//Change Endknots to unclamped
-		//first degree values before zero
-		for (int j=degree-1; j>=0; j--) //from first that should less than zero to the lowest value
-		{
-			double lastval = Knots.get(j+1);
-			double correspInterval = Knots.get(maxKnotIndex-degree - (degree-1-j)) - Knots.get(maxKnotIndex-degree - (degree-1-j) -1);
-			Knots.set(j, lastval - correspInterval);
-//			Knots.set(j, 0d);
-		}
-		//last degree values following One
-		for (int j=0; j<degree; j++) //from first that should less than zero to the lowest value
-		{
-			double lastval = Knots.get(maxKnotIndex-degree+j);
-			double correspInterval = Knots.get(degree+j+1) - Knots.get(degree+j);
-			Knots.set(maxKnotIndex-degree+j+1,lastval + correspInterval);
-//			Knots.set(maxKnotIndex-degree+j+1,1d);
-		}
+//		//Change Endknots to unclamped
+//		//first degree values before zero
+//		for (int j=degree-1; j>=0; j--) //from first that should less than zero to the lowest value
+//		{
+//			double lastval = Knots.get(j+1);
+//			double correspInterval = Knots.get(maxKnotIndex-degree - (degree-1-j)) - Knots.get(maxKnotIndex-degree - (degree-1-j) -1);
+//			Knots.set(j, lastval - correspInterval);
+//		}
+//		//last degree values following One
+//		for (int j=0; j<degree; j++) //from first that should less than zero to the lowest value
+//		{
+//			double lastval = Knots.get(maxKnotIndex-degree+j);
+//			double correspInterval = Knots.get(degree+j+1) - Knots.get(degree+j);
+//			Knots.set(maxKnotIndex-degree+j+1,lastval + correspInterval);
+//		}
 		Vector<Point2D> ControlPoints = new Vector<Point2D>(); //The Resulting ConrolPointVecotr
 		ControlPoints.setSize(maxIPIndex+1);
 		Vector<Double> weights = new Vector<Double>();
