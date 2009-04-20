@@ -5,6 +5,8 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.vecmath.Point3d;
+
 public class NURBSShapeFactory {
 
 	public final static int CIRCLE_ORIGIN = 1;
@@ -96,7 +98,7 @@ public class NURBSShapeFactory {
 		Vector<Point2D> IP = new Vector<Point2D>();
 		for (int i=0; i<q.size(); i++)
 			IP.add((Point2D) q.get(i).clone());
-//		IP.add((Point2D) q.firstElement().clone());
+		IP.add((Point2D) q.firstElement().clone());
 		int maxIPIndex = IP.size()-1; //highest IP Index
 		int maxKnotIndex = maxIPIndex+degree+1;//highest KnotIndex in the resulting NURBS-Curve
 		if (maxIPIndex < 2*degree) //we have less then 2*degree IP -> no interpolatin possible
@@ -129,21 +131,23 @@ public class NURBSShapeFactory {
 			value /= degree;
 			Knots.set(j+degree, value);
 		}
-//		//Change Endknots to unclamped
-//		//first degree values before zero
-//		for (int j=degree-1; j>=0; j--) //from first that should less than zero to the lowest value
-//		{
-//			double lastval = Knots.get(j+1);
-//			double correspInterval = Knots.get(maxKnotIndex-degree - (degree-1-j)) - Knots.get(maxKnotIndex-degree - (degree-1-j) -1);
-//			Knots.set(j, lastval - correspInterval);
-//		}
-//		//last degree values following One
-//		for (int j=0; j<degree; j++) //from first that should less than zero to the lowest value
-//		{
-//			double lastval = Knots.get(maxKnotIndex-degree+j);
-//			double correspInterval = Knots.get(degree+j+1) - Knots.get(degree+j);
-//			Knots.set(maxKnotIndex-degree+j+1,lastval + correspInterval);
-//		}
+		return solveLGS(Knots, lgspoints, IP);
+	}
+	/**
+	 * For given Knot-Vector, lgspoints and InterpolationPoints this Method returns the NURBS-Shape
+	 * The Knots define The range and distribution of the ControlPoints in the resulting NURBSShape
+	 * The lgspoints (that lie within the range of the knots-values) define on  which values the 
+	 * InterpolationPoints are reached within the curve
+	 * @param Knots
+	 * @param lgspoints
+	 * @param IP
+	 * @return
+	 */
+	public static NURBSShape solveLGS(Vector<Double> Knots, Vector<Double> lgspoints, Vector<Point2D> IP) 
+	{	
+		int maxIPIndex = IP.size()-1; //highest IP Index
+		int maxKnotIndex = Knots.size()-1; //highest KnotIndex in the resulting NURBS-Curve
+		int degree = maxKnotIndex-maxIPIndex-1;
 		Vector<Point2D> ControlPoints = new Vector<Point2D>(); //The Resulting ConrolPointVecotr
 		ControlPoints.setSize(maxIPIndex+1);
 		Vector<Double> weights = new Vector<Double>();
@@ -210,8 +214,50 @@ public class NURBSShapeFactory {
 			thisPointY /= LGS[i][i];
 			ControlPoints.set(i,new Point2D.Double(thisPointX,thisPointY));
 		}
-		return new NURBSShape(Knots, ControlPoints,weights); //Temporary Shape for the BasisFunctions
+		//Create a linear Shapepart around Start/End
+		return new NURBSShape(Knots, ControlPoints,weights);
 	}
+	
+	public static NURBSShape unclamp(NURBSShape c)
+	{
+		if ((c.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
+			return c; //already unclamped
+		//Algorithm 12.1
+		Vector<Point3d> Pw = c.controlPointsHom;
+		Vector<Double> U = c.Knots;
+		int p = c.degree, n = c.maxCPIndex;
+		for (int i=0; i<=p-2; i++)
+		{
+			U.set(p-i-1, U.get(p-i) - (U.get(n-i+1)-U.get(n-i)));
+			int k=p-1;
+			for (int j=i; j>=0; j--)
+			{
+				double alpha = (U.get(p)-U.get(k))/(U.get(p+j+1)-U.get(k));
+				double x = (Pw.get(j).x - alpha*Pw.get(j+1).x)/(1.0-alpha);
+				double y = (Pw.get(j).y - alpha*Pw.get(j+1).y)/(1.0-alpha);
+				double w = (Pw.get(j).z - alpha*Pw.get(j+1).z)/(1.0-alpha);
+				Pw.set(j, new Point3d(x,y,w));
+				k--;
+			}
+		}
+		U.set(0, U.get(1) - (U.get(n-p+2)-U.get(n-p+1)));
+		for (int i=0; i<=p-2; i++)
+		{
+			U.set(n+i+2, U.get(n+i+1) + (U.get(p+i+1)-U.get(p+i)));
+			for (int j=i; j>=0; j--)
+			{
+				double alpha = (U.get(n+1)-U.get(n-j))/(U.get(n-j+i+2)-U.get(n-j));
+				double x = (Pw.get(n-j).x - (1d-alpha)*Pw.get(n-j-1).x)/alpha;
+				double y = (Pw.get(n-j).y - (1d-alpha)*Pw.get(n-j-1).y)/alpha;
+				double w = (Pw.get(n-j).z - (1d-alpha)*Pw.get(n-j-1).z)/alpha;
+				Pw.set(j, new Point3d(x,y,w));
+			}
+		}
+		U.set(n+p+1, U.get(n+p) + (U.get(2*p)-U.get(2*p-1)));
+		c = new NURBSShape(U, Pw);
+		return c;
+	}
+	
 	/**
 	 * Based on Grahams Scan this Method creates a convex hull and calculates Interpolation-Points that are at least
 	 * The size of a node plus the minimal Distance away from the node 
@@ -322,10 +368,12 @@ public class NURBSShapeFactory {
 		}		 
 		return result;
 	}
+	
 	private static double CrossProduct(Point2D p1, Point2D p2, Point2D p3)
 	{
        return (p2.getX() - p1.getX())*(p3.getY() - p1.getY()) - (p3.getX() - p1.getX())*(p2.getY() - p1.getY());
 	}
+	
 	private static double getDegreefromDirection(Point2D dir)
 	{
 		//Compute Degree with inverted Y Axis due to Computergraphics

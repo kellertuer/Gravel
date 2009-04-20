@@ -90,11 +90,7 @@ public class NURBSShape {
 				controlPoints.set(i,new Point2D.Double(pPw.get(i).x/pPw.get(i).z,pPw.get(i).y/pPw.get(i).z));
 			cpWeight.set(i,stw);
 		}
-		Knots = knots;
-		maxCPIndex = controlPoints.size()-1;
-		maxKnotIndex = Knots.size()-1;
-		degree = Knots.size()-controlPoints.size()-1;
-		InitHomogeneous();		
+		setCurveTo(knots, controlPoints, cpWeight);
 	}
 	/**
 	 * Set the Curve to another NURBS
@@ -365,7 +361,6 @@ public class NURBSShape {
 			newKnots.add(subcurve.Knots.get(index).doubleValue());
 			index++;
 		}
-//		System.err.println("#Knots "+Knots.size()+" reduced to"+newKnots.size()+", #CP "+controlPoints.size()+" reduced to"+newCP.size()+" and Degree is "+degree+"->"+(newKnots.size()-newCP.size()-1));
 		return new NURBSShape(newKnots,newCP,newWeight);
 	}
 	/**
@@ -395,6 +390,7 @@ public class NURBSShape {
 		//
 		//Calculate values in between as long as they are not near enough
 		//
+		int i=0;
 		while(!calculatedPoints.empty())
 		{
 			Point2D comparePoint = calculatedPoints.peek();
@@ -408,8 +404,17 @@ public class NURBSShape {
 			else //Not near enough - take middle between them and push that
 			{
 				double middleu = (compareu+actualu)/2d;
-				calculatedPoints.push(CurveAt(middleu));
-				calculatedParameters.push(middleu);
+				if ((middleu==compareu)||(middleu==actualu)) //Bei Maschinengenauigkeit angelangt
+				{
+					actualPoint = calculatedPoints.pop();
+					actualu = calculatedParameters.pop();
+					path.lineTo((float)actualPoint.getX(), (float)actualPoint.getY());					
+				}
+				else
+				{
+					calculatedPoints.push(CurveAt(middleu));
+					calculatedParameters.push(middleu);
+				}
 			}
 		}
 		return path;
@@ -943,6 +948,7 @@ public class NURBSShape {
 		controlPoints.set(Pindex,Pnew);
 		if ((getType()&UNCLAMPED)==UNCLAMPED)
 		{
+			System.err.println("UNCLAMPED!!!111einselfdrölfunddrölfzig");
 			if (Pindex<degree) //first degree ones
 				controlPoints.set(maxCPIndex-degree+Pindex+1, (Point2D) Pnew.clone());
 			else if (Pindex > maxCPIndex-degree) // degree ones
