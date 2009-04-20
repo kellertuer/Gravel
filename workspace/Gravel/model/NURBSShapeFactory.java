@@ -98,7 +98,7 @@ public class NURBSShapeFactory {
 		Vector<Point2D> IP = new Vector<Point2D>();
 		for (int i=0; i<q.size(); i++)
 			IP.add((Point2D) q.get(i).clone());
-		IP.add((Point2D) q.firstElement().clone());
+//TODO:temp		IP.add((Point2D) q.firstElement().clone());
 		int maxIPIndex = IP.size()-1; //highest IP Index
 		int maxKnotIndex = maxIPIndex+degree+1;//highest KnotIndex in the resulting NURBS-Curve
 		if (maxIPIndex < 2*degree) //we have less then 2*degree IP -> no interpolatin possible
