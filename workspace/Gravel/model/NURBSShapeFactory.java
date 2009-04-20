@@ -96,9 +96,13 @@ public class NURBSShapeFactory {
 		//Based on Algorithm 9.1 from the NURBS-Book
 		//close IP to a closed curve
 		Vector<Point2D> IP = new Vector<Point2D>();
+		int IPCount = q.size();
+		for (int i=q.size()-degree-1; i<q.size(); i++)
+			IP.add((Point2D) q.get(i).clone());			
 		for (int i=0; i<q.size(); i++)
 			IP.add((Point2D) q.get(i).clone());
-//TODO:temp		IP.add((Point2D) q.firstElement().clone());
+		for (int i=0; i<degree+1; i++)
+			IP.add((Point2D) IP.get(i).clone());
 		int maxIPIndex = IP.size()-1; //highest IP Index
 		int maxKnotIndex = maxIPIndex+degree+1;//highest KnotIndex in the resulting NURBS-Curve
 		if (maxIPIndex < 2*degree) //we have less then 2*degree IP -> no interpolatin possible
@@ -131,7 +135,11 @@ public class NURBSShapeFactory {
 			value /= degree;
 			Knots.set(j+degree, value);
 		}
-		return solveLGS(Knots, lgspoints, IP);
+		NURBSShape c = solveLGS(Knots, lgspoints, IP);
+		int startpoint = degree;
+		c = c.ClampedSubCurve(lgspoints.get(startpoint), lgspoints.get(startpoint+IPCount));
+		c.controlPoints.set(c.maxCPIndex, (Point2D) c.controlPoints.firstElement()); //remove rounding problems of subcurving
+		return unclamp(c);
 	}
 	/**
 	 * For given Knot-Vector, lgspoints and InterpolationPoints this Method returns the NURBS-Shape
@@ -250,7 +258,7 @@ public class NURBSShapeFactory {
 				double x = (Pw.get(n-j).x - (1d-alpha)*Pw.get(n-j-1).x)/alpha;
 				double y = (Pw.get(n-j).y - (1d-alpha)*Pw.get(n-j-1).y)/alpha;
 				double w = (Pw.get(n-j).z - (1d-alpha)*Pw.get(n-j-1).z)/alpha;
-				Pw.set(j, new Point3d(x,y,w));
+				Pw.set(n-j, new Point3d(x,y,w));
 			}
 		}
 		U.set(n+p+1, U.get(n+p) + (U.get(2*p)-U.get(2*p-1)));

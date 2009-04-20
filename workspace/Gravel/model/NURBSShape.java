@@ -331,16 +331,16 @@ public class NURBSShape {
 		
 		//Raise both endvalues to multiplicity d to get an clamped curve
 		int multStart = 0;
-		while (Knots.get(degree+multStart).doubleValue()==u1)
+		while (Knots.get(Start+multStart).doubleValue()==u1)
 			multStart++;
 		int multEnd = 0;
-		while (Knots.get(maxKnotIndex-degree-multEnd).doubleValue()==u2)
+		while (Knots.get(End-multEnd).doubleValue()==u2)
 			multEnd++;
 		Vector<Double> Refinement = new Vector<Double>();
 		for (int i=0; i<=degree-multStart; i++)
-			Refinement.add(Knots.get(degree).doubleValue());
+			Refinement.add(u1);
 		for (int i=0; i<=degree-multEnd; i++)
-			Refinement.add(Knots.get(maxKnotIndex-degree).doubleValue());
+			Refinement.add(u2);
 		//Nun wird der Start- und der Endpunkt
 		NURBSShape subcurve = clone();
 		subcurve.RefineKnots(Refinement); //Now it interpolates subcurve(u1) and subcurve(u2)
@@ -948,7 +948,6 @@ public class NURBSShape {
 		controlPoints.set(Pindex,Pnew);
 		if ((getType()&UNCLAMPED)==UNCLAMPED)
 		{
-			System.err.println("UNCLAMPED!!!111einselfdrölfunddrölfzig");
 			if (Pindex<degree) //first degree ones
 				controlPoints.set(maxCPIndex-degree+Pindex+1, (Point2D) Pnew.clone());
 			else if (Pindex > maxCPIndex-degree) // degree ones

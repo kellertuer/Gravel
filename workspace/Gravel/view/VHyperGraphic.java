@@ -93,63 +93,58 @@ public class VHyperGraphic extends VCommonGraphic
 		IP.add(new Point2D.Double(60,200));
 		IP.add(new Point2D.Double(50,130));
 		int degree = 4;
-		for (int i=0; i<degree; i++)
-			IP.add((Point2D) IP.get(i).clone());
 		NURBSShape c = NURBSShapeFactory.CreateInterpolation(IP,degree);
+		
 		g2.setStroke(new BasicStroke(1.2f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		NURBSShape cs = c.clone();
 		cs.scale(zoomfactor);
 		g2.setColor(Color.black);
-//		g2.draw(cs.getCurve(5d/(double)zoomfactor));
+		g2.draw(cs.getCurve(5d/(double)zoomfactor));
 		for (int i=0; i<IP.size(); i++)
 		{
-			drawCP(g2,new Point(Math.round((float)IP.get(i).getX()),Math.round((float)IP.get(i).getY())),Color.cyan.darker());
+	//		drawCP(g2,new Point(Math.round((float)IP.get(i).getX()),Math.round((float)IP.get(i).getY())),Color.cyan.darker());
 		}
-		for (int i=0; i<c.controlPoints.size(); i++) //c.controlPoints.size(); i++)
-		{
-		//	drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())),Color.red.brighter().brighter());
-		}
-		//Extract Curve_2 needed for continuity
-		Vector<Point2D> IP2 = new Vector<Point2D>();
-		for (int i=IP.size()-1-degree+1; i<IP.size(); i++) //Copy last deg+1 Elements
-			IP2.add((Point2D)IP.get(i).clone());
-		int offset = IP2.size();
-		System.err.println("Point Offset = "+offset);
-		for (int i=0; i<IP.size()-1-degree+1; i++) //Rest
-			IP2.add((Point2D)IP.get(i).clone());
-		NURBSShape c2 = NURBSShapeFactory.CreateInterpolation(IP2,degree);
-		for (int i=0; i<c2.controlPoints.size(); i++) //c.controlPoints.size(); i++)
-		{
-		//	drawCP(g2,new Point(Math.round((float)c2.controlPoints.get(i).getX()),Math.round((float)c2.controlPoints.get(i).getY())),Color.orange.brighter().brighter());
-		}
-		NURBSShape cs2 = c2.clone();
-		cs2.scale(zoomfactor);
-		g2.setColor(Color.orange.darker().darker());
-//		g2.draw(cs2.getCurve(5d/(double)zoomfactor));
-
-		NURBSShape c3 = c.clone();
-		for (int i=0; i<c3.controlPoints.size(); i++)
-		{
-			System.err.println(c3.controlPoints.get(i).getX()+","+c3.controlPoints.get(i).getY()+" | "+c2.controlPoints.get(i).getX()+","+c2.controlPoints.get(i).getY());
-		}
-		for (int i=0; i<degree; i++)
-		{
-			Point2D p = c2.controlPoints.get(offset+i);
-			c3.controlPoints.set(i,(Point2D)p.clone());
-			c3.controlPoints.set(c3.maxCPIndex-degree+1+i, (Point2D)p.clone());
-		}
-		for (int i=degree-1; i>=0; i--) //Knots
-		{
-			c3.Knots.set(i, c3.Knots.get(i+1)-(c3.Knots.get(c3.maxKnotIndex-2*degree+1+i)-c3.Knots.get(c3.maxKnotIndex-2*degree+1+i-1)));
-			c3.Knots.set(c3.maxKnotIndex-i, c3.Knots.get(c3.maxKnotIndex-i-1)+(c3.Knots.get(2*degree-i)-c3.Knots.get(2*degree-i-1)));
-		}
-		c3 = new NURBSShape(c3.Knots, c3.controlPoints, c3.cpWeight);
-		NURBSShape cs3 = c3.clone();
-		cs3.scale(zoomfactor);
-		g2.setColor(Color.orange);
-		g2.draw(cs3.getCurve(5d/(double)zoomfactor));
+//		for (int i=0; i<c.controlPoints.size(); i++) //c.controlPoints.size(); i++)
+//		{
+//			drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())),Color.red.brighter().brighter());
+//		}
+//		//Extract Curve_2 needed for continuity
+//		Vector<Point2D> IP2 = new Vector<Point2D>();
+//		for (int i=IP.size()-1-degree+1; i<IP.size(); i++) //Copy last deg+1 Elements
+//			IP2.add((Point2D)IP.get(i).clone());
+//		int offset = IP2.size();
+//		System.err.println("Point Offset = "+offset);
+//		for (int i=0; i<IP.size()-1-degree+1; i++) //Rest
+//			IP2.add((Point2D)IP.get(i).clone());
+//		NURBSShape c2 = NURBSShapeFactory.CreateInterpolation(IP2,degree);
+//		for (int i=0; i<c2.controlPoints.size(); i++) //c.controlPoints.size(); i++)
+//		{
+//		//	drawCP(g2,new Point(Math.round((float)c2.controlPoints.get(i).getX()),Math.round((float)c2.controlPoints.get(i).getY())),Color.orange.brighter().brighter());
+//		}
+//		NURBSShape cs2 = c2.clone();
+//		cs2.scale(zoomfactor);
+//		g2.setColor(Color.orange.darker().darker());
+////		g2.draw(cs2.getCurve(5d/(double)zoomfactor));
+//
+//		NURBSShape c3 = c.clone();
+//		for (int i=0; i<degree; i++)
+//		{
+//			Point2D p = c2.controlPoints.get(offset+i);
+//			c3.controlPoints.set(i,(Point2D)p.clone());
+//			c3.controlPoints.set(c3.maxCPIndex-degree+1+i, (Point2D)p.clone());
+//		}
+//		for (int i=degree-1; i>=0; i--) //Knots
+//		{
+//			c3.Knots.set(i, c3.Knots.get(i+1)-(c3.Knots.get(c3.maxKnotIndex-2*degree+1+i)-c3.Knots.get(c3.maxKnotIndex-2*degree+1+i-1)));
+//			c3.Knots.set(c3.maxKnotIndex-i, c3.Knots.get(c3.maxKnotIndex-i-1)+(c3.Knots.get(2*degree-i)-c3.Knots.get(2*degree-i-1)));
+//		}
+//		c3 = new NURBSShape(c3.Knots, c3.controlPoints, c3.cpWeight);
+//		NURBSShape cs3 = c3.clone();
+//		cs3.scale(zoomfactor);
+//		g2.setColor(Color.orange);
+//		g2.draw(cs3.getCurve(5d/(double)zoomfactor));
 	}
-	private void paintPointInversionDEBUG(Graphics2D g2)
+	private void paintPIDEBUG(Graphics2D g2)
 	{
 		Vector<Double> knots = new Vector<Double>();
 		for (int i=0; i<=20; i++)
