@@ -464,6 +464,8 @@ public class NURBSShape {
 	public Point2D.Double CurveAt(double u)
 	{	
 		Point3d erg = deBoer3D(u); //Result in homogeneous Values on Our Points		
+		if (erg==null)
+			System.err.println(u+" in "+Knots.firstElement()+","+Knots.lastElement());
 		if (erg.z==0) //
 			return new Point2D.Double(erg.x,erg.y);
 		else

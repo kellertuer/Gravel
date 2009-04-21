@@ -38,6 +38,7 @@ public class NURBSShapeProjection
 		if ((c.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
 			c = c.ClampedSubCurve(c.Knots.get(c.degree), c.Knots.get(c.maxKnotIndex-c.degree));
 		curve = c.clone();
+		resultu=c.Knots.firstElement();
 		this.p = p;
 		Queue<NURBSShape> Parts = new LinkedList<NURBSShape>();
 		if (!isInBezierForm(c))
@@ -50,7 +51,7 @@ public class NURBSShapeProjection
 			Parts.offer(c.clone());
 		double alpha = Math.min(p.distanceSq(c.controlPoints.firstElement()), p.distanceSq(c.controlPoints.lastElement()));
 		if (p.distanceSq(c.controlPoints.firstElement()) > p.distanceSq(c.controlPoints.lastElement()))
-			resultu=1.0d;
+			resultu=c.Knots.lastElement();
 		
 		Vector<Double> candidates = new Vector<Double>(); //because we may have more than one candidate Span 
 		while (!Parts.isEmpty()) 
