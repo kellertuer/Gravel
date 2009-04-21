@@ -88,8 +88,6 @@ public class FreeModificationHandler implements ShapeMouseHandler {
 		else
 		{
 			Point2D p = temporaryShape.ProjectionPoint(pointInGraph);
-			System.err.println(p+" "+pointInGraph);
-			System.err.println(p.distance(pointInGraph));
 		}
 	}
 

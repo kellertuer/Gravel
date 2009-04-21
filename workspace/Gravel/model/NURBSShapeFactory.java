@@ -137,9 +137,58 @@ public class NURBSShapeFactory {
 		}
 		NURBSShape c = solveLGS(Knots, lgspoints, IP);
 		int startpoint = degree;
-		c = c.ClampedSubCurve(lgspoints.get(startpoint), lgspoints.get(startpoint+IPCount));
-//		c.controlPoints.set(c.maxCPIndex, (Point2D) c.controlPoints.firstElement()); //remove rounding problems of subcurving
-		return unclamp(c);
+		return unclamp(cutoverlaps(c,lgspoints.get(startpoint), lgspoints.get(startpoint+IPCount)));
+	}
+	/**
+	 * Cut the additionally added parts from the curve to get an 
+	 * unclamped closed NURBSCurve
+	 * 
+	 * TODO: Try to set [u1,u2] to [0,1] For simplicity reasons?
+	 * @param u1
+	 * @param u2
+	 */
+	private static NURBSShape cutoverlaps(NURBSShape c, double u1, double u2)
+	{
+		int Start = c.findSpan(u1);
+		int End = c.findSpan(u2);
+		if (u2==c.Knots.get(c.maxKnotIndex-c.degree)) //Last possible Value the Curve is evaluated
+			End++;
+		if ((Start==-1)||(End==-1)||(u1>=u2)) //Ohne u out of range or invalid interval
+			return new NURBSShape(); //Return amepty Shape
+		
+		//Raise both endvalues to multiplicity d to get an clamped curve
+		int multStart = 0;
+		while (c.Knots.get(Start+multStart).doubleValue()==u1)
+			multStart++;
+		int multEnd = 0;
+		while (c.Knots.get(End-multEnd).doubleValue()==u2)
+			multEnd++;
+		Vector<Double> Refinement = new Vector<Double>();
+		for (int i=0; i<=c.degree-multStart; i++)
+			Refinement.add(u1);
+		for (int i=0; i<=c.degree-multEnd; i++)
+			Refinement.add(u2);
+		//Nun wird der Start- und der Endpunkt
+		NURBSShape subcurve = c.clone();
+		subcurve.RefineKnots(Refinement); //Now it interpolates subcurve(u1) and subcurve(u2)
+		Vector<Point2D> newCP = new Vector<Point2D>();
+		Vector<Double> newWeight= new Vector<Double>();
+		for (int i=Start+1; i<(End+c.degree+1-multStart+1); i++)
+		{
+			newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
+			newWeight.add(subcurve.cpWeight.get(i).doubleValue());
+		}
+		//Copy needed Knots
+		int index = 0;
+		Vector<Double> newKnots = new Vector<Double>();
+		while (subcurve.Knots.get(index)<u1)
+			index++;
+		while (subcurve.Knots.get(index)<=u2)
+		{
+			newKnots.add(subcurve.Knots.get(index).doubleValue());
+			index++;
+		}
+		return new NURBSShape(newKnots,newCP,newWeight);
 	}
 	/**
 	 * For given Knot-Vector, lgspoints and InterpolationPoints this Method returns the NURBS-Shape
@@ -151,7 +200,7 @@ public class NURBSShapeFactory {
 	 * @param IP
 	 * @return
 	 */
-	public static NURBSShape solveLGS(Vector<Double> Knots, Vector<Double> lgspoints, Vector<Point2D> IP) 
+	private static NURBSShape solveLGS(Vector<Double> Knots, Vector<Double> lgspoints, Vector<Point2D> IP) 
 	{	
 		int maxIPIndex = IP.size()-1; //highest IP Index
 		int maxKnotIndex = Knots.size()-1; //highest KnotIndex in the resulting NURBS-Curve
