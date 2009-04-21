@@ -78,6 +78,8 @@ public class VHyperGraphic extends VCommonGraphic
 	private void paintDEBUG(Graphics2D g2)
 	{
 		Vector<Point2D> IP = new Vector<Point2D>();
+		IP.add(new Point2D.Double(60,200));
+		IP.add(new Point2D.Double(50,130));
 		IP.add(new Point2D.Double(150,60));
 		IP.add(new Point2D.Double(270,80));
 		IP.add(new Point2D.Double(270,120));
@@ -90,8 +92,6 @@ public class VHyperGraphic extends VCommonGraphic
 		IP.add(new Point2D.Double(175,290));
 		IP.add(new Point2D.Double(185,320));
 		IP.add(new Point2D.Double(80,350));
-		IP.add(new Point2D.Double(60,200));
-		IP.add(new Point2D.Double(50,130));
 		int degree = 4;
 		NURBSShape c = NURBSShapeFactory.CreateInterpolation(IP,degree);
 		
@@ -102,7 +102,10 @@ public class VHyperGraphic extends VCommonGraphic
 		g2.draw(cs.getCurve(5d/(double)zoomfactor));
 		for (int i=0; i<IP.size(); i++)
 		{
-	//		drawCP(g2,new Point(Math.round((float)IP.get(i).getX()),Math.round((float)IP.get(i).getY())),Color.cyan.darker());
+			if (i==0)
+				drawCP(g2,new Point(Math.round((float)IP.get(i).getX()),Math.round((float)IP.get(i).getY())),Color.red.darker());
+			else
+				drawCP(g2,new Point(Math.round((float)IP.get(i).getX()),Math.round((float)IP.get(i).getY())),Color.cyan.darker());				
 		}
 //		for (int i=0; i<c.controlPoints.size(); i++) //c.controlPoints.size(); i++)
 //		{

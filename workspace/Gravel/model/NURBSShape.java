@@ -346,7 +346,7 @@ public class NURBSShape {
 		subcurve.RefineKnots(Refinement); //Now it interpolates subcurve(u1) and subcurve(u2)
 		Vector<Point2D> newCP = new Vector<Point2D>();
 		Vector<Double> newWeight= new Vector<Double>();
-		for (int i=Start; i<(End+degree+1-multStart); i++)
+		for (int i=Start+1; i<(End+degree+1-multStart+1); i++)
 		{
 			newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
 			newWeight.add(subcurve.cpWeight.get(i).doubleValue());
@@ -361,7 +361,8 @@ public class NURBSShape {
 			newKnots.add(subcurve.Knots.get(index).doubleValue());
 			index++;
 		}
-		return new NURBSShape(newKnots,newCP,newWeight);
+		NURBSShape c = new NURBSShape(newKnots,newCP,newWeight);
+		return c;
 	}
 	/**
 	 * Get the Curve as a piecewise approximated linear Java Path

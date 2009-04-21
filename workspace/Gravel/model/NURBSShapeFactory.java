@@ -97,12 +97,12 @@ public class NURBSShapeFactory {
 		//close IP to a closed curve
 		Vector<Point2D> IP = new Vector<Point2D>();
 		int IPCount = q.size();
-		for (int i=q.size()-degree-1; i<q.size(); i++)
-			IP.add((Point2D) q.get(i).clone());			
+		for (int i=q.size()-degree; i<q.size(); i++)
+			IP.add((Point2D) q.get(i).clone());
 		for (int i=0; i<q.size(); i++)
 			IP.add((Point2D) q.get(i).clone());
-		for (int i=0; i<degree+1; i++)
-			IP.add((Point2D) IP.get(i).clone());
+		for (int i=0; i<=degree; i++)
+			IP.add((Point2D) q.get(i).clone());
 		int maxIPIndex = IP.size()-1; //highest IP Index
 		int maxKnotIndex = maxIPIndex+degree+1;//highest KnotIndex in the resulting NURBS-Curve
 		if (maxIPIndex < 2*degree) //we have less then 2*degree IP -> no interpolatin possible
@@ -138,7 +138,7 @@ public class NURBSShapeFactory {
 		NURBSShape c = solveLGS(Knots, lgspoints, IP);
 		int startpoint = degree;
 		c = c.ClampedSubCurve(lgspoints.get(startpoint), lgspoints.get(startpoint+IPCount));
-		c.controlPoints.set(c.maxCPIndex, (Point2D) c.controlPoints.firstElement()); //remove rounding problems of subcurving
+//		c.controlPoints.set(c.maxCPIndex, (Point2D) c.controlPoints.firstElement()); //remove rounding problems of subcurving
 		return unclamp(c);
 	}
 	/**
