@@ -126,50 +126,55 @@ public class VHyperGraphic extends VCommonGraphic
 			NodePos2Index.put(p2,n.getIndex());
 			OldSet.put(p2,n.getIndex());
 		}
+		int base = vG.getMathGraph().modifyNodes.getNextIndex();
+		for (int i=0; i<c.maxCPIndex-c.degree; i++)
+		{
+			Points.offer(c.controlPoints.get(i));
+			OldSet.put(c.controlPoints.get(i), base+i+1);
+		}
 		int i=0;
 		while (!Points.isEmpty()) 
 		{
 			Point2D actualP = Points.poll();
 			NURBSShapeProjection proj = new NURBSShapeProjection(c,actualP);
-			drawCP(g2,new Point(Math.round((float)actualP.getX()),Math.round((float)actualP.getY())),Color.GREEN); //Draw as handled
+//			drawCP(g2,new Point(Math.round((float)actualP.getX()),Math.round((float)actualP.getY())),Color.GREEN); //Draw as handled
 			Point2D ProjP = proj.getResultPoint(); //This Point belong definetly to the same set as actualP but lies on the Curve
 			double radius= ProjP.distance(actualP)-(double)e.getWidth()/2d;
-			OldRadii.put(actualP,radius);
-			g2.setColor(Color.gray);
-			g2.drawOval(Math.round((float)(actualP.getX()-radius)*zoomfactor),
-					Math.round((float)(actualP.getY()-radius)*zoomfactor),
-					Math.round((float)(2*radius)*zoomfactor), Math.round((float)(2*radius)*zoomfactor));
-			Point2D ProjDir = new Point2D.Double(ProjP.getX()-actualP.getX(),ProjP.getY()-actualP.getY());
-			ProjDir = new Point2D.Double(radius/ProjP.distance(actualP)*ProjDir.getX(),radius/ProjP.distance(actualP)*ProjDir.getY());
-			//Check whether other Old Points interfere with this one
-			Iterator<Entry<Point2D,Double>> RadiusIterator = OldRadii.entrySet().iterator();
-			while (RadiusIterator.hasNext()) //Iterate all old Points
-			{
-				Entry<Point2D,Double> actEntry = RadiusIterator.next();
-				//If the distance of the actualPoint to this is smaller that the sum of both radii - both are in the same set
-				if (actEntry.getKey().distance(actualP)<(actEntry.getValue()+radius))
+			if (radius<900)
+			{	OldRadii.put(actualP,radius);
+				g2.setColor(Color.gray);
+//				g2.drawOval(Math.round((float)(actualP.getX()-radius)*zoomfactor),
+//					Math.round((float)(actualP.getY()-radius)*zoomfactor),
+//					Math.round((float)(2*radius)*zoomfactor), Math.round((float)(2*radius)*zoomfactor));
+				Point2D ProjDir = new Point2D.Double(ProjP.getX()-actualP.getX(),ProjP.getY()-actualP.getY());
+				ProjDir = new Point2D.Double(radius/ProjP.distance(actualP)*ProjDir.getX(),radius/ProjP.distance(actualP)*ProjDir.getY());
+				//Check whether other Old Points interfere with this one
+				Iterator<Entry<Point2D,Double>> RadiusIterator = OldRadii.entrySet().iterator();
+				while (RadiusIterator.hasNext()) //Iterate all old Points
 				{
-					int sameset = Math.min(OldSet.get(actEntry.getKey()),OldSet.get(actualP));
-					OldSet.put(actEntry.getKey(),sameset);
-					OldSet.put(actualP,sameset);
-					if (NodePos2Index.containsKey(actEntry.getKey()))
+					Entry<Point2D,Double> actEntry = RadiusIterator.next();
+					//If the distance of the actualPoint to this is smaller that the sum of both radii - both are in the same set
+					if (actEntry.getKey().distance(actualP)<(actEntry.getValue()+radius))
 					{
-						NodeSetIndex.put(NodePos2Index.get(actEntry.getKey()).intValue(),sameset);
+						int sameset = Math.min(OldSet.get(actEntry.getKey()),OldSet.get(actualP));
+						OldSet.put(actEntry.getKey(),sameset);
+						OldSet.put(actualP,sameset);
+						if (NodePos2Index.containsKey(actEntry.getKey()))
+						{
+							NodeSetIndex.put(NodePos2Index.get(actEntry.getKey()).intValue(),sameset);
+						}
 					}
-				}
 //				System.err.print("-->#"+NodeSetIndex.values().size());
-			}
-			//Calculate a new Point for the set (TODO: the other two new points in 90 and 270 Degree ?)
-			Point2D newP = new Point2D.Double(actualP.getX()-ProjDir.getX(),actualP.getY()-ProjDir.getY());
-			drawCP(g2,new Point(Math.round((float)newP.getX()/zoomfactor),Math.round((float)newP.getY()/zoomfactor)),Color.BLUE); //Draw as handled
-			if (radius>1000) //TODO: Only add new points inside a given area around graph!
-			{}
-			else if (++i<100)
-			{
-				Points.offer(newP);
-				OldSet.put(newP,OldSet.get(actualP)); //New value is in the same set as actualP
-			}
-		
+				}
+				//Calculate a new Point for the set (TODO: the other two new points in 90 and 270 Degree ?)
+				Point2D newP = new Point2D.Double(actualP.getX()-ProjDir.getX(),actualP.getY()-ProjDir.getY());
+				drawCP(g2,new Point(Math.round((float)newP.getX()/zoomfactor),Math.round((float)newP.getY()/zoomfactor)),Color.BLUE); //Draw as handled
+				if (++i<70)
+				{
+					Points.offer(newP);
+					OldSet.put(newP,OldSet.get(actualP)); //New value is in the same set as actualP
+				}
+			}		
 		}
 		for (int j=0; j<vG.getMathGraph().modifyNodes.getNextIndex(); j++)
 		{
