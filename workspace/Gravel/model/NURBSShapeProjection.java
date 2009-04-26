@@ -176,10 +176,6 @@ public class NURBSShapeProjection
 			  double coincidence = diff.distance(0d,0d);
 			  double movement = Math.abs(nominator/denominator);
 			  double movementu = Math.abs(unext-u)*Math.sqrt(firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y);
-			  if (iterations==25)
-				  System.err.print("\n--"+u+" -- ");
-			  else if (iterations>25)
-				  System.err.print(" "+u+" -- ");
 			  if (iterations>50) //it sould converge fast so here we should change sth
 			  {
 				  u = (u+unext)/2;
@@ -191,8 +187,6 @@ public class NURBSShapeProjection
 			  if ((coincidence<=epsilon1)||(movement<=epsilon2)||(movementu<=epsilon1))
 				  running=false;
 		  }
-		  if (iterations>15)
-			  System.err.print(" #"+iterations);
 		  return u;
 	}
 	/**

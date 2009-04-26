@@ -8,12 +8,16 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 //import javax.swing.*;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Observable;
+import java.util.Queue;
 import java.util.Vector;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+import java.util.Map.Entry;
 
 import control.*;
 import model.*;
@@ -73,7 +77,7 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-		paintPIDEBUG(g2);
+		paintDEBUG(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
@@ -100,52 +104,79 @@ public class VHyperGraphic extends VCommonGraphic
 		cs.scale(zoomfactor);
 		g2.setColor(Color.black);
 		g2.draw(cs.getCurve(5d/(double)zoomfactor));
-		for (int i=0; i<IP.size(); i++)
+		VHyperEdge e = vG.modifyHyperEdges.get(1);
+		if (e==null)
+			return;
+		Queue<Point2D> Points = new LinkedList<Point2D>();
+		Iterator<VNode> vti = vG.modifyNodes.getIterator();
+		HashMap<Integer,Integer> NodeSetIndex = new HashMap<Integer,Integer>();
+		HashMap<Point2D,Integer> NodePos2Index = new HashMap<Point2D,Integer>();
+		HashMap<Point2D,Double> OldRadii = new HashMap<Point2D,Double>();
+		HashMap<Point2D,Integer> OldSet = new HashMap<Point2D,Integer>();
+		int numsets = 0;
+		while (vti.hasNext())
 		{
-			if (i==0)
-				drawCP(g2,new Point(Math.round((float)IP.get(i).getX()),Math.round((float)IP.get(i).getY())),Color.red.darker());
-			else
-				drawCP(g2,new Point(Math.round((float)IP.get(i).getX()),Math.round((float)IP.get(i).getY())),Color.cyan.darker());				
+			VNode n = vti.next();
+			Point p = n.getPosition();
+			drawCP(g2,p,Color.BLUE); //Draw as not handled
+			Point2D p2 = new Point2D.Double(p.getX(),p.getY());
+			Points.offer(p2);
+			NodeSetIndex.put(n.getIndex(),n.getIndex()); //Ste into its own Set
+			numsets++;
+			NodePos2Index.put(p2,n.getIndex());
+			OldSet.put(p2,n.getIndex());
 		}
-//		for (int i=0; i<c.controlPoints.size(); i++) //c.controlPoints.size(); i++)
-//		{
-//			drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())),Color.red.brighter().brighter());
-//		}
-//		//Extract Curve_2 needed for continuity
-//		Vector<Point2D> IP2 = new Vector<Point2D>();
-//		for (int i=IP.size()-1-degree+1; i<IP.size(); i++) //Copy last deg+1 Elements
-//			IP2.add((Point2D)IP.get(i).clone());
-//		int offset = IP2.size();
-//		System.err.println("Point Offset = "+offset);
-//		for (int i=0; i<IP.size()-1-degree+1; i++) //Rest
-//			IP2.add((Point2D)IP.get(i).clone());
-//		NURBSShape c2 = NURBSShapeFactory.CreateInterpolation(IP2,degree);
-//		for (int i=0; i<c2.controlPoints.size(); i++) //c.controlPoints.size(); i++)
-//		{
-//		//	drawCP(g2,new Point(Math.round((float)c2.controlPoints.get(i).getX()),Math.round((float)c2.controlPoints.get(i).getY())),Color.orange.brighter().brighter());
-//		}
-//		NURBSShape cs2 = c2.clone();
-//		cs2.scale(zoomfactor);
-//		g2.setColor(Color.orange.darker().darker());
-////		g2.draw(cs2.getCurve(5d/(double)zoomfactor));
-//
-//		NURBSShape c3 = c.clone();
-//		for (int i=0; i<degree; i++)
-//		{
-//			Point2D p = c2.controlPoints.get(offset+i);
-//			c3.controlPoints.set(i,(Point2D)p.clone());
-//			c3.controlPoints.set(c3.maxCPIndex-degree+1+i, (Point2D)p.clone());
-//		}
-//		for (int i=degree-1; i>=0; i--) //Knots
-//		{
-//			c3.Knots.set(i, c3.Knots.get(i+1)-(c3.Knots.get(c3.maxKnotIndex-2*degree+1+i)-c3.Knots.get(c3.maxKnotIndex-2*degree+1+i-1)));
-//			c3.Knots.set(c3.maxKnotIndex-i, c3.Knots.get(c3.maxKnotIndex-i-1)+(c3.Knots.get(2*degree-i)-c3.Knots.get(2*degree-i-1)));
-//		}
-//		c3 = new NURBSShape(c3.Knots, c3.controlPoints, c3.cpWeight);
-//		NURBSShape cs3 = c3.clone();
-//		cs3.scale(zoomfactor);
-//		g2.setColor(Color.orange);
-//		g2.draw(cs3.getCurve(5d/(double)zoomfactor));
+		int i=0;
+		while (!Points.isEmpty()) 
+		{
+			Point2D actualP = Points.poll();
+			NURBSShapeProjection proj = new NURBSShapeProjection(c,actualP);
+			drawCP(g2,new Point(Math.round((float)actualP.getX()),Math.round((float)actualP.getY())),Color.GREEN); //Draw as handled
+			Point2D ProjP = proj.getResultPoint(); //This Point belong definetly to the same set as actualP but lies on the Curve
+			double radius= ProjP.distance(actualP)-(double)e.getWidth()/2d;
+			OldRadii.put(actualP,radius);
+			g2.setColor(Color.gray);
+			g2.drawOval(Math.round((float)(actualP.getX()-radius)*zoomfactor),
+					Math.round((float)(actualP.getY()-radius)*zoomfactor),
+					Math.round((float)(2*radius)*zoomfactor), Math.round((float)(2*radius)*zoomfactor));
+			Point2D ProjDir = new Point2D.Double(ProjP.getX()-actualP.getX(),ProjP.getY()-actualP.getY());
+			ProjDir = new Point2D.Double(radius/ProjP.distance(actualP)*ProjDir.getX(),radius/ProjP.distance(actualP)*ProjDir.getY());
+			//Check whether other Old Points interfere with this one
+			Iterator<Entry<Point2D,Double>> RadiusIterator = OldRadii.entrySet().iterator();
+			while (RadiusIterator.hasNext()) //Iterate all old Points
+			{
+				Entry<Point2D,Double> actEntry = RadiusIterator.next();
+				//If the distance of the actualPoint to this is smaller that the sum of both radii - both are in the same set
+				if (actEntry.getKey().distance(actualP)<(actEntry.getValue()+radius))
+				{
+					int sameset = Math.min(OldSet.get(actEntry.getKey()),OldSet.get(actualP));
+					OldSet.put(actEntry.getKey(),sameset);
+					OldSet.put(actualP,sameset);
+					if (NodePos2Index.containsKey(actEntry.getKey()))
+					{
+						NodeSetIndex.put(NodePos2Index.get(actEntry.getKey()).intValue(),sameset);
+					}
+				}
+//				System.err.print("-->#"+NodeSetIndex.values().size());
+			}
+			//Calculate a new Point for the set (TODO: the other two new points in 90 and 270 Degree ?)
+			Point2D newP = new Point2D.Double(actualP.getX()-ProjDir.getX(),actualP.getY()-ProjDir.getY());
+			drawCP(g2,new Point(Math.round((float)newP.getX()/zoomfactor),Math.round((float)newP.getY()/zoomfactor)),Color.BLUE); //Draw as handled
+			if (radius>1000) //TODO: Only add new points inside a given area around graph!
+			{}
+			else if (++i<100)
+			{
+				Points.offer(newP);
+				OldSet.put(newP,OldSet.get(actualP)); //New value is in the same set as actualP
+			}
+		
+		}
+		for (int j=0; j<vG.getMathGraph().modifyNodes.getNextIndex(); j++)
+		{
+			if (NodeSetIndex.containsKey(j))
+				System.err.print("#"+j+"->"+NodeSetIndex.get(j)+" ");
+		}
+		System.err.println("\n");
 	}
 	private void paintPIDEBUG(Graphics2D g2)
 	{

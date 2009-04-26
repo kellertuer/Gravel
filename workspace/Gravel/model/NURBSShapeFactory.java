@@ -136,8 +136,21 @@ public class NURBSShapeFactory {
 			Knots.set(j+degree, value);
 		}
 		NURBSShape c = solveLGS(Knots, lgspoints, IP);
-		int startpoint = degree;
-		return unclamp(cutoverlaps(c,lgspoints.get(startpoint), lgspoints.get(startpoint+IPCount)));
+		c = unclamp(cutoverlaps(c,lgspoints.get(degree), lgspoints.get(degree+IPCount)));
+		for (int i=0; i<degree; i++)
+		{
+			Point2D a = c.controlPoints.get(i);
+			double aw = c.cpWeight.get(i);
+			Point2D b = c.controlPoints.get(c.maxCPIndex-degree+1+i);
+			double bw = c.cpWeight.get(c.maxCPIndex-degree+1+i);
+			
+			Point2D middle = new Point2D.Double((a.getX()+b.getX())/2d,	(a.getY()+b.getY())/2d);
+			c.cpWeight.set(i, (aw+bw)/2d);
+			c.cpWeight.set(c.maxCPIndex-degree+1+i, (aw+bw)/2d);
+			c.controlPoints.set(i,(Point2D)middle.clone());
+			c.controlPoints.set(c.maxCPIndex-degree+1+i,middle);
+		}
+		return c;
 	}
 	/**
 	 * Cut the additionally added parts from the curve to get an 
