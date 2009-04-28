@@ -14,15 +14,13 @@ import javax.vecmath.Point3d;
  * 
  * This class is based on the Algorithm by Chen et al. unsing a circular clipping method
  *
- * It extends VHyperEdgeShape due to the resulting objective square distance function which is itself
- * a Bezier-Curve
- * @author Ronny Bergmann
+ * It extends NURBSShape due to the resulting objective square distance function which is itself
+ * a Bezier-Curve - so it follow the decorator-Pattern
  * 
- *
+ * @author Ronny Bergmann
  */
-public class NURBSShapeProjection
+public class NURBSShapeProjection extends NURBSShape
 {
-	NURBSShape curve;
 	Point2D p;
 	//Values of the just handled qadrated bezier curve
 	Vector<Double> qcWeights, qcControlPoints;
@@ -30,28 +28,34 @@ public class NURBSShapeProjection
 	double umin, umax;
 	
 	double resultu;
-	
-	public NURBSShapeProjection(NURBSShape c, Point2D p)
+	/**
+	 * Start the NURBSShapeProjection with a given Curve the Point is projected onto
+	 * 
+	 * @param c
+	 * @param p
+	 */
+	public NURBSShapeProjection(NURBSShape Curve, Point2D p)
 	{
-		c = c.clone();
+		NURBSShape clone = Curve.clone();
 		//If it is unclamped - clamp it!
-		if ((c.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
-			c = c.ClampedSubCurve(c.Knots.get(c.degree), c.Knots.get(c.maxKnotIndex-c.degree));
-		curve = c.clone();
-		resultu=c.Knots.firstElement();
+		if ((clone.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
+			clone = clone.ClampedSubCurve(clone.Knots.get(clone.degree), clone.Knots.get(clone.maxKnotIndex-clone.degree));
+		//Set internal Curve to this curve clone
+		setCurveTo(clone.Knots, clone.controlPoints, clone.cpWeight);
+		resultu=Knots.firstElement();
 		this.p = p;
 		Queue<NURBSShape> Parts = new LinkedList<NURBSShape>();
-		if (!isInBezierForm(c))
+		if (!isInBezierForm())
 		{
-			Vector<NURBSShape> partsf = DecomposeCurve(c);
+			Vector<NURBSShape> partsf = DecomposeCurve(this);
 			for (int i=0; i<partsf.size(); i++)
 				Parts.offer(partsf.get(i));
 		}
 		else
-			Parts.offer(c.clone());
-		double alpha = Math.min(p.distanceSq(c.controlPoints.firstElement()), p.distanceSq(c.controlPoints.lastElement()));
-		if (p.distanceSq(c.controlPoints.firstElement()) > p.distanceSq(c.controlPoints.lastElement()))
-			resultu=c.Knots.lastElement();
+			Parts.offer(clone());
+		double alpha = Math.min(p.distanceSq(controlPoints.firstElement()), p.distanceSq(controlPoints.lastElement()));
+		if (p.distanceSq(controlPoints.firstElement()) > p.distanceSq(controlPoints.lastElement()))
+			resultu=Knots.lastElement();
 		
 		Vector<Double> candidates = new Vector<Double>(); //because we may have more than one candidate Span 
 		while (!Parts.isEmpty()) 
@@ -119,7 +123,7 @@ public class NURBSShapeProjection
 					double candidate_u = NewtonIteration(actualPart.clone(), startvalue, p);
 					candidates.add(candidate_u);
 //					System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
-					double newdistsq = curve.CurveAt(candidate_u).distanceSq(p);
+					double newdistsq = CurveAt(candidate_u).distanceSq(p);
 					if (alpha > newdistsq)
 						alpha = newdistsq;
 				}
@@ -128,7 +132,7 @@ public class NURBSShapeProjection
 		double min = Double.MAX_VALUE;
 		for (int i=0; i<candidates.size(); i++)
 		{
-			Point2D pcmp = curve.CurveAt(candidates.get(i));
+			Point2D pcmp = CurveAt(candidates.get(i));
 			if (pcmp.distance(p)<min)
 			{
 				resultu = candidates.get(i);
@@ -136,14 +140,17 @@ public class NURBSShapeProjection
 			}
 		}
 	}
+	
 	public double getResultParameter()
 	{
 		return resultu;
 	}
+	
 	public Point2D getResultPoint()
 	{
-		return curve.CurveAt(resultu);
+		return CurveAt(resultu);
 	}
+	
 	private double NewtonIteration(NURBSShape c, double startvalue, Point2D p)
 	{
 		//System.err.println("Start: "+startvalue);
@@ -190,35 +197,36 @@ public class NURBSShapeProjection
 		  return u;
 	}
 	/**
-	 * Returns true if and only if the given NURBS-Curve is a rational Bezier curve, that is, 
+	 * Returns true if and only if the NURBS Curve in this Class is in Bezier Form, that is, 
 	 * there are only knots at the start and end of the Interval
-	 * @param c
 	 * @return
 	 */
-	private boolean isInBezierForm(NURBSShape c)
+	private boolean isInBezierForm()
 	{
-		int deg = c.degree;
-		double a = c.Knots.firstElement();		
-		double b = c.Knots.lastElement();
+		double a = Knots.firstElement();		
+		double b = Knots.lastElement();
 		int counta=0, countb=0;
-		for (int i=0; i<=c.maxKnotIndex; i++)
+		for (int i=0; i<=maxKnotIndex; i++)
 		{
-			if (c.Knots.get(i).doubleValue()==a)
+			if (Knots.get(i).doubleValue()==a)
 				counta++;
-			else if (c.Knots.get(i).doubleValue()==b)
+			else if (Knots.get(i).doubleValue()==b)
 				countb++;
 			else
 				return false;
 		}
-		return ((deg==(counta-1))&&(deg==(countb-1)));
+		return ((degree==(counta-1))&&(degree==(countb-1)));
 	}
+	
 	/**
+	 * Calculate Square distance Function proposed by Chen et al.
+	 * the Curve must be in Bezier-Form to work properly
 	 * 
+	 * @param c
+	 * @param p
 	 */
 	private void CalculateSquareDistanceFunction(NURBSShape c, Point2D p)
 	{
-		if (!isInBezierForm(c))
-			return;
 		c.translate(-p.getX(),-p.getY());
 		//Further donted as FV
 		double FirstValue = c.Knots.firstElement(); //In a pure Bezier-Curve on [0,1] this i 0, 
@@ -379,7 +387,7 @@ public class NURBSShapeProjection
 	 * @param c
 	 * @return
 	 */
-	public Vector<NURBSShape> DecomposeCurve(NURBSShape c)
+	private Vector<NURBSShape> DecomposeCurve(NURBSShape c)
 	{			
 		int m = c.maxCPIndex+1;
 		int a = c.degree;
@@ -447,6 +455,7 @@ public class NURBSShapeProjection
 		BezierSegments.add(new NURBSShape(bezierKnots, bezierCP));
 		return BezierSegments;
 	}
+
 	long nint(double x)
 	{
 		if (x < 0.0) return (long) Math.ceil(x - 0.5);

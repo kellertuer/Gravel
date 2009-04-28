@@ -77,7 +77,7 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-		paintDEBUG(g2);
+		paintPIDEBUG(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
@@ -107,22 +107,29 @@ public class VHyperGraphic extends VCommonGraphic
 		VHyperEdge e = vG.modifyHyperEdges.get(1);
 		if (e==null)
 			return;
+		//
+		// Start of Validation-Algorithm
+		//
+		Point2D HighestCP= new Point2D.Double(Double.MAX_VALUE,Double.MAX_VALUE);
+		for (int i=0; i<c.controlPoints.size(); i++)
+		{
+			Point2D actual = c.controlPoints.get(i);
+			if (actual.getY()<HighestCP.getY())
+				HighestCP = (Point2D)actual.clone();	
+		}
 		Queue<Point2D> Points = new LinkedList<Point2D>();
 		Iterator<VNode> vti = vG.modifyNodes.getIterator();
 		HashMap<Integer,Integer> NodeSetIndex = new HashMap<Integer,Integer>();
 		HashMap<Point2D,Integer> NodePos2Index = new HashMap<Point2D,Integer>();
 		HashMap<Point2D,Double> OldRadii = new HashMap<Point2D,Double>();
 		HashMap<Point2D,Integer> OldSet = new HashMap<Point2D,Integer>();
-		int numsets = 0;
 		while (vti.hasNext())
 		{
 			VNode n = vti.next();
 			Point p = n.getPosition();
-			drawCP(g2,p,Color.BLUE); //Draw as not handled
 			Point2D p2 = new Point2D.Double(p.getX(),p.getY());
 			Points.offer(p2);
 			NodeSetIndex.put(n.getIndex(),n.getIndex()); //Ste into its own Set
-			numsets++;
 			NodePos2Index.put(p2,n.getIndex());
 			OldSet.put(p2,n.getIndex());
 		}
@@ -132,17 +139,20 @@ public class VHyperGraphic extends VCommonGraphic
 			Points.offer(c.controlPoints.get(i));
 			OldSet.put(c.controlPoints.get(i), base+i+1);
 		}
+		//Number of Projections made, 
 		int i=0;
+		//MaxSize of any circle used, because a circle with this radius is much bigger than the whole graph
 		int maxSize = Math.max( Math.round((float)(vG.getMaxPoint(g2).getX()-vG.getMinPoint(g2).getX())),
 								Math.round((float)(vG.getMaxPoint(g2).getY()-vG.getMinPoint(g2).getY())) );
-		while (!Points.isEmpty()) 
+		//Check each Intervall, whether we are done
+		int checkInterval = Points.size();
+		boolean valid=true, running=true;
+		while (!Points.isEmpty()&&running) 
 		{
 			Point2D actualP = Points.poll();
 			NURBSShapeProjection proj = new NURBSShapeProjection(c,actualP);
-//			drawCP(g2,new Point(Math.round((float)actualP.getX()),Math.round((float)actualP.getY())),Color.GREEN); //Draw as handled
 			Point2D ProjP = proj.getResultPoint(); //This Point belong definetly to the same set as actualP but lies on the Curve
 			double radius= ProjP.distance(actualP)-(double)e.getWidth()/2d;
-			System.err.println(i+" "+radius+" "+(radius<maxSize)+" "+maxSize);
 			if (radius<maxSize)
 			{	OldRadii.put(actualP,radius);
 				g2.setColor(Color.gray);
@@ -181,10 +191,48 @@ public class VHyperGraphic extends VCommonGraphic
 				//Calculate a new Point for the set (TODO: the other two new points in 90 and 270 Degree ?)
 				Point2D newP = new Point2D.Double(actualP.getX()-ProjDir.getX(),actualP.getY()-ProjDir.getY());
 				drawCP(g2,new Point(Math.round((float)newP.getX()/zoomfactor),Math.round((float)newP.getY()/zoomfactor)),Color.BLUE); //Draw as handled
-				if (++i<100)
-				{
+//				if (++i<100)
+//				{
 					Points.offer(newP);
 					OldSet.put(newP,OldSet.get(actualP)); //New value is in the same set as actualP
+//				}
+				i++;
+				if ((i%checkInterval)==0)
+				{
+					int inSet=-1, outSet = OldSet.get(HighestCP).intValue();
+					Iterator<Point2D> nodeiter = NodePos2Index.keySet().iterator();
+					boolean twosets=true;
+					while (nodeiter.hasNext())
+					{
+						Point2D pos = nodeiter.next();
+						int id = NodePos2Index.get(pos);
+						if (vG.getMathGraph().modifyHyperEdges.get(e.getIndex()).containsNode(id))
+						{
+							if (inSet==-1) //not set yet This nodes set must be the one for VH
+								inSet = OldSet.get(pos); 
+							else if (OldSet.get(pos)==outSet) //node of Hyperedge outside
+							{
+								valid=false; running=false; System.err.println("Node #"+id+" outside shape but in Edge");
+							}
+						}
+						else
+						{
+							if ((inSet!=-1)&&(inSet==OldSet.get(pos))) //Another node not from edge is inside
+							{
+								valid=false; running=false; System.err.println("Node #"+id+" inside but not in Edge!");
+							}
+						}
+						if ((inSet!=-1)&&(inSet!=OldSet.get(pos))&&(outSet!=OldSet.get(pos)))
+						{
+							System.err.println("Not yet only 2 sets left");
+							twosets=false; //More than two sets
+							break;
+						}
+					}
+					//If we have only two sets left we're done
+					running &= (!twosets);
+					if (!running)
+						System.err.println("#"+i+" InSet="+inSet+" OutSet="+outSet+" valid="+valid+" running="+running+" twosets="+twosets);
 				}
 			}		
 		}
