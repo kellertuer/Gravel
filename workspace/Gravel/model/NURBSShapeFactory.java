@@ -7,6 +7,16 @@ import java.util.Vector;
 
 import javax.vecmath.Point3d;
 
+/**
+ * The NURBSShapeFactory creates specific NURBS-Curves based on the input
+ * 
+ * These NURBS-Curves are always inclamped and closed (and by that degree-1 times continuous also
+ * at the start- and endpoint)
+ * 
+ * @author Ronny Bergmann
+ * @since 0.4
+ *
+ */
 public class NURBSShapeFactory {
 
 	public final static int CIRCLE_ORIGIN = 1;
@@ -19,6 +29,23 @@ public class NURBSShapeFactory {
 	public final static int SIZES = 6;
 	public final static int MAX_INDEX = 7;
 	
+	/**
+	 * Create the Shape based on Specification of Type and needed Parameters
+	 * 
+	 * For all Types the Minimum Distance to the nodes is needed (TODO: Make this value a property of VHYperEdge instead of NURBSShape)
+	 * 
+	 * All Values given in Capital-Letters are predefined values at which the Parameter must be placed inside the Parameter-Vector
+	 * and for each Parameter the Type is given in brackets
+	 * 
+	 * For the Types
+	 * - „Circle“ with Parameters CIRCLE_RAdius (int), CircleOrigin (Point)
+	 * - „Global Interpolation“ with given POINTS (Vector<Point2D>) and a DEGREE (int)
+	 * - „Convex Hull“ the Nodepositions given through POINTS(Vector<Point2D>) their sizes given by SIZES (Vector<Integer>) and the DEGREE (int)
+	 *
+	 * @param type
+	 * @param Parameters
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public static NURBSShape CreateShape(String type, Vector<Object> Parameters)
 	{
@@ -58,6 +85,16 @@ public class NURBSShapeFactory {
 		return null;
 	}
 	
+	/**
+	 * Create a NURBSSHape Circle based on the Information, where its Origin is, its Radius and the Distance to the nodes
+	 * 
+	 * TODO: Create an Higher Order Circle
+	 * 
+	 * @param origin Point of Circle Origin
+	 * @param radius Radius of the Circle
+	 * @param dist Distance to the nodes
+	 * @return
+	 */
 	private static NURBSShape CreateCircle(Point origin, int radius, int dist)
 	{
 		//See L. Piegl, W. Tiller: A Menagerie of rational B-Spline Circles
@@ -85,7 +122,8 @@ public class NURBSShapeFactory {
 	}
 
 	/**
-  	  * Create and return a Smooth NURBS-Curve of degree degree through the given Interpolation Points
+  	  * Create and return a Smooth NURBS-Curve of degree degree through the given Interpolation Points,
+  	  * that is degree-1 continuous at every Point
   	  * 
 	  * @param IP The Interpolation-Points
 	  * @param degree the degree
@@ -152,6 +190,7 @@ public class NURBSShapeFactory {
 		}
 		return c;
 	}
+
 	/**
 	 * Cut the additionally added parts from the curve to get an 
 	 * unclamped closed NURBSCurve
@@ -288,6 +327,11 @@ public class NURBSShapeFactory {
 		return new NURBSShape(Knots, ControlPoints,weights);
 	}
 	
+	/**
+	 * Unclamp the Curve at both sides
+	 * @param c
+	 * @return
+	 */
 	public static NURBSShape unclamp(NURBSShape c)
 	{
 		if ((c.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
@@ -329,9 +373,14 @@ public class NURBSShapeFactory {
 	}
 	
 	/**
-	 * Based on Grahams Scan this Method creates a convex hull and calculates Interpolation-Points that are at least
+	 * 	 * Based on Grahams Scan this Method creates a convex hull and calculates Interpolation-Points that are at least
 	 * The size of a node plus the minimal Distance away from the node 
+	 * @param nodes Positions of the Nodes inside the convex hull
+	 * @param sizes Node-Sizes, so that the Shape is at most sizes(i)+distance away from the node-position
+	 * @param degree degree of the resulting NURBSShape
+	 * @param distance Distance mentioned above in the sizes
 	 * 
+	 * @return
 	 */
 	private static NURBSShape CreateConvexHullPolygon(Vector<Point2D> nodes, Vector<Integer> sizes, int degree, int distance)
 	{
@@ -379,7 +428,15 @@ public class NURBSShapeFactory {
 		return CreateInterpolation(IPoints, degree);
 	}
 	
-	public static Vector<Point2D> GrahamsScan(Vector<Point2D> nodes)
+	/**
+	 * Calculate the Convex Hull of a set of Points 
+	 * by using Grahams Scan
+	 * 
+	 * @param nodes Points from which the resulting Convex Hull is calculated
+	 * 
+	 * @return Points of the nodes that from the convex hull in clockwise order
+	 */
+	private static Vector<Point2D> GrahamsScan(Vector<Point2D> nodes)
 	{
 		//Find Pivot Point with lowest Y Coordinate. If there are two, take the one with lowest X
 		Point2D pivot = new Point2D.Double(Double.MAX_VALUE,Double.MAX_VALUE);
@@ -439,11 +496,23 @@ public class NURBSShapeFactory {
 		return result;
 	}
 	
+	/**
+	 * Calculating the cross product of three points
+	 * @param p1
+	 * @param p2
+	 * @param p3
+	 * @return
+	 */
 	private static double CrossProduct(Point2D p1, Point2D p2, Point2D p3)
 	{
        return (p2.getX() - p1.getX())*(p3.getY() - p1.getY()) - (p3.getX() - p1.getX())*(p2.getY() - p1.getY());
 	}
 	
+	/**
+	 * Calculate the Degree of a given direction
+	 * @param dir
+	 * @return
+	 */
 	private static double getDegreefromDirection(Point2D dir)
 	{
 		//Compute Degree with inverted Y Axis due to Computergraphics
