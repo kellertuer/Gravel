@@ -301,7 +301,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		c.gridx=0;
 		c.gridwidth=2;
 		c.anchor = GridBagConstraints.CENTER;
-	//	TextContent.add(cText.getContent(),c);
+		c.gridy++; TextContent.add(cText.getContent(),c);
 		c.gridy++; TextContent.add(cLine.getContent(),c);
 		
 		//Werte einfügen
@@ -431,7 +431,6 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 				temp++; //Position in checks-vector
 			}
 		}
-		System.err.println(isNewHyperedge+" "+checkEdge.cardinality());
 		if (checkEdge.cardinality()==0)
 		{
 			JOptionPane.showMessageDialog(this,message+="<br><br>Es ist kein Knoten in der Hyperkante, leere Kanten sind nicht erlaubt.</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);				
@@ -498,8 +497,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 			JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung der Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Eine Kante mit der gleichen Knotenmenge existiert.</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);
 			return;	
 		}
-		graphref.modifyHyperEdges.add(
-				 addEdge,mathEdge);		//Gruppen einbauen
+		graphref.modifyHyperEdges.add(addEdge,mathEdge);		//Gruppen einbauen
 		temp=0;
 		for (int i=0; i<subgraphlist.size(); i++)
 		{
@@ -512,7 +510,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		}
 		//Text bauen
 		VHyperEdge e = graphref.modifyHyperEdges.get(iEdgeIndex.getValue());
-		//TODO Not yet active		e = cText.modifyHyperEdge(e);
+		e = cText.modifyHyperEdge(e);
 		e = cLine.modifyHyperEdge(e);
 		if (!isNewHyperedge)//Change edge, end block
 		{

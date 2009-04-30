@@ -70,9 +70,8 @@ import model.Messages.GraphMessage;
 public class HyperEdgeShapePanel implements CaretListener, ActionListener, Observer {
 
 	private Container cont;
-	private IntegerTextField iDistance;
 	private JComboBox cBasicShape;
-	private JLabel Distance, BasicShape;
+	private JLabel BasicShape;
 	//Circle Fields
 	private JLabel CircleOriginX, CircleOriginY, CircleRadius;
 	private IntegerTextField iCOrigX, iCOrigY, iCRad;
@@ -117,18 +116,6 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		c.gridwidth=1;
 		c.gridheight=1;
 		//INput fields besides the Display
-		iDistance = new IntegerTextField();
-		iDistance.addCaretListener(this);;
-		iDistance.setPreferredSize(new Dimension(100, 20));
-		iDistance.setValue(15); //TODO-Std Value
-		//TODO Change to a Slider with actual Value in the middle and the possibility to vary that by -+10?
-		Distance = new JLabel("<html><p>Mindestabstand<br><font size=\"-2\">Knoten \u2194 Umriss</font></p></html>");
-		cont.add(Distance,c);
-		c.gridx++;
-		cont.add(iDistance,c);
-
-		c.gridy++;
-		c.gridx=0;
 		String[] BasicShapes = {"Kreis", "Interpolation", "konvexe Hülle"};
 		cBasicShape = new JComboBox(BasicShapes);
 		cBasicShape.setSelectedIndex(0);
@@ -381,7 +368,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		params.set(NURBSShapeFactory.DEGREE,iDegree.getValue());
 		params.set(NURBSShapeFactory.POINTS, nodepos);
 		params.set(NURBSShapeFactory.SIZES, nodesizes);
-		params.set(NURBSShapeFactory.DISTANCE_TO_NODE, iDistance.getValue());
+		params.set(NURBSShapeFactory.DISTANCE_TO_NODE, HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin());
 		NURBSShape s = NURBSShapeFactory.CreateShape("convex hull", params);
 		if (s.isEmpty())
 		{
@@ -402,13 +389,13 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		if ((e.getSource()==iCOrigX)||(e.getSource()==iCOrigY)||(e.getSource()==iCRad))
 		{
 			
-			if ((iCOrigX.getValue()!=-1)&&(iCOrigY.getValue()!=-1)&&(iCRad.getValue()!=-1)&&(iDistance.getValue()!=-1))
+			if ((iCOrigX.getValue()!=-1)&&(iCOrigY.getValue()!=-1)&&(iCRad.getValue()!=-1))
 			{
 				Vector<Object> param = new Vector<Object>();
 				param.setSize(NURBSShapeFactory.MAX_INDEX);
 				param.add(NURBSShapeFactory.CIRCLE_ORIGIN, new Point(iCOrigX.getValue(), iCOrigY.getValue()));
 				param.add(NURBSShapeFactory.CIRCLE_RADIUS, iCRad.getValue());
-				param.add(NURBSShapeFactory.DISTANCE_TO_NODE,iDistance.getValue()); 			
+				param.add(NURBSShapeFactory.DISTANCE_TO_NODE,HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin()); 			
 				HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).setShape(NURBSShapeFactory.CreateShape("Circle",param));
 				HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
 			}
