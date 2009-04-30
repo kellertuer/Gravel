@@ -61,7 +61,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 	private JCheckBox[] SubgraphChecks;
 	private JScrollPane iSubgraph;
 	private VHyperGraph graphref;
-	private IntegerTextField iEdgeIndex, iWidth, iValue;
+	private IntegerTextField iEdgeIndex, iWidth, iValue, iMargin;
 	private JTextField Colorfield, EdgeName;
 	private JButton bOK, bCancel;
 		
@@ -134,24 +134,15 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		tabs = new JTabbedPane();
 		GridBagConstraints c = new GridBagConstraints();
 		
+		//Build Main Tab
 		buildMainContent();
 		
-		TextContent = new Container();
-		TextContent.setLayout(new GridBagLayout());
-		c.insets = new Insets(0,0,0,0);
-		c.anchor = GridBagConstraints.CENTER;
-		c.gridx=0; c.gridy=0; c.gridwidth=1;
-	//	TextContent.add(cText.getContent(),c);
-		c.gridy++; TextContent.add(cLine.getContent(),c);
-
-		c.insets = new Insets(7,7,7,7);
-		c.anchor = GridBagConstraints.WEST;
+		//Build View Tab
+		buildViewTab();
 		
 		tabs.addTab("Allgemein", MainContent);
 		tabs.addTab("Ansicht", TextContent);
-		
-		VHyperGraph editClone = graphref.clone();
-		
+				
 		Container ContentPane = this.getContentPane();
 		ContentPane.setLayout(new GridBagLayout());
 		c.gridy=0;c.gridx=0;c.gridwidth=2;
@@ -291,6 +282,32 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		EdgeName.setText(oldmhyperedge.name);
 	}
 	/**
+	 * Built the view Tab containing the visual stuff
+	 */
+	private void buildViewTab()
+	{
+		TextContent = new Container();
+		TextContent.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(7,7,7,7);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridx=0; c.gridy=0; c.gridwidth=1;
+		TextContent.add(new JLabel("<html>Innenabstand<br><font  size=\"-2\">Des Umrisses zu den Knoten der Kante</font></html>"),c);
+		c.gridx = 1;
+		iMargin = new IntegerTextField();
+		iMargin.setPreferredSize(new Dimension(100, 20));
+		TextContent.add(iMargin,c);
+
+		c.gridx=0;
+		c.gridwidth=2;
+		c.anchor = GridBagConstraints.CENTER;
+	//	TextContent.add(cText.getContent(),c);
+		c.gridy++; TextContent.add(cLine.getContent(),c);
+		
+		//Werte einfügen
+		iMargin.setValue(12); //TODO Std.
+	}
+	/**
 	 * Help function to create the list of node names from the corresponding VGraph 
 	 * to create the Nodelists for start and endnode
 	 */
@@ -374,14 +391,15 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 	 */
 	private void Check()
 	{
+		String message="";
+		if (isNewHyperedge)
+			message = "<html><p>Erstellen der Kante nicht m"+main.CONST.html_oe+"glich.";
+		else
+			message = "<html><p>"+main.CONST.html_Ae+"ndern der Kante nicht m"+main.CONST.html_oe+"glich.";
+
 //		Test, ob die notwendigen Felder ausgefuellt sind, wobei die Knotendropdowns nicht geprüft werden muessen
-		if ((iEdgeIndex.getValue()==-1)||(iWidth.getValue()==-1)||(iValue.getValue()==-1))
+		if ((iEdgeIndex.getValue()==-1)||(iWidth.getValue()==-1)||(iValue.getValue()==-1)||(iMargin.getValue()==-1))
 		{
-			String message = new String();
-			if (isNewHyperedge)
-				message = "<html><p>Erstellen der Kante nicht m"+main.CONST.html_oe+"glich.";
-			else
-				message = "<html><p>"+main.CONST.html_Ae+"ndern der Kante nicht m"+main.CONST.html_oe+"glich.";
 			message+="<br><br>Einige Felder nicht ausgef"+main.CONST.html_ue+"llt.</p></hmtl>";
 			JOptionPane.showMessageDialog(this,message, "Fehler", JOptionPane.ERROR_MESSAGE);
 			return;
@@ -390,23 +408,48 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		String t = cText.VerifyInput(EdgeName.getText());
 		if (!t.equals(""))
 		{
-			JOptionPane.showMessageDialog(this,"<html><p>"+main.CONST.html_Ae+"ndern der Kante nicht mungen nicht m"+main.CONST.html_oe+"glich.<br><br>"+t+"</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);				
+			message+="<br><br>"+t+"</p></html>";
+			JOptionPane.showMessageDialog(this,message, "Fehler", JOptionPane.ERROR_MESSAGE);				
 			return;
 		}
 		//Testen der Linienbedingungen, Felder die nicht ausgefüllt und gleichzeitig nicht benötigt werden, werden auch nicht gesetzt
 		t = cLine.VerifyInput();
 		if (!t.equals(""))
 		{
-			JOptionPane.showMessageDialog(this,"<html><p>"+main.CONST.html_Ae+"ndern der Kante nicht mungen nicht m"+main.CONST.html_oe+"glich.<br><br>"+t+"</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);				
+			message+="<br><br>"+t+"</p></html>";			
+			JOptionPane.showMessageDialog(this,message, "Fehler", JOptionPane.ERROR_MESSAGE);				
 			return;
 		}
-		
+		MHyperEdge checkEdge = new MHyperEdge(iEdgeIndex.getValue(),iValue.getValue(),EdgeName.getText());
+		int temp=0;
+		for (int i=0; i<nodelist.size(); i++)
+		{
+			if (nodelist.elementAt(i)!=null) //Ein Untergraph mit dem Index existiert
+			{
+				if (NodeChecks[temp].isSelected())
+					checkEdge.addNode(i);
+				temp++; //Position in checks-vector
+			}
+		}
+		System.err.println(isNewHyperedge+" "+checkEdge.cardinality());
+		if (checkEdge.cardinality()==0)
+		{
+			JOptionPane.showMessageDialog(this,message+="<br><br>Es ist kein Knoten in der Hyperkante, leere Kanten sind nicht erlaubt.</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);				
+			return;			
+		}
+		//If we have an edge with same nodeset, existsEdge is !=null
+		MHyperEdge existsEdge = graphref.getMathGraph().modifyHyperEdges.get(checkEdge.getEndNodes());
 		if (isNewHyperedge) //neuer Kante, index testen
 		{
 			//Index bereits vergeben ?
 			if (graphref.modifyHyperEdges.get(iEdgeIndex.getValue())!=null) //So einen gibt es schon
 			{
-				JOptionPane.showMessageDialog(this, "<html><p>Erstellen der Hyperante nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "<html><p>Erstellen der Hyperkante nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			if (existsEdge!=null) //Would result in Duplicate Edge
+			{
+				JOptionPane.showMessageDialog(this, "<html><p>Erstellen der Hyperkante nicht m"+main.CONST.html_oe+"glich.<br><br>Eine Kante mit der gleichen Menge Knoten existiert und Mehrfachkanten sind nicht erlaubt.</p></hmtl>", "Fehler", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 		}
@@ -416,8 +459,14 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 			//Falls sich der Kantenindex geaendert hat darf dieser nicht vergeben sein
 			if ((graphref.modifyHyperEdges.get(iEdgeIndex.getValue())!=null)&&(iEdgeIndex.getValue()!=oldmhyperedge.index)) //So einen gibt es schon
 			{
-				JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung der Kante nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung der Hyperkante nicht m"+main.CONST.html_oe+"glich.<br><br>Der Index ist bereits vergeben.</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);
 				return;
+			}
+			if ((existsEdge!=null)&&(existsEdge.index!=oldmhyperedge.index)) //Another edge with the new set of nodex exists but it wasn't the old one before
+			{
+				JOptionPane.showMessageDialog(this, "<html><p>"+main.CONST.html_Ae+"nderung der Hyperkante nicht m"+main.CONST.html_oe+"glich.<br><br>Eine Hyperkante mit der gleichen Knotenmenge existiert bereits.</p></html>", "Fehler", JOptionPane.ERROR_MESSAGE);
+				return;
+				
 			}
 			if (oldmhyperedge.index==iEdgeIndex.getValue()) //Index not changed -> Just an EdgeReplace
 				graphref.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,oldmhyperedge.index,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.HYPEREDGE));
@@ -425,18 +474,17 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 				graphref.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.HYPEREDGE));
 			graphref.modifyHyperEdges.remove(oldmhyperedge.index);
 		}
-		//TODO: Get the Minimum Distance into the properties
-		VHyperEdge addEdge = new VHyperEdge (iEdgeIndex.getValue(), iWidth.getValue(), 12, oldvhyperedge.getShape().clone(), new VEdgeText(), new VEdgeLinestyle());
+		VHyperEdge addEdge = new VHyperEdge (iEdgeIndex.getValue(), iWidth.getValue(), iMargin.getValue(), oldvhyperedge.getShape().clone(), new VEdgeText(), new VEdgeLinestyle());
 
 		MHyperEdge mathEdge = new MHyperEdge(addEdge.getIndex(),iValue.getValue(),EdgeName.getText());
-		int temp=0;
+		int arrayindex=0;
 		for (int i=0; i<nodelist.size(); i++)
 		{
 			if (nodelist.elementAt(i)!=null) //Ein Untergraph mit dem Index existiert
 			{
-				if (NodeChecks[temp].isSelected())
+				if (NodeChecks[arrayindex].isSelected())
 					mathEdge.addNode(i);
-				temp++; //Position at vector
+				arrayindex++; //Position at vector
 			}
 		}
 		addEdge.setWidth(iWidth.getValue());
