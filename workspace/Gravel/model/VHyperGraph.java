@@ -333,7 +333,7 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 				NURBSShapeProjection projection = new NURBSShapeProjection(temp.getShape(),m);
 				Point2D OnCurve = projection.getResultPoint();
 			
-				if (OnCurve.distance(m)<=(variation+(double)temp.width))
+				if (OnCurve.distance(m)<=(variation+(double)temp.getWidth()))
 					return temp;
 			}
 		}
@@ -351,8 +351,8 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 		Iterator<VNode> iter = modifyNodes.getIterator();
 		int i = mG.modifyHyperEdges.getNextIndex();
 		MHyperEdge me = new MHyperEdge(i,GeneralPreferences.getInstance().getIntValue("edge.value"),"HE"+i);
-		//TODO: VHyperGraph:addHyperEdge(SelNodes) Standardname					
-		modifyHyperEdges.add(new VHyperEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), me);
+		//TODO: VHyperGraph:addHyperEdge(SelNodes) Standardname und Standardabstand					
+		modifyHyperEdges.add(new VHyperEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width"), 12), me);
 		while (iter.hasNext()) 
 		{
 				VNode temp = iter.next();

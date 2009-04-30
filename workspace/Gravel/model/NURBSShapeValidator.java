@@ -78,7 +78,7 @@ public class NURBSShapeValidator extends NURBSShape {
 				CPOutside = (Point2D)actual.clone();	
 		}
 		
-		initSets(vG);
+		initPointSets(vG);
 		
 		//Number of Projections made, 
 		int i=0;
@@ -140,9 +140,14 @@ public class NURBSShapeValidator extends NURBSShape {
 				}
 			}	
 		}
+		if (ResultValidation) //Nodes are valid due to inside or outside
+			checkDistances(vG,HyperEdgeIndex);
+
 		if (!ResultValidation)
 			System.err.print("IN");
+		
 		System.err.println("VALID");
+		
 		for (int j=0; j<this.invalidNodeIndices.size(); j++)
 		{
 				System.err.print("#"+invalidNodeIndices.get(j));
@@ -208,7 +213,8 @@ public class NURBSShapeValidator extends NURBSShape {
 			}
 		}
 	}
-	private void initSets(VHyperGraph vG)
+	
+	private void initPointSets(VHyperGraph vG)
 	{
 		Points = new LinkedList<Point2D>();
 		Iterator<VNode> vti = vG.modifyNodes.getIterator();
@@ -268,7 +274,7 @@ public class NURBSShapeValidator extends NURBSShape {
 				{
 					invalidNodeIndices.add(id);
 					ResultValidation = false;
-					System.err.println("Node #"+id+" outside shape but in Edge");
+//					System.err.println("Node #"+id+" outside shape but in Edge");
 				}
 			}
 			else //Outside
@@ -277,7 +283,7 @@ public class NURBSShapeValidator extends NURBSShape {
 				{
 					invalidNodeIndices.add(id);
 					ResultValidation=false;
-					System.err.println("Node #"+id+" inside but not in Edge!");
+//					System.err.println("Node #"+id+" inside but not in Edge!");
 				}
 			}
 			if ((inSet!=point2Set.get(pos))&&(outSet!=point2Set.get(pos)))
@@ -290,6 +296,36 @@ public class NURBSShapeValidator extends NURBSShape {
 		if (!twosets) //We'Re not ready yet
 		{
 			invalidNodeIndices.clear(); ResultValidation=false;
+		}
+	}
+	
+	/**
+	 * If all nodes are valid due to the NURBSShape the last point is, whether their distance to the shape is
+	 * bigger than the given minimal distance of the NURBSShape
+	 */
+	private void checkDistances(VHyperGraph vG, int HEIndex)
+	{
+		if ((!ResultValidation)||(invalidNodeIndices.size()>0)) //already nonvalid
+			return;
+		int minDist = vG.modifyHyperEdges.get(HEIndex).getMinimumMargin();
+		System.err.println(minDist);
+		Iterator<Point2D> nodeiter = NodePos2Index.keySet().iterator();
+		while (nodeiter.hasNext()) //Iterator for all node-positions
+		{
+			Point2D pos = nodeiter.next();
+			int id = NodePos2Index.get(pos);
+			if (vG.getMathGraph().modifyHyperEdges.get(HEIndex).containsNode(id))
+			{ //INside so its radius (distance to projecion must be at most minDist
+				double noderadius = (double)vG.modifyNodes.get(id).getSize()/2d;
+				System.err.println(id+" "+((double)minDist + noderadius)+" vs length:"+point2Radius.get(pos));
+				if (point2Radius.get(pos).doubleValue() <= ((double)minDist + noderadius)) //shape of node must be at most mindist away from shape
+				{
+					System.err.println("too small");
+					invalidNodeIndices.add(id);
+					ResultValidation = false;
+					System.err.println("Node #"+id+" is inside margin "+minDist+" of Shape");
+				}
+			}
 		}
 	}
 }

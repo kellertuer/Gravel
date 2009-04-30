@@ -87,7 +87,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		graphref = (VHyperGraph)Gui.getInstance().getVGraph();
 		int index = graphref.getMathGraph().modifyHyperEdges.getNextIndex();
 		oldmhyperedge = new MHyperEdge(index,1,"E "+index); //Value 1 TODO GeneralPreferences-Std-Values
-		oldvhyperedge = new VHyperEdge(index,1); //Width 1 TODO GP STd Values
+		oldvhyperedge = new VHyperEdge(index,1, 12); //Width 1 TODO GP STd Values also for Distance
 		for (int i=0; i<=initNodes.length(); i++)
 		{
 			if (initNodes.get(i))
@@ -425,7 +425,8 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 				graphref.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.HYPEREDGE));
 			graphref.modifyHyperEdges.remove(oldmhyperedge.index);
 		}
-		VHyperEdge addEdge = new VHyperEdge (iEdgeIndex.getValue(), iWidth.getValue(), oldvhyperedge.getShape().clone(), new VEdgeText(), new VEdgeLinestyle());
+		//TODO: Get the Minimum Distance into the properties
+		VHyperEdge addEdge = new VHyperEdge (iEdgeIndex.getValue(), iWidth.getValue(), 12, oldvhyperedge.getShape().clone(), new VEdgeText(), new VEdgeLinestyle());
 
 		MHyperEdge mathEdge = new MHyperEdge(addEdge.getIndex(),iValue.getValue(),EdgeName.getText());
 		int temp=0;
@@ -496,7 +497,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 				Color colour = Color.BLACK;
 				int colourcount = 0;
 				int temp = 0; //zum mitzaehlen
-				VHyperEdge colorsrc = new VHyperEdge(0,0);
+				VHyperEdge colorsrc = new VHyperEdge(0,0,0);
 				for (int j=0; j<subgraphlist.size();j++)
 				{
 					if (subgraphlist.elementAt(j)!=null)
