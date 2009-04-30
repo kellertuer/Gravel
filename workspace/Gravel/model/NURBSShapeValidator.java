@@ -131,8 +131,16 @@ public class NURBSShapeValidator extends NURBSShape {
 				i++;
 				if ((i%checkInterval)==0)
 				{
-					System.err.println(i);
-					CheckSet(vG, HyperEdgeIndex);
+					System.err.print(i+"   -  ");
+					CheckSetWeak(vG, HyperEdgeIndex);
+					Iterator<Point2D> nodeiter = NodePos2Index.keySet().iterator();
+					while (nodeiter.hasNext()) //Iterator for all node-positions
+					{
+						Point2D pos = nodeiter.next();
+						int id = NodePos2Index.get(pos);
+						System.err.print(id+"in"+node2Set.get(id)+"  ");
+					}
+					System.err.println("--- Definetly utside-Set "+point2Set.get(CPOutside));
 					//If either ResultValid=true Wrong.size()==0 we're ready because the shape is valid
 					//If ResultValid=false and Wrong.size()>0 we're ready because the shape is invalid
 					running = ! (  (ResultValidation&&(invalidNodeIndices.size()==0)) || (!ResultValidation&&(invalidNodeIndices.size()>0)) );
@@ -234,6 +242,9 @@ public class NURBSShapeValidator extends NURBSShape {
 	 * Results are saved in the classglobal variables ResultValid and Wrong-Integer-set, because this method is just for 
 	 * better structure
 	 * 
+	 * This method does not terminate for curves where the internal nodes are nearly isolated so that there are no circles 
+	 * that interconnect the internal regions which never results in twosets to be true
+	 * 
 	 * @param vG
 	 * @param HEIndex
 	 */
@@ -286,6 +297,69 @@ public class NURBSShapeValidator extends NURBSShape {
 		if (!twosets) //We'Re not ready yet
 		{
 			invalidNodeIndices.clear(); ResultValidation=false;
+		}
+	}
+	/**
+	 * Check the actual sets of NodePositions whether they are legal or not and
+	 * whether there are only two sets left
+	 * 
+	 * Results are saved in the classglobal variables ResultValid and Wrong-Integer-set, because this method is just for 
+	 * better structure
+	 * 
+	 * This Method approximates the Stron CheckSet by only looking at the external nodes to be really
+	 * outside - the internal nodes might be in several sets
+	 * 
+	 * This is not yet checked to be true every time, but the external nodes converge faster
+	 * 
+	 * @param vG
+	 * @param HEIndex
+	 */
+	private void CheckSetWeak(VHyperGraph vG, int HEIndex)
+	{
+		int outSet = point2Set.get(CPOutside).intValue();
+		Vector<Integer> inSets = new Vector<Integer>();
+		//Build inSet
+		Iterator<MNode> nit = vG.getMathGraph().modifyNodes.getIterator();
+		while (nit.hasNext()) //Find Set of any node inside Hyper Edge - if we're ready - this should be the only one inside
+		{
+			int nodeid = nit.next().index;
+			if (vG.getMathGraph().modifyHyperEdges.get(HEIndex).containsNode(nodeid))
+			{
+				Point p = vG.modifyNodes.get(nodeid).getPosition();
+				Point2D p2 = new Point2D.Double(p.getX(),p.getY());
+				if (!inSets.contains(point2Set.get(p2)))
+				{
+					inSets.add(point2Set.get(p2));
+				}
+			}
+		}
+		
+		Iterator<Point2D> nodeiter = NodePos2Index.keySet().iterator();
+		while (nodeiter.hasNext())
+		{
+			Point2D pos = nodeiter.next();
+			int id = NodePos2Index.get(pos);
+			if (vG.getMathGraph().modifyHyperEdges.get(HEIndex).containsNode(id))
+			{
+				if (point2Set.get(pos)==outSet) //node of Hyperedge outside
+				{
+					invalidNodeIndices.add(id);
+					ResultValidation = false;
+					System.err.println("Node #"+id+" outside shape but in Edge");
+				}
+			}
+			else //Outside must be the outset to be valid
+			{
+				if (point2Set.get(pos)!=outSet) //Another node not from edge is not yet accumulated with the outside stuff
+				{
+					ResultValidation=false;
+					if (inSets.contains(point2Set.get(pos))) //same side as an inside node
+					{
+						System.err.println("Node #"+id+" inside but not in Edge!");
+						invalidNodeIndices.add(id);
+					}
+				}
+			}
 		}
 	}
 	
