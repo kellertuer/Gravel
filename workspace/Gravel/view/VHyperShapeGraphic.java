@@ -67,6 +67,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(ShapeModifier.getSelectionRectangle());
 		}
+		paintDEBUG(g2);
 	}
 	/**
 	 * @param g
@@ -89,9 +90,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				NURBSShape s = temp.getShape().clone();
 				s.scale(zoomfactor);
 				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(5d/(double)zoomfactor),temp.getWidth(),zoomfactor));
-				//DEBUG
-				for (int i=0; i<s.controlPoints.size(); i++)
-					drawCP(g2,new Point(Math.round((float)temp.getShape().controlPoints.get(i).getX()),Math.round((float)temp.getShape().controlPoints.get(i).getY())),Color.ORANGE);
 			}
 		}
 	}
@@ -176,17 +174,22 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
+		g2.setColor(Color.orange.darker());
 		NURBSShape s =  vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().clone();
 		s.scale(zoomfactor);
 		Iterator<Point2D> pi = s.controlPoints.iterator();
+		Point2D last=null, first=null;
 		while (pi.hasNext())
 		{
 			Point2D p = (Point2D) pi.next();
-			g2.setColor(Color.BLACK);
+			if (first==null)
+				first = p;
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-
 			g2.drawLine(Math.round(((float)p.getX()-3)),Math.round((float)p.getY()),Math.round(((float)p.getX()+3)),Math.round((float)p.getY()));
 			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
+			if (last!=null)
+				g2.drawLine(Math.round((float)last.getX()),Math.round((float)last.getY()), Math.round((float)p.getX()), Math.round((float)p.getY()));
+			last = p;
 		}
 		s.scale(1/zoomfactor);
 	}

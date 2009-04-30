@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -34,6 +35,7 @@ import dialogs.IntegerTextField;
 
 import model.MHyperEdge;
 import model.NURBSShapeFactory;
+import model.NURBSShapeValidator;
 import model.VHyperEdge;
 import model.NURBSShape;
 import model.VHyperGraph;
@@ -79,8 +81,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	private JLabel Degree, IPInfo;
 	private IntegerTextField iDegree;
 	//FreeModFields
-	private JLabel knots, degree;
-	private JButton bIncKnots, bDecKnots, bIncDegree, bDecDegree;
+	private JLabel knots, degree, CheckResult;
+	private JButton bIncKnots, bDecKnots, bIncDegree, bDecDegree, bCheckShape;
 	
 	private JButton bModeChange, bOk, bCancel;
 	private JButton bRotation,bTranslation, bScaling;
@@ -164,8 +166,22 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 
 		c.gridy++;
 		c.gridx=0;
+
+		c.gridy++;
+		c.gridx=0;
+		c.insets.top+=5;
+		bCheckShape = new JButton("<html>Umriss pr&uuml;fen</html>");
+		bCheckShape.addActionListener(this);
+		cont.add(bCheckShape,c);
+		c.gridy++;
+		c.insets.top=0;
+		c.insets.bottom=7;
+		CheckResult = new JLabel("<html>&nbsp;</html>");
+		cont.add(CheckResult,c);
+		c.gridy++;		
+		c.insets.top=5;
+		c.insets.bottom=0;		
 		c.gridwidth=1;
-		
 		c.anchor = GridBagConstraints.SOUTHWEST;
 		bCancel = new JButton("Abbrechen");
 		bCancel.addActionListener(this);
@@ -529,6 +545,28 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SCALE_MOUSEHANDLING);	        		
 	        	}
 	        }
+	        if (e.getSource()==bCheckShape)
+	        {
+	        	NURBSShapeValidator validator = new NURBSShapeValidator(HGraphRef, HEdgeRefIndex, null); //Check actual Shape of the Edge
+	    		if (validator.isShapeValid())
+	    		{
+	    			CheckResult.setOpaque(true);
+	    			CheckResult.setBackground(Color.GREEN.darker());
+	    			CheckResult.setText("<html>Der Umriss ist korrekt.</html>");
+	    		}
+	    		else
+	    		{
+	    			CheckResult.setOpaque(true);
+	    			CheckResult.setBackground(Color.RED.darker());
+		    		String msg = "<html>Umriss nicht korrekt.<br>";		    		
+		    		Vector<Integer> WrongNodes = validator.getInvalidNodeIndices();
+		    		for (int j=0; j<WrongNodes.size(); j++)
+		    				msg+="#"+WrongNodes.get(j);
+		    		msg+="</html>";
+		    		CheckResult.setText(msg);
+	    		}
+	        }
+	        getContent().validate();
 	        getContent().repaint();
 	}
 	private void updateCircleFields()
@@ -571,6 +609,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		iDegree.addCaretListener(this);
 		updateInfo();
 	}
+	
+	@SuppressWarnings("unchecked")
 	private void updateInfo()
 	{
 		Vector<Object> params = HShapeGraphicRef.getShapeParameters();
@@ -612,7 +652,14 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 				}
 			}
 			if ((HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape()!=null)&&(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty()))
+			{
 				IPInfo.setText("<html><p>&nbsp;</p></html>");
+				bCheckShape.setEnabled(true);
+			}
+			else
+			{
+				bCheckShape.setEnabled(false); CheckResult.setText("<html>&nbsp;</html>"); CheckResult.setOpaque(false);
+			}
 			bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 			bOk.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 		}	

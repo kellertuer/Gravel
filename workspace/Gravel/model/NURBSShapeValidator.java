@@ -61,7 +61,7 @@ public class NURBSShapeValidator extends NURBSShape {
 		if (Curve!=null)
 			clone = Curve.clone();
 		else
-			clone = e.getShape();
+			clone = e.getShape().clone();
 		if (clone.isEmpty())
 			return;
 		//Now also the curve and the Hyperedge are correct for the check
@@ -131,6 +131,7 @@ public class NURBSShapeValidator extends NURBSShape {
 				i++;
 				if ((i%checkInterval)==0)
 				{
+					System.err.println(i);
 					CheckSet(vG, HyperEdgeIndex);
 					//If either ResultValid=true Wrong.size()==0 we're ready because the shape is valid
 					//If ResultValid=false and Wrong.size()>0 we're ready because the shape is invalid
@@ -142,17 +143,6 @@ public class NURBSShapeValidator extends NURBSShape {
 		}
 		if (ResultValidation) //Nodes are valid due to inside or outside
 			checkDistances(vG,HyperEdgeIndex);
-
-		if (!ResultValidation)
-			System.err.print("IN");
-		
-		System.err.println("VALID");
-		
-		for (int j=0; j<this.invalidNodeIndices.size(); j++)
-		{
-				System.err.print("#"+invalidNodeIndices.get(j));
-		}
-		System.err.println("\n");
 	}
 	
 	/**
@@ -308,22 +298,18 @@ public class NURBSShapeValidator extends NURBSShape {
 		if ((!ResultValidation)||(invalidNodeIndices.size()>0)) //already nonvalid
 			return;
 		int minDist = vG.modifyHyperEdges.get(HEIndex).getMinimumMargin();
-		System.err.println(minDist);
 		Iterator<Point2D> nodeiter = NodePos2Index.keySet().iterator();
 		while (nodeiter.hasNext()) //Iterator for all node-positions
 		{
 			Point2D pos = nodeiter.next();
 			int id = NodePos2Index.get(pos);
 			if (vG.getMathGraph().modifyHyperEdges.get(HEIndex).containsNode(id))
-			{ //INside so its radius (distance to projecion must be at most minDist
+			{ //Inside so its radius (distance to projecion must be at most minDist
 				double noderadius = (double)vG.modifyNodes.get(id).getSize()/2d;
-				System.err.println(id+" "+((double)minDist + noderadius)+" vs length:"+point2Radius.get(pos));
 				if (point2Radius.get(pos).doubleValue() <= ((double)minDist + noderadius)) //shape of node must be at most mindist away from shape
 				{
-					System.err.println("too small");
 					invalidNodeIndices.add(id);
 					ResultValidation = false;
-					System.err.println("Node #"+id+" is inside margin "+minDist+" of Shape");
 				}
 			}
 		}
