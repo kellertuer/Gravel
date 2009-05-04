@@ -44,7 +44,7 @@ public class VSegmentedEdge extends VEdge
 			points = p;
 	}
 	
-	public int getType() 
+	public int getEdgeType() 
 	{
 		return VEdge.SEGMENTED;
 	}
@@ -93,7 +93,7 @@ public class VSegmentedEdge extends VEdge
 	}
 	public boolean PathEquals(VEdge v)
 	{
-		if (v.getType()!=VEdge.SEGMENTED)
+		if (v.getEdgeType()!=VEdge.SEGMENTED)
 			return false;
 		Vector<Point> vPoints = v.getControlPoints();
 		if (points.size()!=vPoints.size())

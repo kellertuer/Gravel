@@ -144,7 +144,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 			Point startpoint = vg.modifyNodes.get(start).getPosition();
 			Point endpoint = vg.modifyNodes.get(ende).getPosition();
 			VEdge actual = vg.modifyEdges.get(me.index);
-			switch(actual.getType())
+			switch(actual.getEdgeType())
 			{
 				case VEdge.ORTHOGONAL : {
 					bends.put(actual.getIndex(),1); 

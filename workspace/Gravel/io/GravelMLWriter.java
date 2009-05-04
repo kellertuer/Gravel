@@ -215,20 +215,20 @@ public class GravelMLWriter {
 	    	   if (actual.getArrow().getPos()!=((float)gp.getIntValue("edge.arrpos")/100)) //if arrangle is not std
 	    		   s.write("\t\t\t<data key=\"eapos\">"+actual.getArrow().getPos()+"</data>"+nl);
 	    	   
-	    	   if (actual.getType()==VEdge.ORTHOGONAL)
+	    	   if (actual.getEdgeType()==VEdge.ORTHOGONAL)
 	    	   {
 	    		   s.write("\t\t\t<data key=\"et\">Orthogonal</data>"+nl);
 	    		   if (((VOrthogonalEdge)actual).getVerticalFirst()!=gp.getBoolValue("edge.orth_verticalfirst")) //non standard Orth Edge
 	    			   s.write("\t\t\t<data key=\"eo\">"+((VOrthogonalEdge)actual).getVerticalFirst()+"</data>"+nl);
 	    	   }
-	    	   else if (actual.getType()==VEdge.QUADCURVE)
+	    	   else if (actual.getEdgeType()==VEdge.QUADCURVE)
 	    	   {
 	    		   s.write("\t\t\t<data key=\"et\">QuadCurve</data>"+nl);
 	    		   Point p = ((VQuadCurveEdge)actual).getControlPoints().firstElement();
 	    		   s.write("\t\t\t<data key=\"ex\">"+p.x+"</data>"+nl);
 	    		   s.write("\t\t\t<data key=\"ey\">"+p.y+"</data>"+nl);		   
 	    	   }
-	    	   else if (actual.getType()==VEdge.SEGMENTED)
+	    	   else if (actual.getEdgeType()==VEdge.SEGMENTED)
 	    	   {
 	    		   s.write("\t\t\t<data key=\"et\">Segmented</data>"+nl);
 	    		   Vector<Point> points = ((VSegmentedEdge)actual).getControlPoints();
@@ -241,7 +241,7 @@ public class GravelMLWriter {
     		    		   s.write("\t\t\t<data key=\"ey\">"+p.y+"</data>"+nl);	}
 	    			}		   
 	    	   }
-	    	   else if (actual.getType()==VEdge.LOOP)
+	    	   else if (actual.getEdgeType()==VEdge.LOOP)
 	    	   {
 	    		   VLoopEdge vle = (VLoopEdge) actual;
 	    		   s.write("\t\t\t<data key=\"et\">Loop</data>"+nl);

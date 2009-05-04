@@ -231,20 +231,20 @@ public class MyTikZPictureWriter implements TeXWriter {
 	    			}
 	    		} //end of switch
     		   	s.write("]  (ID"+start+")");
-    		   	if (actual.getType()==VEdge.ORTHOGONAL)
+    		   	if (actual.getEdgeType()==VEdge.ORTHOGONAL)
     		   	{
     		   		if (((VOrthogonalEdge)actual).getVerticalFirst())
     		   			s.write(" |- ");
     		   		else
     		   			s.write(" -| ");
     		   	}
-    		   	else if (actual.getType()==VEdge.QUADCURVE)
+    		   	else if (actual.getEdgeType()==VEdge.QUADCURVE)
     		   	{
     		   		int px = ((VQuadCurveEdge)actual).getControlPoints().firstElement().x;
     		   		int py = ((VQuadCurveEdge)actual).getControlPoints().firstElement().y;
     		   		s.write(".. controls ("+px+","+(max.y-py)+") ..");
     		   	}
-    		   	else if (actual.getType()==VEdge.SEGMENTED)
+    		   	else if (actual.getEdgeType()==VEdge.SEGMENTED)
     		   	{
     		   		Iterator <Point> p = ((VSegmentedEdge)actual).getControlPoints().iterator();
     		   		while (p.hasNext())

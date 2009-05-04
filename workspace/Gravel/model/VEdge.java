@@ -73,7 +73,7 @@ public abstract class VEdge extends VItem {
 	 * get the Edge Type. Return the Type of the actual Edge 
 	 * @return the edge type constant
 	 */
-	public abstract int getType();
+	public abstract int getEdgeType();
 	/**
 	 * Returns the Path of an edge ignoring the line style, so only for computational cases
 	 * @param Start Coordinates of the Start Node
@@ -398,5 +398,9 @@ public abstract class VEdge extends VItem {
 	 */
 	public VEdgeArrow getArrow() {
 		return arrow;
+	}
+	public int getType()
+	{
+		return VItem.EDGE;
 	}
 }

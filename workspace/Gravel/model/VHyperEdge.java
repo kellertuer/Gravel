@@ -228,4 +228,9 @@ public class VHyperEdge extends VItem {
 	public NURBSShape getShape() {
 		return shape;
 	}
+	
+	public int getType()
+	{
+		return VItem.HYPEREDGE;
+	}
 }
