@@ -26,11 +26,11 @@ import java.util.Observer;
 public class GraphHistoryManager implements Observer
 {
 	//Lastgraph is for the creation of actions, for delete especially
-	VGraph trackedGraph, lastGraph;
+	VGraphInterface trackedGraph, lastGraph;
 	GraphMessage Blockstart;
-	boolean active = true, trackSelection;
-	int blockdepth, stacksize, SavedUndoStackSize;
-	LinkedList<GraphAction> UndoStack, RedoStack;
+	boolean active, trackSelection;
+	int blockdepth, stacksize, SavedUndoStackSize, graphType;
+	LinkedList<CommonGraphAction> UndoStack, RedoStack;
 	
 	/**
 	 * Create a new GraphHistoryManager for the given VGraph
@@ -39,50 +39,73 @@ public class GraphHistoryManager implements Observer
 	public GraphHistoryManager(VGraph vg)
 	{
 		trackedGraph = vg;
-		lastGraph = trackedGraph.clone();
-		trackedGraph.addObserver(this);
+		lastGraph = vg.clone();
+		vg.addObserver(this);
+		Blockstart=null;
+		CommonInitialization();
+	}
+	/**
+	 * Create a new GraphHistoryManager for the given VHyperGraph
+	 * @param vhg the HyperGraph, that should be extended with a History
+	 */
+	public GraphHistoryManager(VHyperGraph vhg)
+	{
+		trackedGraph = vhg;
+		lastGraph = vhg.clone();
+		vhg.addObserver(this);
+		CommonInitialization();
+	}
+
+	private void CommonInitialization()
+	{
+		active=true;
 		Blockstart=null;
 		blockdepth=0;
-		UndoStack = new LinkedList<GraphAction>();
-		RedoStack = new LinkedList<GraphAction>();
+		UndoStack = new LinkedList<CommonGraphAction>();
+		RedoStack = new LinkedList<CommonGraphAction>();
 		stacksize=GeneralPreferences.getInstance().getIntValue("history.Stacksize");
 		trackSelection=GeneralPreferences.getInstance().getBoolValue("history.trackSelection");
 		SavedUndoStackSize = 0;
 	}
-   /**
+	/**
 	 * Create an Action based on the message, that came from the Graph,
 	 * return that Action and update LastGraph
 	 * @param m the created Action
 	 * @return
 	 */
-	private GraphAction handleSingleAction(GraphMessage m)
+	private CommonGraphAction handleSingleAction(GraphMessage m)
 	{
 		int action = 0;
-		VGraph tempG; //which Graph provides information for the action?
+		//Check, which Graph contains the Information for the information, we need to create an Action
+		VGraphInterface InformationalGraph; //which Graph provides information for the action?
 		switch(m.getModification()&(~GraphConstraints.BLOCK_ALL)) //Action must be spcific, therefore a switch but by ignoring Blocks (thats already handled)
 		{	case GraphConstraints.ADDITION: //Node added, Create action and modify lastgraph
 				action = GraphConstraints.ADDITION;
-				tempG = trackedGraph; //get Information from actual Graph;
+				InformationalGraph = trackedGraph; //get Information from actual Graph;
 				break;
 			case GraphConstraints.REMOVAL:
 				action = GraphConstraints.REMOVAL;
-				tempG = lastGraph; //Information of the deleted Node must be taken from last status
+				InformationalGraph = lastGraph; //Information of the deleted Node must be taken from last status
 				break;
 			case GraphConstraints.INDEXCHANGED:
 			case GraphConstraints.UPDATE:
 			case GraphConstraints.TRANSLATION:
 				action = GraphConstraints.UPDATE;
-				tempG = lastGraph;
+				InformationalGraph = lastGraph;
 				break;
 			default: //not suitable action
 				return null;
 		}		
-		GraphAction act = null;
+		CommonGraphAction act = null;
 		if (m.getModifiedElementTypes()==GraphConstraints.NODE) //Action on unique node
 		{
 			try { 
-				//TODO: Optimize temp.clone();
-				act = new GraphAction(tempG.modifyNodes.get(m.getElementID()),action,tempG.clone()); 
+				if (InformationalGraph.getType()==VGraphInterface.GRAPH)	//TODO: Optimize temp.clone();
+					act = new GraphAction(((VGraph)InformationalGraph).modifyNodes.get(m.getElementID()),action,((VGraph)InformationalGraph).clone()); 
+				else if (InformationalGraph.getType()==VGraphInterface.HYPERGRAPH)	//TODO: Optimize temp.clone();
+					act = new HyperGraphAction(((VHyperGraph)InformationalGraph).modifyNodes.get(m.getElementID()),action,((VHyperGraph)InformationalGraph).clone()); 
+				else
+					act=null;
 			}
 			catch (GraphActionException e)
 			{
@@ -92,8 +115,23 @@ public class GraphHistoryManager implements Observer
 		else if (m.getModifiedElementTypes()==GraphConstraints.EDGE) //Change on Unique Edge
 		{
 			try { 
+				if (InformationalGraph.getType()!=VGraphInterface.GRAPH)
+					act = null;
 				//TODO: Optimize Environment Graph
-				act = new GraphAction(tempG.modifyEdges.get(m.getElementID()),action,tempG.clone());
+				act = new GraphAction(((VGraph)InformationalGraph).modifyEdges.get(m.getElementID()),action,((VGraph)InformationalGraph).clone());
+			}
+			catch (GraphActionException e2)
+			{
+				act=null; System.err.println("DEBUG: ¢added.GraphAction Creation Failed:"+e2.getMessage());
+			}
+		}
+		else if (m.getModifiedElementTypes()==GraphConstraints.HYPEREDGE) //Change on Unique HyperEdge
+		{
+			try { 
+				if (InformationalGraph.getType()!=VGraphInterface.HYPERGRAPH)
+					act = null;
+				//TODO: Optimize Environment Graph
+				act = new HyperGraphAction(((VHyperGraph)InformationalGraph).modifyHyperEdges.get(m.getElementID()).clone(),action,((VHyperGraph)InformationalGraph).clone());
 			}
 			catch (GraphActionException e2)
 			{
@@ -103,8 +141,12 @@ public class GraphHistoryManager implements Observer
 		else if (m.getModifiedElementTypes()==GraphConstraints.SUBGRAPH)
 		{
 			try { 
-				//TODO: Optimize Environment.
-				act = new GraphAction(tempG.modifySubgraphs.get(m.getElementID()),action, tempG.getMathGraph().modifySubgraphs.get(m.getElementID()));
+				if (InformationalGraph.getType()==VGraphInterface.GRAPH)	//TODO: Optimize temp.clone();
+					act = new GraphAction(((VGraph)InformationalGraph).modifySubgraphs.get(m.getElementID()),action,((VGraph)InformationalGraph).getMathGraph().modifySubgraphs.get(m.getElementID())); 
+				else if (InformationalGraph.getType()==VGraphInterface.HYPERGRAPH)	//TODO: Optimize temp.clone();
+					act = new HyperGraphAction(((VHyperGraph)InformationalGraph).modifySubgraphs.get(m.getElementID()),action,((VHyperGraph)InformationalGraph).getMathGraph().modifySubgraphs.get(m.getElementID())); 
+				else
+					return null;
 			}
 			catch (GraphActionException e2)
 			{
@@ -119,21 +161,42 @@ public class GraphHistoryManager implements Observer
 	 */
 	private void updateLastSelection()
 	{
-		Iterator<VNode> ni = trackedGraph.modifyNodes.getIterator();
+		Iterator<VNode> ni;
+		VNodeSet lastNodeSet;
+		if (trackedGraph.getType()==VGraphInterface.GRAPH)
+		{
+			Iterator<VEdge> ei = ((VGraph)trackedGraph).modifyEdges.getIterator();
+			while (ei.hasNext())
+			{
+				VEdge e = ei.next();
+				VEdge e2 = ((VGraph)lastGraph).modifyEdges.get(e.getIndex());
+				if (e2!=null)
+					e2.setSelectedStatus(e.getSelectedStatus());
+			}
+			ni = ((VGraph)trackedGraph).modifyNodes.getIterator();
+			lastNodeSet = ((VGraph)lastGraph).modifyNodes;
+		}
+		else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
+		{
+			Iterator<VHyperEdge> ei = ((VHyperGraph)trackedGraph).modifyHyperEdges.getIterator();
+			while (ei.hasNext())
+			{
+				VHyperEdge e = ei.next();
+				VHyperEdge e2 = ((VHyperGraph)lastGraph).modifyHyperEdges.get(e.getIndex());
+				if (e2!=null)
+					e2.setSelectedStatus(e.getSelectedStatus());
+			}
+			ni = ((VHyperGraph)trackedGraph).modifyNodes.getIterator();
+			lastNodeSet = ((VHyperGraph)lastGraph).modifyNodes;
+		}
+		else
+			return;
 		while (ni.hasNext())
 		{
 			VNode n = ni.next();
-			VNode n2 = lastGraph.modifyNodes.get(n.getIndex());
+			VNode n2 = lastNodeSet.get(n.getIndex());
 			if (n2!=null)
 				n2.setSelectedStatus(n.getSelectedStatus());
-		}
-		Iterator<VEdge> ei = trackedGraph.modifyEdges.getIterator();
-		while (ei.hasNext())
-		{
-			VEdge e = ei.next();
-			VEdge e2 = lastGraph.modifyEdges.get(e.getIndex());
-			if (e2!=null)
-				e2.setSelectedStatus(e.getSelectedStatus());
 		}
 	}
 	/**
@@ -144,32 +207,60 @@ public class GraphHistoryManager implements Observer
 	private void addAction(GraphMessage m)	{	
 		if ((m.getModification()&GraphConstraints.BLOCK_ABORT)==GraphConstraints.BLOCK_ABORT)
 			return; //Don't handle Block-Abort-Stuff
-		GraphAction act = null;
+		CommonGraphAction act = null;
 		if (m.getElementID() > 0) //Message for single stuff thats not just selection
 			act = handleSingleAction(m);
 		else //multiple modifications, up to know just a replace */
 		{
 			//Last status in action - and yes there was an Change in the items
 			try {						
-				//New Action, that tracks the graph, or only the selection
-				act = new GraphAction(lastGraph, GraphConstraints.UPDATE, m.getModifiedElementTypes()!=GraphConstraints.SELECTION); }
+				//New Action, that tracks the graph or only the selection
+				if (lastGraph.getType()==VGraphInterface.GRAPH)
+					act = new GraphAction((VGraph)lastGraph, GraphConstraints.UPDATE, m.getModifiedElementTypes()!=GraphConstraints.SELECTION); 
+				else if (lastGraph.getType()==VGraphInterface.HYPERGRAPH)
+					act = new HyperGraphAction((VHyperGraph)lastGraph, GraphConstraints.UPDATE, m.getModifiedElementTypes()!=GraphConstraints.SELECTION); 
+				else
+					throw new GraphActionException("Unknown Graph Type");
+			}
 			catch (GraphActionException e)
 			{
 				act=null; System.err.println("DEBUG: Edge.added.GraphAction Creation Failed:"+e.getMessage());				
 			}
 		}
-		lastGraph = trackedGraph.clone(); //Actual status as last status.clone
-		if (act!=null)
-		{ //Try to add to Stack, if its full discard oldest action
-			//Because its a new action, delete Redo, if its filled
-			if (!RedoStack.isEmpty())
-				RedoStack.clear();
-			if (UndoStack.size()>=stacksize)
-			{	//Now it can't get Unchanged by Undo
-				SavedUndoStackSize--;
-				UndoStack.remove();
-			}
-			UndoStack.add(act);
+		if (act==null)
+			return;
+		clonetrackedGraph();
+		if (!RedoStack.isEmpty())
+			RedoStack.clear();
+		if (UndoStack.size()>=stacksize)
+		{	//Now it can't get Unchanged by Undo
+			SavedUndoStackSize--;
+			UndoStack.remove();
+		}
+		UndoStack.add(act);
+	}
+	private void clonetrackedGraph()
+	{
+		if (lastGraph.getType()==VGraphInterface.GRAPH)
+			lastGraph = ((VGraph)trackedGraph).clone(); //Actual status as last status.clone
+		else if (lastGraph.getType()==VGraphInterface.HYPERGRAPH)
+			lastGraph = ((VHyperGraph)trackedGraph).clone(); //Actual status as last status.clone
+	}
+	private void setObservation(boolean observing)
+	{
+		if (lastGraph.getType()==VGraphInterface.GRAPH)
+		{
+			if (observing)
+				((VGraph)trackedGraph).addObserver(this);
+			else
+				((VGraph)trackedGraph).deleteObserver(this);
+		}
+		else if (lastGraph.getType()==VGraphInterface.HYPERGRAPH)
+		{
+			if (observing)
+				((VHyperGraph)trackedGraph).addObserver(this);
+			else
+				((VHyperGraph)trackedGraph).deleteObserver(this);
 		}
 	}
 	/**
@@ -189,11 +280,11 @@ public class GraphHistoryManager implements Observer
 	{
 		if (!CanUndo())
 			return;
-		trackedGraph.deleteObserver(this); //Deaktivate Tracking
-		GraphAction LastAction = UndoStack.removeLast();
+		setObservation(false); //Deaktivate Tracking
+		CommonGraphAction LastAction = UndoStack.removeLast();
 		try{
 			LastAction.UnDoAction(trackedGraph);
-			lastGraph = trackedGraph.clone();
+			clonetrackedGraph();
 		}
 		catch (GraphActionException e)
 		{
@@ -203,7 +294,7 @@ public class GraphHistoryManager implements Observer
 			RedoStack.remove();
 		RedoStack.add(LastAction);
 		trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));
-		trackedGraph.addObserver(this); //Activate Tracking again
+		setObservation(true); //Activate Tracking again
 	}
 	/**
 	 * Indicate whether an Redo is possible
@@ -222,11 +313,11 @@ public class GraphHistoryManager implements Observer
 	{
 		if (!CanRedo())
 			return;
-		trackedGraph.deleteObserver(this); //Deaktivate Tracking
-		GraphAction LastAction = RedoStack.removeLast();
+		setObservation(false);//Deaktivate Tracking
+		CommonGraphAction LastAction = RedoStack.removeLast();
 		try{
 			LastAction.redoAction(trackedGraph);
-			lastGraph = trackedGraph.clone();
+			clonetrackedGraph();
 		}
 		catch (GraphActionException e)
 		{
@@ -239,7 +330,7 @@ public class GraphHistoryManager implements Observer
 		}
 		UndoStack.add(LastAction);
 		trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));
-		trackedGraph.addObserver(this); //Activate Tracking again
+		setObservation(true); //Activate Tracking again
 	}
 	/**
 	 * Is the Tracked Graph Unchanged since last 
@@ -256,11 +347,11 @@ public class GraphHistoryManager implements Observer
 	 */
 	public void setGraphSaved()
 	{
-		trackedGraph.deleteObserver(this);
+		setObservation(false);
 		SavedUndoStackSize=UndoStack.size();
 		//Notify everyone despite us.
 		trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS, GraphConstraints.UPDATE));
-		trackedGraph.addObserver(this);		
+		setObservation(true);
 	}
 	/**
 	 * Indicates whether Selection Changes on the Graph are put on the Undo Stack or not
@@ -292,16 +383,9 @@ public class GraphHistoryManager implements Observer
 		//Complete Replacement of Graph Handling
 		if ((m.getModifiedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getAffectedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getModification()==GraphConstraints.REPLACEMENT))
 		{
-				lastGraph = trackedGraph.clone();
-				Blockstart=null;
-				blockdepth=0;
-				UndoStack = new LinkedList<GraphAction>();
-				RedoStack = new LinkedList<GraphAction>();
-				active=true;
-				SavedUndoStackSize=0;
-				//Reload Standards
-				stacksize=GeneralPreferences.getInstance().getIntValue("history.Stacksize");
-				trackSelection=GeneralPreferences.getInstance().getBoolValue("history.trackSelection");
+				clonetrackedGraph();
+				//Reinit all stuff because graph has changed
+				CommonInitialization();
 				return;
 		}
 		if ((m.getModifiedElementTypes()==GraphConstraints.SELECTION)&&(!trackSelection))
