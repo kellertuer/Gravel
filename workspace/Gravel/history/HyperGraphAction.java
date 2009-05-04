@@ -6,13 +6,13 @@ import model.*;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 /**
- * GraphAction represents one single action that can be performed to manipulate a VGraph.
+ * HyperGraphAction represents one single action that can be performed to manipulate a VHyperGraph.
  * Besides a standard action, that replaces a graph with a new one (because 
  * there were many changes), there are specific Actions to reduce memory and computation usage
  * 
  * The given Values are Actions that happened to the Graph:
- * - Replace, where the change is given in a new graph, node, edge or subgraph that is replaced
- * - create, where an Object is created in the graph (a node, edge or subgraph)
+ * - Replace, where the change is given in a new graph, node, hyperedge or subgraph that is replaced
+ * - create, where an Object is created in the graph (a node, hyperedge or subgraph)
  * - delete, where an Object is deleted
  * 
  *  The Action specified is the action DONE to the graph.
@@ -21,27 +21,27 @@ import model.Messages.GraphMessage;
  *  for the manipulation of a node, where the ID changes.
  *  
  * @author Ronny Bergmann
- * @since 0.3
+ * @since 0.4
  */
-public class GraphAction extends CommonGraphAction {
+public class HyperGraphAction extends CommonGraphAction {
 	
-	private MEdge me;
-	private VGraph envG;
+	private MHyperEdge mhe;
+	private VHyperGraph envHG;
 	/**
-	 * Create a New Action with whole Graph or an Selection Change
-	 * Only updates are possible, because Graphs can't be created or deleted while editing a graph
+	 * Create a New Action with whole HyperGraph or an Selection Change
+	 * Only replacements are possible, because Graphs can't be created or deleted while editing a graph
 	 * Selection is also simplified to updates, because the deselect-function does the same as the exChangeUpdate here
 	 * (in their computational comparison)
 	 *  
-	 * @param o VGraph
+	 * @param o VHyperGraph
 	 * @param action Action that happened
-	 * @param boolean Itemchange Indicator for the change happened: True if an Node/Edge/Subgraph was changed, false if only selection was changed
+	 * @param boolean Itemchange Indicator for the change happened: True if an Node/Hyperedge/Subgraph was changed, false if only selection was changed
 	 * @throws GraphActionException E.g. a Graph can not be Created or Deleted within a Graph
 	 */
-	public GraphAction(VGraph o, int action, boolean Itemchange) throws GraphActionException
+	public HyperGraphAction(VHyperGraph o, int action, boolean Itemchange) throws GraphActionException
 	{
 		if (o==null)
-			throw new GraphActionException("Could not Create Action: Graph must not be null.");
+			throw new GraphActionException("Could not Create Action: HyperGraph must not be null.");
 		ActionObject=o.clone();
 		Action=action;
 		if ((action&(GraphConstraints.ADDITION|GraphConstraints.REMOVAL))>0) //Create or delete is active
@@ -51,29 +51,30 @@ public class GraphAction extends CommonGraphAction {
 			throw new GraphActionException("Creating or Deletion Graph/Selection is not possible as an Trackable Action.");
 		}
 		if (Itemchange)
-			Objecttype=GraphConstraints.GRAPH;
+			Objecttype=GraphConstraints.HYPERGRAPH;
 		else
 			Objecttype=GraphConstraints.SELECTION;
 	}
 	/**
-	 * Create an Action for Manipulation of an Edge
+	 * Create an Action for Manipulation of an HyperEdge
 	 * @param o The Visual Information of the Edge
 	 * @param action Action Happening to it
-	 * @param environment VGraph containins at least the Start- and Endnode and the Subgraphs the Edge belongs to
+	 * @param environment VHyperGraph containins at least the Endnodes of the HyperEdge and the Subgraphs the affected Hyperedge belongs to
+	 * 
 	 * @throws GraphActionException
 	 */
-	public GraphAction(VEdge o, int action, VGraph environment) throws GraphActionException
+	public HyperGraphAction(VHyperEdge o, int action, VHyperGraph environment) throws GraphActionException
 	{
 		if ((o==null)||(environment==null))
 			throw new GraphActionException("Could not Create Action: Edge and Environment must not be null.");
-		if (environment.modifyEdges.get(o.getIndex())==null)
-			throw new GraphActionException("Could not Create Action: Environment must contain edge");
+		if (environment.modifyHyperEdges.get(o.getIndex())==null)
+			throw new GraphActionException("Could not Create Action: Environment must contain hyper edge");
 		ActionObject=o;
 		Action=action;
-		me = environment.getMathGraph().modifyEdges.get(o.getIndex());
+		mhe = environment.getMathGraph().modifyHyperEdges.get(o.getIndex());
 		env = environment;
-		envG = environment;
-		Objecttype=GraphConstraints.EDGE;
+		envHG = environment;
+		Objecttype=GraphConstraints.HYPEREDGE;
 	}
 
 	/**
@@ -83,10 +84,10 @@ public class GraphAction extends CommonGraphAction {
 	 * @param environment Graph containing the Subgraphs the node belongs to and (at least) andjacent edges and their second nodes
 	 * @throws GraphActionException
 	 */
-	public GraphAction(VNode o, int action, VGraph environment) throws GraphActionException
+	public HyperGraphAction(VNode o, int action, VHyperGraph environment) throws GraphActionException
 	{
 		super(o,action,environment);
-		envG = environment;
+		envHG = environment;
 	}
 
 	/**
@@ -96,22 +97,24 @@ public class GraphAction extends CommonGraphAction {
 	 * @param c Color.
 	 * @throws GraphActionException
 	 */
-	public GraphAction(VSubgraph o, int action, MSubgraph m) throws GraphActionException
+	public HyperGraphAction(VSubgraph o, int action, MSubgraph m) throws GraphActionException
 	{
 		super(o,action,m);
 	}
 	
 	protected void exchangeSelection(VGraphInterface first, VGraphInterface second)
 	{
-		if ((first.getType()!=VGraphInterface.GRAPH)||(first.getType()!=second.getType()))
+		if ((first.getType()!=VGraphInterface.HYPERGRAPH)||(first.getType()!=second.getType()))
 				return;
+		//Exchange Selection on the nodes
 		super.exchangeSelection(first, second);
-		Iterator<VEdge> ei = ((VGraph)first).modifyEdges.getIterator();
+
+		Iterator<VHyperEdge> ei = ((VHyperGraph)first).modifyHyperEdges.getIterator();
 		while (ei.hasNext())
 		{
-			VEdge e = ei.next();
+			VHyperEdge e = ei.next();
 			int sel = e.getSelectedStatus();
-			VEdge e2 = ((VGraph)second).modifyEdges.get(e.getIndex());
+			VHyperEdge e2 = ((VHyperGraph)second).modifyHyperEdges.get(e.getIndex());
 			if (e2!=null)
 			{
 				e.setSelectedStatus(e2.getSelectedStatus());
@@ -122,19 +125,19 @@ public class GraphAction extends CommonGraphAction {
 
 	protected VGraphInterface doReplace(VGraphInterface graph) throws GraphActionException
 	{
-		if (graph.getType()!=VGraphInterface.GRAPH)
+		if (graph.getType()!=VGraphInterface.HYPERGRAPH)
 			throw new GraphActionException("Can't doDelete(): Wrong Type of Graph");
-		VGraph g = (VGraph)graph;
-		VGraph ret;
+		VHyperGraph g = (VHyperGraph)graph;
+		VHyperGraph ret;
 		switch(Objecttype)
 		{
 			case GraphConstraints.SELECTION:
 				ret = g;
 			break;
 			case GraphConstraints.GRAPH: //Replace whole graph and save the actual parameter als old object
-				ret = new VGraph(((VGraph)ActionObject).getMathGraph().isDirected(), ((VGraph)ActionObject).getMathGraph().isLoopAllowed(), ((VGraph)ActionObject).getMathGraph().isMultipleAllowed());
-				ret.replace((VGraph)ActionObject);
-				((VGraph)ActionObject).replace(g);
+				ret = new VHyperGraph();
+				ret.replace((VHyperGraph)ActionObject);
+				((VHyperGraph)ActionObject).replace(g);
 				g.replace(ret);
 			break;
 			case GraphConstraints.NODE: //Replace Node and keep the given one in the graph as old one
@@ -153,15 +156,15 @@ public class GraphAction extends CommonGraphAction {
 				MNode tempmn = mn;
 				mn = new MNode(n.getIndex(), g.getMathGraph().modifyNodes.get(n.getIndex()).name);
 				g.modifyNodes.replace(n, tempmn);
-				envG.modifyNodes.replace((VNode)ActionObject, mn);
+				envHG.modifyNodes.replace((VNode)ActionObject, mn);
 				exchangeSubgraphMembership(GraphConstraints.NODE,n.getIndex(),env,graph);
 				ret = g; //return graph
 			break;
-			case GraphConstraints.EDGE: //Replace Edge in graph and keep the replaced one as old one 
-				VEdge e = (VEdge)ActionObject;
-				if (g.modifyEdges.get(e.getIndex())==null) //edge does not exists
-					throw new GraphActionException("Can't replace edge, none there.");
-				ActionObject = g.modifyEdges.get(e.getIndex()).clone(); //save old edge
+			case GraphConstraints.HYPEREDGE: //Replace Edge in graph and keep the replaced one as old one 
+				VHyperEdge e = (VHyperEdge)ActionObject;
+				if (g.modifyHyperEdges.get(e.getIndex())==null) //edge does not exists
+					throw new GraphActionException("Can't replace hyper edge, none there.");
+				ActionObject = g.modifyHyperEdges.get(e.getIndex()).clone(); //save old edge
 				//Save Color of old node
 				Iterator<VSubgraph> esi = g.modifySubgraphs.getIterator();
 				while (esi.hasNext())
@@ -170,11 +173,11 @@ public class GraphAction extends CommonGraphAction {
 					if (g.getMathGraph().modifySubgraphs.get(s.getIndex()).containsEdge(e.getIndex()))
 						((VEdge)ActionObject).addColor(s.getColor());
 				}
-				MEdge tempme = new MEdge(me.index, me.StartIndex, me.EndIndex, me.Value, me.name);
-				MEdge me = g.getMathGraph().modifyEdges.get(e.getIndex());
-				g.modifyEdges.replace(e, tempme);
-				envG.modifyEdges.replace((VEdge)ActionObject, me);
-				exchangeSubgraphMembership(GraphConstraints.EDGE,e.getIndex(),env,graph);
+				MHyperEdge tempmhe = mhe.clone();
+				MHyperEdge mhe = g.getMathGraph().modifyHyperEdges.get(e.getIndex());
+				g.modifyHyperEdges.replace(e, tempmhe);
+				envHG.modifyHyperEdges.replace((VHyperEdge)ActionObject, mhe);
+				exchangeSubgraphMembership(GraphConstraints.HYPEREDGE,e.getIndex(),env,graph);
 				ret = g;
 			break;
 			case GraphConstraints.SUBGRAPH:
@@ -195,26 +198,26 @@ public class GraphAction extends CommonGraphAction {
 					if (tempms.containsNode(n2.getIndex()))
 						g.modifySubgraphs.addNodetoSubgraph(n2.getIndex(), newSubgraph.getIndex());
 				}
-				Iterator<VEdge> ei = g.modifyEdges.getIterator();
+				Iterator<VHyperEdge> ei = g.modifyHyperEdges.getIterator();
 				while (ei.hasNext())
 				{
-					VEdge e2 = ei.next();
+					VHyperEdge e2 = ei.next();
 					if (tempms.containsEdge(e2.getIndex()))
 						g.modifySubgraphs.addEdgetoSubgraph(e2.getIndex(), newSubgraph.getIndex());
 				}
 				graph.pushNotify(new GraphMessage(GraphConstraints.SUBGRAPH,newSubgraph.getIndex(),GraphConstraints.BLOCK_END,GraphConstraints.GRAPH_ALL_ELEMENTS));
 				ret = g;
 				break;
-			default: throw new GraphActionException("GraphAction::doReplace(); Unknown ActionObject");
+			default: throw new GraphActionException("HyperGraphAction::doReplace(); Unknown ActionObject");
 		}
 		return ret;
 	}
 
 	protected VGraphInterface doCreate(VGraphInterface graph) throws GraphActionException
 	{
-		if (graph.getType()!=VGraphInterface.GRAPH)
-			throw new GraphActionException("Can't doDelete(): Wrong Type of Graph");
-		VGraph g = (VGraph)graph;
+		if (graph.getType()!=VGraphInterface.HYPERGRAPH)
+			throw new GraphActionException("HyperGraphAction: Can't doDelete(): Wrong Type of Graph");
+		VHyperGraph g = (VHyperGraph)graph;
 		switch(Objecttype)
 		{
 			case GraphConstraints.NODE:
@@ -223,38 +226,43 @@ public class GraphAction extends CommonGraphAction {
 					throw new GraphActionException("Can't create node, already exists.");
 				g.modifyNodes.add(n, mn);
 				//Recreate all Subgraphs
-				Iterator<VSubgraph> si = envG.modifySubgraphs.getIterator();
+				Iterator<VSubgraph> si = envHG.modifySubgraphs.getIterator();
 				while (si.hasNext())
 				{
 					VSubgraph s = si.next();
-					if (envG.getMathGraph().modifySubgraphs.get(s.getIndex()).containsNode(n.getIndex()))
+					if (envHG.getMathGraph().modifySubgraphs.get(s.getIndex()).containsNode(n.getIndex()))
 					{
 						g.modifySubgraphs.addNodetoSubgraph(n.getIndex(), s.getIndex());
 						recreateItemColor(n,g);
 					}
 				}
-				//Recreate adjacent edges and their subgraohs
-				Iterator<VEdge> ei = envG.modifyEdges.getIterator();
+				//Recreate adjacent edges (if they were deleted) and their subgraphs
+				Iterator<VHyperEdge> ei = envHG.modifyHyperEdges.getIterator();
 				while (ei.hasNext())
 				{
-					VEdge e = ei.next();
-					MEdge me = envG.getMathGraph().modifyEdges.get(e.getIndex());
-					if ((me.StartIndex==n.getIndex())||(me.EndIndex==n.getIndex()))
+					VHyperEdge e = ei.next();
+					MHyperEdge me = envHG.getMathGraph().modifyHyperEdges.get(e.getIndex());
+					if (me.containsNode(n.getIndex()))
 					{ //Add all Adjacent Edges again and recreate theis color
-						g.modifyEdges.add(e, me, envG.modifyNodes.get(me.StartIndex).getPosition(), envG.modifyNodes.get(me.EndIndex).getPosition());
-						recreateItemColor(e,g);
+						g.modifyHyperEdges.add(e, me);
+						recreateItemColor(e,g); //recreate its color from g
 					}
 				}
 				break;
-			case GraphConstraints.EDGE:
-				VEdge e = (VEdge)ActionObject;
-				if ((g.modifyEdges.get(e.getIndex())!=null)||(g.modifyNodes.get(me.StartIndex)==null)||(g.modifyNodes.get(me.EndIndex)==null)) //edge exists or one of its Nodes does not
-					throw new GraphActionException("Can't create edge, it already exists or one of its Nodes does not.");
-				g.modifyEdges.add(e, me, envG.modifyNodes.get(me.StartIndex).getPosition(),envG.modifyNodes.get(me.EndIndex).getPosition());
+			case GraphConstraints.HYPEREDGE:
+				VHyperEdge e = (VHyperEdge)ActionObject;
+				if ((g.modifyHyperEdges.get(e.getIndex())!=null)) //edge exists or one of its Nodes does not
+					throw new GraphActionException("Can't create edge, it already exists");
+				for (int i=0; i<mhe.getEndNodes().size(); i++) //All possible node indices
+				{
+					if (mhe.containsNode(i)&&(g.modifyNodes.get(i)==null)) //Hyperedge contains this node but it does not exist
+						throw new GraphActionException("Can't create hyper edge, one of its End nodes does not exist");						
+				}
+				g.modifyHyperEdges.add(e, mhe);
 				recreateItemColor(e,g);
-				g.modifyEdges.get(e.getIndex()).setSelectedStatus(envG.modifyEdges.get(e.getIndex()).getSelectedStatus());
+				g.modifyHyperEdges.get(e.getIndex()).setSelectedStatus(envHG.modifyHyperEdges.get(e.getIndex()).getSelectedStatus());
 				break;
-				
+			
 			case GraphConstraints.SUBGRAPH:
 				VSubgraph vs = (VSubgraph)ActionObject;
 				if ((g.modifySubgraphs.get(vs.getIndex())!=null))
@@ -268,9 +276,9 @@ public class GraphAction extends CommonGraphAction {
 
 	protected VGraphInterface doDelete(VGraphInterface graph) throws GraphActionException
 	{
-		if (graph.getType()!=VGraphInterface.GRAPH)
+		if (graph.getType()!=VGraphInterface.HYPERGRAPH)
 			throw new GraphActionException("Can't doDelete(): Wrong Type of Graph");
-		VGraph g = (VGraph)graph;
+		VHyperGraph g = (VHyperGraph)graph;
 		switch(Objecttype)
 		{
 			case GraphConstraints.NODE:
@@ -279,11 +287,11 @@ public class GraphAction extends CommonGraphAction {
 					throw new GraphActionException("Can't delete node, none there.");
 				g.modifyNodes.remove(n.getIndex());
 				break;
-			case GraphConstraints.EDGE:
-				VEdge e = (VEdge)ActionObject;
-				if (g.modifyEdges.get(e.getIndex())==null) //edge does not exists
-					throw new GraphActionException("Can't delete edge, none there.");
-				g.modifyEdges.remove(e.getIndex());
+			case GraphConstraints.HYPEREDGE:
+				VHyperEdge e = (VHyperEdge)ActionObject;
+				if (g.modifyHyperEdges.get(e.getIndex())==null) //edge does not exists
+					throw new GraphActionException("Can't delete hyperedge, none there.");
+				g.modifyHyperEdges.remove(e.getIndex());
 				break;
 			case GraphConstraints.SUBGRAPH:
 				VSubgraph vs = (VSubgraph)ActionObject;
