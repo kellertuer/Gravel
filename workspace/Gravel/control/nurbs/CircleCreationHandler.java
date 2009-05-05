@@ -99,10 +99,11 @@ public class CircleCreationHandler implements ShapeMouseHandler {
 			CircleOrigin = mp;
 			size = rad;
 			buildCircle();
-			if (vg!=null) //Normal Graph
-				vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
-			else if (vhg!=null) //Hypergraph
-				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGESHAPE));
+//			if (vg!=null) //Normal Graph
+//				vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+//			else
+			if (vhg!=null) //Hypergraph
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 		}
 	}
 	public NURBSShape getShape()

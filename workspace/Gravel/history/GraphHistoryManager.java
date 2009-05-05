@@ -78,7 +78,7 @@ public class GraphHistoryManager implements Observer
 		int action = 0;
 		//Check, which Graph contains the Information for the information, we need to create an Action
 		VGraphInterface InformationalGraph; //which Graph provides information for the action?
-		switch(m.getModification()&(~GraphConstraints.BLOCK_ALL)) //Action must be spcific, therefore a switch but by ignoring Blocks (thats already handled)
+		switch(m.getModification()&(~(GraphConstraints.BLOCK_ALL|GraphConstraints.PARTINFO))) //Action must be status uupdates, neither Block-Info nor Partsinfo
 		{	case GraphConstraints.ADDITION: //Node added, Create action and modify lastgraph
 				action = GraphConstraints.ADDITION;
 				InformationalGraph = trackedGraph; //get Information from actual Graph;

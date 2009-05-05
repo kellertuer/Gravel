@@ -596,7 +596,6 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 		GraphMessage m = (GraphMessage)arg1;
 		if (m==null)
 			return;
-		System.err.println("Can Undo"+GraphHistory.CanUndo()+" Can Redo "+GraphHistory.CanRedo());
 		mEdUndo.setEnabled(GraphHistory.CanUndo());
 		mEdRedo.setEnabled(GraphHistory.CanRedo());
 		//either Selection changed or was affected
