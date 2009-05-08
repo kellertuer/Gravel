@@ -23,7 +23,6 @@ import javax.vecmath.Point3d;
  * - Addition (Refinement of Knots)
  * - TODO Removal of knots (with or without tollerance? i think wihout because there is undo - soon)
  * - TODO ?get&set knots &weights?
- * - TODO ?In/Decrease Degree of the polynonials?
  * 
  * 
  * @author Ronny Bergmann
@@ -33,7 +32,7 @@ public class NURBSShape {
 
 	public final int CLAMPED = 0;
 	public final static int UNCLAMPED = 1;
-	protected Vector<Double> Knots;
+	public Vector<Double> Knots;
 	public Vector<Point2D> controlPoints; //ControlPoints, TODO: Set protected after DEBUG
 	protected Vector<Double> cpWeight;
 	protected Vector<Point3d> controlPointsHom; //b in homogeneous coordinates multiplied by weight
@@ -483,31 +482,38 @@ public class NURBSShape {
 	{
 		if (derivate==0)
 			return CurveAt(u);
-		Vector<Point3d> DerivatesBSpline = new Vector<Point3d>();
-		DerivatesBSpline = DerivateValues(derivate, u);
+		Vector<Point3d> DerivatesBSpline = DerivateValues(derivate, u);
 		Vector<Point2D> DerivatesNURBS = new Vector<Point2D>();
 		DerivatesNURBS.setSize(derivate);
-		DerivatesNURBS.set(0,CurveAt(u));
-		for (int k=1; k<=derivate; k++)
+		for (int k=0; k<=derivate; k++)
 		{ //Calculate kth Derivate
-			Point2D.Double thisdeg = new Point2D.Double(DerivatesBSpline.get(k).x,DerivatesBSpline.get(k).y);
-			double denominator = deBoer3D(u).z;
+			Point2D.Double thisdeg //v = aders(k)
+				= new Point2D.Double(DerivatesBSpline.get(k).x,DerivatesBSpline.get(k).y);
 			for (int i=1; i<=k; i++)
 			{
-				double factor = binomial(k,i)*DerivatesBSpline.get(i).z;
-				Point2D prev = (Point2D) DerivatesNURBS.get(k-i).clone();
-				thisdeg.x = thisdeg.x - prev.getX()*factor;
-				thisdeg.y = thisdeg.y - prev.getY()*factor;
+				double factor = binomial(k,i)*DerivatesBSpline.get(i).z; //bin(k,i)*wders(i)
+				Point2D prev = (Point2D) DerivatesNURBS.get(k-i); //get CK(k-i)
+				thisdeg.x = thisdeg.x - prev.getX()*factor; //v = v- bin(k,i)*wders(i)*ck(k-i)
+				thisdeg.y = thisdeg.y - prev.getY()*factor; //second componnt
 			}
-			if (denominator!=0.0)
+			if ((DerivatesBSpline.get(0).z!=0.0))
 			{
-				thisdeg.x = thisdeg.x/denominator;
-				thisdeg.y = thisdeg.y/denominator;
+				thisdeg.x = thisdeg.x/DerivatesBSpline.get(0).z;
+				thisdeg.y = thisdeg.y/DerivatesBSpline.get(0).z;
 			}
 			DerivatesNURBS.add(k, new Point2D.Double(thisdeg.x,thisdeg.y));
 		}
 		return DerivatesNURBS.elementAt(derivate);
 	}
+	/**
+	 * Derivate-th derivate at u of the Curve computed in homogeneous Coordinates so its B-Spline-Derivate-Algorithm (
+	 * nurbs-book alg 3.2
+	 * so in the third coordinate are the wders and the first two are the aders, as mentioned in the nurbs-book
+	 * 
+	 * @param derivate
+	 * @param u
+	 * @return
+	 */
 	private Vector<Point3d> DerivateValues(int derivate, double u)
 	{
 		int du = Math.min(degree, derivate);

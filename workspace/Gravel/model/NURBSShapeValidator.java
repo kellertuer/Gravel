@@ -1,6 +1,8 @@
 package model;
 
 import view.VHyperGraphic;
+
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -234,7 +236,50 @@ public class NURBSShapeValidator extends NURBSShape {
 		}
 
 	}
-	
+	/**
+	 * Find a successor for the point p depending upon its precessor pre
+	 * and the nurbs Curve c (its projection and secod derivative)
+	 * @param p
+	 * @param pre
+	 * @param c
+	 * @return
+	 */
+	public static Vector<Point2D> findSuccessor(Point2D p, Point2D pre, NURBSShape c,Graphics2D Debug,float z)
+	{
+		NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
+		Point2D hatp = proj.getResultPoint(); //This Point belong definetly to the same set as actualP but lies on the Curve
+		double hatt = proj.getResultParameter();
+		double radius= hatp.distance(p)-1d; //1 linewidth
+//		System.err.print("Circle Radius: "+radius);
+
+		Debug.setColor(Color.gray);
+		Debug.drawOval(Math.round((float)(p.getX()-radius)*z),
+			Math.round((float)(p.getY()-radius)*z),
+			Math.round((float)(2*radius)*z), Math.round((float)(2*radius)*z));
+		//Calculate Distance and direction from Point to its projection
+		Point2D ProjDir = new Point2D.Double(hatp.getX()-p.getX(),hatp.getY()-p.getY());
+		//and shorten this by 
+		ProjDir = new Point2D.Double(radius/hatp.distance(p)*ProjDir.getX(),radius/hatp.distance(p)*ProjDir.getY());
+		Debug.drawLine(Math.round((float)p.getX()*z), Math.round((float)p.getY()*z),
+				Math.round((float)(p.getX()+ProjDir.getX())*z),
+				Math.round((float)(p.getY()+ProjDir.getY())*z));
+		
+		double kappa = c.DerivateCurveAt(2,hatt).distance(0d,0d)/10000;
+//		System.err.println("  - at "+hatt+" we have Abs2 "+kappa+" that is "+((Math.atan(kappa)+(Math.PI/2))/Math.PI)*180+" Degree");
+		double varphi = Math.atan(kappa)+(Math.PI/2); 
+		double newx = ProjDir.getX()* Math.cos(varphi) +  ProjDir.getY()*Math.sin(varphi);
+		double newy = -ProjDir.getX()*Math.sin(varphi) + ProjDir.getY()*Math.cos(varphi);
+		Point2D newp = new Point2D.Double(newx,newy);
+		Debug.setColor(Color.orange);
+		Debug.drawLine(Math.round((float)p.getX()*z), Math.round((float)p.getY()*z),
+				Math.round((float)(p.getX()+newp.getX())*z),
+				Math.round((float)(p.getY()+newp.getY())*z));
+		newp = new Point2D.Double(p.getX()+newp.getX(),p.getY()+newp.getY()); 
+		Debug.drawLine(Math.round((float)(newp.getX()-4)*z),Math.round((float)newp.getY()*z),Math.round((float)(newp.getX()+4)*z),Math.round((float)newp.getY()*z));
+		Debug.drawLine(Math.round((float)newp.getX()*z),Math.round((float)(newp.getY()-4)*z),Math.round((float)newp.getX()*z),Math.round((float)(newp.getY()+4)*z));
+
+		return null;
+	}
 	/**
 	 * Check the actual sets of NodePositions whether they are legal or not and
 	 * whether there are only two sets left
