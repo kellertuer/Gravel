@@ -122,17 +122,17 @@ public class VHyperGraphic extends VCommonGraphic
 		
 		Vector<Point2D> points = new Vector<Point2D>();
 		Vector<Double> weights = new Vector<Double>();
-		points.add(new Point2D.Double(60d,35d)); weights.add(.6d);
-		points.add(new Point2D.Double(80d,75d)); weights.add(.7d);
-		points.add(new Point2D.Double(180d,305d)); weights.add(.5d);
+		points.add(new Point2D.Double(60d,35d)); weights.add(1d);
+		points.add(new Point2D.Double(80d,75d)); weights.add(1d);
+		points.add(new Point2D.Double(100d,205d)); weights.add(.8d);
 		points.add(new Point2D.Double(190d,305d)); weights.add(1d);
 		points.add(new Point2D.Double(200d,305d)); weights.add(1d);
 		points.add(new Point2D.Double(330d,105d)); weights.add(1d);
 		points.add(new Point2D.Double(430d,205d)); weights.add(1d);
 		points.add(new Point2D.Double(530d,105d)); weights.add(1d);
 		points.add(new Point2D.Double(530d,130d)); weights.add(1d);
-		points.add(new Point2D.Double(580d,95d)); weights.add(1d);
-		points.add(new Point2D.Double(430d,80d)); weights.add(1d);
+		points.add(new Point2D.Double(580d,95d)); weights.add(1.2d);
+		points.add(new Point2D.Double(430d,80d)); weights.add(1.5d);
 		points.add(new Point2D.Double(230d,125d));weights.add(1d);
 		for (int i=0; i<3; i++)
 		{
@@ -149,8 +149,10 @@ public class VHyperGraphic extends VCommonGraphic
 		{
 			drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())),Color.cyan.darker());
 			if (i>0)
+			{
 				g2.drawLine(Math.round((float)c.controlPoints.get(i).getX()*zoomfactor),Math.round((float)c.controlPoints.get(i).getY()*zoomfactor),
 						Math.round((float)c.controlPoints.get(i-1).getX()*zoomfactor),Math.round((float)c.controlPoints.get(i-1).getY()*zoomfactor));
+			}
 		}
 		for (int i=0; i<1000; i++)
 		{
@@ -160,13 +162,15 @@ public class VHyperGraphic extends VCommonGraphic
 			Point2D ps = c.DerivateCurveAt(1,pos);
 			g2.setColor(Color.orange.brighter());
 			Point2D normps = new Point2D.Double(ps.getX()/ps.distance(0d,0d),ps.getY()/ps.distance(0d,0d));
-			Point2D pss = c.DerivateCurveAt(2,pos);
-			double length = pss.distance(0d,0d)/100;
+			Point2D deriv1 = c.DerivateCurveAt(1,pos);
+			Point2D deriv2 = c.DerivateCurveAt(2,pos);
+			double d1 = deriv1.distance(0d,0d);
+			double length = (deriv1.getX()*deriv2.getX() + deriv1.getY()*deriv2.getY()) / d1*d1*d1;
+			length = Math.abs(length);
 			//Now orthogonal to the first derivate the seconds derivates length
 			g2.drawLine(Math.round((float)p.getX()*zoomfactor), Math.round((float)p.getY()*zoomfactor),
 					Math.round((float)(p.getX()-normps.getY()*length)*zoomfactor),
 					Math.round((float)(p.getY()+normps.getX()*length)*zoomfactor));
-			
 		}
 	}
 	

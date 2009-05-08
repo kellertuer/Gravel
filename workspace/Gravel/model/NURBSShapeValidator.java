@@ -264,8 +264,13 @@ public class NURBSShapeValidator extends NURBSShape {
 				Math.round((float)(p.getX()+ProjDir.getX())*z),
 				Math.round((float)(p.getY()+ProjDir.getY())*z));
 		
-		double kappa = c.DerivateCurveAt(2,hatt).distance(0d,0d)/10000;
-//		System.err.println("  - at "+hatt+" we have Abs2 "+kappa+" that is "+((Math.atan(kappa)+(Math.PI/2))/Math.PI)*180+" Degree");
+		Point2D deriv1 = c.DerivateCurveAt(1,hatt);
+		Point2D deriv2 = c.DerivateCurveAt(2,hatt);
+		double d1 = deriv1.distance(0d,0d);
+		double kappa = Math.abs((deriv1.getX()*deriv2.getX() + deriv1.getY()*deriv2.getY()) / d1*d1*d1);
+		kappa = kappa/5000000;
+		kappa /=10000;
+		System.err.println("  - at "+hatt+" we have Abs2 "+kappa+" that is "+((Math.atan(kappa)+(Math.PI/2))/Math.PI)*180+" Degree");
 		double varphi = Math.atan(kappa)+(Math.PI/2); 
 		double newx = ProjDir.getX()* Math.cos(varphi) +  ProjDir.getY()*Math.sin(varphi);
 		double newy = -ProjDir.getX()*Math.sin(varphi) + ProjDir.getY()*Math.cos(varphi);
