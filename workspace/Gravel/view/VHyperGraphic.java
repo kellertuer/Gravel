@@ -76,7 +76,7 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-	paintDEBUG(g2);
+//	paintDEBUG(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
@@ -122,18 +122,18 @@ public class VHyperGraphic extends VCommonGraphic
 		
 		Vector<Point2D> points = new Vector<Point2D>();
 		Vector<Double> weights = new Vector<Double>();
-		points.add(new Point2D.Double(60d,35d)); weights.add(1d);
-		points.add(new Point2D.Double(80d,75d)); weights.add(1d);
-		points.add(new Point2D.Double(100d,205d)); weights.add(.8d);
-		points.add(new Point2D.Double(190d,305d)); weights.add(1d);
-		points.add(new Point2D.Double(200d,305d)); weights.add(1d);
-		points.add(new Point2D.Double(330d,105d)); weights.add(1d);
-		points.add(new Point2D.Double(430d,205d)); weights.add(1d);
-		points.add(new Point2D.Double(530d,105d)); weights.add(1d);
-		points.add(new Point2D.Double(530d,130d)); weights.add(1d);
-		points.add(new Point2D.Double(580d,95d)); weights.add(1.2d);
-		points.add(new Point2D.Double(430d,80d)); weights.add(1.5d);
-		points.add(new Point2D.Double(230d,125d));weights.add(1d);
+		points.add(new Point2D.Double(60d,65d)); weights.add(1d);
+		points.add(new Point2D.Double(80d,105d)); weights.add(1d);
+		points.add(new Point2D.Double(100d,235d)); weights.add(1d);
+		points.add(new Point2D.Double(190d,335d)); weights.add(1d);
+		points.add(new Point2D.Double(200d,335d)); weights.add(1d);
+		points.add(new Point2D.Double(330d,135d)); weights.add(.8d);
+		points.add(new Point2D.Double(430d,235d)); weights.add(1d);
+		points.add(new Point2D.Double(530d,135d)); weights.add(1d);
+		points.add(new Point2D.Double(530d,160d)); weights.add(1d);
+		points.add(new Point2D.Double(580d,125d)); weights.add(.6d);
+		points.add(new Point2D.Double(430d,110d)); weights.add(1d);
+		points.add(new Point2D.Double(230d,155d));weights.add(1d);
 		for (int i=0; i<3; i++)
 		{
 			points.add((Point2D)points.get(i).clone());
@@ -162,11 +162,10 @@ public class VHyperGraphic extends VCommonGraphic
 			Point2D ps = c.DerivateCurveAt(1,pos);
 			g2.setColor(Color.orange.brighter());
 			Point2D normps = new Point2D.Double(ps.getX()/ps.distance(0d,0d),ps.getY()/ps.distance(0d,0d));
-			Point2D deriv1 = c.DerivateCurveAt(1,pos);
 			Point2D deriv2 = c.DerivateCurveAt(2,pos);
-			double d1 = deriv1.distance(0d,0d);
-			double length = (deriv1.getX()*deriv2.getX() + deriv1.getY()*deriv2.getY()) / d1*d1*d1;
+			double length = deriv2.distance(0d,0d)/80;
 			length = Math.abs(length);
+			
 			//Now orthogonal to the first derivate the seconds derivates length
 			g2.drawLine(Math.round((float)p.getX()*zoomfactor), Math.round((float)p.getY()*zoomfactor),
 					Math.round((float)(p.getX()-normps.getY()*length)*zoomfactor),

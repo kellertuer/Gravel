@@ -45,7 +45,7 @@ import view.VHyperGraphic;
  * @author Ronny Bergmann
  *
  */
-public class InterpolationCreationHandler implements ShapeMouseHandler {
+public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	VHyperGraph vhg = null;
 	VCommonGraphic vgc;
 	GeneralPreferences gp;

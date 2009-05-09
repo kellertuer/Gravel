@@ -43,7 +43,7 @@ import view.VHyperGraphic;
  * @author Ronny Bergmann
  *
  */
-public class CircleCreationHandler implements ShapeMouseHandler {
+public class CircleCreationHandler implements ShapeCreationMouseHandler {
 	VGraph vg = null;
 	VHyperGraph vhg = null;
 	VCommonGraphic vgc;

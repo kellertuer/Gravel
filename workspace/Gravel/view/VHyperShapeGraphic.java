@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.Observable;
 import java.util.Vector;
 
-import control.*;
 import control.nurbs.*;
 import model.*;
 import model.Messages.GraphConstraints;
@@ -29,7 +28,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	private VHyperGraph vG;
 	// Visual Styles
 	private BasicStroke vHyperEdgeStyle;
-	private ShapeMouseHandler ShapeModifier;
+	private ShapeCreationMouseHandler firstModus;
+	private ShapeModificationMouseHandler secondModus;
 	private static final long serialVersionUID = 1L;
 	private int actualMouseState, highlightedHyperEdge;
 	
@@ -60,11 +60,11 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		paintMouseModeDetails(g2);
 		paintHyperEdges(g2);
 		paintNodes(g2);
-		if ((ShapeModifier!=null)&&(ShapeModifier.getSelectionRectangle()!=null))
+		if ((firstModus!=null)&&(firstModus.getSelectionRectangle()!=null))
 		{
 			g2.setColor(selColor);
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-			g2.draw(ShapeModifier.getSelectionRectangle());
+			g2.draw(firstModus.getSelectionRectangle());
 		}
 		paintDEBUG(g2);
 	}
@@ -135,21 +135,36 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	
 	private void paintMouseModeDetails(Graphics2D g2)
 	{
-		if ((actualMouseState&(CIRCLE_MOUSEHANDLING|CURVEPOINT_MOVEMENT_MOUSEHANDLING|SHAPE|INTERPOLATION_MOUSEHANDLING))> 0)
+		if ( ((actualMouseState&(CIRCLE_MOUSEHANDLING|INTERPOLATION_MOUSEHANDLING))> 0) && (firstModus!=null)) //We'Re in Creation
 		{
-			NURBSShape tempshape = ((ShapeMouseHandler)ShapeModifier).getShape();
-			if ((tempshape!=null)&&(ShapeModifier.dragged()))
-			{
-				NURBSShape draw = tempshape.clone();
-				draw.scale(zoomfactor);
-				g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-				g2.setColor(selColor);
-				g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
-			}			
+			paintCreationDetails(g2);
 		}
+		if ( ((actualMouseState&SHAPE) > 0) && (secondModus!=null) )
+		{
+			Point2D p = secondModus.getDragStartPoint();
+			Point2D p2 = secondModus.getDragPoint();
+			if ((p!=null)&&(p2.getX()!=0d)&&(p2.getY()!=0d)) //Set per Drag
+				g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
+						Math.round((float)p2.getX()*zoomfactor), Math.round((float)p2.getY()*zoomfactor));
+		}
+	}
+	@SuppressWarnings("unchecked")
+	private void paintCreationDetails(Graphics2D g2)
+	{
+		if (firstModus==null)
+			return;
+		NURBSShape tempshape = firstModus.getShape();
+		if ((tempshape!=null)&&(firstModus.dragged()))
+		{
+			NURBSShape draw = tempshape.clone();
+			draw.scale(zoomfactor);
+			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			g2.setColor(selColor);
+			g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
+		}			
 		if (actualMouseState==INTERPOLATION_MOUSEHANDLING)
 		{
-			Vector<Point2D> IP = (Vector<Point2D>) ShapeModifier.getShapeParameters().get(NURBSShapeFactory.POINTS);
+			Vector<Point2D> IP = (Vector<Point2D>) firstModus.getShapeParameters().get(NURBSShapeFactory.POINTS);
 			Iterator<Point2D> iter = IP.iterator();
 			while (iter.hasNext())
 			{
@@ -158,10 +173,10 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				this.drawCP(g2, p2, Color.BLUE);
 			}
 		}
-		if ((actualMouseState==CIRCLE_MOUSEHANDLING)||((actualMouseState&SHAPE) > 0))
+		if (actualMouseState==CIRCLE_MOUSEHANDLING)
 		{
-			Point p = (Point) ShapeModifier.getShapeParameters().get(NURBSShapeFactory.CIRCLE_ORIGIN);
-			Point p2 = ShapeModifier.getMouseOffSet();
+			Point p = (Point) firstModus.getShapeParameters().get(NURBSShapeFactory.CIRCLE_ORIGIN);
+			Point p2 = firstModus.getMouseOffSet(); //Actual Point in Graph
 			if ((p!=null)&&(p2.x!=0)&&(p2.y!=0)) //Set per Drag
 			{
 				GeneralPath path = new GeneralPath();
@@ -171,7 +186,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			}
 		}
 	}
-	private void paintDEBUG(Graphics2D g2)
+
+	private void paintDEBUG(Graphics2D g2) //TODO: Remove Debug Controlpoint-polygon
 	{
 		g2.setColor(Color.orange.darker());
 		NURBSShape s =  vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().clone();
@@ -198,51 +214,51 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	}
 	//MOdified to only Handle those shape stati
 	public void setMouseHandling(int state) {
-		if (ShapeModifier!=null)
-		{
-			MouseEvent e = new MouseEvent(this,111,System.nanoTime(),0,-1,-1,1,false);		
-			ShapeModifier.mouseReleased(e);
-		}
+		MouseEvent e = new MouseEvent(this,111,System.nanoTime(),0,-1,-1,1,false);		
+		if (firstModus!=null)
+			firstModus.mouseReleased(e);
+		if (secondModus!=null)
+			secondModus.mouseReleased(e);
 		resetMouseHandling();
 		switch (state) 
 		{
 			case CIRCLE_MOUSEHANDLING:
-				ShapeModifier = new CircleCreationHandler(this);
-				this.addMouseListener(ShapeModifier);
-				this.addMouseMotionListener(ShapeModifier);
+				firstModus = new CircleCreationHandler(this);
+				this.addMouseListener(firstModus);
+				this.addMouseMotionListener(firstModus);
 				actualMouseState = state;
 			break;
 			case INTERPOLATION_MOUSEHANDLING:
-				ShapeModifier = new InterpolationCreationHandler(this);
-				this.addMouseListener(ShapeModifier);
-				this.addMouseMotionListener(ShapeModifier);
+				firstModus = new InterpolationCreationHandler(this);
+				this.addMouseListener(firstModus);
+				this.addMouseMotionListener(firstModus);
 				actualMouseState = state;
 			break;
 			case CURVEPOINT_MOVEMENT_MOUSEHANDLING:
-				ShapeModifier = new FreeModificationHandler(this, highlightedHyperEdge);
-				this.addMouseListener(ShapeModifier);
-				this.addMouseMotionListener(ShapeModifier);
+				secondModus = new FreeModificationHandler(this, highlightedHyperEdge);
+				this.addMouseListener(secondModus);
+				this.addMouseMotionListener(secondModus);
 				actualMouseState = state;
 			break;
 			case SHAPE_ROTATE_MOUSEHANDLING:
-				ShapeModifier = new ShapeModificationHandler(this, highlightedHyperEdge);
-				((ShapeModificationHandler)ShapeModifier).setModificationState(ShapeModificationHandler.ROTATION);
-				this.addMouseListener(ShapeModifier);
-				this.addMouseMotionListener(ShapeModifier);
+				secondModus = new ShapeAffinTransformationHandler(this, highlightedHyperEdge);
+				((ShapeAffinTransformationHandler)secondModus).setModificationState(ShapeAffinTransformationHandler.ROTATION);
+				this.addMouseListener(secondModus);
+				this.addMouseMotionListener(secondModus);
 				actualMouseState = state;
 			break;
 			case SHAPE_TRANSLATE_MOUSEHANDLING:
-				ShapeModifier = new ShapeModificationHandler(this, highlightedHyperEdge);
-				((ShapeModificationHandler)ShapeModifier).setModificationState(ShapeModificationHandler.TRANSLATION);
-				this.addMouseListener(ShapeModifier);
-				this.addMouseMotionListener(ShapeModifier);
+				secondModus = new ShapeAffinTransformationHandler(this, highlightedHyperEdge);
+				((ShapeAffinTransformationHandler)secondModus).setModificationState(ShapeAffinTransformationHandler.TRANSLATION);
+				this.addMouseListener(secondModus);
+				this.addMouseMotionListener(secondModus);
 				actualMouseState = state;
 			break;
 			case SHAPE_SCALE_MOUSEHANDLING:
-				ShapeModifier = new ShapeModificationHandler(this, highlightedHyperEdge);
-				((ShapeModificationHandler)ShapeModifier).setModificationState(ShapeModificationHandler.SCALING);
-				this.addMouseListener(ShapeModifier);
-				this.addMouseMotionListener(ShapeModifier);
+				secondModus = new ShapeAffinTransformationHandler(this, highlightedHyperEdge);
+				((ShapeAffinTransformationHandler)secondModus).setModificationState(ShapeAffinTransformationHandler.SCALING);
+				this.addMouseListener(secondModus);
+				this.addMouseMotionListener(secondModus);
 				actualMouseState = state;
 			break;
 			case NO_MOUSEHANDLING:
@@ -250,10 +266,15 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				actualMouseState = NO_MOUSEHANDLING;
 			break;
 		}
-		if (ShapeModifier!=null) //Update Info in the Drag-Handler about the Grid.
+		if (firstModus!=null) //Update Info in the Drag-Handler about the Grid.
 		{
-			ShapeModifier.setGrid(gridy,gridy);
-			ShapeModifier.setGridOrientated(gridenabled&&gridorientated);
+			firstModus.setGrid(gridy,gridy);
+			firstModus.setGridOrientated(gridenabled&&gridorientated);
+		}
+		if (secondModus!=null) //Update Info in the Drag-Handler about the Grid.
+		{
+			secondModus.setGrid(gridy,gridy);
+			secondModus.setGridOrientated(gridenabled&&gridorientated);
 		}
 		repaint();
 	}
@@ -262,26 +283,31 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	 */
 	private void resetMouseHandling()
 	{
-		this.removeMouseListener(ShapeModifier);
-		this.removeMouseMotionListener(ShapeModifier);
-		ShapeModifier = null;
+		this.removeMouseListener(firstModus);
+		this.removeMouseMotionListener(firstModus);
+		this.removeMouseListener(secondModus);
+		this.removeMouseMotionListener(secondModus);
+		firstModus=null;
+		secondModus=null;
 	}
 	public Vector<Object> getShapeParameters()
 	{
-		if (ShapeModifier!=null)
-			return ShapeModifier.getShapeParameters();
+		if (firstModus!=null)
+			return firstModus.getShapeParameters();
 	else
 		return null;		
 	}
 	public void setShapeParameters(Vector<Object> p)
 	{
-		if (ShapeModifier!=null)
-			ShapeModifier.setShapeParameters(p);
+		if (firstModus!=null)
+			firstModus.setShapeParameters(p);
 	}
 	protected Point DragMouseOffSet()
 	{
-		if ((ShapeModifier!=null)&&(ShapeModifier.dragged()))
-				return ShapeModifier.getMouseOffSet();
+		if ((firstModus!=null)&&(firstModus.dragged()))
+				return firstModus.getMouseOffSet();
+		else if ((secondModus!=null)&&(secondModus.dragged()))
+				return secondModus.getMouseOffSet();
 		else
 			return null;
 	}
@@ -291,14 +317,31 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		if (arg instanceof GraphMessage)
 		{
 			GraphMessage m = (GraphMessage)arg;
-			if ((ShapeModifier!=null)&&(!ShapeModifier.dragged()) //If we have no drag (anymore) and have one of the MOdification-Mousehandlings AND a Block End
-					&&((actualMouseState&CIRCLE_MOUSEHANDLING|CURVEPOINT_MOVEMENT_MOUSEHANDLING|SHAPE|INTERPOLATION_MOUSEHANDLING)>0)
-					&&((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) 
-			//Drag just ended -> Set Circle as Shape
+			if ((firstModus!=null)&&(!firstModus.dragged())) //First Modus and we have no drag
 			{
-				vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(ShapeModifier.getShape());
-				vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
-				ShapeModifier.resetShape();
+				if (((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) //Drag just ended -> Set Circle as Shape
+				{
+					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(firstModus.getShape());
+					vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
+					firstModus.resetShape();
+					return;
+				}
+			}
+			if ((secondModus!=null)&&(!secondModus.dragged())) //Second Modus and we have no drag
+			{
+				if (((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) //Drag just ended -> Set Circle as Shape
+				{
+					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(secondModus.getShape());
+					vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
+					secondModus.resetShape();
+					return;
+				}
+			}
+			//If 							
+ 			if ( ((m.getModifiedElementTypes()&GraphConstraints.HYPEREDGE)==GraphConstraints.HYPEREDGE) )
+			{
+ 				if ((actualMouseState&(SHAPE|CURVEPOINT_MOVEMENT_MOUSEHANDLING))>0) //Second modus 
+ 					secondModus.resetShape();				
 			}
 			repaint();
 		}

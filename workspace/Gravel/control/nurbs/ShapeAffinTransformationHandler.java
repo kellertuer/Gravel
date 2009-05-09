@@ -55,7 +55,7 @@ import view.VHyperGraphic;
  * @author Ronny Bergmann
  *
  */
-public class ShapeModificationHandler implements ShapeMouseHandler {
+public class ShapeAffinTransformationHandler implements ShapeModificationMouseHandler {
 	
 	public final static int NO_MODIFICATION = 0;
 	public final static int ROTATION = 1;
@@ -79,7 +79,7 @@ public class ShapeModificationHandler implements ShapeMouseHandler {
 	 * @param g
 	 * @param hyperedgeindex the specific edge to be modified
 	 */
-	public ShapeModificationHandler(VHyperGraphic g, int hyperedgeindex)
+	public ShapeAffinTransformationHandler(VHyperGraphic g, int hyperedgeindex)
 	{
 		vgc = g;
 		vhg = g.getGraph();
@@ -98,24 +98,34 @@ public class ShapeModificationHandler implements ShapeMouseHandler {
 	public void resetShape()
 	{
 		temporaryShape=HyperEdgeRef.getShape().clone(); //Reset to actual Edge Shape;
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 	}
-	public Vector<Object> getShapeParameters()
-	{
-		Vector<Object> param = new Vector<Object>();
-		param.setSize(NURBSShapeFactory.MAX_INDEX);
-		Point p=null;
-		if (DragOrigin!=null)
-			p = new Point(Math.round((float)DragOrigin.getX()),Math.round((float)DragOrigin.getY()));
-		param.add(NURBSShapeFactory.CIRCLE_ORIGIN, p);
-		return param;		
-	}
-	public void setShapeParameters(Vector<Object> p)
-	{} //see above
 
 	public NURBSShape getShape()
 	{
 		return temporaryShape;
 	}
+	public void setShape(NURBSShape s)
+	{
+		if (dragged()) //End Drag
+			internalReset();
+		HyperEdgeRef.setShape(s);
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+	}
+	public Point2D getDragStartPoint()
+	{
+		if (!dragged())
+			return null;
+		return DragOrigin;
+	}
+	
+	public Point2D getDragPoint()
+	{
+		if (!dragged())
+			return null;
+		return new Point2D.Double(MouseOffSet.getX()/((double)vgc.getZoom()/100d),MouseOffSet.getY()/((double)vgc.getZoom()/100d));		
+	}
+
 
 	public boolean dragged()
 	{

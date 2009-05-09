@@ -25,7 +25,7 @@ import view.VHyperGraphic;
  * @author Ronny Bergmann
  *
  */
-public class FreeModificationHandler implements ShapeMouseHandler {
+public class FreeModificationHandler implements ShapeModificationMouseHandler {
 	VHyperGraph vhg;
 	VCommonGraphic vgc;
 	VHyperEdge HyperEdgeRef;
@@ -57,7 +57,28 @@ public class FreeModificationHandler implements ShapeMouseHandler {
 	public void resetShape()
 	{
 		temporaryShape = HyperEdgeRef.getShape().clone(); //Set back to old shape
-	} //Shape can't be reset
+	}
+	public void setShape(NURBSShape s)
+	{
+		if (dragged()) //End Drag
+			internalReset();
+		HyperEdgeRef.setShape(s);
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+	}
+	public Point2D getDragStartPoint()
+	{
+		if (!dragged())
+			return null;
+		return temporaryShape.CurveAt(DragStartProjection);
+	}
+	
+	public Point2D getDragPoint()
+	{
+		if (!dragged())
+			return null;
+		return new Point2D.Double(MouseOffSet.getX()/((double)vgc.getZoom()/100d),MouseOffSet.getY()/((double)vgc.getZoom()/100d));
+		
+	}
 	public boolean dragged()
 	{
 		return ((!Double.isNaN(DragStartProjection))&&(!firstdrag));

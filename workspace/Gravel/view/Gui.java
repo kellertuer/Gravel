@@ -17,6 +17,8 @@ import model.MHyperEdge;
 import model.VGraph;
 import model.VGraphInterface;
 import model.VHyperGraph;
+import model.Messages.GraphConstraints;
+import model.Messages.GraphMessage;
 
 /**
  * 	Hauptklasse der GUI, stellt das Hauptfenster zur Verfügung mittels Singelton-Muster.
@@ -214,7 +216,15 @@ public class Gui implements WindowListener
     		int index = shapeParameters.getActualEdge().getIndex();
     		MHyperEdge mhe = shapePart.getGraph().getMathGraph().modifyHyperEdges.get(index);
     		((VHyperGraph)MainGraph).modifyHyperEdges.replace(shapeParameters.getActualEdge(), mhe);
+    		graphpart.getGraphHistoryManager().activate();
+    		//Push the change as a block of changes
+    		MainGraph.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,index,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
     	}
+    	else if (shapePart!=null)
+    	{
+     		graphpart.getGraphHistoryManager().activate();
+       	}
+
     	mainPanel.remove(mainSplit);
         //Unter die GraphList noch die Statistik
     	graphpart.setViewPort(shapeScroll.getViewport());
@@ -243,7 +253,8 @@ public class Gui implements WindowListener
     		return; //Only for HyperGraphs that...
    	   if (((VHyperGraph)MainGraph).modifyHyperEdges.get(edge)==null)
    		   return; //Have the specific Edge in themselves
-   	   mainPanel.remove(mainSplit);
+   	   	graphpart.getGraphHistoryManager().deactivate();
+   	   	mainPanel.remove(mainSplit);
    	   	shapePart = new VHyperShapeGraphic(graphpart.getBounds().getSize(), ((VHyperGraph)MainGraph).clone(), edge);
         //Das Ganze als Scrollpane
         shapeScroll = new JScrollPane(shapePart);

@@ -40,8 +40,6 @@ public class GraphHistoryManager implements Observer
 	{
 		trackedGraph = vg;
 		lastGraph = vg.clone();
-		vg.addObserver(this);
-		Blockstart=null;
 		CommonInitialization();
 	}
 	/**
@@ -52,12 +50,21 @@ public class GraphHistoryManager implements Observer
 	{
 		trackedGraph = vhg;
 		lastGraph = vhg.clone();
-		vhg.addObserver(this);
 		CommonInitialization();
 	}
 
 	private void CommonInitialization()
 	{
+		if (trackedGraph.getType()==VGraphInterface.GRAPH)
+		{
+			((VGraph)trackedGraph).deleteObserver(this); //For not adding double
+			((VGraph)trackedGraph).addObserver(this); 			
+		}
+		else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
+		{
+			((VHyperGraph)trackedGraph).deleteObserver(this); //For not adding double
+			((VHyperGraph)trackedGraph).addObserver(this); 						
+		}
 		active=true;
 		Blockstart=null;
 		blockdepth=0;
@@ -67,6 +74,27 @@ public class GraphHistoryManager implements Observer
 		trackSelection=GeneralPreferences.getInstance().getBoolValue("history.trackSelection");
 		SavedUndoStackSize = 0;
 	}
+	/**
+	 * Stop listening on changes of the tracked graph by keeping all history thats available
+	 */
+	public void deactivate()
+	{
+		if (trackedGraph.getType()==VGraphInterface.GRAPH)
+			((VGraph)trackedGraph).deleteObserver(this);
+		else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
+			((VHyperGraph)trackedGraph).deleteObserver(this);
+	}
+	/**
+	 * Start listening again
+	 */
+	public void activate()
+	{
+		if (trackedGraph.getType()==VGraphInterface.GRAPH)
+			((VGraph)trackedGraph).addObserver(this);
+		else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
+			((VHyperGraph)trackedGraph).addObserver(this);
+	}
+	
 	/**
 	 * Create an Action based on the message, that came from the Graph,
 	 * return that Action and update LastGraph
@@ -293,7 +321,10 @@ public class GraphHistoryManager implements Observer
 		if (RedoStack.size()>=stacksize)
 			RedoStack.remove();
 		RedoStack.add(LastAction);
-		trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));
+		if (trackedGraph.getType()==VGraphInterface.GRAPH)
+			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));
+		else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
+			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));			
 		setObservation(true); //Activate Tracking again
 	}
 	/**
@@ -329,7 +360,10 @@ public class GraphHistoryManager implements Observer
 			UndoStack.remove();
 		}
 		UndoStack.add(LastAction);
-		trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));
+		if (trackedGraph.getType()==VGraphInterface.GRAPH)
+			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));
+		else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
+			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));			
 		setObservation(true); //Activate Tracking again
 	}
 	/**

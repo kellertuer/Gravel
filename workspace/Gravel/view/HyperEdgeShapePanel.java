@@ -7,7 +7,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -28,20 +27,11 @@ import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import control.nurbs.ShapeModificationHandler;
-
 import dialogs.IntegerTextField;
 
 
-import model.MHyperEdge;
-import model.NURBSShapeFactory;
-import model.NURBSShapeValidator;
-import model.VHyperEdge;
-import model.NURBSShape;
-import model.VHyperGraph;
-import model.VNode;
-import model.Messages.GraphConstraints;
-import model.Messages.GraphMessage;
+import model.*;
+import model.Messages.*;
 
 /**
  * This Class represents all GUI-Elements, e.g. Parameters / Buttons,

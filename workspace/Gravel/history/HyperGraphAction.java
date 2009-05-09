@@ -134,7 +134,7 @@ public class HyperGraphAction extends CommonGraphAction {
 			case GraphConstraints.SELECTION:
 				ret = g;
 			break;
-			case GraphConstraints.GRAPH: //Replace whole graph and save the actual parameter als old object
+			case GraphConstraints.HYPERGRAPH: //Replace whole graph and save the actual parameter als old object
 				ret = new VHyperGraph();
 				ret.replace((VHyperGraph)ActionObject);
 				((VHyperGraph)ActionObject).replace(g);
@@ -189,7 +189,7 @@ public class HyperGraphAction extends CommonGraphAction {
 				ms = g.getMathGraph().modifySubgraphs.get(newSubgraph.getIndex()).clone();
 				g.modifySubgraphs.remove(newSubgraph.getIndex()); //Remove old Subgraph.
 				g.modifySubgraphs.add(newSubgraph, tempms);
-				g.pushNotify(new GraphMessage(GraphConstraints.SUBGRAPH,newSubgraph.getIndex(),GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.GRAPH_ALL_ELEMENTS));
+				g.pushNotify(new GraphMessage(GraphConstraints.SUBGRAPH,newSubgraph.getIndex(),GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.HYPERGRAPH_ALL_ELEMENTS));
 				//Reintroduce all Nodes/Edges
 				Iterator<VNode> ni = g.modifyNodes.getIterator();
 				while (ni.hasNext())
@@ -205,10 +205,10 @@ public class HyperGraphAction extends CommonGraphAction {
 					if (tempms.containsEdge(e2.getIndex()))
 						g.modifySubgraphs.addEdgetoSubgraph(e2.getIndex(), newSubgraph.getIndex());
 				}
-				graph.pushNotify(new GraphMessage(GraphConstraints.SUBGRAPH,newSubgraph.getIndex(),GraphConstraints.BLOCK_END,GraphConstraints.GRAPH_ALL_ELEMENTS));
+				graph.pushNotify(new GraphMessage(GraphConstraints.SUBGRAPH,newSubgraph.getIndex(),GraphConstraints.BLOCK_END,GraphConstraints.HYPERGRAPH_ALL_ELEMENTS));
 				ret = g;
 				break;
-			default: throw new GraphActionException("HyperGraphAction::doReplace(); Unknown ActionObject");
+			default: throw new GraphActionException("HyperGraphAction::doReplace(); Unknown ActionObject:"+ActionObject);
 		}
 		return ret;
 	}
