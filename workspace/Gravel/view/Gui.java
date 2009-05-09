@@ -216,13 +216,13 @@ public class Gui implements WindowListener
     		int index = shapeParameters.getActualEdge().getIndex();
     		MHyperEdge mhe = shapePart.getGraph().getMathGraph().modifyHyperEdges.get(index);
     		((VHyperGraph)MainGraph).modifyHyperEdges.replace(shapeParameters.getActualEdge(), mhe);
-    		graphpart.getGraphHistoryManager().activate();
+    		graphpart.getGraphHistoryManager().setObservation(true);
     		//Push the change as a block of changes
     		MainGraph.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,index,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
     	}
     	else if (shapePart!=null)
     	{
-     		graphpart.getGraphHistoryManager().activate();
+    		graphpart.getGraphHistoryManager().setObservation(true);
        	}
 
     	mainPanel.remove(mainSplit);
@@ -253,7 +253,7 @@ public class Gui implements WindowListener
     		return; //Only for HyperGraphs that...
    	   if (((VHyperGraph)MainGraph).modifyHyperEdges.get(edge)==null)
    		   return; //Have the specific Edge in themselves
-   	   	graphpart.getGraphHistoryManager().deactivate();
+		graphpart.getGraphHistoryManager().setObservation(false);
    	   	mainPanel.remove(mainSplit);
    	   	shapePart = new VHyperShapeGraphic(graphpart.getBounds().getSize(), ((VHyperGraph)MainGraph).clone(), edge);
         //Das Ganze als Scrollpane

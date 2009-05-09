@@ -73,28 +73,7 @@ public class GraphHistoryManager implements Observer
 		stacksize=GeneralPreferences.getInstance().getIntValue("history.Stacksize");
 		trackSelection=GeneralPreferences.getInstance().getBoolValue("history.trackSelection");
 		SavedUndoStackSize = 0;
-	}
-	/**
-	 * Stop listening on changes of the tracked graph by keeping all history thats available
-	 */
-	public void deactivate()
-	{
-		if (trackedGraph.getType()==VGraphInterface.GRAPH)
-			((VGraph)trackedGraph).deleteObserver(this);
-		else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
-			((VHyperGraph)trackedGraph).deleteObserver(this);
-	}
-	/**
-	 * Start listening again
-	 */
-	public void activate()
-	{
-		if (trackedGraph.getType()==VGraphInterface.GRAPH)
-			((VGraph)trackedGraph).addObserver(this);
-		else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
-			((VHyperGraph)trackedGraph).addObserver(this);
-	}
-	
+	}	
 	/**
 	 * Create an Action based on the message, that came from the Graph,
 	 * return that Action and update LastGraph
@@ -236,6 +215,7 @@ public class GraphHistoryManager implements Observer
 		if ((m.getModification()&GraphConstraints.BLOCK_ABORT)==GraphConstraints.BLOCK_ABORT)
 			return; //Don't handle Block-Abort-Stuff
 		CommonGraphAction act = null;
+		System.err.println("Handling an action..."+UndoStack.size());
 		if (m.getElementID() > 0) //Message for single stuff thats not just selection
 			act = handleSingleAction(m);
 		else //multiple modifications, up to know just a replace */
@@ -274,7 +254,11 @@ public class GraphHistoryManager implements Observer
 		else if (lastGraph.getType()==VGraphInterface.HYPERGRAPH)
 			lastGraph = ((VHyperGraph)trackedGraph).clone(); //Actual status as last status.clone
 	}
-	private void setObservation(boolean observing)
+	/**
+	 * (De)Activate Observation and with that the acvitiy of the History-Manager itself
+	 * @param observing true if it should be set to active, else false
+	 */
+	public void setObservation(boolean observing)
 	{
 		if (lastGraph.getType()==VGraphInterface.GRAPH)
 		{
@@ -322,9 +306,9 @@ public class GraphHistoryManager implements Observer
 			RedoStack.remove();
 		RedoStack.add(LastAction);
 		if (trackedGraph.getType()==VGraphInterface.GRAPH)
-			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));
+			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.HISTORY));
 		else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
-			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));			
+			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.HISTORY));			
 		setObservation(true); //Activate Tracking again
 	}
 	/**
@@ -361,9 +345,9 @@ public class GraphHistoryManager implements Observer
 		}
 		UndoStack.add(LastAction);
 		if (trackedGraph.getType()==VGraphInterface.GRAPH)
-			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));
+			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.HISTORY));
 		else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
-			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.UPDATE));			
+			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.HISTORY));			
 		setObservation(true); //Activate Tracking again
 	}
 	/**
@@ -384,7 +368,10 @@ public class GraphHistoryManager implements Observer
 		setObservation(false);
 		SavedUndoStackSize=UndoStack.size();
 		//Notify everyone despite us.
-		trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS, GraphConstraints.UPDATE));
+		if (trackedGraph.getType()==VGraphInterface.GRAPH)
+			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS, GraphConstraints.HISTORY));
+		else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
+			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS, GraphConstraints.HISTORY));			
 		setObservation(true);
 	}
 	/**
@@ -413,6 +400,8 @@ public class GraphHistoryManager implements Observer
 	{
 		GraphMessage m = (GraphMessage)arg;
 		if (m==null)
+			return;
+		if (m.getModification()==GraphConstraints.HISTORY) //Ignore them, they'Re from us or another stupid history
 			return;
 		//Complete Replacement of Graph Handling
 		if ((m.getModifiedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getAffectedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getModification()==GraphConstraints.REPLACEMENT))

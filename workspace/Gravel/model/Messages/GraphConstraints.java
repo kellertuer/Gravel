@@ -26,9 +26,10 @@ public interface GraphConstraints {
 	public static final int UPDATE = 1;
 	public static final int ADDITION = 2;
 	public static final int REMOVAL = 4;
-	public static final int TRANSLATION = 8;
-	public static final int REPLACEMENT = 16;
-	public static final int INDEXCHANGED = 32;
+	public static final int HISTORY = 8;
+	public static final int TRANSLATION = 16;
+	public static final int REPLACEMENT = 32;
+	public static final int INDEXCHANGED = 64;
 
 	//Special Stati for single parts
 	public static final int HYPEREDGESHAPE = 64;	

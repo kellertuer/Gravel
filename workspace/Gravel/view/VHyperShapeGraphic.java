@@ -324,6 +324,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(firstModus.getShape());
 					vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
 					firstModus.resetShape();
+					repaint();
 					return;
 				}
 			}
@@ -334,14 +335,18 @@ public class VHyperShapeGraphic extends VHyperGraphic
 					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(secondModus.getShape());
 					vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
 					secondModus.resetShape();
+					repaint();
 					return;
 				}
 			}
 			//If 							
- 			if ( ((m.getModifiedElementTypes()&GraphConstraints.HYPEREDGE)==GraphConstraints.HYPEREDGE) )
+ 			if (m.getModification()==GraphConstraints.HISTORY) //We got an undo/redp
 			{
- 				if ((actualMouseState&(SHAPE|CURVEPOINT_MOVEMENT_MOUSEHANDLING))>0) //Second modus 
- 					secondModus.resetShape();				
+ 				System.err.println("History-Reset.");
+ 				if (secondModus!=null) //Simple, because we just reset the shape to that one from the graph - history updated that
+ 					secondModus.setShape(vG.modifyHyperEdges.get(highlightedHyperEdge).getShape());
+ 				repaint();
+				return;
 			}
 			repaint();
 		}
