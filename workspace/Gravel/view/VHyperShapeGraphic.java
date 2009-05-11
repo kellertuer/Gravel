@@ -319,6 +319,10 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	else
 		return null;		
 	}
+	/**
+	 * Set the parameters for ShapeCreation in the first modus (e.g. when they where changed in the panel to the left)
+	 * @param p
+	 */
 	public void setShapeParameters(Vector<Object> p)
 	{
 		if (firstModus!=null)
@@ -339,7 +343,13 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		if (arg instanceof GraphMessage)
 		{
 			GraphMessage m = (GraphMessage)arg;
-			if ((firstModus!=null)&&(!firstModus.dragged())) //First Modus and we have no drag
+ 			if (m.getModification()==GraphConstraints.HISTORY) //We got an undo/redp
+			{
+ 				System.err.println("History Set.");
+ 				if (secondModus!=null) //Simple, because we just reset the shape to that one from the graph - history updated that
+ 					secondModus.setShape(vG.modifyHyperEdges.get(highlightedHyperEdge).getShape());
+			}
+ 			else if ((firstModus!=null)&&(!firstModus.dragged())) //First Modus and we have no drag
 			{
 				if (((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) //Drag just ended -> Set Circle as Shape
 				{
@@ -348,7 +358,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 					firstModus.resetShape();
 				}
 			}
-			if ((secondModus!=null)&&(!secondModus.dragged())) //Second Modus and we have no drag
+ 			else if ((secondModus!=null)&&(!secondModus.dragged())) //Second Modus and we have no drag
 			{
 				if (((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) //Drag just ended -> Set Circle as Shape
 				{
@@ -357,13 +367,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 					secondModus.resetShape();
 				}
 			}
-			//If 							
- 			if (m.getModification()==GraphConstraints.HISTORY) //We got an undo/redp
-			{
- 				if (secondModus!=null) //Simple, because we just reset the shape to that one from the graph - history updated that
- 					secondModus.setShape(vG.modifyHyperEdges.get(highlightedHyperEdge).getShape());
-			}
-			repaint();
+ 			repaint();
 		}
 	}
 }

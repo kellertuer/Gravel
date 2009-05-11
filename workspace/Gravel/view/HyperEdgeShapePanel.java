@@ -9,7 +9,9 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Observable;
@@ -18,12 +20,14 @@ import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -70,8 +74,11 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	//Interpolation Fields
 	private JLabel Degree, IPInfo;
 	private IntegerTextField iDegree;
+	private ButtonGroup bAddIP;
+	private JRadioButton rAddEnd, rAddBetween;
+
 	//FreeModFields
-	private JLabel knots, degree, CheckResult;
+	private JLabel knots, CheckResult;
 	private JButton bIncKnots, bDecKnots, bCheckShape;
 	
 	private JButton bModeChange, bOk, bCancel;
@@ -80,7 +87,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	private VHyperGraph HGraphRef; //Reference to the edited Graph, should be a copy of the Graph from the main GUI because the user might cancel this dialog 
 	private VHyperShapeGraphic HShapeGraphicRef;
 	
-	private Container CircleFields, InterpolationFields, FreeModFields;
+	private Container CircleFields, InterpolationFields, DegreeFields, FreeModFields;
 	/**
 	 * Create the Dialog for an hyperedge with index i
 	 * and the corresponding VHyperGraph
@@ -123,6 +130,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		c.gridy++;
 		c.gridx=0;
 		c.gridwidth=2;
+		c.gridheight=2;
 		c.insets = new Insets(30,7,0,7);
 		
 		//
@@ -132,7 +140,12 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		buildCirclePanel();
 		cont.add(CircleFields,c);
 		CircleFields.setVisible(false);
-		
+
+		c.gridheight=1;
+		buildDegreePanel();
+		cont.add(DegreeFields,c);
+		DegreeFields.setVisible(false);
+		c.gridy++;
 		buildInterpolationPanel();
 		cont.add(InterpolationFields,c);
 		InterpolationFields.setVisible(false);
@@ -140,16 +153,19 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		//
 		//Container for the fields of the second mode
 		//
+		c.gridy--;
+		c.gridx=0;
+		c.gridwidth=2;
 		buildFreeModPanel();
 		cont.add(FreeModFields,c);
 		FreeModFields.setVisible(false);
 		
-		c.gridy++;
+		c.gridy+=2;
 		c.gridx=0;
 		c.gridwidth=2;
 		
 		c.anchor = GridBagConstraints.SOUTH;
-		bModeChange = new JButton("freie Modifikation (?)"); //Name suchen!
+		bModeChange = new JButton("Modifikation"); //Name suchen!
 		bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 		bModeChange.addActionListener(this);
 		cont.add(bModeChange,c);
@@ -248,10 +264,10 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		CircleFields.add(iCRad,c);
 	}
 
-	private void buildInterpolationPanel()
+	private void buildDegreePanel()
 	{
-		InterpolationFields = new Container();
-		InterpolationFields.setLayout(new GridBagLayout());
+		DegreeFields = new Container();
+		DegreeFields.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(5,7,5,7);
 		c.anchor = GridBagConstraints.WEST;
@@ -264,16 +280,41 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		iDegree.setPreferredSize(new Dimension(80, 20));
 		iDegree.setValue(3);
 		Degree = new JLabel("<html><p>Polynomgrad</p></html>");
-		InterpolationFields.add(Degree,c);
+		DegreeFields.add(Degree,c);
 		c.gridx++;
-		InterpolationFields.add(iDegree,c);
+		DegreeFields.add(iDegree,c);
 		c.gridy++;
 		c.gridx=0;
-		c.gridwidth=3;
-		c.gridheight=2;
+		c.gridwidth=2;
 		IPInfo = new JLabel("<html><p>&nbsp;</p></html>");
+		DegreeFields.add(IPInfo,c);
 
-		InterpolationFields.add(IPInfo,c);
+	}
+	private void buildInterpolationPanel()
+	{
+		InterpolationFields = new Container();
+		InterpolationFields.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(5,7,5,7);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridy = 0;
+		c.gridx = 0;
+		c.gridheight=1;
+		c.gridwidth=2;		
+		InterpolationFields.add(new JLabel("<html><p>Neuen Interpolationspunkt einfügen:</p></html>"),c);		
+		c.gridwidth=1;
+		c.gridy++;
+		bAddIP = new ButtonGroup();
+		rAddEnd = new JRadioButton("Am Ende");
+		rAddEnd.addActionListener(this);
+		rAddBetween = new JRadioButton("dazwischen");
+		rAddBetween.addActionListener(this);
+		rAddEnd.setSelected(true);
+		bAddIP.add(rAddEnd); bAddIP.add(rAddBetween);
+		InterpolationFields.add(rAddEnd,c);
+		c.gridx++;
+		InterpolationFields.add(rAddBetween,c);
+		System.err.println(java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
 	}
 	
 	private void buildFreeModPanel()
@@ -282,7 +323,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		FreeModFields = new Container();
 		FreeModFields.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		c.insets = new Insets(5,3,5,3);
+		c.insets = new Insets(5,0,5,0);
 		c.anchor = GridBagConstraints.WEST;
 		c.gridy = 0;
 		c.gridx = 0;
@@ -308,7 +349,9 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		c.gridx=0;
 		c.gridwidth=1;
 		bRotation = new JButton("R");
-		bRotation.setSize(new Dimension(17,17));
+		bRotation.setSize(new Dimension(32,32));
+		bRotation.setPreferredSize(new Dimension(32,32));
+		bRotation.setMaximumSize(new Dimension(38,38));
 		bRotation.addActionListener(this);
 		FreeModFields.add(bRotation,c);
 
@@ -419,6 +462,71 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		bScaling.setSelected(false);
 		bScalingDir.setSelected(false);
 	}
+	private void performSecondModus(ActionEvent e)
+	{
+        if (e.getSource()==bIncKnots)
+        {
+        	HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().refineMiddleKnots();
+        	HShapeGraphicRef.setMouseHandling(HShapeGraphicRef.getMouseHandling()); //ReInit Drag/Click
+        }
+        else if (e.getSource()==bRotation)
+        {
+        	if (bRotation.isSelected())
+        	{
+        		bRotation.setSelected(false);
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
+        	}
+        	else
+        	{
+        		deselectButtons();
+        		bRotation.setSelected(true);
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_ROTATE_MOUSEHANDLING);	        		
+        	}
+        }
+        else if (e.getSource()==bTranslation)
+        {
+        	if (bTranslation.isSelected())
+        	{
+        		bTranslation.setSelected(false);
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
+        	}
+        	else
+        	{
+        		deselectButtons();
+        		bTranslation.setSelected(true);
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_TRANSLATE_MOUSEHANDLING);	        		
+        	}
+        }
+        else if (e.getSource()==bScaling)
+        {
+        	if (bScaling.isSelected())
+        	{
+        		bScaling.setSelected(false);
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
+        	}
+        	else
+        	{
+        		deselectButtons();
+        		bScaling.setSelected(true);
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SCALE_MOUSEHANDLING);	        		
+        	}
+        }
+        else if (e.getSource()==bScalingDir)
+        {
+        	if (bScalingDir.isSelected())
+        	{
+        		bScalingDir.setSelected(false);
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
+        	}
+        	else
+        	{
+        		deselectButtons();
+        		bScalingDir.setSelected(true);
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SCALEDIR_MOUSEHANDLING);	        		
+        	}
+        }
+	}
+	
 	public void actionPerformed(ActionEvent e) {
 	        if ((e.getSource()==bCancel)||(e.getSource()==bOk))
 	        {
@@ -434,6 +542,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        {
 	        	CircleFields.setVisible(false);
 	        	InterpolationFields.setVisible(false);
+	        	DegreeFields.setVisible(false);
 	        	String Shape = (String)cBasicShape.getSelectedItem();
 	        	if (Shape.equals("Kreis"))
 	        	{
@@ -444,27 +553,27 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        	{
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.INTERPOLATION_MOUSEHANDLING);
 	        		InterpolationFields.setVisible(true);
+		        	DegreeFields.setVisible(true);
 	        	}
 	        	else if (Shape.equals("konvexe Hülle"))
 	        	{
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.NO_MOUSEHANDLING);
 	        		CalculateConvexHullShape();
-	        		InterpolationFields.setVisible(true);
+	        		DegreeFields.setVisible(true);
 	        	}
 	        	else
 	        	{
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.NO_MOUSEHANDLING);
-	        		CircleFields.setVisible(false);
-	        		InterpolationFields.setVisible(false);
 	        	}
 	        }
-	        if (e.getSource()==bModeChange)
+	        if (e.getSource()==bModeChange) //Modus Change Button
 	        {
 	        	if (cBasicShape.isVisible()) //We are in mode 1
 	        	{
-	        		bModeChange.setText("neue Grundform");
+	        		bModeChange.setText("neue Grundfrom");
 	        		CircleFields.setVisible(false);
 	        		InterpolationFields.setVisible(false);
+		        	DegreeFields.setVisible(false);
 	        		cBasicShape.setVisible(false);
 	        		BasicShape.setVisible(false);
 	        		FreeModFields.setVisible(true);
@@ -472,74 +581,23 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        	}
 	        	else
 	        	{
-	        		bModeChange.setText("Freie Bearbeitung");
+	        		bModeChange.setText("Modifikation");
 	        		FreeModFields.setVisible(false);
 	        		cBasicShape.setVisible(true);
 	        		BasicShape.setVisible(true);
 	        		actionPerformed(new ActionEvent(cBasicShape,0,"Refresh"));
 	        	}
 	        }
-	        if (e.getSource()==bIncKnots)
+	        if ((e.getSource()==rAddBetween)||(e.getSource()==rAddEnd))
 	        {
-	        	HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().refineMiddleKnots();
-	        	HShapeGraphicRef.setMouseHandling(HShapeGraphicRef.getMouseHandling()); //ReInit Drag/Click
-	        }
-	        if (e.getSource()==bRotation)
-	        {
-	        	if (bRotation.isSelected())
-	        	{
-	        		bRotation.setSelected(false);
-	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
-	        	}
-	        	else
-	        	{
-	        		deselectButtons();
-	        		bRotation.setSelected(true);
-	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_ROTATE_MOUSEHANDLING);	        		
-	        	}
-	        }
-	        if (e.getSource()==bTranslation)
-	        {
-	        	if (bTranslation.isSelected())
-	        	{
-	        		bTranslation.setSelected(false);
-	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
-	        	}
-	        	else
-	        	{
-	        		deselectButtons();
-	        		bTranslation.setSelected(true);
-	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_TRANSLATE_MOUSEHANDLING);	        		
-	        	}
-	        }
-	        if (e.getSource()==bScaling)
-	        {
-	        	if (bScaling.isSelected())
-	        	{
-	        		bScaling.setSelected(false);
-	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
-	        	}
-	        	else
-	        	{
-	        		deselectButtons();
-	        		bScaling.setSelected(true);
-	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SCALE_MOUSEHANDLING);	        		
-	        	}
-	        }
-	        if (e.getSource()==bScalingDir)
-	        {
-	        	if (bScalingDir.isSelected())
-	        	{
-	        		bScalingDir.setSelected(false);
-	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
-	        	}
-	        	else
-	        	{
-	        		deselectButtons();
-	        		bScalingDir.setSelected(true);
-	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SCALEDIR_MOUSEHANDLING);	        		
-	        	}
-	        }
+	       		Vector<Object> param = HShapeGraphicRef.getShapeParameters();
+				if (rAddBetween.isSelected())
+					param.set(NURBSShapeFactory.ADDPOINTS, NURBSShapeFactory.ADD_BETWEEN);
+				else
+					param.set(NURBSShapeFactory.ADDPOINTS, NURBSShapeFactory.ADD_END);
+	       		HShapeGraphicRef.setShapeParameters(param);
+	        }	
+	        performSecondModus(e);
 	        if (e.getSource()==bCheckShape)
 	        {
 	        	NURBSShapeValidator validator = new NURBSShapeValidator(HGraphRef, HEdgeRefIndex, null); //Check actual Shape of the Edge

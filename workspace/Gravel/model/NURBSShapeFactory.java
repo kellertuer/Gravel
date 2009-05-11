@@ -13,6 +13,16 @@ import javax.vecmath.Point3d;
  * These NURBS-Curves are always inclamped and closed (and by that degree-1 times continuous also
  * at the start- and endpoint)
  * 
+ * The Constant Values used for the Parameter-Vector are (all always without zoom in original graph coordinates)
+ * 
+ * - ADDPOINTS			: (Integer) Typpe of Point Addition to the POINTS-Set (ADD_END or ADD_BETWEEN)
+ * - CIRCLE_ORIGIN 		: (Java.AWT.Point) of the Circle Origin
+ * - CIRCLE_RADIUS 		: (Integer) Radius of the Circle
+ * - DEGREE				: (Integer) Degree of the resulting NURBS.Curve
+ * - DISTANCE TO NODE 	: (Integer) Distance from Curve to Node obtained from VHyperEdge property
+ * - POINTS				: (Vector<Point2D>) Any Set of Points, e.g. the Nodepositions or Interpolationpoints
+ * - SIZES 				: (Vector<Integer>) Sizes of the nodes if using convex hull  
+ * 
  * @author Ronny Bergmann
  * @since 0.4
  *
@@ -25,9 +35,15 @@ public class NURBSShapeFactory {
 	public final static int DISTANCE_TO_NODE = 3;
 	
 	public final static int POINTS = 4;
-	public final static int DEGREE = 5;
-	public final static int SIZES = 6;
-	public final static int MAX_INDEX = 7;
+	public final static int ADDPOINTS = 5;
+	public final static int DEGREE = 6;
+	public final static int SIZES = 7;
+
+	public final static int MAX_INDEX = 8;
+	
+	//ADDPOINT Specification
+	public final static int ADD_END = 1;
+	public final static int ADD_BETWEEN = 2;
 	
 	/**
 	 * Create the Shape based on Specification of Type and needed Parameters

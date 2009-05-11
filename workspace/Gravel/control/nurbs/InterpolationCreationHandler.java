@@ -53,7 +53,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	boolean firstdrag = true;
 	Point2D DragOrigin = null;
 	Vector<Point2D> InterpolationPoints;
-	int degree, nodedist;
+	int degree, nodedist, PointAdditionStatus;
 	NURBSShape lastshape=null;
 
 	public InterpolationCreationHandler(VHyperGraphic g)
@@ -65,6 +65,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		degree = 3; //TODO: Define Std-Value for nURBSShape-Degree
 		nodedist = 20; //TODO: Get that margin from the respective VHyperEdge
 		InterpolationPoints = new Vector<Point2D>();
+		PointAdditionStatus = NURBSShapeFactory.ADD_END;
 	}
 	
 	public Rectangle getSelectionRectangle()
@@ -92,6 +93,9 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		int tempdegree;
 		try	{tempdegree = Integer.parseInt(p.get(NURBSShapeFactory.DEGREE).toString());}
 		catch (Exception e) {return;} //Empty Shape
+		int tempaddpoints;
+		try	{tempaddpoints = Integer.parseInt(p.get(NURBSShapeFactory.ADDPOINTS).toString());}
+		catch (Exception e) {return;} //Empty Shape
 		int tempnd;
 		try	{tempnd = Integer.parseInt(p.get(NURBSShapeFactory.DISTANCE_TO_NODE).toString());}
 		catch (Exception e) {return;} //Empty Shape
@@ -100,6 +104,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		catch (Exception e) {return;} //Empty Shape
 		
 		InterpolationPoints = tempIP;
+		PointAdditionStatus = tempaddpoints;
 		degree = tempdegree;
 		nodedist = tempnd;
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
@@ -155,6 +160,41 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		DragOrigin = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100d),(double)e.getPoint().y/((double)vgc.getZoom()/100)); //Rausrechnen des zooms
 	}
 
+	/**
+	 * Search for the two consecutive Points in the first vector, whose distances are in sum minimal and return the second of these
+	 * This result is identical with the addition point the second Parameter should be added by thinking of adding it in between the vector
+	 * 
+	 * If there exists any Element that is null in the Vector, Vector.size() is returned
+	 *
+	 * @param points Set of Point to search in 
+	 * @param newPoint new point for insertion
+	 * @return
+	 */
+	private int getSecondOfNewarestPair(Vector<Point2D> points, Point2D newPoint)
+	{
+		if (points.lastElement()==null) //if the last element is null, the point can be inserted there
+			return points.size()-1; 
+		double lastdistance = points.lastElement().distance(newPoint);
+		double min = Double.MAX_VALUE;
+		int returnindex = -1;
+		for (int i=0; i<points.size(); i++)
+		{
+			if (points.get(i)==null)
+				return points.size();
+			double actualdistance = points.get(i).distance(newPoint);
+			if (lastdistance+actualdistance<min)
+			{
+				min = lastdistance+actualdistance;
+				returnindex = i;
+			}
+			lastdistance = actualdistance;
+		}
+		return returnindex;
+	}
+	//
+	// Mouse Handling
+	//
+	
 	public void mouseDragged(MouseEvent e) {
 		
 		if (((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)||((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))
@@ -212,11 +252,15 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	public void mouseExited(MouseEvent e) {}
 	public void mouseClicked(MouseEvent e)
 	{
-		Point2D.Double newPoint = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100d),(double)e.getPoint().y/((double)vgc.getZoom()/100)); //Rausrechnen des zooms
-		if (containsPoint(newPoint))
+		//New Point without Zoom
+		Point2D.Double newPoint = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100d),(double)e.getPoint().y/((double)vgc.getZoom()/100));
+		if (containsPoint(newPoint)) //Do not add twice
 			return;
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+		if (PointAdditionStatus==NURBSShapeFactory.ADD_END)
 			InterpolationPoints.add((Point2D.Double) newPoint.clone()); 
+		else
+			InterpolationPoints.add(getSecondOfNewarestPair(InterpolationPoints,newPoint), (Point2D) newPoint.clone());
 		UpdateShape();
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 	}	

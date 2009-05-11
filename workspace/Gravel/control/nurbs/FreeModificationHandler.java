@@ -63,7 +63,7 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 		if (dragged()) //End Drag
 			internalReset();
 		HyperEdgeRef.setShape(s);
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 	}
 	public Point2D getDragStartPoint()
 	{
@@ -89,7 +89,7 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 		if ((DragStartProjection!=Double.NaN)&&(!firstdrag)) //We had an Drag an a Circle was created, draw it one final time
 		{
 			DragStartProjection=Double.NaN;
-			vhg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.BLOCK_END));			
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_END,GraphConstraints.HYPEREDGE));			
 		}
 		DragStartProjection=Double.NaN;
 	}
@@ -129,9 +129,9 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 			temporaryShape.movePoint(DragStartProjection, exactPointInGraph);
 
 			if (firstdrag) //If wirst drag - start Block
-				vhg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE,GraphConstraints.SELECTION));
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_START|GraphConstraints.UPDATE,GraphConstraints.HYPEREDGE));
 			else		//continnue Block
-				vhg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE,GraphConstraints.SELECTION));
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.UPDATE,GraphConstraints.HYPEREDGE));
 		}
 		MouseOffSet = e.getPoint();
 		firstdrag = false;
