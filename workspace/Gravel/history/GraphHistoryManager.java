@@ -215,7 +215,6 @@ public class GraphHistoryManager implements Observer
 		if ((m.getModification()&GraphConstraints.BLOCK_ABORT)==GraphConstraints.BLOCK_ABORT)
 			return; //Don't handle Block-Abort-Stuff
 		CommonGraphAction act = null;
-		System.err.println("Handling an action..."+UndoStack.size());
 		if (m.getElementID() > 0) //Message for single stuff thats not just selection
 			act = handleSingleAction(m);
 		else //multiple modifications, up to know just a replace */
@@ -403,8 +402,9 @@ public class GraphHistoryManager implements Observer
 			return;
 		if (m.getModification()==GraphConstraints.HISTORY) //Ignore them, they'Re from us or another stupid history
 			return;
-		//Complete Replacement of Graph Handling
-		if ((m.getModifiedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getAffectedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getModification()==GraphConstraints.REPLACEMENT))
+		//Complete Replacement of Graphor Hypergraph Handling (Happens when loading a new graph
+		if ( ((m.getModifiedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getAffectedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getModification()==GraphConstraints.REPLACEMENT))
+				|| ((m.getModifiedElementTypes()==GraphConstraints.HYPERGRAPH_ALL_ELEMENTS)&&(m.getAffectedElementTypes()==GraphConstraints.HYPERGRAPH_ALL_ELEMENTS)&&(m.getModification()==GraphConstraints.REPLACEMENT)))
 		{
 				clonetrackedGraph();
 				//Reinit all stuff because graph has changed

@@ -40,7 +40,6 @@ import model.Messages.*;
  * 
  * this includes its CreationParameters, e.g. a Circle 
  * TODO Modification Parameters and Modi
- * TODO Validation of the Shape (distance to each Node of the VHyperEdge, and whether they are all inside the Shape)
  * 
  * Therefore the interaction is split into 2 seperate steps:
  * 1) Create a Basic Shape, e.g. a circle, polygon or Interpolation Points
@@ -262,7 +261,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		iDegree = new IntegerTextField();
 		iDegree.addCaretListener(this);;
 		iDegree.setPreferredSize(new Dimension(80, 20));
-		iDegree.setValue(4);
+		iDegree.setValue(3);
 		Degree = new JLabel("<html><p>Polynomgrad</p></html>");
 		InterpolationFields.add(Degree,c);
 		c.gridx++;

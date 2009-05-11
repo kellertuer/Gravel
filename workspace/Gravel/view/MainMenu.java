@@ -80,81 +80,84 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         else
         	((VHyperGraphic)graphpart).getGraph().addObserver(this);
  	}
+	public void changeVGraph(VCommonGraphic vgraphic)
+	{
+		//remove old observerstuff
+        if (isGraph)
+        	((VGraphic)graphpart).getGraph().deleteObserver(this);
+        else
+        	((VHyperGraphic)graphpart).getGraph().deleteObserver(this);
+        
+        graphpart = vgraphic;
+        GraphHistory = graphpart.getGraphHistoryManager();
+        isGraph = vgraphic.getType()==VCommonGraphic.VGRAPHIC;
+        refreshMenuBar();
+		fileDialogs = new JFileDialogs(vgraphic);
+        if (isGraph)
+        	((VGraphic)graphpart).getGraph().addObserver(this);
+        else
+        	((VHyperGraphic)graphpart).getGraph().addObserver(this);
+        validate();
+        repaint();
+	}
 	/**
 	 * Create the Menu-Bar with all its items
 	 */
 	private void createMenuBar() {
 		MenuAccModifier = java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		
+        buildFileMenuItems();
         buildFileMenu();
         add(mFile);
         
+        buildEditMenuItems();
         buildEditMenu();
         add(mEdit);
 
+        buildViewMenuItems();
         buildViewMenu();
         add(mView);
-        
-        //Letzter Menüpunkt : Hilfe.
-        mHelp = new JMenu("Hilfe");
-        if (!isMac) mHelp.setMnemonic(KeyEvent.VK_H);
+
+        buildHelpMenuItems();
+        buildHelpMenu();
         add(mHelp);
-        mHIndex = new JMenuItem("Index",KeyEvent.VK_I);
-        	mHIndex.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1,0));
-   
-        mHIndex.getAccessibleContext().setAccessibleDescription("Hilfe-Index");
-        mHIndex.addActionListener(this);
-        if (!isMac) mHIndex.setMnemonic(KeyEvent.VK_I);
-        mHelp.add(mHIndex);
-        if (!isMac)
-        {
-        	mHAbout = new JMenuItem("Über",KeyEvent.VK_B);
-        	mHAbout.getAccessibleContext().setAccessibleDescription(
-        			main.CONST.utf8_Ue+"ber Gravel</html>");
-        	mHAbout.addActionListener(this);
-            if (!isMac) mHAbout.setMnemonic(KeyEvent.VK_A);
-        	mHelp.add(mHAbout);
-        }
     }
+	private void refreshMenuBar()
+	{
+        buildFileMenu();
+        
+        buildEditMenu();
+
+        buildViewMenu();
+
+        buildHelpMenu();
+        validate();
+	}
 	
-	private void buildFileMenu()
+	private void buildFileMenuItems()
 	{
 		//Das erste Menü : Datei
-        if (isMac)
-        {
-        	mFile = new JMenu("Ablage");
-        }
-        else
-        {
-        	mFile = new JMenu("Datei");
-        	mFile.setMnemonic(KeyEvent.VK_D);         
-        }
         mFNew = new JMenuItem("Neuer Graph");
         mFNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, MenuAccModifier));
         if (!isMac) mFNew.setMnemonic(KeyEvent.VK_N);
         mFNew.addActionListener(this);
-        mFile.add(mFNew);
         
         mFOpen = new JMenuItem("Öffnen...");
         mFOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, MenuAccModifier));
         mFOpen.addActionListener(this);
         if (!isMac) mFOpen.setMnemonic(KeyEvent.VK_O);
-        mFile.add(mFOpen);
         
         mFSave = new JMenuItem("Speichern");
         mFSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, MenuAccModifier));
         //aktiv setzen, falls da ein File ist.
-        mFSave.setEnabled(!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"));
         mFSave.addActionListener(this);
         if (!isMac) mFSave.setMnemonic(KeyEvent.VK_S);
-        mFile.add(mFSave);
         
         mFSaveAs = new JMenuItem("Speichern unter...");
         mFSaveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, (java.awt.event.InputEvent.SHIFT_MASK | MenuAccModifier)));
         //aktiv setzen, falls da ein File ist.
         if (!isMac) mFSaveAs.setMnemonic(KeyEvent.VK_A);
         mFSaveAs.addActionListener(this);
-        mFile.add(mFSaveAs);
 
         if (!isMac)
         {
@@ -163,34 +166,59 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         	mFWinPrefs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, MenuAccModifier));
         	mFWinPrefs.addActionListener(this);
         	mFWinPrefs.setMnemonic(KeyEvent.VK_P);
-        	mFile.add(mFWinPrefs);
         }
         
         mFExport = new JMenuItem("Exportieren...");
         mFExport.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuAccModifier));
         mFExport.addActionListener(this);
         if (!isMac) mFExport.setMnemonic(KeyEvent.VK_E);
-        mFile.add(mFExport);        
        
         if (!isMac)
         {
-        	mFile.addSeparator();
-
         	//Datei Beenden
         	mFExit = new JMenuItem("Beenden");
         	mFExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, MenuAccModifier));
             if (!isMac) mFExit.setMnemonic(KeyEvent.VK_Q);
         	mFExit.addActionListener(this);
-        	mFile.add(mFExit);
         }
 	}
-
-	private void buildEditMenu()
+	private void buildFileMenu()
 	{
-        mEdit = new JMenu("Bearbeiten");
-        if (!isMac) mEdit.setMnemonic(KeyEvent.VK_E);
-        add(mEdit);
+		if (mFile==null)
+		{
+			if (isMac)
+	        {
+	        	mFile = new JMenu("Ablage");
+	        }
+	        else
+	        {
+	        	mFile = new JMenu("Datei");
+	        	mFile.setMnemonic(KeyEvent.VK_D);         
+	        }
+		}
+		else
+			mFile.removeAll();
+		
+	        mFile.add(mFNew);
+	        mFile.add(mFOpen);
+	        mFSave.setEnabled(!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"));
+	        mFile.add(mFSave);
+	        mFile.add(mFSaveAs);
 
+	        if (!isMac)	//Nur fuer Windows : Datei Einstellungen, beim Mac ist das im Mac Menü
+	        	mFile.add(mFWinPrefs);
+	        mFile.add(mFExport);        
+	       
+	        if (!isMac)
+	        {
+	        	mFile.addSeparator();
+	        	mFile.add(mFExit);
+	        }
+
+	}
+
+	private void buildEditMenuItems()
+	{
         mEdUndo = new JMenuItem("Widerrufen");
        	mEdUndo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,MenuAccModifier));
         if (!isMac)
@@ -230,9 +258,14 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
            mEdArrangeSelection.setMnemonic(KeyEvent.VK_R);
     	mEdArrangeSelection.addActionListener(this);
     	mEdArrangeSelection.setEnabled(hasGraphSelectedNodes());
-
-    	
-    	if (!isMac) mEdit.setMnemonic(KeyEvent.VK_E);
+  	}
+	private void buildEditMenu()
+	{
+		if (mEdit==null)
+			mEdit = new JMenu("Bearbeiten");
+		else
+			mEdit.removeAll();
+		if (!isMac) mEdit.setMnemonic(KeyEvent.VK_E);
     	mEdit.add(mEdUndo);
     	mEdit.add(mEdRedo);
     	mEdit.addSeparator();
@@ -241,19 +274,14 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         mEdit.add(mEdArrangeSelection);
 	}
 	
-	private void buildViewMenu()
+	private void buildViewMenuItems()
 	{
-        //Menüpunkt Ansicht
-        mView = new JMenu("Ansicht");
-        if (!isMac) mView.setMnemonic(KeyEvent.VK_A);
-
         if (isGraph)
         {
         	VGraph vG = ((VGraphic)graphpart).getGraph();
         	//Editor Umformung directed / undirected Graph
         	mVGraph = new JMenu("Graph umformen (zu)");
         	if (!isMac) mVGraph.setMnemonic(KeyEvent.VK_G);
-        	mView.add(mVGraph);
         
         	if (vG.getMathGraph().isDirected())
         		mVGDirCh = new JMenuItem("ungerichtet");
@@ -287,7 +315,6 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         //--Editor Modus--
         mEdModus = new JMenu("Modus");
         if (!isMac) mEdModus.setMnemonic(KeyEvent.VK_M);
-        mView.add(mEdModus);
         //normal
         mVModusNormal = new JRadioButtonMenuItem("Standard");
         mVModusNormal.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_4, MenuAccModifier));
@@ -322,19 +349,16 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         	mVShowBP.setSelected(GeneralPreferences.getInstance().getBoolValue("vgraphic.cpshow"));
         	if (!isMac) mVShowBP.setMnemonic(KeyEvent.VK_A);
         	mVShowBP.addActionListener(this);
-        	mView.add(mVShowBP);        
         }
         //Editor Raster
         mVGrid = new JMenuItem("Raster-Einstellungen...");
         mVGrid.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, MenuAccModifier));
         mVGrid.addActionListener(this);
         if (!isMac) mVGrid.setMnemonic(KeyEvent.VK_R);
-        mView.add(mVGrid);        
         
 //      --Editor Modus--
         mEdZoom = new JMenu("Maßstab");
         if (!isMac) mEdModus.setMnemonic(KeyEvent.VK_Z);
-        mView.add(mEdZoom);
         //normal
         mVZoom1 = new JRadioButtonMenuItem("50%");
         mVZoom1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, MenuAccModifier));
@@ -356,6 +380,55 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         zoomgroup.add(mVZoom1);
         zoomgroup.add(mVZoom2);
         zoomgroup.add(mVZoom3); 
+	}
+	private void buildViewMenu()
+	{
+		if (mView==null)
+			mView = new JMenu("Ansicht");
+		else
+			mView.removeAll();
+		if (!isMac) mView.setMnemonic(KeyEvent.VK_A);
+
+        if (isGraph)
+        	mView.add(mVGraph);
+        //--Editor Modus--
+        mView.add(mEdModus);
+        //normal
+        if (isGraph)//      Editor Kontrollpunkte der Kanten
+        	mView.add(mVShowBP);        
+        mView.add(mVGrid);                
+        mView.add(mEdZoom);
+	}
+	
+	private void buildHelpMenuItems()
+	{
+        mHIndex = new JMenuItem("Index",KeyEvent.VK_I);
+        	mHIndex.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1,0));
+   
+        mHIndex.getAccessibleContext().setAccessibleDescription("Hilfe-Index");
+        mHIndex.addActionListener(this);
+        if (!isMac) mHIndex.setMnemonic(KeyEvent.VK_I);
+        if (!isMac)
+        {
+        	mHAbout = new JMenuItem("Über",KeyEvent.VK_B);
+        	mHAbout.getAccessibleContext().setAccessibleDescription(
+        			main.CONST.utf8_Ue+"ber Gravel</html>");
+        	mHAbout.addActionListener(this);
+            mHAbout.setMnemonic(KeyEvent.VK_A);
+        }
+	}
+	private void buildHelpMenu()
+	{
+		if (mHelp==null)
+			mHelp = new JMenu("Hilfe");
+		else
+			mHelp.removeAll();
+        if (!isMac) mHelp.setMnemonic(KeyEvent.VK_H);		
+        mHelp.add(mHIndex);
+        if (!isMac)
+        {
+        	mHelp.add(mHAbout);
+        }
 	}
 	
 	private boolean hasGraphSelection()

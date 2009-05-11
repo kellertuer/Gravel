@@ -305,7 +305,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		c.gridy++; TextContent.add(cLine.getContent(),c);
 		
 		//Werte einfügen
-		iMargin.setValue(12); //TODO Std.
+		iMargin.setValue(12); //TODO Std.-Value needed for Hyperedge Margin
 	}
 	/**
 	 * Help function to create the list of node names from the corresponding VGraph 

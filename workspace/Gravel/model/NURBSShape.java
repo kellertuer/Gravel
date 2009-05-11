@@ -21,7 +21,7 @@ import javax.vecmath.Point3d;
  * Other Methods are
  * - Min and Max of the Bounding Box of the ControlPolygon
  * - Addition (Refinement of Knots)
- * - TODO Removal of knots (with or without tollerance? i think wihout because there is undo - soon)
+ * - TODO Removal of knots (without tollerance - because there is undo, so everyone can try to remove any knot and look whether it fits)
  * - TODO ?get&set knots &weights?
  * 
  * 
@@ -738,7 +738,6 @@ public class NURBSShape {
 	 * Compares this Curve to another (minDist does not matter)
 	 * if alle values of t,b,w are equal it returns true, else false
 	 * 
-	 * TODO: Check whether there's a way to check for equality if these values are different ?
 	 * @param s another Shape
 	 * @return true if Shape s is equal to this else false
 	 */

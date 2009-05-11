@@ -62,8 +62,8 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		vhg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
 		MouseOffSet = new Point(0,0);
-		degree = 5; //TODO: Std Value?
-		nodedist = 20; //TODO-Std Value
+		degree = 3; //TODO: Define Std-Value for nURBSShape-Degree
+		nodedist = 20; //TODO: Get that margin from the respective VHyperEdge
 		InterpolationPoints = new Vector<Point2D>();
 	}
 	

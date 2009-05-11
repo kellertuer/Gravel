@@ -32,8 +32,6 @@ public class NURBSShapeFactory {
 	/**
 	 * Create the Shape based on Specification of Type and needed Parameters
 	 * 
-	 * For all Types the Minimum Distance to the nodes is needed (TODO: Make this value a property of VHYperEdge instead of NURBSShape)
-	 * 
 	 * All Values given in Capital-Letters are predefined values at which the Parameter must be placed inside the Parameter-Vector
 	 * and for each Parameter the Type is given in brackets
 	 * 

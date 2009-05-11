@@ -24,8 +24,6 @@ import model.Messages.GraphMessage;
  */
 public class VHyperShapeGraphic extends VHyperGraphic
 {
-	// VGraph : Die Daten des Graphen
-	private VHyperGraph vG;
 	// Visual Styles
 	private BasicStroke vHyperEdgeStyle;
 	private ShapeCreationMouseHandler firstModus;
@@ -48,9 +46,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		selWidth = gp.getIntValue("vgraphic.selwidth");
 		actualMouseState = NO_MOUSEHANDLING;
 		highlightedHyperEdge = hyperedgeindex;
-		vG = Graph;
-		vG.addObserver(this); //Die Graphikumgebung als Observer der Datenstruktur eintragen
-		vGh = new GraphHistoryManager(vG);
+//TODO override parental GraphHistoryManager with special ShapeHistoryManager		vGh = new GraphHistoryManager(vG);
 	}	
 
 	public void paint(Graphics2D g2)
@@ -141,11 +137,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		}
 		if ( ((actualMouseState&SHAPE) > 0) && (secondModus!=null) )
 		{
-			Point2D p = secondModus.getDragStartPoint();
-			Point2D p2 = secondModus.getDragPoint();
-			if ((p!=null)&&(p2.getX()!=0d)&&(p2.getY()!=0d)) //Set per Drag
-				g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
-						Math.round((float)p2.getX()*zoomfactor), Math.round((float)p2.getY()*zoomfactor));
+			paintModificationDetails(g2);
 		}
 	}
 	@SuppressWarnings("unchecked")
@@ -187,6 +179,25 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		}
 	}
 
+	private void paintModificationDetails(Graphics2D g2)
+	{
+		if (secondModus==null)
+			return;
+		Point2D p = secondModus.getDragStartPoint();
+		Point2D p2 = secondModus.getDragPoint();
+		if ((p!=null)&&(p2.getX()!=0d)&&(p2.getY()!=0d)) //Set per Drag
+			g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
+					Math.round((float)p2.getX()*zoomfactor), Math.round((float)p2.getY()*zoomfactor));
+		NURBSShape tempshape = secondModus.getShape();
+		if ((tempshape!=null)&&(secondModus.dragged()))
+		{
+			NURBSShape draw = tempshape.clone();
+			draw.scale(zoomfactor);
+			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			g2.setColor(selColor);
+			g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
+		}			
+	}
 	private void paintDEBUG(Graphics2D g2) //TODO: Remove Debug Controlpoint-polygon
 	{
 		g2.setColor(Color.orange.darker());
@@ -342,7 +353,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			//If 							
  			if (m.getModification()==GraphConstraints.HISTORY) //We got an undo/redp
 			{
- 				System.err.println("History-Reset.");
  				if (secondModus!=null) //Simple, because we just reset the shape to that one from the graph - history updated that
  					secondModus.setShape(vG.modifyHyperEdges.get(highlightedHyperEdge).getShape());
  				repaint();

@@ -28,7 +28,7 @@ import model.Messages.*;
 public class VHyperGraphic extends VCommonGraphic
 {
 	// VGraph : Die Daten des Graphen
-	private VHyperGraph vG;
+	protected VHyperGraph vG;
 	// Visual Styles
 	private BasicStroke vHyperEdgeStyle;
 	private DragMouseHandler Drag;
@@ -52,6 +52,7 @@ public class VHyperGraphic extends VCommonGraphic
 		vG = Graph;
 		vG.addObserver(this); //Die Graphikumgebung als Observer der Datenstruktur eintragen
 		vGh = new GraphHistoryManager(vG);
+		System.err.println("HyperGraphic::Init::History is "+vGh);
 	}
 	public void paint(Graphics g) 
 	{
@@ -217,7 +218,6 @@ public class VHyperGraphic extends VCommonGraphic
 			VNode actual = iter.next();
 			projectionpoints.add(actual.getPosition());
 		}
-		//TODO: Measure again after Optimization of the Square Computation
 	    long time = System.currentTimeMillis();
 	    System.err.print("#"+projectionpoints.size()+" ");
 	    for (int j=0; j<projectionpoints.size(); j++)
