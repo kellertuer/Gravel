@@ -18,6 +18,7 @@ import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -277,6 +278,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	
 	private void buildFreeModPanel()
 	{
+		String IconDir = System.getProperty("user.dir")+"/data/img/icon/";
 		FreeModFields = new Container();
 		FreeModFields.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -312,15 +314,16 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 
 		c.gridx++;
 		c.gridwidth=1;
-		bTranslation = new JButton("T");
-		bTranslation.setSize(new Dimension(17,17));
+		
+		bTranslation = new JButton(new ImageIcon(IconDir+"translation32.png"));	
+		bTranslation.setSize(new Dimension(32,32));
 		bTranslation.addActionListener(this);
 		FreeModFields.add(bTranslation,c);
 
 		c.gridx++;
 		c.gridwidth=1;
-		bScaling = new JButton("S");
-		bScaling.setSize(new Dimension(17,17));
+		bScaling = new JButton(new ImageIcon(IconDir+"scale32.png"));	
+		bScaling.setSize(new Dimension(32,32));
 		bScaling.addActionListener(this);
 		FreeModFields.add(bScaling,c);
 

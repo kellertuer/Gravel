@@ -183,6 +183,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	{
 		if (secondModus==null)
 			return;
+		g2.setColor(selColor);
 		if ((actualMouseState&SHAPE) > 0) //ShapeModification always means to indicate the Drag with a line
 		{
 			Point2D p = secondModus.getDragStartPoint();
@@ -198,7 +199,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			NURBSShape draw = tempshape.clone();
 			draw.scale(zoomfactor);
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-			g2.setColor(selColor);
 			g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
 		}			
 	}
