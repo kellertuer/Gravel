@@ -250,8 +250,10 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 					//involve massive scaling by small mouse movement
 					Point2D min = DragBeginShape.getMin();
 					Point2D max = DragBeginShape.getMax();					
-					double origsizefactor = (max.getX()-min.getX()+max.getY()-min.getY())/2.0d;
-					double factor = (origsizefactor + Math.signum(DragMov.getX())*dist)/origsizefactor;
+					//Each side by half
+					double origsizefactor = (max.getX()-min.getX()+max.getY()-min.getY())/4.0d;
+					double factor = (dist)/origsizefactor;
+				//	factor *= factor; //Increase scaling further away from 1.0
 					temporaryShape.translate(-DragOrigin.getX(),-DragOrigin.getY()); //Origin
 					temporaryShape.scale(factor);
 					temporaryShape.translate(DragOrigin.getX(),DragOrigin.getY()); //Back
@@ -263,11 +265,12 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 					temporaryShape.rotate(-getDegreefromDirection(DragMov)); //Rotate
 					double minDir = DragBeginShape.getMin().getX();
 					double maxDir = DragBeginShape.getMax().getX();					
-					double origDirfactor = (maxDir-minDir);
-					double DirScale = (origDirfactor + Math.signum(DragMov.getX())*onedist)/origDirfactor;
+					double origDirfactor = (maxDir-minDir)/2;
+					double DirScale = (onedist)/origDirfactor;
+				//	DirScale *=DirScale; //Increase change with distance from 1.0
 					temporaryShape.scale(DirScale, 1d);
-					temporaryShape.translate(DragOrigin.getX(),DragOrigin.getY()); //Back
 					temporaryShape.rotate(getDegreefromDirection(DragMov)); //Rotate back
+					temporaryShape.translate(DragOrigin.getX(),DragOrigin.getY()); //Back
 				break;
 				default: break; //If there is no state, e.g. NO_MODIFICATION, do nothing
 			}
