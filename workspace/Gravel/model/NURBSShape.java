@@ -260,21 +260,29 @@ public class NURBSShape {
 		return new Point2D.Double(x,y);
 	}
 	/**
-	 * Scale all Controlpoints by factor s, of you want to resize a shape
-	 * make shure to translate its middle to 0,0 before and back afterwards
+	 * Scale all Controlpoints by factor s, if you want to resize a shape
+	 * make sure to translate its middle to 0,0 before and back afterwards
 	 * @param s
 	 */
 	public void scale(double s)
+	{
+		scale(s,s);
+	}
+	/**
+	 * Scale all Controlpoints by factor sx and sy in the directions X and Y, if you want to resize a shape
+	 * make sure to translate its middle to 0,0 before and back afterwards
+	 * @param s
+	 */
+	public void scale(double sx, double sy)
 	{
 		Iterator<Point2D> bi = controlPoints.iterator();
 		while (bi.hasNext())
 		{
 			Point2D p = bi.next();
-			p.setLocation(p.getX()*s,p.getY()*s);
+			p.setLocation(p.getX()*sx,p.getY()*sy);
 		}
 		//recalculate Homogeneous
-		InitHomogeneous();
-		
+		InitHomogeneous();		
 	}
 	/**
 	 * Translate Curve - due to Translation Invariance, only the ControlPoints need to be moved

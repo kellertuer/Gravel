@@ -135,7 +135,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		{
 			paintCreationDetails(g2);
 		}
-		if ( ((actualMouseState&SHAPE) > 0) && (secondModus!=null) )
+		if (secondModus!=null)
 		{
 			paintModificationDetails(g2);
 		}
@@ -183,11 +183,15 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	{
 		if (secondModus==null)
 			return;
-		Point2D p = secondModus.getDragStartPoint();
-		Point2D p2 = secondModus.getDragPoint();
-		if ((p!=null)&&(p2.getX()!=0d)&&(p2.getY()!=0d)) //Set per Drag
-			g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
-					Math.round((float)p2.getX()*zoomfactor), Math.round((float)p2.getY()*zoomfactor));
+		if ((actualMouseState&SHAPE) > 0) //ShapeModification always means to indicate the Drag with a line
+		{
+			Point2D p = secondModus.getDragStartPoint();
+			Point2D p2 = secondModus.getDragPoint();
+			if ((p!=null)&&(p2.getX()!=0d)&&(p2.getY()!=0d)) //Set per Drag
+				g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
+						Math.round((float)p2.getX()*zoomfactor), Math.round((float)p2.getY()*zoomfactor));
+		}
+		//All cases (Shape & CurvePointMod) draw tempshape
 		NURBSShape tempshape = secondModus.getShape();
 		if ((tempshape!=null)&&(secondModus.dragged()))
 		{
@@ -272,6 +276,13 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				this.addMouseMotionListener(secondModus);
 				actualMouseState = state;
 			break;
+			case SHAPE_SCALEDIR_MOUSEHANDLING:
+				secondModus = new ShapeAffinTransformationHandler(this, highlightedHyperEdge);
+				((ShapeAffinTransformationHandler)secondModus).setModificationState(ShapeAffinTransformationHandler.SCALE_ONEDIRECTION);
+				this.addMouseListener(secondModus);
+				this.addMouseMotionListener(secondModus);
+				actualMouseState = state;
+			break;
 			case NO_MOUSEHANDLING:
 			default:
 				actualMouseState = NO_MOUSEHANDLING;
@@ -335,8 +346,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(firstModus.getShape());
 					vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
 					firstModus.resetShape();
-					repaint();
-					return;
 				}
 			}
 			if ((secondModus!=null)&&(!secondModus.dragged())) //Second Modus and we have no drag
@@ -346,8 +355,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(secondModus.getShape());
 					vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
 					secondModus.resetShape();
-					repaint();
-					return;
 				}
 			}
 			//If 							
@@ -355,8 +362,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			{
  				if (secondModus!=null) //Simple, because we just reset the shape to that one from the graph - history updated that
  					secondModus.setShape(vG.modifyHyperEdges.get(highlightedHyperEdge).getShape());
- 				repaint();
-				return;
 			}
 			repaint();
 		}

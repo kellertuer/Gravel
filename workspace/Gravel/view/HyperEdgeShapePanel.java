@@ -71,10 +71,10 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	private IntegerTextField iDegree;
 	//FreeModFields
 	private JLabel knots, degree, CheckResult;
-	private JButton bIncKnots, bDecKnots, bIncDegree, bDecDegree, bCheckShape;
+	private JButton bIncKnots, bDecKnots, bCheckShape;
 	
 	private JButton bModeChange, bOk, bCancel;
-	private JButton bRotation,bTranslation, bScaling;
+	private JButton bRotation,bTranslation, bScaling, bScalingDir;
 	private int HEdgeRefIndex; //Reference to the HyperEdge in the Graph that is edited here
 	private VHyperGraph HGraphRef; //Reference to the edited Graph, should be a copy of the Graph from the main GUI because the user might cancel this dialog 
 	private VHyperShapeGraphic HShapeGraphicRef;
@@ -304,25 +304,6 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		
 		c.gridy++;
 		c.gridx=0;
-		c.gridwidth=2;
-		degree = new JLabel("Polynomgrad: "+iDegree.getValue());
-		FreeModFields.add(degree,c);
-		
-		c.gridx++;
-		c.gridwidth=1;
-		bIncDegree = new JButton("+");
-		bIncDegree.setSize(new Dimension(17,17));
-		bIncDegree.setEnabled(false);
-		FreeModFields.add(bIncDegree,c);
-		
-		c.gridx++;
-		bDecDegree = new JButton("-");
-		bDecDegree.setSize(new Dimension(17,17));
-		bDecDegree.setEnabled(false);
-		FreeModFields.add(bDecDegree,c);
-
-		c.gridy++;
-		c.gridx=0;
 		c.gridwidth=1;
 		bRotation = new JButton("R");
 		bRotation.setSize(new Dimension(17,17));
@@ -342,6 +323,13 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		bScaling.setSize(new Dimension(17,17));
 		bScaling.addActionListener(this);
 		FreeModFields.add(bScaling,c);
+
+		c.gridx++;
+		c.gridwidth=1;
+		bScalingDir = new JButton("<html>S<sub>D</sub></html>");
+		bScalingDir.setSize(new Dimension(17,17));
+		bScalingDir.addActionListener(this);
+		FreeModFields.add(bScalingDir,c);
 
 	}
 	/**
@@ -426,6 +414,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		bRotation.setSelected(false);
 		bTranslation.setSelected(false);
 		bScaling.setSelected(false);
+		bScalingDir.setSelected(false);
 	}
 	public void actionPerformed(ActionEvent e) {
 	        if ((e.getSource()==bCancel)||(e.getSource()==bOk))
@@ -532,6 +521,20 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        		deselectButtons();
 	        		bScaling.setSelected(true);
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SCALE_MOUSEHANDLING);	        		
+	        	}
+	        }
+	        if (e.getSource()==bScalingDir)
+	        {
+	        	if (bScalingDir.isSelected())
+	        	{
+	        		bScalingDir.setSelected(false);
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
+	        	}
+	        	else
+	        	{
+	        		deselectButtons();
+	        		bScalingDir.setSelected(true);
+	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SCALEDIR_MOUSEHANDLING);	        		
 	        	}
 	        }
 	        if (e.getSource()==bCheckShape)

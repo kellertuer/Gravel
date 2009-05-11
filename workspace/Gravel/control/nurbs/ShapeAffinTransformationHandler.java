@@ -49,6 +49,9 @@ import view.VHyperGraphic;
  *     The distance from the Drag Start Point in Relation to the size of the Shape is used
  *     for calculation of the scaling factor
  *     
+ *  - Scaling with direction
+ *  
+ *     
  *     Perhaps a second scaling would be nice where X and Y are treaded seperately to
  *     change not only size but aspect ratio of the shape
  *  
@@ -61,6 +64,7 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	public final static int ROTATION = 1;
 	public final static int TRANSLATION = 2;
 	public final static int SCALING = 4;
+	public final static int SCALE_ONEDIRECTION = 8;
 	private VHyperGraph vhg = null;
 	private VCommonGraphic vgc;
 	private GeneralPreferences gp;
@@ -95,23 +99,30 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 		return null;
 	}
 
+	/**
+	 * Reset shape to last state that was really saved in the graph - doeas not push any notification
+	 */
 	public void resetShape()
 	{
 		temporaryShape=HyperEdgeRef.getShape().clone(); //Reset to actual Edge Shape;
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 	}
 
 	public NURBSShape getShape()
 	{
 		return temporaryShape;
 	}
+	/**
+	 * Set shape to a specific given shape - e.g. when the History-Manager resets
+	 */
 	public void setShape(NURBSShape s)
 	{
+		HyperEdgeRef.setShape(s);
+		//This is pushed in side the Drag-Block if it happens while dragging so the whole action is only captured as one
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 		if (dragged()) //End Drag
 			internalReset();
-		HyperEdgeRef.setShape(s);
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 	}
+
 	public Point2D getDragStartPoint()
 	{
 		if (!dragged())
@@ -150,13 +161,12 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	
 	private void internalReset()
 	{
-		//Only if a Block was started: End it...
-		if (dragged())//We had an Drag an a Circle was created, draw it one final time
+		//Only if a Block was started: End it... with notification
+		if (dragged())
 		{
 			DragOrigin = null;
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 		}
-
 	}
 	
 	private double getDegreefromDirection(Point2D dir)
@@ -245,6 +255,19 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 					temporaryShape.translate(-DragOrigin.getX(),-DragOrigin.getY()); //Origin
 					temporaryShape.scale(factor);
 					temporaryShape.translate(DragOrigin.getX(),DragOrigin.getY()); //Back
+				break;
+				case SCALE_ONEDIRECTION:
+					//Factor is depending on Distance
+					double onedist = DragMov.distance(0d,0d);
+					temporaryShape.translate(-DragOrigin.getX(),-DragOrigin.getY()); //Translate to Origin
+					temporaryShape.rotate(-getDegreefromDirection(DragMov)); //Rotate
+					double minDir = DragBeginShape.getMin().getX();
+					double maxDir = DragBeginShape.getMax().getX();					
+					double origDirfactor = (maxDir-minDir);
+					double DirScale = (origDirfactor + Math.signum(DragMov.getX())*onedist)/origDirfactor;
+					temporaryShape.scale(DirScale, 1d);
+					temporaryShape.translate(DragOrigin.getX(),DragOrigin.getY()); //Back
+					temporaryShape.rotate(getDegreefromDirection(DragMov)); //Rotate back
 				break;
 				default: break; //If there is no state, e.g. NO_MODIFICATION, do nothing
 			}
