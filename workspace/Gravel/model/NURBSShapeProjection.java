@@ -1,7 +1,11 @@
 package model;
 
 import java.awt.geom.Point2D;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Vector;
+
+import javax.vecmath.Point3d;
 
 /**
  * This Class is used for the projection and point inversion on NURBS Curves
@@ -10,138 +14,448 @@ import java.util.Vector;
  * 
  * This class is based on the Algorithm by Chen et al. unsing a circular clipping method
  *
- * It extends VHyperEdgeShape due to the resulting objective square distance function which is itself
- * a Bezier-Curve
- * @author Ronny Bergmann
+ * It extends NURBSShape due to the resulting objective square distance function which is itself
+ * a Bezier-Curve - so it follow the decorator-Pattern
  * 
- *
+ * @author Ronny Bergmann
  */
-public class NURBSShapeProjection
+public class NURBSShapeProjection extends NURBSShape
 {
-	VHyperEdgeShape curve;
-	VHyperEdgeShape[] bezierparts;
 	Point2D p;
-	Vector<Double> weights, ControlPoints;
-	public NURBSShapeProjection(VHyperEdgeShape c, Point2D p)
+	//Values of the just handled qadrated bezier curve
+	Vector<Double> qcWeights, qcControlPoints;
+	int qcDegree;
+	double umin, umax;
+	
+	double resultu;
+	/**
+	 * Start the NURBSShapeProjection with a given Curve the Point is projected onto
+	 * 
+	 * @param c
+	 * @param p
+	 */
+	public NURBSShapeProjection(NURBSShape Curve, Point2D p)
 	{
-		if (!isInBezierForm(c))
-			System.err.println("TODO: Split");
-		else
-		initObjSquDist(c.clone(),p);
-		double alpha = Math.min(p.distanceSq(c.controlPoints.firstElement()), p.distanceSq(c.controlPoints.lastElement()));
-		System.err.println("Initial alpha: "+alpha+" Radius"+Math.sqrt(alpha));
-		//Check whether all are outside compute min
-		double min = Double.MAX_VALUE;
-		for (int i=0; i<ControlPoints.size(); i++)
+		NURBSShape clone = Curve.clone();
+		//If it is unclamped - clamp it!
+		if ((clone.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
+			clone = clone.ClampedSubCurve(clone.Knots.get(clone.degree), clone.Knots.get(clone.maxKnotIndex-clone.degree));
+		//Set internal Curve to this curve clone
+		setCurveTo(clone.Knots, clone.controlPoints, clone.cpWeight);
+		resultu=Knots.firstElement();
+		this.p = p;
+		Queue<NURBSShape> Parts = new LinkedList<NURBSShape>();
+		if (!isInBezierForm())
 		{
-			System.err.print(ControlPoints.get(i)+"  ");
-			if (ControlPoints.get(i)<min)
-				min = ControlPoints.get(i);
-		}
-		System.err.println("   \n");
-		if (min>alpha)
-		{
-			System.err.println("Exlclude this part");
-		}
-		else if (min==alpha)
-		{
-			System.err.println("Minimum should be one of the endpoints.");
+			Vector<NURBSShape> partsf = DecomposeCurve(this);
+			for (int i=0; i<partsf.size(); i++)
+				Parts.offer(partsf.get(i));
 		}
 		else
+			Parts.offer(clone());
+		double alpha = Math.min(p.distanceSq(controlPoints.firstElement()), p.distanceSq(controlPoints.lastElement()));
+		if (p.distanceSq(controlPoints.firstElement()) > p.distanceSq(controlPoints.lastElement()))
+			resultu=Knots.lastElement();
+		
+		Vector<Double> candidates = new Vector<Double>(); //because we may have more than one candidate Span 
+		while (!Parts.isEmpty()) 
+			//Wander through all parts, if a part is splitted, its new parts are added at the end of
+			//The Quere, so that they hopefully are out of range of the circle and get discarded then 
+			//
 		{
-			
-			System.err.println("Inside, checking for Prop2");
-			int k=0; //None found
-			boolean prop2=true;
-			double lastP = ControlPoints.firstElement();
-			while (((k+2)<ControlPoints.size())&&(lastP > ControlPoints.get(k+1)))
-				k++;
-			System.err.println("First Min "+k+" if there is no max before end, prop 2 given");
-				//First Minimum found in ControlPoints, so all the values after k must be increasing
-			for (int i=k; i<ControlPoints.size()-1; i++)
+			NURBSShape actualPart = Parts.poll();	
+			CalculateSquareDistanceFunction(actualPart.clone(),p);
+			double partAlpha = Math.min(p.distanceSq(actualPart.controlPoints.firstElement()), p.distanceSq(actualPart.controlPoints.lastElement()));
+			if (partAlpha<alpha)
+				alpha = partAlpha;
+//			System.err.print(alpha+" on ["+actualPart.Knots.firstElement()+","+actualPart.Knots.lastElement()+"].");
+
+			//Check whether all are outside compute min
+			double min = Double.MAX_VALUE;
+			for (int i=0; i<qcControlPoints.size(); i++)
 			{
-				if (ControlPoints.get(i)>=ControlPoints.get(i+1)) //nonincreasing
-				{
-					System.err.println("Prop2 not given");
-					prop2=false;
-				}
+				if (qcControlPoints.get(i)<min)
+					min = qcControlPoints.get(i);
 			}
-			if (prop2)
-				System.err.println("Griven");
+			if (min>alpha)
+			{	//System.err.println(min+" out)");// - outside");
+			}
+			else if (min==partAlpha)
+			{
+				//System.err.println("Endknot candidate");
+			}
+			else
+			{
+		//		System.err.print(" - inside");
+				int k=0; //None found
+				boolean prop2=true;
+				double lastP = qcControlPoints.firstElement();
+				while (((k+2)<qcControlPoints.size())&&(lastP > qcControlPoints.get(k+1)))
+				{
+					lastP = qcControlPoints.get(k+1);
+					k++;
+				}
+				for (int i=k; i<qcControlPoints.size()-1; i++)
+				{
+					if (qcControlPoints.get(i)>=qcControlPoints.get(i+1)) //nonincreasing
+					{
+						prop2=false;
+						break;
+					}
+				}
+				if (!prop2) //Split in the middle
+				{
+					double refinement = (actualPart.Knots.firstElement() + actualPart.Knots.lastElement())/2d;
+//					if ((actualPart.Knots.lastElement()-actualPart.Knots.firstElement())<0.002d)
+//						System.err.println((actualPart.Knots.firstElement()-actualPart.Knots.lastElement())+" addin "+refinement+" on ["+actualPart.Knots.firstElement()+" "+actualPart.Knots.lastElement()+"]");
+					Vector<Double> ref = new Vector<Double>();
+					ref.add(refinement);
+					actualPart.RefineKnots(ref);
+					Vector<NURBSShape> newParts = DecomposeCurve(actualPart);
+					for (int i=0; i<newParts.size(); i++)
+						Parts.offer(newParts.get(i));
+				}
+				else //Newton Iteration on this part
+				{
+					umin = actualPart.Knots.firstElement();
+					umax = actualPart.Knots.lastElement();
+					double startvalue = umin + (double)qcControlPoints.indexOf(min)/((double)qcControlPoints.size()-1)*(umax-umin);
+					double candidate_u = NewtonIteration(actualPart.clone(), startvalue, p);
+					candidates.add(candidate_u);
+//					System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
+					double newdistsq = CurveAt(candidate_u).distanceSq(p);
+					if (alpha > newdistsq)
+						alpha = newdistsq;
+				}
+			} //End INside
+		} //End while
+		double min = Double.MAX_VALUE;
+		for (int i=0; i<candidates.size(); i++)
+		{
+			Point2D pcmp = CurveAt(candidates.get(i));
+			if (pcmp.distance(p)<min)
+			{
+				resultu = candidates.get(i);
+				min = pcmp.distance(p);
+			}
 		}
 	}
+	
+	public double getResultParameter()
+	{
+		return resultu;
+	}
+	
+	public Point2D getResultPoint()
+	{
+		return CurveAt(resultu);
+	}
+	
+	private double NewtonIteration(NURBSShape c, double startvalue, Point2D p)
+	{
+		//System.err.println("Start: "+startvalue);
+		//End criteria
+		double epsilon1 = 0.00002d;
+		double epsilon2 = 0.0003d;
+		//So now we 
+		boolean running = true;
+		Point2D.Double Value = (Point2D.Double) c.CurveAt(startvalue);
+		Point2D.Double firstDeriv = (Point2D.Double) c.DerivateCurveAt(1,startvalue);
+		Point2D.Double secondDeriv = (Point2D.Double) c.DerivateCurveAt(2,startvalue);
+		Point2D.Double diff = new Point2D.Double(Value.x-p.getX(), Value.y-p.getY());
+		double u=startvalue;
+		int iterations=0;
+		while (running)
+		{
+			iterations++;
+			double nominator = firstDeriv.x*diff.x + firstDeriv.y*diff.y;
+			double denominator = secondDeriv.x*diff.x + secondDeriv.y*diff.y + firstDeriv.distanceSq(0d,0d);
+			double unext = u - nominator/denominator;
+			if (unext > c.Knots.lastElement()) //Out of Range
+				unext = c.Knots.lastElement();
+			if (unext < c.Knots.firstElement()) //Out of Range
+				unext = c.Knots.firstElement();
+			  //System.err.print(" u="+unext);
+			  Value = (Point2D.Double) c.CurveAt(unext);
+			  firstDeriv = (Point2D.Double) c.DerivateCurveAt(1,unext);
+			  secondDeriv = (Point2D.Double) c.DerivateCurveAt(2,unext);
+			  diff = new Point2D.Double(Value.x-p.getX(), Value.y-p.getY());
+			  double coincidence = diff.distance(0d,0d);
+			  double movement = Math.abs(nominator/denominator);
+			  double movementu = Math.abs(unext-u)*Math.sqrt(firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y);
+			  if (iterations>50) //it sould converge fast so here we should change sth
+			  {
+				  u = (u+unext)/2;
+				  System.err.println("# "+iterations+"Criteria: "+coincidence+" and "+movement+" and "+movementu);
+				  iterations=0;
+			  }
+			  else
+				   u=unext;            
+			  if ((coincidence<=epsilon1)||(movement<=epsilon2)||(movementu<=epsilon1))
+				  running=false;
+		  }
+		  return u;
+	}
 	/**
-	 * Returns true if and only if the given NURBS-Curve is a rational Bezier curve, that is, 
+	 * Returns true if and only if the NURBS Curve in this Class is in Bezier Form, that is, 
 	 * there are only knots at the start and end of the Interval
-	 * @param c
 	 * @return
 	 */
-	private boolean isInBezierForm(VHyperEdgeShape c)
+	private boolean isInBezierForm()
 	{
-		int deg = c.degree;
-		double a = c.Knots.firstElement();		
-		double b = c.Knots.lastElement();
+		double a = Knots.firstElement();		
+		double b = Knots.lastElement();
 		int counta=0, countb=0;
-		for (int i=0; i<=c.maxKnotIndex; i++)
+		for (int i=0; i<=maxKnotIndex; i++)
 		{
-			if (c.Knots.get(i).doubleValue()==a)
+			if (Knots.get(i).doubleValue()==a)
 				counta++;
-			else if (c.Knots.get(i).doubleValue()==b)
+			else if (Knots.get(i).doubleValue()==b)
 				countb++;
 			else
 				return false;
 		}
-		return ((deg==(counta-1))&&(deg==(countb-1)));
+		return ((degree==(counta-1))&&(degree==(countb-1)));
 	}
+	
 	/**
+	 * Calculate Square distance Function proposed by Chen et al.
+	 * the Curve must be in Bezier-Form to work properly
 	 * 
+	 * @param c
+	 * @param p
 	 */
-	private void initObjSquDist(VHyperEdgeShape c, Point2D p)
+	private void CalculateSquareDistanceFunction(NURBSShape c, Point2D p)
 	{
 		c.translate(-p.getX(),-p.getY());
-		int n = c.maxCPIndex;
-		//Compute new weights
-		weights = new Vector<Double>();
-		for (int k=0; k<=(2*n); k++) //For each k compute
-		{
-			double thisw = 0.0d;
-			for (int i=0; (i<=k)&&(i<=n); i++)
+		//Further donted as FV
+		double FirstValue = c.Knots.firstElement(); //In a pure Bezier-Curve on [0,1] this i 0, 
+		//Futher denoted as LV
+		double LastValue = c.Knots.lastElement(); //this is 1
+		
+		int Degree = c.maxCPIndex; //Old Degree of the given Bezier Curve
+//		System.err.println("Degree: "+Degree+"   and of the product: "+(2*Degree)+" so the tP and tQ have "+(3*Degree+2)+" elements");
+		
+		Vector<Double> tP,tQ;
+		qcControlPoints = new Vector<Double>();
+		qcWeights = new Vector<Double>();
+		for (int i=0; i<=(2*Degree); i++)
+		{	//Compute new weights \hat w_i of the product with  i \in {0,...,2n}
+			//i also determines the number of ones in the Intervall for tP and tQ we may choose			
+			//Init tP and  tQ
+			tP = new Vector<Double>();
+			tQ = new Vector<Double>();
+			//Init tP with maximum number of FV, that is the min (n+1+i, 2n+1), because there are never more than 2n+1 FV
+			//Analog tQ as the max(n+1,i+1) because it starts with least possible zeros and ends with the max (2n+1)
+			for (int j=0; j<(3*Degree+2); j++) //This is the length of P and Q
 			{
-				int j = k-i; //So that the sum i+j=k - that way we get every sum of i+j that is k
-				if (j<=n)
-					thisw += alpha(i,j,n)*c.cpWeight.get(i)*c.cpWeight.get(j);
+				if (j<Math.min(Degree+1+i,2*Degree+1)) //All befor this max to FV all other to LV
+					tP.add(FirstValue);
+				else
+					tP.add(LastValue);
+				if (j<Math.max(Degree+1,i+1)) //All brfore this to FV all behind to LV
+					tQ.add(FirstValue);
+				else
+					tQ.add(LastValue);
 			}
-			weights.add(thisw);
-		}
-		//With the new weights we also can compute the new CP
-		ControlPoints = new Vector<Double>();
-		for (int k=0; k<=(2*n); k++) //For each k compute
-		{
-			double thisp = 0.0d;
-			for (int i=0; (i<=k)&&(i<=n); i++)
+			double dix = 0.0d, diy = 0.0d; //actualCoefficient
+			double diw = 0.0d;
+			//Now for each i there exist Degree+1 - |i-n| cases (Symmetric to n, because 0,...,2n is always odd)
+			int numberOfCases = Degree+1 - Math.abs(i-Degree);
+			for (int cases=0; cases < numberOfCases; cases++)
 			{
-//				System.err.print("\n k="+k+" ");
-				int j = k-i; //So that the sum i+j=k - that way we get every sum of i+j that is k
-				if (j<=n)
-				{ //Compute Pi^T*Pj^
-					double scp = c.controlPoints.get(i).getX()*c.controlPoints.get(j).getX() + c.controlPoints.get(i).getY()*c.controlPoints.get(j).getY();
-					System.err.println("i="+i+" j="+j+"  alpha_ij="+alpha(i,j,n)+" scp="+scp);
-					System.err.println(" Adding "+(alpha(i,j,n)*c.cpWeight.get(i)*c.cpWeight.get(j)*scp)+" ... ");
-					thisp += alpha(i,j,n)*c.cpWeight.get(i)*c.cpWeight.get(j)*scp;
+				//This one case has combinatorial multiplicity:
+				int realcases = cases; //Shift becase after i=Degree the first cases are missing
+				if (i>Degree)
+					realcases += (i-Degree); //After i=Degree first the case, that all p are FV is not possible anymore. this is for the binomial corrected here
+				long mult = binomial(2*Degree-i, Degree-realcases)*binomial(i,realcases);
+				//For each of the cases of t^P/t^Q compute the projection parameters alpha,
+				//that project t^P onto the old t-Vector, and t^Q onto the old t
+				double foronepx = 0.0d, foronepy = 0.0d; //actualCoefficient
+				double foronepw = 0.0d;
+				double[] alphaP = alphaVec(Degree, c.Knots, tP,i);
+				double[] alphaQ = alphaVec(Degree, c.Knots, tQ,i);
+				for (int j1=0; j1<c.controlPoints.size(); j1++)
+				{
+					for (int j2=0; j2<c.controlPoints.size(); j2++)
+					{
+						if (((alphaP[j1]!=0d)&&(alphaP[j1]!=1d))||((alphaQ[j2]!=0d)&&(alphaQ[j2]!=1d)))
+							System.err.print(""+(alphaP[j1])+" and "+(alphaQ[j2])+" \n");
+						foronepx += c.controlPoints.get(j1).getX()*alphaP[j1]*c.controlPoints.get(j2).getX()*alphaQ[j2];
+						foronepy += c.controlPoints.get(j1).getY()*alphaP[j1]*c.controlPoints.get(j2).getY()*alphaQ[j2];
+						foronepw += c.cpWeight.get(j1).doubleValue()*alphaP[j1]*c.cpWeight.get(j2).doubleValue()*alphaQ[j2];
+					}
 				}
+				dix += foronepx*mult;
+				diy += foronepy*mult;
+				diw += foronepw*mult;
+				//Change the t^P and t^Q, so that t^P its first LV set to FV and t^Q its last FV set to LV
+				int changeindex = 0;
+				while (tP.get(changeindex).doubleValue()==FirstValue)
+					changeindex++;
+				tP.set(changeindex-1, LastValue);
+				changeindex = 0;
+				while (tQ.get(changeindex).doubleValue()==FirstValue)
+					changeindex++;
+				tQ.set(changeindex, FirstValue);
+			} //End Cases
+			dix /= binomial(2*Degree,Degree);
+			diy /= binomial(2*Degree,Degree);
+			diw /= binomial(2*Degree,Degree);
+			qcControlPoints.add(dix + diy);
+			qcWeights.add(diw);
+		}	//End i
+		//Update Degree
+		qcDegree = 2*Degree;
+		umin = c.Knots.firstElement().doubleValue();
+		umax = c.Knots.lastElement().doubleValue();
+	}
+	/**
+	 * Computes the discrete B-Spline Coefficients of the projection-curve coefficient i from tau to t
+	 * and a given index i
+	 * @param k the Degree
+	 * @param tau
+	 * @param t
+	 * @param i index of the Coefficient these discrete stuff is needed for
+	**/
+	private double[] alphaVec(int k, Vector<Double> tau, Vector<Double> t, int i)
+	{
+		double[] temp = new double[2*k+1]; //0...2k
+		for (int j=0; j<=2*k; j++) //Init for degree 0
+		{
+			if ((tau.get(j)<=t.get(i))&&(t.get(i)<tau.get(j+1)))
+				temp[j] = 1;
+			else
+				temp[j] = 0;	
+		}
+		for (int deg=1; deg<=k; deg++) //Compute up to degree k
+		{
+			for (int j=0; j<=2*k-deg; j++) //For each higher degree one coefficient in the end less
+			{
+				temp[j] = w(j,deg,tau,t.get(i+deg))*temp[j] + (1-w(j+1,deg,tau,t.get(i+deg)))*temp[j+1];
 			}
-			ControlPoints.add(thisp/weights.get(k));
+		}
+		double[] result = new double[k+1];
+		for (int j=0; j<=k; j++)
+			result[j] = temp[j];
+		return result;
+	}
+	/**
+	 * @param j element of the discrete alphas
+	 * @param k the Degree
+	 * @param tau
+	 * @param t
+	 * @param i index of the 
+	 * @return alpha_j,i,tau,t(i)
+	 * @deprecated use the nonrecursive alphaVec-Funktion
+	 */
+	private double alpha(int j, int k, Vector<Double> tau, Vector<Double> t, int i)
+	{
+		if (k==0)
+		{ //Formular after 1.2 with i=j, t=tau x=t.get(i) with shiftet k by 1
+			if ((tau.get(j)<=t.get(i))&&(t.get(i)<tau.get(j+1)))
+				return 1;
+			else
+				return 0;
+		}	
+		else
+			return w(j,k,tau,t.get(i+k))*alpha(j,k-1,tau,t,i) + (1-w(j+1,k,tau,t.get(i+k)))*alpha(j+1,k-1,tau,t,i);
+	}
+	/**
+	 * w from Formular (1.2) of K. Mørten
+	 * TODO: Optimize for Bezier Curves
+	 * @param i
+	 * @param k the Degree
+	 * @param t
+	 * @param x
+	 * @return
+	 */
+	private double w(int i, int k, Vector<Double> t, double x)
+	{
+		if (t.get(i)<t.get(i+k)) //i is the first value and k+i the last, they are different so not zero
+		{
+			return (x-t.get(i))/(t.get(i+k)-t.get(i));			
+		}
+		else
+		{
+			return 0.0d;
 		}
 	}
-	private double alpha(int i, int j, int n)
-	{
-		long a = binomial(n,i);
-		long b = binomial(n,j);
-		long c = binomial(2*n,i+j);
-		double alpha = (double)(a*b)/(double)c;
-		return alpha;
+
+	/**
+	 * Split a given NURBS-Curve into its rational Bezier-Segments
+	 * @param c
+	 * @return
+	 */
+	private Vector<NURBSShape> DecomposeCurve(NURBSShape c)
+	{			
+		int m = c.maxCPIndex+1;
+		int a = c.degree;
+		int b = c.degree+1;
+		Vector<NURBSShape> BezierSegments = new Vector<NURBSShape>();
+		Vector<Point3d> bezierCP = new Vector<Point3d>();
+		Vector<Point3d> nextbezierCP = new Vector<Point3d>();
+		nextbezierCP.setSize(c.degree+1);
+		for (int i=0; i<=c.degree; i++)
+			bezierCP.add(c.controlPointsHom.get(i));
+		while (b<m)
+		{
+			int i=b;
+			while ((b < m)&&(c.Knots.get(b+1).doubleValue()==c.Knots.get(b).doubleValue()))
+				b++;
+			int multiplicity = b-i+1; //Multiplicity of actual Knot
+			if (multiplicity < c.degree) //Refine it until it is p
+			{
+				double numer = c.Knots.get(b).doubleValue() - c.Knots.get(a).doubleValue(); //Numerator of the alphas 
+				Vector<Double> alpha = new Vector<Double>();
+				alpha.setSize(c.degree-multiplicity);
+				for (int j=c.degree; j>multiplicity; j--)
+					alpha.set(j-multiplicity-1, numer/(c.Knots.get(a+j).doubleValue()-c.Knots.get(a).doubleValue()));
+				int insertionMultiplicity = c.degree-multiplicity;
+				for (int j=1; j<=insertionMultiplicity; j++) //Insert Knot as often as needed
+				{
+					int save = insertionMultiplicity - j;
+					int s = multiplicity+j; //These many new Points
+					for (int k=c.degree; k>=s; k--) //
+					{
+						Point3d p1 = (Point3d) bezierCP.get(k).clone();
+						Point3d p2 = (Point3d) bezierCP.get(k-1).clone();
+						p1.scale(alpha.get(k-s)); p2.scale(1-alpha.get(k-s));						
+						p1.add(p2);
+						bezierCP.set(k,p1);
+					}
+					if (b<m) //then the last cp is also a CP of the next bezier segment
+						nextbezierCP.set(save, bezierCP.get(c.degree));
+				}
+			} //End of refinement
+			//Save actual
+			Vector<Double> bezierKnots = new Vector<Double>();
+			for (int k=0; k<=c.degree; k++)
+				bezierKnots.add(c.Knots.get(a));
+			for (int k=0; k<=c.degree; k++)
+				bezierKnots.add(c.Knots.get(b));
+			BezierSegments.add(new NURBSShape(bezierKnots, bezierCP));
+			if (b<m) //init next
+			{
+				bezierCP = nextbezierCP;
+				nextbezierCP = new Vector<Point3d>();
+				nextbezierCP.setSize(c.degree+1);
+				for (int k=(c.degree-multiplicity); k<=c.degree; k++)
+					bezierCP.set(k, c.controlPointsHom.get(b-c.degree+k));
+				a = b;
+				b++;
+			}
+		}
+		//save last
+		Vector<Double> bezierKnots = new Vector<Double>();
+		for (int k=0; k<=c.degree; k++)
+			bezierKnots.add(c.Knots.get(a));
+		for (int k=0; k<=c.degree; k++)
+			bezierKnots.add(c.Knots.get(b));
+		BezierSegments.add(new NURBSShape(bezierKnots, bezierCP));
+		return BezierSegments;
 	}
-	// return integer nearest to x
+
 	long nint(double x)
 	{
 		if (x < 0.0) return (long) Math.ceil(x - 0.5);

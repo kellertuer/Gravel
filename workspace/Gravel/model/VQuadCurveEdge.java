@@ -41,7 +41,7 @@ public class VQuadCurveEdge extends VEdge
 		p.quadTo(bezierpoint.x*zoom,bezierpoint.y*zoom,p2.x*zoom, p2.y*zoom);
 		return p;
 	}
-	public int getType() {
+	public int getEdgeType() {
 		return VEdge.QUADCURVE;
 	}
 	public void translate(int x, int y)
@@ -65,7 +65,7 @@ public class VQuadCurveEdge extends VEdge
 	}
 	public boolean PathEquals(VEdge v)
 	{
-		if (v.getType()!=VEdge.QUADCURVE)
+		if (v.getEdgeType()!=VEdge.QUADCURVE)
 			return false; //not the same type
 		Point vcp = v.getControlPoints().firstElement();
 		//both are quadcurves so they share same path if the bezierpoint is equal

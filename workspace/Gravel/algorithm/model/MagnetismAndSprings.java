@@ -29,7 +29,7 @@ public class MagnetismAndSprings implements VAlgorithmIF
 		Iterator<VEdge> edgeiterator = vg.modifyEdges.getIterator();
 		while (edgeiterator.hasNext())
 		{
-			if (edgeiterator.next().getType()!=VEdge.STRAIGHTLINE)
+			if (edgeiterator.next().getEdgeType()!=VEdge.STRAIGHTLINE)
 			{
 				return false;
 			}

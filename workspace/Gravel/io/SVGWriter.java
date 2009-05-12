@@ -190,21 +190,21 @@ public class SVGWriter
 	    	   e.x = e.x; e.y = e.y;
 	    	   //not needed int value = values.elementAt(MGraph.EDGEVALUE);
 			   //Mittlere Linie der Kante...immer Zeichnen
-	    	   if (actual.getType()==VEdge.STRAIGHTLINE)
+	    	   if (actual.getEdgeType()==VEdge.STRAIGHTLINE)
 	    	  	   s.write("<path d=\"M "+b.x+","+b.y+" L "+e.x+","+e.y+"\" ");
-	    	   if (actual.getType()==VEdge.ORTHOGONAL)
+	    	   if (actual.getEdgeType()==VEdge.ORTHOGONAL)
 	    	   {
 	    		   if (((VOrthogonalEdge)actual).getVerticalFirst())
 	    			    s.write("<path d=\"M "+b.x+","+b.y+" L "+b.x+","+e.y+" L "+e.x+","+e.y+"\" ");
 	    		   else	
 	    			    s.write("<path d=\"M "+b.x+","+b.y+" L "+e.x+","+b.y+" L "+e.x+","+e.y+"\" ");
 	    	   }
-	    	   if (actual.getType()==VEdge.QUADCURVE)
+	    	   if (actual.getEdgeType()==VEdge.QUADCURVE)
 	    	   {
 	    		   Point bez = ((VQuadCurveEdge)actual).getControlPoints().firstElement();
 	    		   s.write("<path d=\"M "+b.x+","+b.y+" Q "+bez.x+","+bez.y+" "+e.x+","+e.y+"\"");
 	    	   }
-	    	   if (actual.getType()==VEdge.SEGMENTED)
+	    	   if (actual.getEdgeType()==VEdge.SEGMENTED)
 	    	   {
 	    		   Iterator<Point> pit = ((VSegmentedEdge)actual).getControlPoints().iterator();
 	    		   s.write("<path d=\"M "+b.x+","+b.y+"");
@@ -215,7 +215,7 @@ public class SVGWriter
 	    		   }
 	    		   s.write(" \"");
 	    	   }	    	  			   
-	    	   if (actual.getType()==VEdge.LOOP) // SVG Export
+	    	   if (actual.getEdgeType()==VEdge.LOOP) // SVG Export
 	    	   {
 	    		   VLoopEdge l = (VLoopEdge)actual;
 	    		   Point m = l.getControlPoints().firstElement();

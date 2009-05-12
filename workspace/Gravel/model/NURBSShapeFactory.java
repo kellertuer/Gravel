@@ -5,6 +5,28 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.vecmath.Point3d;
+
+/**
+ * The NURBSShapeFactory creates specific NURBS-Curves based on the input
+ * 
+ * These NURBS-Curves are always inclamped and closed (and by that degree-1 times continuous also
+ * at the start- and endpoint)
+ * 
+ * The Constant Values used for the Parameter-Vector are (all always without zoom in original graph coordinates)
+ * 
+ * - ADDPOINTS			: (Integer) Typpe of Point Addition to the POINTS-Set (ADD_END or ADD_BETWEEN)
+ * - CIRCLE_ORIGIN 		: (Java.AWT.Point) of the Circle Origin
+ * - CIRCLE_RADIUS 		: (Integer) Radius of the Circle
+ * - DEGREE				: (Integer) Degree of the resulting NURBS.Curve
+ * - DISTANCE TO NODE 	: (Integer) Distance from Curve to Node obtained from VHyperEdge property
+ * - POINTS				: (Vector<Point2D>) Any Set of Points, e.g. the Nodepositions or Interpolationpoints
+ * - SIZES 				: (Vector<Integer>) Sizes of the nodes if using convex hull  
+ * 
+ * @author Ronny Bergmann
+ * @since 0.4
+ *
+ */
 public class NURBSShapeFactory {
 
 	public final static int CIRCLE_ORIGIN = 1;
@@ -13,50 +35,81 @@ public class NURBSShapeFactory {
 	public final static int DISTANCE_TO_NODE = 3;
 	
 	public final static int POINTS = 4;
-	public final static int DEGREE = 5;
-	public final static int SIZES = 6;
-	public final static int MAX_INDEX = 7;
+	public final static int ADDPOINTS = 5;
+	public final static int DEGREE = 6;
+	public final static int SIZES = 7;
+
+	public final static int MAX_INDEX = 8;
 	
+	//ADDPOINT Specification
+	public final static int ADD_END = 1;
+	public final static int ADD_BETWEEN = 2;
+	
+	/**
+	 * Create the Shape based on Specification of Type and needed Parameters
+	 * 
+	 * All Values given in Capital-Letters are predefined values at which the Parameter must be placed inside the Parameter-Vector
+	 * and for each Parameter the Type is given in brackets
+	 * 
+	 * For the Types
+	 * - „Circle“ with Parameters CIRCLE_RAdius (int), CircleOrigin (Point)
+	 * - „Global Interpolation“ with given POINTS (Vector<Point2D>) and a DEGREE (int)
+	 * - „Convex Hull“ the Nodepositions given through POINTS(Vector<Point2D>) their sizes given by SIZES (Vector<Integer>) and the DEGREE (int)
+	 *
+	 * @param type
+	 * @param Parameters
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
-	public static VHyperEdgeShape CreateShape(String type, Vector<Object> Parameters)
+	public static NURBSShape CreateShape(String type, Vector<Object> Parameters)
 	{
 		int distance;
 		try	{distance = Integer.parseInt(Parameters.get(DISTANCE_TO_NODE).toString());}
-		catch (Exception e) {return new VHyperEdgeShape();} //EmptyShape
+		catch (Exception e) {return new NURBSShape();} //EmptyShape
 		if (type.toLowerCase().equals("circle"))
 		{
 			int radius;
 			try	{radius = Integer.parseInt(Parameters.get(CIRCLE_RADIUS).toString());}
-			catch (Exception e) {return new VHyperEdgeShape();} //Empty Shape
+			catch (Exception e) {return new NURBSShape();} //Empty Shape
 			return CreateCircle((Point) Parameters.get(CIRCLE_ORIGIN), radius, distance);
 		}
 		else if (type.toLowerCase().equals("global interpolation"))
 		{
 			Vector<Point2D> IP_Points;
 			try {IP_Points = (Vector<Point2D>) Parameters.get(POINTS);}
-			catch (Exception e) {return new VHyperEdgeShape();} //Empty Shape
+			catch (Exception e) {return new NURBSShape();} //Empty Shape
 			int degree;
 			try	{degree = Integer.parseInt(Parameters.get(DEGREE).toString());}
-			catch (Exception e) {return new VHyperEdgeShape();}
+			catch (Exception e) {return new NURBSShape();}
 			return CreateInterpolation(IP_Points, degree);
 		}
 		else if (type.toLowerCase().equals("convex hull"))
 		{
 			Vector<Point2D> nodes;
 			try {nodes = (Vector<Point2D>) Parameters.get(POINTS);}
-			catch (Exception e) {return new VHyperEdgeShape();} //Empty Shape
+			catch (Exception e) {return new NURBSShape();} //Empty Shape
 			Vector<Integer> Sizes;
 			try {Sizes = (Vector<Integer>) Parameters.get(SIZES);}
-			catch (Exception e) {return new VHyperEdgeShape();} //Empty Shape
+			catch (Exception e) {return new NURBSShape();} //Empty Shape
 			int degree;
 			try	{degree = Integer.parseInt(Parameters.get(DEGREE).toString());}
-			catch (Exception e) {return new VHyperEdgeShape();}
+			catch (Exception e) {return new NURBSShape();}
 			return CreateConvexHullPolygon(nodes, Sizes, degree, distance);
 		}
 		return null;
 	}
 	
-	private static VHyperEdgeShape CreateCircle(Point origin, int radius, int dist)
+	/**
+	 * Create a NURBSSHape Circle based on the Information, where its Origin is, its Radius and the Distance to the nodes
+	 * 
+	 * TODO: Create an Higher Order Circle
+	 * 
+	 * @param origin Point of Circle Origin
+	 * @param radius Radius of the Circle
+	 * @param dist Distance to the nodes
+	 * @return
+	 */
+	private static NURBSShape CreateCircle(Point origin, int radius, int dist)
 	{
 		//See L. Piegl, W. Tiller: A Menagerie of rational B-Spline Circles
 		Vector<Double> knots = new Vector<Double>();
@@ -79,34 +132,43 @@ public class NURBSShapeFactory {
 		controlPoints.add(new Point2D.Double(origin.x-radius, origin.y+radius)); //P4, bottom left
 		controlPoints.add(new Point2D.Double(origin.x+radius, origin.y+radius)); //P5, bottom right
 		controlPoints.add(new Point2D.Double(origin.x+radius, origin.y)); //P6 again P0
-		return new VHyperEdgeShape(knots,controlPoints,weights,dist);
+		return new NURBSShape(knots,controlPoints,weights);
 	}
 
 	/**
-  	  * Create and return a Smooth NURBS-Curve of degree degree through the given Interpolation Points
+  	  * Create and return a Smooth NURBS-Curve of degree degree through the given Interpolation Points,
+  	  * that is degree-1 continuous at every Point
   	  * 
-	  * @param q The Interpolation-Points
+	  * @param IP The Interpolation-Points
 	  * @param degree the degree
 	  * @return
 	 */
-	private static VHyperEdgeShape CreateInterpolation(Vector<Point2D> q, int degree)
+	public static NURBSShape CreateInterpolation(Vector<Point2D> q, int degree)
 	{
 		//Based on Algorithm 9.1 from the NURBS-Book
-		
-		int maxIPIndex = q.size()-1; //So we have the InterpolationPoints q.get(0) to q.get(maxIPIndex)
-		int maxKnotIndex = maxIPIndex+degree+1;//So we have Knots with indices from Zero to MaxKnotIndex
-		
-		//First determine the Points, where we interpolate depending to the Interpolation-Points
-		//This Part uses the cetripetal Aproach
+		//close IP to a closed curve
+		Vector<Point2D> IP = new Vector<Point2D>();
+		int IPCount = q.size();
+		for (int i=q.size()-degree; i<q.size(); i++)
+			IP.add((Point2D) q.get(i).clone());
+		for (int i=0; i<q.size(); i++)
+			IP.add((Point2D) q.get(i).clone());
+		for (int i=0; i<=degree; i++)
+			IP.add((Point2D) q.get(i).clone());
+		int maxIPIndex = IP.size()-1; //highest IP Index
+		int maxKnotIndex = maxIPIndex+degree+1;//highest KnotIndex in the resulting NURBS-Curve
+		if (maxIPIndex < 2*degree) //we have less then 2*degree IP -> no interpolatin possible
+			return new NURBSShape();
+		//Determine Points to evaluate for IP with cetripetal Aproach
 		double d = 0d;
 		for (int i=1; i<=maxIPIndex; i++)
-			d += Math.sqrt(q.get(i).distance(q.get(i-1)));
+			d += Math.sqrt(IP.get(i).distance(IP.get(i-1)));
 		Vector<Double> lgspoints = new Vector<Double>();
-		lgspoints.setSize(q.size());
+		lgspoints.setSize(IP.size());
 		lgspoints.set(0,0d);
 		lgspoints.set(maxIPIndex, 1d);
 		for (int i=1; i<maxIPIndex; i++)
-			lgspoints.set(i, lgspoints.get(i-1).doubleValue() + Math.sqrt(q.get(i).distance(q.get(i-1)))/d);
+			lgspoints.set(i, lgspoints.get(i-1).doubleValue() + Math.sqrt(IP.get(i).distance(IP.get(i-1)))/d);
 		//At the lgspoints we evaluate the Curve, get an LGS, that is totally positive and banded
 		Vector<Double> Knots = new Vector<Double>();
 		Knots.setSize(maxKnotIndex+1); //Because there are 0,...,macKnotIndex Knots
@@ -125,6 +187,90 @@ public class NURBSShapeFactory {
 			value /= degree;
 			Knots.set(j+degree, value);
 		}
+		NURBSShape c = solveLGS(Knots, lgspoints, IP);
+		c = unclamp(cutoverlaps(c,lgspoints.get(degree), lgspoints.get(degree+IPCount)));
+		for (int i=0; i<degree; i++)
+		{
+			Point2D a = c.controlPoints.get(i);
+			double aw = c.cpWeight.get(i);
+			Point2D b = c.controlPoints.get(c.maxCPIndex-degree+1+i);
+			double bw = c.cpWeight.get(c.maxCPIndex-degree+1+i);
+			
+			Point2D middle = new Point2D.Double((a.getX()+b.getX())/2d,	(a.getY()+b.getY())/2d);
+			c.cpWeight.set(i, (aw+bw)/2d);
+			c.cpWeight.set(c.maxCPIndex-degree+1+i, (aw+bw)/2d);
+			c.controlPoints.set(i,(Point2D)middle.clone());
+			c.controlPoints.set(c.maxCPIndex-degree+1+i,middle);
+		}
+		return c;
+	}
+
+	/**
+	 * Cut the additionally added parts from the curve to get an 
+	 * unclamped closed NURBSCurve
+	 * 
+	 * TODO: Try to set [u1,u2] to [0,1] For simplicity reasons?
+	 * @param u1
+	 * @param u2
+	 */
+	private static NURBSShape cutoverlaps(NURBSShape c, double u1, double u2)
+	{
+		int Start = c.findSpan(u1);
+		int End = c.findSpan(u2);
+		if (u2==c.Knots.get(c.maxKnotIndex-c.degree)) //Last possible Value the Curve is evaluated
+			End++;
+		if ((Start==-1)||(End==-1)||(u1>=u2)) //Ohne u out of range or invalid interval
+			return new NURBSShape(); //Return amepty Shape
+		
+		//Raise both endvalues to multiplicity d to get an clamped curve
+		int multStart = 0;
+		while (c.Knots.get(Start+multStart).doubleValue()==u1)
+			multStart++;
+		int multEnd = 0;
+		while (c.Knots.get(End-multEnd).doubleValue()==u2)
+			multEnd++;
+		Vector<Double> Refinement = new Vector<Double>();
+		for (int i=0; i<=c.degree-multStart; i++)
+			Refinement.add(u1);
+		for (int i=0; i<=c.degree-multEnd; i++)
+			Refinement.add(u2);
+		//Nun wird der Start- und der Endpunkt
+		NURBSShape subcurve = c.clone();
+		subcurve.RefineKnots(Refinement); //Now it interpolates subcurve(u1) and subcurve(u2)
+		Vector<Point2D> newCP = new Vector<Point2D>();
+		Vector<Double> newWeight= new Vector<Double>();
+		for (int i=Start+1; i<(End+c.degree+1-multStart+1); i++)
+		{
+			newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
+			newWeight.add(subcurve.cpWeight.get(i).doubleValue());
+		}
+		//Copy needed Knots
+		int index = 0;
+		Vector<Double> newKnots = new Vector<Double>();
+		while (subcurve.Knots.get(index)<u1)
+			index++;
+		while (subcurve.Knots.get(index)<=u2)
+		{
+			newKnots.add(subcurve.Knots.get(index).doubleValue());
+			index++;
+		}
+		return new NURBSShape(newKnots,newCP,newWeight);
+	}
+	/**
+	 * For given Knot-Vector, lgspoints and InterpolationPoints this Method returns the NURBS-Shape
+	 * The Knots define The range and distribution of the ControlPoints in the resulting NURBSShape
+	 * The lgspoints (that lie within the range of the knots-values) define on  which values the 
+	 * InterpolationPoints are reached within the curve
+	 * @param Knots
+	 * @param lgspoints
+	 * @param IP
+	 * @return
+	 */
+	private static NURBSShape solveLGS(Vector<Double> Knots, Vector<Double> lgspoints, Vector<Point2D> IP) 
+	{	
+		int maxIPIndex = IP.size()-1; //highest IP Index
+		int maxKnotIndex = Knots.size()-1; //highest KnotIndex in the resulting NURBS-Curve
+		int degree = maxKnotIndex-maxIPIndex-1;
 		Vector<Point2D> ControlPoints = new Vector<Point2D>(); //The Resulting ConrolPointVecotr
 		ControlPoints.setSize(maxIPIndex+1);
 		Vector<Double> weights = new Vector<Double>();
@@ -135,7 +281,7 @@ public class NURBSShapeFactory {
 			ControlPoints.set(i,new Point(0,0)); //Zero Initialization
 		}
 		
-		VHyperEdgeShape temp = new VHyperEdgeShape(Knots, ControlPoints,weights,0); //Temporary Shape for the BasisFunctions
+		NURBSShape temp = new NURBSShape(Knots, ControlPoints,weights); //Temporary Shape for the BasisFunctions
 		//Compute the basis-Function-Values and set them as row of a Matrix
 		double[][] LGS = new double[maxIPIndex+1][maxIPIndex+1]; //Already zero initialized;
 		for (int i=0; i<=maxIPIndex; i++) //For each Row
@@ -170,7 +316,7 @@ public class NURBSShapeFactory {
 		//Forward Computation of P
 		for (int i=0; i<=maxIPIndex; i++)
 		{
-			double thisX = q.get(i).getX(), thisY = q.get(i).getY();
+			double thisX = IP.get(i).getX(), thisY = IP.get(i).getY();
 			for (int k=0; k<i; k++)
 			{
 				thisX -= LGS[i][k]*ControlPoints.get(k).getX();
@@ -191,19 +337,69 @@ public class NURBSShapeFactory {
 			thisPointY /= LGS[i][i];
 			ControlPoints.set(i,new Point2D.Double(thisPointX,thisPointY));
 		}
-		temp.setCurveTo(Knots, ControlPoints, weights);
-		return temp;
+		//Create a linear Shapepart around Start/End
+		return new NURBSShape(Knots, ControlPoints,weights);
 	}
-
+	
 	/**
-	 * Based on Grahams Scan this Method creates a convex hull and calculates Interpolation-Points that are at least
-	 * The size of a node plus the minimal Distance away from the node 
-	 * 
+	 * Unclamp the Curve at both sides
+	 * @param c
+	 * @return
 	 */
-	private static VHyperEdgeShape CreateConvexHullPolygon(Vector<Point2D> nodes, Vector<Integer> sizes, int degree, int distance)
+	public static NURBSShape unclamp(NURBSShape c)
+	{
+		if ((c.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
+			return c; //already unclamped
+		//Algorithm 12.1
+		Vector<Point3d> Pw = c.controlPointsHom;
+		Vector<Double> U = c.Knots;
+		int p = c.degree, n = c.maxCPIndex;
+		for (int i=0; i<=p-2; i++)
+		{
+			U.set(p-i-1, U.get(p-i) - (U.get(n-i+1)-U.get(n-i)));
+			int k=p-1;
+			for (int j=i; j>=0; j--)
+			{
+				double alpha = (U.get(p)-U.get(k))/(U.get(p+j+1)-U.get(k));
+				double x = (Pw.get(j).x - alpha*Pw.get(j+1).x)/(1.0-alpha);
+				double y = (Pw.get(j).y - alpha*Pw.get(j+1).y)/(1.0-alpha);
+				double w = (Pw.get(j).z - alpha*Pw.get(j+1).z)/(1.0-alpha);
+				Pw.set(j, new Point3d(x,y,w));
+				k--;
+			}
+		}
+		U.set(0, U.get(1) - (U.get(n-p+2)-U.get(n-p+1)));
+		for (int i=0; i<=p-2; i++)
+		{
+			U.set(n+i+2, U.get(n+i+1) + (U.get(p+i+1)-U.get(p+i)));
+			for (int j=i; j>=0; j--)
+			{
+				double alpha = (U.get(n+1)-U.get(n-j))/(U.get(n-j+i+2)-U.get(n-j));
+				double x = (Pw.get(n-j).x - (1d-alpha)*Pw.get(n-j-1).x)/alpha;
+				double y = (Pw.get(n-j).y - (1d-alpha)*Pw.get(n-j-1).y)/alpha;
+				double w = (Pw.get(n-j).z - (1d-alpha)*Pw.get(n-j-1).z)/alpha;
+				Pw.set(n-j, new Point3d(x,y,w));
+			}
+		}
+		U.set(n+p+1, U.get(n+p) + (U.get(2*p)-U.get(2*p-1)));
+		c = new NURBSShape(U, Pw);
+		return c;
+	}
+	
+	/**
+	 * 	 * Based on Grahams Scan this Method creates a convex hull and calculates Interpolation-Points that are at least
+	 * The size of a node plus the minimal Distance away from the node 
+	 * @param nodes Positions of the Nodes inside the convex hull
+	 * @param sizes Node-Sizes, so that the Shape is at most sizes(i)+distance away from the node-position
+	 * @param degree degree of the resulting NURBSShape
+	 * @param distance Distance mentioned above in the sizes
+	 * 
+	 * @return
+	 */
+	private static NURBSShape CreateConvexHullPolygon(Vector<Point2D> nodes, Vector<Integer> sizes, int degree, int distance)
 	{
 		if (nodes.size()<2) //mindestens 3 Knoten nötig
-			return new VHyperEdgeShape();
+			return new NURBSShape();
 		Vector<Point2D> ConvexHull = GrahamsScan(nodes);
 		Vector<Point2D> IPoints = new Vector<Point2D>();
 		for (int i=0; i<ConvexHull.size(); i++)
@@ -241,13 +437,20 @@ public class NURBSShapeFactory {
 			IPoints.add(new Point2D.Double(thisX - direction3.getX()/dir3l*(distance+(double)sizes.get(pos)/2d), thisY - direction3.getY()/dir3l*(distance+(double)sizes.get(pos)/2d)));
 		}
 		IPoints = GrahamsScan(IPoints); //Make convex again
-		IPoints.add((Point2D) IPoints.firstElement().clone());
 		if (IPoints.size()<=degree)
-			return new VHyperEdgeShape();
+			return new NURBSShape();
 		return CreateInterpolation(IPoints, degree);
 	}
 	
-	public static Vector<Point2D> GrahamsScan(Vector<Point2D> nodes)
+	/**
+	 * Calculate the Convex Hull of a set of Points 
+	 * by using Grahams Scan
+	 * 
+	 * @param nodes Points from which the resulting Convex Hull is calculated
+	 * 
+	 * @return Points of the nodes that from the convex hull in clockwise order
+	 */
+	private static Vector<Point2D> GrahamsScan(Vector<Point2D> nodes)
 	{
 		//Find Pivot Point with lowest Y Coordinate. If there are two, take the one with lowest X
 		Point2D pivot = new Point2D.Double(Double.MAX_VALUE,Double.MAX_VALUE);
@@ -306,10 +509,24 @@ public class NURBSShapeFactory {
 		}		 
 		return result;
 	}
+	
+	/**
+	 * Calculating the cross product of three points
+	 * @param p1
+	 * @param p2
+	 * @param p3
+	 * @return
+	 */
 	private static double CrossProduct(Point2D p1, Point2D p2, Point2D p3)
 	{
        return (p2.getX() - p1.getX())*(p3.getY() - p1.getY()) - (p3.getX() - p1.getX())*(p2.getY() - p1.getY());
 	}
+	
+	/**
+	 * Calculate the Degree of a given direction
+	 * @param dir
+	 * @return
+	 */
 	private static double getDegreefromDirection(Point2D dir)
 	{
 		//Compute Degree with inverted Y Axis due to Computergraphics

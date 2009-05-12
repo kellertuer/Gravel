@@ -27,23 +27,25 @@ public class VHyperEdge extends VItem {
 		}
 		
 	}		
-	protected int width;
+	private int width, minMargin;
 	private VEdgeText text;
 	private VEdgeLinestyle linestyle;
-	private VHyperEdgeShape shape;
+	private NURBSShape shape;
 	/**
 	 * Constructor that initializes the Arrow-Part of the Edge with the GeneralPreferences Standard
 	 * 
 	 * @param i index of the edge - must be the same as the index in the mathematical corresponding edge
 	 * @param w line width of the edge when drawn
+	 * @param d minimal distance between any node of the VHyperEdge and its shape
 	 */
-	public VHyperEdge(int i,int w)
+	public VHyperEdge(int i,int w, int d)
 	{
 		super(i);
+		minMargin = d;
 		width=w;
 		text = new VEdgeText();
 		linestyle = new VEdgeLinestyle();
-		shape = new VHyperEdgeShape();
+		shape = new NURBSShape();
 	}
 	/**
 	 * Create an Edge with specific Arrow, Text and LineStyle Elements
@@ -53,11 +55,12 @@ public class VHyperEdge extends VItem {
 	 * @param t Text-Specifications of the edge
 	 * @param l Linestyle values of the Edge
 	 */
-	public VHyperEdge(int i,int w, VHyperEdgeShape s, VEdgeText t, VEdgeLinestyle l)
+	public VHyperEdge(int i,int w, int d, NURBSShape s, VEdgeText t, VEdgeLinestyle l)
 	{
 		super(i);
 		width=w;
 		shape = s;
+		minMargin = d;
 		text = t;
 		linestyle = l;
 	}
@@ -123,7 +126,7 @@ public class VHyperEdge extends VItem {
 	 */
 	public VHyperEdge clone()
 	{
-		return new VHyperEdge(getIndex(), width, shape, text.clone(), linestyle.clone());
+		return new VHyperEdge(getIndex(), width, minMargin, shape, text.clone(), linestyle.clone());
 	}
 	/**
 	 * getDirectionatPointonEdge
@@ -184,6 +187,15 @@ public class VHyperEdge extends VItem {
 	{
 		width = i;
 	}
+	
+	public int getMinimumMargin()
+	{
+		return minMargin;
+	}
+	public void setMinimumMargin(int m)
+	{
+		minMargin = m;
+	}
 	/**
 	 * return the class for the textproperties
 	 * @return
@@ -206,14 +218,19 @@ public class VHyperEdge extends VItem {
 	 * Set the Shape, You should notify the vGraph about this change
 	 * @param s the new Shape
 	 */
-	public void setShape(VHyperEdgeShape s) {
+	public void setShape(NURBSShape s) {
 		shape = s;
 	}
 	/**
 	 * Get the actual Shape
 	 * @return the arrow
 	 */
-	public VHyperEdgeShape getShape() {
+	public NURBSShape getShape() {
 		return shape;
+	}
+	
+	public int getType()
+	{
+		return VItem.HYPEREDGE;
 	}
 }

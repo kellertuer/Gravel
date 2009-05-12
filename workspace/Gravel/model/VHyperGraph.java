@@ -7,6 +7,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -321,14 +322,20 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 	 * 
 	 * @param p a point
 	 * @param variation the variation m may be away from the edge
-	 * @return the first edge in range, if there is one, else null
+	 * @return the first edge in range, if there is one, else
 	 */
 	public VHyperEdge getEdgeinRangeOf(Point m, double variation) {
 		Iterator<VHyperEdge> n = modifyHyperEdges.getIterator();
 		while (n.hasNext()) {
 			VHyperEdge temp = n.next();
-			temp.clone(); //Hrhr
-			//TODO VHyperGraph:getEdgeinRangeOf:Check for the Point in Range of Curve
+			if (!temp.getShape().isEmpty())
+			{
+				NURBSShapeProjection projection = new NURBSShapeProjection(temp.getShape(),m);
+				Point2D OnCurve = projection.getResultPoint();
+			
+				if (OnCurve.distance(m)<=(variation+(double)temp.getWidth()))
+					return temp;
+			}
 		}
 		return null; // keinen gefunden
 	}
@@ -344,8 +351,8 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 		Iterator<VNode> iter = modifyNodes.getIterator();
 		int i = mG.modifyHyperEdges.getNextIndex();
 		MHyperEdge me = new MHyperEdge(i,GeneralPreferences.getInstance().getIntValue("edge.value"),"HE"+i);
-		//TODO: VHyperGraph:addHyperEdge(SelNodes) Standardname					
-		modifyHyperEdges.add(new VHyperEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width")), me);
+		//TODO: VHyperGraph:addHyperEdge(SelNodes) Standardname und Standardabstand					
+		modifyHyperEdges.add(new VHyperEdge(i,GeneralPreferences.getInstance().getIntValue("edge.width"), 12), me);
 		while (iter.hasNext()) 
 		{
 				VNode temp = iter.next();

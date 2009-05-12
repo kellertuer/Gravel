@@ -171,7 +171,7 @@ public class VEdgeSet extends Observable implements Observer {
 			try 
 			{
 				// In einem ungerichteten Graphen existiert eine Kante von e zu s und die ist StraightLine und die neue Kante ist dies auch	
-				if ((medge.StartIndex!=medge.EndIndex)&&(mG.isDirected())&&(mG.modifyEdges.cardinalityBetween(medge.EndIndex, medge.StartIndex)==1)&&(get(mG.modifyEdges.indicesBetween(medge.EndIndex, medge.StartIndex).firstElement()).getType()==VEdge.STRAIGHTLINE)&&(edge.getType()==VEdge.STRAIGHTLINE))
+				if ((medge.StartIndex!=medge.EndIndex)&&(mG.isDirected())&&(mG.modifyEdges.cardinalityBetween(medge.EndIndex, medge.StartIndex)==1)&&(get(mG.modifyEdges.indicesBetween(medge.EndIndex, medge.StartIndex).firstElement()).getEdgeType()==VEdge.STRAIGHTLINE)&&(edge.getEdgeType()==VEdge.STRAIGHTLINE))
 				{ //Dann würde diese Kante direkt auf der anderen liegen
 					Point dir = new Point(end.x-start.x,end.y-start.y);
 					double length = dir.distanceSq(new Point(0,0));
@@ -316,7 +316,7 @@ public class VEdgeSet extends Observable implements Observer {
 			{
 				VEdge act = get(iiter.next());
 				MEdge me = mG.modifyEdges.get(act.getIndex());
-				if ((me.StartIndex==e)&&(!mG.isDirected())&&(act.getType()==VEdge.ORTHOGONAL)&&(edge.getType()==VEdge.ORTHOGONAL)) 
+				if ((me.StartIndex==e)&&(!mG.isDirected())&&(act.getEdgeType()==VEdge.ORTHOGONAL)&&(edge.getEdgeType()==VEdge.ORTHOGONAL)) 
 				//ungerichtet, beide orthogonal und entgegengesetz gespeichert
 				{
 					if (((VOrthogonalEdge)act).getVerticalFirst()!=((VOrthogonalEdge)edge).getVerticalFirst())
@@ -358,7 +358,7 @@ public class VEdgeSet extends Observable implements Observer {
 		Iterator<VEdge> n = vEdges.iterator();
 		while (n.hasNext()) {
 			VEdge temp = n.next(); // naechste Kante
-			switch (temp.getType()) {
+			switch (temp.getEdgeType()) {
 				case VEdge.LOOP :
 				case VEdge.QUADCURVE : // Wenns eine Bezierkante ist
 				{

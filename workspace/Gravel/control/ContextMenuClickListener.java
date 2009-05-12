@@ -36,6 +36,7 @@ import model.VSubgraph;
 import model.VSubgraphSet;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
+import view.Gui;
 import view.VCommonGraphic;
 import view.VGraphic;
 import view.VHyperGraphic;
@@ -62,7 +63,7 @@ public class ContextMenuClickListener
 	private JPopupMenu EdgePopup;
 	private JMenuItem Eproperties, Edelete, Ename, EDelSelection;
 	private JMenu EaddtoSet, EremfromSet; // Kantenuntermenüs
-	
+	private JMenuItem HEShape;
 	//Save Any Item that is clicked
 	private VNode selectedNode=null; 
 	private VEdge selectedEdge=null; 
@@ -179,6 +180,11 @@ public class ContextMenuClickListener
 		Ename.setEnabled(false);
 		Eproperties = new JMenuItem("Eigenschaften...");
 		Eproperties.addActionListener(this);
+		if (vhg!=null)
+		{
+			HEShape = new JMenuItem("Umriss bearbeiten...");
+			HEShape.addActionListener(this);
+		}
 		Edelete = new JMenuItem("Löschen");
 		Edelete.addActionListener(this);
 		EaddtoSet = new JMenu("Kante hinzufügen zu");
@@ -193,15 +199,18 @@ public class ContextMenuClickListener
 		else if (vhg!=null)
 			EDelSelection.setEnabled(vhg.hasSelection());
 		EDelSelection.addActionListener(this);	
+
 		EdgePopup = new JPopupMenu();
 		EdgePopup.add(Ename);
 		EdgePopup.addSeparator();
 		EdgePopup.add(Eproperties);
+		if (vhg!=null)
+			EdgePopup.add(HEShape);
 		EdgePopup.add(EaddtoSet);
 		EdgePopup.add(EremfromSet);
 		EdgePopup.addSeparator();
 		EdgePopup.add(Edelete);
-		EdgePopup.add(EDelSelection);	
+		EdgePopup.add(EDelSelection);
 	}
 	
 	/**
@@ -507,9 +516,16 @@ public class ContextMenuClickListener
 			vg.modifyEdges.remove(selectedEdge.getIndex());
 		}
 		//KantenMen� : Eigenschaften
-		if (e.getSource()==Eproperties)
+		else if (e.getSource()==Eproperties)
 		{
-			new JEdgeDialog(selectedEdge,vg);
+			if (vg!=null)
+				new JEdgeDialog(selectedEdge,vg);
+			else if (vhg!=null)
+				new JHyperEdgeDialog(selectedHyperEdge);
+		}
+		else if (e.getSource()==HEShape)
+		{
+			Gui.getInstance().InitShapeModification(selectedHyperEdge.getIndex());
 		}
 	}
 	public void actionPerformed(ActionEvent e) {

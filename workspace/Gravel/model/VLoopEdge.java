@@ -86,7 +86,7 @@ public class VLoopEdge extends VEdge {
 		return p;
 	}
 
-	public int getType() {
+	public int getEdgeType() {
 		return VEdge.LOOP;
 	}
 	public void translate(int x, int y) {}
@@ -159,7 +159,7 @@ public class VLoopEdge extends VEdge {
 	}
 	public boolean PathEquals(VEdge v)
 	{
-		if (v.getType()!=VEdge.LOOP)
+		if (v.getEdgeType()!=VEdge.LOOP)
 			return false; //not the same type
 		VLoopEdge tempv = (VLoopEdge)v;
 		//if direction, length and proportion equal, they might share the same path		

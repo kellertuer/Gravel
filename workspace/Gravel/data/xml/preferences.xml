@@ -19,8 +19,8 @@
 		<value name="arrpart" type="Integer">75</value>
 		<value name="arrpos" type="Integer">100</value>
 		<value name="arrsize" type="Integer">14</value>
-		<value name="line_distance" type="Integer">15</value>
-		<value name="line_length" type="Integer">10</value>
+		<value name="line_distance" type="Integer">5</value>
+		<value name="line_length" type="Integer">8</value>
 		<value name="line_type" type="Integer">1</value>
 		<value name="loopclockwise" type="Boolean">true</value>
 		<value name="loopdirection" type="Integer">0</value>
@@ -60,8 +60,8 @@
 		<value name="name_distance" type="Integer">18</value>
 		<value name="name_rotation" type="Integer">270</value>
 		<value name="name_size" type="Integer">12</value>
-		<value name="name_visible" type="Boolean">true</value>
-		<value name="size" type="Integer">9</value>
+		<value name="name_visible" type="Boolean">false</value>
+		<value name="size" type="Integer">8</value>
 	</group>
 	<group name="pref">
 		<value name="saveonexit" type="Boolean">true</value>

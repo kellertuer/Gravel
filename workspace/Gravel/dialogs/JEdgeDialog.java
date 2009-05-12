@@ -184,7 +184,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		tabs.addTab("Ansicht", TextContent);
 		if (chEdge!=null)
 		{
-			if (chEdge.getType()==VEdge.LOOP)
+			if (chEdge.getEdgeType()==VEdge.LOOP)
 				tabs.addTab(" Schleife ",cLoop);
 			else
 				tabs.addTab("Kantentyp", cEdgeTypeField);
@@ -504,7 +504,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		cStraightLine.setVisible(false);
 		int type = VEdge.STRAIGHTLINE;
 	    if (chEdge!=null)
-	    	type = chEdge.getType();  
+	    	type = chEdge.getEdgeType();  
 	   	switch(type)
 	    {
 			case	VEdge.QUADCURVE : //Wenns eine Bezierkante ist
@@ -563,7 +563,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		c.gridx++;
 		cQuadCurve.add(iQCy,c);
 		cQuadCurve.setPreferredSize(prefSize);
-		if ((chEdge!=null)&&(chEdge.getType()==VEdge.QUADCURVE)) //Werte holen
+		if ((chEdge!=null)&&(chEdge.getEdgeType()==VEdge.QUADCURVE)) //Werte holen
 		{
 			Point p = ((VQuadCurveEdge) chEdge).getControlPoints().firstElement();
 			iQCx.setValue(p.x);
@@ -577,7 +577,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		c.gridy = 0;
 		c.gridx = 0;
 		c.gridheight=3;
-		if ((chEdge!=null)&&(chEdge.getType()==VEdge.SEGMENTED))
+		if ((chEdge!=null)&&(chEdge.getEdgeType()==VEdge.SEGMENTED))
 				segmentpoints = chEdge.getControlPoints();
 			else
 				segmentpoints = new Vector<Point>();
@@ -616,7 +616,7 @@ public class JEdgeDialog extends JDialog implements ActionListener, ItemListener
 		c.gridx++;
 		cOrthogonal.add(bOrthVertFirst,c);
 		cOrthogonal.setPreferredSize(prefSize);
-		if ((chEdge!=null)&&(chEdge.getType()==VEdge.ORTHOGONAL))
+		if ((chEdge!=null)&&(chEdge.getEdgeType()==VEdge.ORTHOGONAL))
 				bOrthVertFirst.setSelected(((VOrthogonalEdge) chEdge).getVerticalFirst());
 	}
 	/**

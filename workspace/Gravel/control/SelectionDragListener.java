@@ -112,7 +112,7 @@ public class SelectionDragListener
 				ep.x = Math.round((float)ep.x*zoom);ep.y = Math.round((float)ep.y*zoom);
 				boolean intersects = false;
 				//Switch Type and check for intersection (special checks for some types)
-				switch (e.getType())
+				switch (e.getEdgeType())
 				{
 					case VEdge.STRAIGHTLINE:{
 						intersects = selrect.intersectsLine(new Line2D.Double(sp,ep));
@@ -213,7 +213,7 @@ public class SelectionDragListener
 		else if (vhg!=null) //Hypergraph
 		{
 			nodeInRange = vhg.modifyNodes.getFirstinRangeOf(pointInGraph);
-			hyperedgeInRange = vhg.getEdgeinRangeOf(pointInGraph, 2.0*((float)vgc.getZoom()/100));
+			//hyperedgeInRange = vhg.getEdgeinRangeOf(pointInGraph, 2.0*((float)vgc.getZoom()/100));
 		}
 		else
 			return; //No graph is !=null

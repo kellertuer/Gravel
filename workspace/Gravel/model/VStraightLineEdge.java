@@ -23,7 +23,7 @@ public class VStraightLineEdge extends VEdge
 		p.lineTo(End.x*zoom,End.y*zoom);
 		return p;
 		}
-	public int getType() {
+	public int getEdgeType() {
 		return VEdge.STRAIGHTLINE;
 	}
 	public void translate(int x, int y)
@@ -44,6 +44,6 @@ public class VStraightLineEdge extends VEdge
 	public boolean PathEquals(VEdge v)
 	{
 		//two straight line edges share the same path (if start and end are equal) so the test is only the type
-		return (v.getType()==VEdge.STRAIGHTLINE);
+		return (v.getEdgeType()==VEdge.STRAIGHTLINE);
 	}
 }

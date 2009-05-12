@@ -36,7 +36,8 @@ public class SelectionClickListener implements MouseListener {
 		vhg = g.getGraph();
 	}
 
-	public void mouseClicked(MouseEvent e) {
+	public void mouseClicked(MouseEvent e) 
+	{
 		//Point in the Graph, without the Zoom in the Display
 		Point pointInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100)));
 		VNode r=null;
@@ -57,48 +58,40 @@ public class SelectionClickListener implements MouseListener {
 		}
 		else
 			return; //No graph is !=null
+		//Get the item in an VItem
+		VItem selectedItem = null;
+		if (r!=null)
+			selectedItem = r;
+		else if (s!=null)
+			selectedItem = s;
+		else if (t!=null)
+			selectedItem = t;
+
 		if (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.SHIFT_MASK) // if not Shift Click
 		{
-			if (r != null) //Clicked on a node toggleSelecition status
-			{
-				if ((r.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED)
-					r.setSelectedStatus(VItem.SELECTED);
-				else
-					r.deselect();
-				notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
-			}
-			else if (s!=null)
-			{
-				if ((s.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED)
-					s.setSelectedStatus(VItem.SELECTED);
-				else
-					s.deselect();
-				notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
-			}
-			else if (t!=null)
-			{
-				if ((t.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED)
-					t.setSelectedStatus(VItem.SELECTED);
-				else
-					t.deselect();
-				notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));			
-			}
+			if (selectedItem==null)
+				return;
+			if ((selectedItem.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED)
+				selectedItem.setSelectedStatus(VItem.SELECTED);
 			else
-				notify.deselect();
+				selectedItem.deselect();
+			notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
 		}
 		else if (e.getModifiers() == MouseEvent.BUTTON1_MASK) //Single Click
-		{
-			//Deselect all, and select only any item in range
-			notify.deselect();
-			if (r!=null)
-				r.setSelectedStatus(VItem.SELECTED);
-			else if (s!=null)
-				s.setSelectedStatus(VItem.SELECTED);
-			else if (t!=null)
-				t.setSelectedStatus(VItem.SELECTED);
-			
-			if  ((r!=null) || (s!=null) || (t!=null))
-				notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));						
+		{			
+			if (selectedItem==null) //Left click on background -> Deselect
+			{
+				notify.deselect();		
+				return;
+			}
+			if ((selectedItem.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED) //Element not selected
+			{
+				notify.deselect();
+				selectedItem.setSelectedStatus(VItem.SELECTED);
+			}	
+			else //was selected
+				notify.deselect();
+			notify.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));						
 		}
 	}
 

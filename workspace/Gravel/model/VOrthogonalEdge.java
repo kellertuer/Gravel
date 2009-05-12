@@ -55,7 +55,7 @@ public class VOrthogonalEdge extends VEdge {
 		verticalfirst = v;
 	}
 	@Override
-	public int getType() {
+	public int getEdgeType() {
 		return VEdge.ORTHOGONAL;
 	}
 	public void translate(int x,int y){}
@@ -74,7 +74,7 @@ public class VOrthogonalEdge extends VEdge {
 	}
 	public boolean PathEquals(VEdge v)
 	{
-		if (v.getType()!=VEdge.ORTHOGONAL)
+		if (v.getEdgeType()!=VEdge.ORTHOGONAL)
 			return false; //not the same type
 		//both are orthogonal edges so thea are equal if both have the same verticalfirst
 		return (verticalfirst==(((VOrthogonalEdge)v).getVerticalFirst()));

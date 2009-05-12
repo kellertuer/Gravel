@@ -142,7 +142,7 @@ public class CLoopParameters extends Container implements ActionListener{
 	public void InitValues(VEdge e, boolean setClockwise)
 	{
 		chEdge = e;
-		if ((chEdge!=null)&&(chEdge.getType()==VEdge.LOOP))
+		if ((chEdge!=null)&&(chEdge.getEdgeType()==VEdge.LOOP))
 		{
 			VLoopEdge vle = (VLoopEdge)chEdge;
 			
@@ -244,7 +244,7 @@ public class CLoopParameters extends Container implements ActionListener{
 	{
 		if (!VerifyInput().equals(""))
 			return e; //Exception ?
-		if (e.getType()!=VEdge.LOOP)
+		if (e.getEdgeType()!=VEdge.LOOP)
 			return e; //keine Schleife
 		VLoopEdge vle = (VLoopEdge) e;
 		if (checksEnabled) //nur angekreuzte Werte ändern

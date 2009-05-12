@@ -21,7 +21,7 @@ import model.VEdge;
 import model.VGraph;
 import model.VGraphInterface;
 import model.VHyperEdge;
-import model.VHyperEdgeShape;
+import model.NURBSShape;
 import model.VHyperGraph;
 import model.VItem;
 import model.VNode;
@@ -43,7 +43,7 @@ import view.VHyperGraphic;
  * @author Ronny Bergmann
  *
  */
-public class CircleCreationHandler implements ShapeMouseHandler {
+public class CircleCreationHandler implements ShapeCreationMouseHandler {
 	VGraph vg = null;
 	VHyperGraph vhg = null;
 	VCommonGraphic vgc;
@@ -52,7 +52,7 @@ public class CircleCreationHandler implements ShapeMouseHandler {
 	boolean firstdrag = true;
 	Point CircleOrigin = null;
 	int size = 0;
-	VHyperEdgeShape lastcircle=null;
+	NURBSShape lastcircle=null;
 
 	public CircleCreationHandler(VGraphic g)
 	{
@@ -99,13 +99,14 @@ public class CircleCreationHandler implements ShapeMouseHandler {
 			CircleOrigin = mp;
 			size = rad;
 			buildCircle();
-			if (vg!=null) //Normal Graph
-				vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
-			else if (vhg!=null) //Hypergraph
-				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGESHAPE));
+//			if (vg!=null) //Normal Graph
+//				vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+//			else
+			if (vhg!=null) //Hypergraph
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 		}
 	}
-	public VHyperEdgeShape getShape()
+	public NURBSShape getShape()
 	{
 		return lastcircle;
 	}

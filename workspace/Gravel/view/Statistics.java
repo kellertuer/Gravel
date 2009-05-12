@@ -84,23 +84,23 @@ public class Statistics extends JPanel implements Observer, ActionListener
 		c.gridy=0;c.gridx = 0;c.gridwidth=1; */
 		ButtonArea.add(Box.createVerticalGlue());
 		String curDir = System.getProperty("user.dir");
-		curDir+="/data/img/plusicon.gif";
+		curDir+="/data/img/icon/plus16.png";
 		bPlus = new JButton(new ImageIcon(curDir));	
 		bPlus.addActionListener(this);
-		bPlus.setSize(new Dimension(17,17));
+		bPlus.setSize(new Dimension(16,16));
 		ButtonArea.add(bPlus);
 		curDir = System.getProperty("user.dir");
-		curDir+="/data/img/minusicon.gif";
+		curDir+="/data/img/icon/minus16.png";
 		bMinus = new JButton(new ImageIcon(curDir));	
 		bMinus.addActionListener(this);
-		bMinus.setSize(new Dimension(17,17));
+		bMinus.setSize(new Dimension(16,16));
 		//c.gridy++;
 		ButtonArea.add(bMinus);
 		curDir = System.getProperty("user.dir");
-		curDir+="/data/img/pencilicon.gif";
+		curDir+="/data/img/icon/edit16.png";
 		bEdit = new JButton(new ImageIcon(curDir));	
 		bEdit.addActionListener(this);
-		bEdit.setSize(new Dimension(17,17));
+		bEdit.setSize(new Dimension(16,16));
 		//c.gridy++;
 		ButtonArea.add(bEdit);
 		ButtonArea.add(Box.createRigidArea(new Dimension(17,10)));
@@ -352,7 +352,7 @@ public class Statistics extends JPanel implements Observer, ActionListener
 		}
 		else if (e.getSource()==bMinus)
 		{
-			System.out.println("Deleting Row "+StatsTable.getSelectedRow());
+//			System.out.println("Deleting Row "+StatsTable.getSelectedRow());
 			if (StatsTable.getSelectedRow()!=-1)
 				formeln.remove(StatsModel.getValueAt(StatsTable.getSelectedRow(), 0));
 			refreshTable();

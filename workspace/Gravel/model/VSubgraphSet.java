@@ -104,7 +104,7 @@ public class VSubgraphSet extends Observable implements Observer {
 		//Nodes
 		for (int i=0; i<mnodes.getNextIndex(); i++)
 		{
-			if ((mnodes.get(i)!=null)&&(msubgraph.containsEdge(i)))
+			if ((mnodes.get(i)!=null)&&(msubgraph.containsNode(i)))
 			{
 						setChanged();
 						notifyObservers(new GraphColorMessage(GraphConstraints.NODE,i,GraphConstraints.ADDITION,subgraph.getColor()));

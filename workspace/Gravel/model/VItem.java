@@ -3,6 +3,8 @@ package model;
 import java.awt.Color;
 import java.util.Comparator;
 
+import model.Messages.GraphConstraints;
+
 /**
  * Abstract superclass for both nodes and edges wdich contains the similar stuff for both
  * 
@@ -36,6 +38,10 @@ public abstract class VItem {
 	public static int SELECTED = 2;
 	//Just ATM selected e.g. while you drag a mouse or sth like that
 	public static int SOFT_SELECTED = 4;
+	
+	public static int EDGE = GraphConstraints.EDGE;
+	public static int HYPEREDGE = GraphConstraints.HYPEREDGE;
+	public static int NODE = GraphConstraints.NODE;
 	
 	private int status;
 	
@@ -180,4 +186,10 @@ public abstract class VItem {
 	{
 		status=SELECTED;
 	}
+	
+	/**
+	 * Get the Type of this VItem - see final values above
+	 * @return type of VItem
+	 */
+	public abstract int getType();
 }

@@ -5,11 +5,15 @@ import history.GraphHistoryManager;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 //import javax.swing.*;
 import java.util.Iterator;
 import java.util.Observable;
 import java.util.Vector;
+
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 import control.*;
 import model.*;
@@ -24,7 +28,7 @@ import model.Messages.*;
 public class VHyperGraphic extends VCommonGraphic
 {
 	// VGraph : Die Daten des Graphen
-	private VHyperGraph vG;
+	protected VHyperGraph vG;
 	// Visual Styles
 	private BasicStroke vHyperEdgeStyle;
 	private DragMouseHandler Drag;
@@ -47,8 +51,7 @@ public class VHyperGraphic extends VCommonGraphic
 		
 		vG = Graph;
 		vG.addObserver(this); //Die Graphikumgebung als Observer der Datenstruktur eintragen
-		//TODO: HistoryManager Umschreiben
-		vGh = new GraphHistoryManager(new VGraph(true,true,true));
+		vGh = new GraphHistoryManager(vG);
 	}
 	public void paint(Graphics g) 
 	{
@@ -69,31 +72,173 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-	paintDEBUG(g2);
+//	paintDEBUG(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
-		Vector<Double> weights = new Vector<Double>();
-		weights.add(.5);weights.add(.5);weights.add(.4);weights.add(.7); weights.add(.8);
-		Vector<Point2D> points = new Vector<Point2D>();
-		points.add(new Point2D.Double(50d,150d));	points.add(new Point2D.Double(150d,400d));
-		points.add(new Point2D.Double(300d,25d));
-//		points.add(new Point2D.Double(350d,150d));
-		points.add(new Point2D.Double(450d,30d));
+		Vector<Point2D> IP = new Vector<Point2D>();
+		IP.add(new Point2D.Double(60,200));
+		IP.add(new Point2D.Double(50,130));
+		IP.add(new Point2D.Double(150,60));
+		IP.add(new Point2D.Double(270,80));
+		IP.add(new Point2D.Double(270,120));
+		IP.add(new Point2D.Double(220,130));
+		IP.add(new Point2D.Double(200,200));
+		IP.add(new Point2D.Double(200,230));
+		IP.add(new Point2D.Double(270,230));
+		IP.add(new Point2D.Double(230,290));
+		IP.add(new Point2D.Double(200,280));
+		IP.add(new Point2D.Double(175,290));
+		IP.add(new Point2D.Double(185,320));
+		IP.add(new Point2D.Double(80,350));
+		int degree = 4;
+		NURBSShape c = NURBSShapeFactory.CreateInterpolation(IP,degree);
+		
+		g2.setStroke(new BasicStroke(1.2f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		NURBSShape cs = c.clone();
+		cs.scale(zoomfactor);
+		g2.setColor(Color.black);
+		g2.draw(cs.getCurve(5d/(double)zoomfactor));
+		//
+		// Start of Validation-Algorithm
+		//
+		Iterator<VNode> nid = vG.modifyNodes.getIterator();
+		while (nid.hasNext())
+		{
+			VNode n = nid.next();
+			Point2D p = new Point2D.Double(n.getPosition().getX(),n.getPosition().getY());
+			NURBSShapeValidator.findSuccessor(p, null, c,g2,zoomfactor);
+		}
+	}
+	private void paintDerivDEBUG(Graphics2D g2)
+	{
 		Vector<Double> knots = new Vector<Double>();
-		knots.add(0d);knots.add(0d);knots.add(0d);knots.add(0d);
-		knots.add(1d);knots.add(1d);knots.add(1d);knots.add(1d);
-		VHyperEdgeShape c = new  VHyperEdgeShape(knots,points,weights,3);
+		for (int i=0; i<=18; i++)
+			knots.add(((double)i-3d)/6d);
+		
+		Vector<Point2D> points = new Vector<Point2D>();
+		Vector<Double> weights = new Vector<Double>();
+		points.add(new Point2D.Double(60d,65d)); weights.add(1d);
+		points.add(new Point2D.Double(80d,105d)); weights.add(1d);
+		points.add(new Point2D.Double(100d,235d)); weights.add(1d);
+		points.add(new Point2D.Double(190d,335d)); weights.add(1d);
+		points.add(new Point2D.Double(200d,335d)); weights.add(1d);
+		points.add(new Point2D.Double(330d,135d)); weights.add(.8d);
+		points.add(new Point2D.Double(430d,235d)); weights.add(1d);
+		points.add(new Point2D.Double(530d,135d)); weights.add(1d);
+		points.add(new Point2D.Double(530d,160d)); weights.add(1d);
+		points.add(new Point2D.Double(580d,125d)); weights.add(.6d);
+		points.add(new Point2D.Double(430d,110d)); weights.add(1d);
+		points.add(new Point2D.Double(230d,155d));weights.add(1d);
+		for (int i=0; i<3; i++)
+		{
+			points.add((Point2D)points.get(i).clone());
+			weights.add(weights.get(i).doubleValue());
+		}
+		g2.setColor(Color.black);
+		NURBSShape c = new  NURBSShape(knots,points,weights);
 		g2.setStroke(new BasicStroke(2,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		g2.draw(c.getCurve(5d/(double)zoomfactor));
+		NURBSShape cs = c.clone();
+		cs.scale(zoomfactor);
+		g2.draw(cs.getCurve(5d/(double)zoomfactor));
 		for (int i=0; i<c.controlPoints.size(); i++)
 		{
-			drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())), Color.magenta);
+			drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())),Color.cyan.darker());
+			if (i>0)
+			{
+				g2.drawLine(Math.round((float)c.controlPoints.get(i).getX()*zoomfactor),Math.round((float)c.controlPoints.get(i).getY()*zoomfactor),
+						Math.round((float)c.controlPoints.get(i-1).getX()*zoomfactor),Math.round((float)c.controlPoints.get(i-1).getY()*zoomfactor));
+			}
 		}
-		Point2D p = new Point2D.Double(80d,170d);
-		drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),Color.magenta);
-		NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
+		for (int i=0; i<1000; i++)
+		{
+			double pos = c.Knots.get(c.degree) + (c.Knots.get(c.degree)+c.Knots.get(c.maxKnotIndex-c.degree))*((double) i)/1000d;
+			Point2D p = c.CurveAt(pos);
+//			drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),Color.LIGHT_GRAY);
+			Point2D ps = c.DerivateCurveAt(1,pos);
+			g2.setColor(Color.orange.brighter());
+			Point2D normps = new Point2D.Double(ps.getX()/ps.distance(0d,0d),ps.getY()/ps.distance(0d,0d));
+			Point2D deriv2 = c.DerivateCurveAt(2,pos);
+			double length = deriv2.distance(0d,0d)/80;
+			length = Math.abs(length);
+			
+			//Now orthogonal to the first derivate the seconds derivates length
+			g2.drawLine(Math.round((float)p.getX()*zoomfactor), Math.round((float)p.getY()*zoomfactor),
+					Math.round((float)(p.getX()-normps.getY()*length)*zoomfactor),
+					Math.round((float)(p.getY()+normps.getX()*length)*zoomfactor));
+		}
 	}
+	
+	private void paintPIDEBUG(Graphics2D g2)
+	{
+		Vector<Double> knots = new Vector<Double>();
+		for (int i=0; i<=22; i++)
+			knots.add(((double)i-3d)/6d);
+		
+		Vector<Point2D> points = new Vector<Point2D>();
+		Vector<Double> weights = new Vector<Double>();
+		points.add(new Point2D.Double(30d,5d)); weights.add(.8);
+		points.add(new Point2D.Double(50d,45d)); weights.add(.7);
+		points.add(new Point2D.Double(150d,275d)); weights.add(1d);
+		points.add(new Point2D.Double(160d,275d)); weights.add(1d);
+		points.add(new Point2D.Double(170d,275d)); weights.add(1d);
+		points.add(new Point2D.Double(300d,75d)); weights.add(1d);
+		points.add(new Point2D.Double(400d,175d)); weights.add(2d);
+		points.add(new Point2D.Double(500d,75d)); weights.add(2d);
+		points.add(new Point2D.Double(500d,100d)); weights.add(2d);
+		points.add(new Point2D.Double(550d,65d)); weights.add(2d);
+		points.add(new Point2D.Double(400d,50d)); weights.add(2d);
+		points.add(new Point2D.Double(200d,95d));weights.add(3d);
+		for (int i=0; i<3; i++)
+		{
+			points.add((Point2D)points.get(i).clone());
+			weights.add(weights.get(i).doubleValue());
+		}
+		for (int i=0; i<points.size(); i++)
+		{
+			float gv = 0f;
+			drawCP(g2,new Point(Math.round((float)points.get(i).getX()),Math.round((float)points.get(i).getY())),new Color(gv,gv,gv));
+		}
+		g2.setColor(Color.black);
+		NURBSShape c = new  NURBSShape(knots,points,weights);
+//		System.err.println(c.degree);
+		g2.setStroke(new BasicStroke(2,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		NURBSShape cs = c.clone();
+		cs.scale(zoomfactor);
+		g2.draw(cs.getCurve(5d/(double)zoomfactor));
+		for (int i=0; i<c.controlPoints.size(); i++)
+		{
+			drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())),Color.cyan.darker());
+		}
+		Vector<Point> projectionpoints = new Vector<Point>();
+		Iterator<VNode> iter = vG.modifyNodes.getIterator();
+		while (iter.hasNext())
+		{
+			VNode actual = iter.next();
+			projectionpoints.add(actual.getPosition());
+		}
+	    long time = System.currentTimeMillis();
+	    System.err.print("#"+projectionpoints.size()+" ");
+	    for (int j=0; j<projectionpoints.size(); j++)
+		{
+			Point p = projectionpoints.get(j);
+			NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
+			double dist = p.distance(proj.getResultPoint());
+			Color cross = Color.magenta;
+			if (dist<=2.0)
+				cross = Color.green.darker().darker();
+			drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),cross);
+			drawCP(g2,new Point(Math.round((float)proj.getResultPoint().getX()), Math.round((float)proj.getResultPoint().getY())), Color.ORANGE);
+			g2.setColor(Color.orange);
+			g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
+					Math.round((float)proj.getResultPoint().getX()*zoomfactor), Math.round((float)proj.getResultPoint().getY()*zoomfactor));
+		}
+        time = -time + System.currentTimeMillis();
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+        SimpleDateFormat sdf = new SimpleDateFormat("ss:SSS");
+        System.err.println(" "+sdf.format(time)+" Sekunden");  
+	}
+	
 	/**
 	 * @param g
 	 */
@@ -104,13 +249,21 @@ public class VHyperGraphic extends VCommonGraphic
 		while (ei.hasNext()) // drawEdges
 		{
 			VHyperEdge temp = ei.next();
-			g2.setColor(temp.getColor());
-			g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			if (!temp.getShape().isEmpty())
 			{
-				VHyperEdgeShape s = temp.getShape().clone();
+				NURBSShape s = temp.getShape().clone();
 				s.scale(zoomfactor);
-				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(5d/(double)zoomfactor),temp.getWidth(),zoomfactor));
+				GeneralPath p = s.getCurve(5d/(double)zoomfactor);
+				if ((((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)||((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))&&((temp.getSelectedStatus()&VItem.SOFT_DESELECTED)!=VItem.SOFT_DESELECTED))
+				{
+					//Falls die Kante Selektiert ist (und nicht temporär deselektiert, zeichne drunter eine etwas dickere Kante in der selectioncolor
+					g2.setColor(selColor);
+					g2.setStroke(new BasicStroke(Math.round((temp.getWidth()+selWidth)*zoomfactor),BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+					g2.draw(temp.getLinestyle().modifyPath(p,temp.getWidth()+selWidth,zoomfactor));
+				}
+				g2.setColor(temp.getColor());
+				g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+				g2.draw(temp.getLinestyle().modifyPath(p,temp.getWidth(),zoomfactor));
 			}
 		}
 	}
@@ -200,5 +353,4 @@ public class VHyperGraphic extends VCommonGraphic
 	public int getType() {
 		return VCommonGraphic.VHYPERGRAPHIC;
 	}
-
 }

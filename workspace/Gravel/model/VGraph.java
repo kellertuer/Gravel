@@ -181,7 +181,7 @@ public class VGraph extends Observable implements VGraphInterface {
 						while (iiter.hasNext())
 						{
 							VEdge act = modifyEdges.get(iiter.next());
-							if ((mG.modifyEdges.get(act.getIndex()).StartIndex==te)&&(!mG.isDirected())&&(act.getType()==VEdge.ORTHOGONAL)&&(t.getType()==VEdge.ORTHOGONAL)) 
+							if ((mG.modifyEdges.get(act.getIndex()).StartIndex==te)&&(!mG.isDirected())&&(act.getEdgeType()==VEdge.ORTHOGONAL)&&(t.getEdgeType()==VEdge.ORTHOGONAL)) 
 							//ungerichtet, beide orthogonal und entgegengesetz gespeichert
 							{
 								if ((((VOrthogonalEdge)act).getVerticalFirst()!=((VOrthogonalEdge)t).getVerticalFirst())&&(!removed.get(act.getIndex())))
@@ -473,7 +473,7 @@ public class VGraph extends Observable implements VGraphInterface {
 		    		{
 				    	//System.err.print("("+new Double(x).intValue()+","+new Double(y).intValue()+") ");
 				    	double distanceSquare = Point.distanceSq(x,y,m.x,m.y);
-				    	if (distanceSquare < (variation+(float)temp.width)) 
+				    	if (distanceSquare < (variation+(double)temp.width)) 
 				    	{
 					    		return temp;
 					    }		    			
@@ -483,7 +483,7 @@ public class VGraph extends Observable implements VGraphInterface {
 		    	path.next();
 		    }
 		    //if the shortest distance is smaller than  
-		    if (closestDistanceSquare < (variation+(float)temp.width))
+		    if (closestDistanceSquare < (variation+(double)temp.width))
 		    	return temp;
 		}
 		return null; // keinen gefunden

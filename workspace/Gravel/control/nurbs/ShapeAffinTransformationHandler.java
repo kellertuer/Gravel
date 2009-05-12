@@ -22,7 +22,7 @@ import model.VEdge;
 import model.VGraph;
 import model.VGraphInterface;
 import model.VHyperEdge;
-import model.VHyperEdgeShape;
+import model.NURBSShape;
 import model.VHyperGraph;
 import model.VItem;
 import model.VNode;
@@ -49,25 +49,29 @@ import view.VHyperGraphic;
  *     The distance from the Drag Start Point in Relation to the size of the Shape is used
  *     for calculation of the scaling factor
  *     
+ *  - Scaling with direction
+ *  
+ *     
  *     Perhaps a second scaling would be nice where X and Y are treaded seperately to
  *     change not only size but aspect ratio of the shape
  *  
  * @author Ronny Bergmann
  *
  */
-public class ShapeModificationHandler implements ShapeMouseHandler {
+public class ShapeAffinTransformationHandler implements ShapeModificationMouseHandler {
 	
 	public final static int NO_MODIFICATION = 0;
 	public final static int ROTATION = 1;
 	public final static int TRANSLATION = 2;
 	public final static int SCALING = 4;
+	public final static int SCALE_ONEDIRECTION = 8;
 	private VHyperGraph vhg = null;
 	private VCommonGraphic vgc;
 	private GeneralPreferences gp;
 	private Point MouseOffSet = new Point(0,0);
 	private Point2D.Double DragOrigin;
 	private boolean firstdrag = true;
-	private VHyperEdgeShape temporaryShape=null, DragBeginShape = null;
+	private NURBSShape temporaryShape=null, DragBeginShape = null;
 	VHyperEdge HyperEdgeRef;
 
 	private int ModificationState = NO_MODIFICATION;
@@ -79,7 +83,7 @@ public class ShapeModificationHandler implements ShapeMouseHandler {
 	 * @param g
 	 * @param hyperedgeindex the specific edge to be modified
 	 */
-	public ShapeModificationHandler(VHyperGraphic g, int hyperedgeindex)
+	public ShapeAffinTransformationHandler(VHyperGraphic g, int hyperedgeindex)
 	{
 		vgc = g;
 		vhg = g.getGraph();
@@ -95,27 +99,44 @@ public class ShapeModificationHandler implements ShapeMouseHandler {
 		return null;
 	}
 
+	/**
+	 * Reset shape to last state that was really saved in the graph - doeas not push any notification
+	 */
 	public void resetShape()
 	{
 		temporaryShape=HyperEdgeRef.getShape().clone(); //Reset to actual Edge Shape;
 	}
-	public Vector<Object> getShapeParameters()
-	{
-		Vector<Object> param = new Vector<Object>();
-		param.setSize(NURBSShapeFactory.MAX_INDEX);
-		Point p=null;
-		if (DragOrigin!=null)
-			p = new Point(Math.round((float)DragOrigin.getX()),Math.round((float)DragOrigin.getY()));
-		param.add(NURBSShapeFactory.CIRCLE_ORIGIN, p);
-		return param;		
-	}
-	public void setShapeParameters(Vector<Object> p)
-	{} //see above
 
-	public VHyperEdgeShape getShape()
+	public NURBSShape getShape()
 	{
 		return temporaryShape;
 	}
+	/**
+	 * Set shape to a specific given shape - e.g. when the History-Manager resets
+	 */
+	public void setShape(NURBSShape s)
+	{
+		HyperEdgeRef.setShape(s);
+		//This is pushed in side the Drag-Block if it happens while dragging so the whole action is only captured as one
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+		if (dragged()) //End Drag
+			internalReset();
+	}
+
+	public Point2D getDragStartPoint()
+	{
+		if (!dragged())
+			return null;
+		return DragOrigin;
+	}
+	
+	public Point2D getDragPoint()
+	{
+		if (!dragged())
+			return null;
+		return new Point2D.Double(MouseOffSet.getX()/((double)vgc.getZoom()/100d),MouseOffSet.getY()/((double)vgc.getZoom()/100d));		
+	}
+
 
 	public boolean dragged()
 	{
@@ -140,13 +161,12 @@ public class ShapeModificationHandler implements ShapeMouseHandler {
 	
 	private void internalReset()
 	{
-		//Only if a Block was started: End it...
-		if (dragged())//We had an Drag an a Circle was created, draw it one final time
+		//Only if a Block was started: End it... with notification
+		if (dragged())
 		{
 			DragOrigin = null;
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 		}
-
 	}
 	
 	private double getDegreefromDirection(Point2D dir)
@@ -230,10 +250,26 @@ public class ShapeModificationHandler implements ShapeMouseHandler {
 					//involve massive scaling by small mouse movement
 					Point2D min = DragBeginShape.getMin();
 					Point2D max = DragBeginShape.getMax();					
-					double origsizefactor = (max.getX()-min.getX()+max.getY()-min.getY())/2.0d;
-					double factor = (origsizefactor + Math.signum(DragMov.getX())*dist)/origsizefactor;
+					//Each side by half
+					double origsizefactor = (max.getX()-min.getX()+max.getY()-min.getY())/4.0d;
+					double factor = (dist)/origsizefactor;
+				//	factor *= factor; //Increase scaling further away from 1.0
 					temporaryShape.translate(-DragOrigin.getX(),-DragOrigin.getY()); //Origin
 					temporaryShape.scale(factor);
+					temporaryShape.translate(DragOrigin.getX(),DragOrigin.getY()); //Back
+				break;
+				case SCALE_ONEDIRECTION:
+					//Factor is depending on Distance
+					double onedist = DragMov.distance(0d,0d);
+					temporaryShape.translate(-DragOrigin.getX(),-DragOrigin.getY()); //Translate to Origin
+					temporaryShape.rotate(-getDegreefromDirection(DragMov)); //Rotate
+					double minDir = DragBeginShape.getMin().getX();
+					double maxDir = DragBeginShape.getMax().getX();					
+					double origDirfactor = (maxDir-minDir)/2;
+					double DirScale = (onedist)/origDirfactor;
+				//	DirScale *=DirScale; //Increase change with distance from 1.0
+					temporaryShape.scale(DirScale, 1d);
+					temporaryShape.rotate(getDegreefromDirection(DragMov)); //Rotate back
 					temporaryShape.translate(DragOrigin.getX(),DragOrigin.getY()); //Back
 				break;
 				default: break; //If there is no state, e.g. NO_MODIFICATION, do nothing

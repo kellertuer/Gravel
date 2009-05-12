@@ -174,4 +174,9 @@ public class VNode extends VItem {
 		public void setNameVisible(boolean name_visible) {
 			this.name_visible = name_visible;
 		}
+		
+		public int getType()
+		{
+			return VItem.NODE;
+		}
 }

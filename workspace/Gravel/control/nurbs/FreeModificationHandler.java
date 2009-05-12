@@ -11,7 +11,7 @@ import java.util.Vector;
 
 
 import model.VHyperEdge;
-import model.VHyperEdgeShape;
+import model.NURBSShape;
 import model.VHyperGraph;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
@@ -25,7 +25,7 @@ import view.VHyperGraphic;
  * @author Ronny Bergmann
  *
  */
-public class FreeModificationHandler implements ShapeMouseHandler {
+public class FreeModificationHandler implements ShapeModificationMouseHandler {
 	VHyperGraph vhg;
 	VCommonGraphic vgc;
 	VHyperEdge HyperEdgeRef;
@@ -33,7 +33,7 @@ public class FreeModificationHandler implements ShapeMouseHandler {
 	Point MouseOffSet = new Point(0,0);;
 	boolean firstdrag = true;
 	double DragStartProjection = Double.NaN;
-	VHyperEdgeShape temporaryShape=null;
+	NURBSShape temporaryShape=null;
 	
 	public FreeModificationHandler(VHyperGraphic g, int hyperedgeindex)
 	{
@@ -50,14 +50,35 @@ public class FreeModificationHandler implements ShapeMouseHandler {
 	{ //No Selections possible here
 		return null;
 	}
-	public VHyperEdgeShape getShape()
+	public NURBSShape getShape()
 	{
 		return temporaryShape;
 	}
 	public void resetShape()
 	{
 		temporaryShape = HyperEdgeRef.getShape().clone(); //Set back to old shape
-	} //Shape can't be reset
+	}
+	public void setShape(NURBSShape s)
+	{
+		if (dragged()) //End Drag
+			internalReset();
+		HyperEdgeRef.setShape(s);
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+	}
+	public Point2D getDragStartPoint()
+	{
+		if (!dragged())
+			return null;
+		return temporaryShape.CurveAt(DragStartProjection);
+	}
+	
+	public Point2D getDragPoint()
+	{
+		if (!dragged())
+			return null;
+		return new Point2D.Double(MouseOffSet.getX()/((double)vgc.getZoom()/100d),MouseOffSet.getY()/((double)vgc.getZoom()/100d));
+		
+	}
 	public boolean dragged()
 	{
 		return ((!Double.isNaN(DragStartProjection))&&(!firstdrag));
@@ -68,7 +89,7 @@ public class FreeModificationHandler implements ShapeMouseHandler {
 		if ((DragStartProjection!=Double.NaN)&&(!firstdrag)) //We had an Drag an a Circle was created, draw it one final time
 		{
 			DragStartProjection=Double.NaN;
-			vhg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.BLOCK_END));			
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_END,GraphConstraints.HYPEREDGE));			
 		}
 		DragStartProjection=Double.NaN;
 	}
@@ -84,6 +105,10 @@ public class FreeModificationHandler implements ShapeMouseHandler {
 		if (temporaryShape.isPointOnCurve(pointInGraph, 2.0d)) //Are we near the Curve?
 		{
 			DragStartProjection = temporaryShape.ProjectionPointParameter(pointInGraph);
+		}
+		else
+		{
+			Point2D p = temporaryShape.ProjectionPoint(pointInGraph);
 		}
 	}
 
@@ -101,13 +126,12 @@ public class FreeModificationHandler implements ShapeMouseHandler {
 			//Update temporary Shape
 			MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed
 			Point2D exactPointInGraph = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100),(double)e.getPoint().y/((double)vgc.getZoom()/100)); //Rausrechnen des zooms
-			Point2D.Double t = temporaryShape.NURBSCurveAt(DragStartProjection);
-			temporaryShape.movePoint(t, exactPointInGraph);
+			temporaryShape.movePoint(DragStartProjection, exactPointInGraph);
 
 			if (firstdrag) //If wirst drag - start Block
-				vhg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE,GraphConstraints.SELECTION));
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_START|GraphConstraints.UPDATE,GraphConstraints.HYPEREDGE));
 			else		//continnue Block
-				vhg.pushNotify(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE,GraphConstraints.SELECTION));
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.UPDATE,GraphConstraints.HYPEREDGE));
 		}
 		MouseOffSet = e.getPoint();
 		firstdrag = false;

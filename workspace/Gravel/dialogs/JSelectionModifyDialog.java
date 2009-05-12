@@ -594,7 +594,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		while (edgeiter.hasNext())
 		{
 			VEdge e = edgeiter.next();
-			loops |= (e.getType()==VEdge.LOOP)&&((e.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED); //Existiert eine selectierte Schleife ?
+			loops |= (e.getEdgeType()==VEdge.LOOP)&&((e.getSelectedStatus() & VItem.SELECTED) == VItem.SELECTED); //Existiert eine selectierte Schleife ?
 		}
 		if (loops)
 		{
@@ -635,7 +635,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 					preEdgeName = GeneralPreferences.replace(preEdgeName,""+temp.getIndex(), "$ID");
 					preEdgeName = GeneralPreferences.replace(preEdgeName,""+me.StartIndex, "$SID");
 					preEdgeName = GeneralPreferences.replace(preEdgeName,""+me.EndIndex, "$EID");					
-					if (pre.getType()==VEdge.LOOP) // very first is a Loop
+					if (pre.getEdgeType()==VEdge.LOOP) // very first is a Loop
 					{
 						vle = (VLoopEdge)pre.clone();
 					}
@@ -682,7 +682,7 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 						if (!tname.equals(vg.getMathGraph().modifyEdges.get(temp.getIndex()).name))
 							preEdgeName = null;
 					}
-					if (temp.getType()==VEdge.LOOP)
+					if (temp.getEdgeType()==VEdge.LOOP)
 					{
 						if (vle==null)
 						{
