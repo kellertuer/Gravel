@@ -109,7 +109,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		cont.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(0,7,0,7);
-		c.anchor = GridBagConstraints.WEST;
+		c.anchor = GridBagConstraints.CENTER;
 		c.gridy = 0;
 		c.gridx = 0;
 		c.gridwidth=1;
@@ -324,23 +324,21 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		FreeModFields.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(5,0,5,0);
-		c.anchor = GridBagConstraints.WEST;
+		c.anchor = GridBagConstraints.CENTER;
 		c.gridy = 0;
 		c.gridx = 0;
-		c.gridwidth=2;
+		c.gridwidth=1;
 		c.gridheight=1;
-
-		knots = new JLabel("Knotenvektor");
-		FreeModFields.add(knots,c);
 
 		c.gridx++;
 		c.gridwidth=1;
-		bIncKnots = new JButton("+");
+		bIncKnots = new JButton(new ImageIcon(IconDir+"plus16.png"));
+		bIncKnots.setSize(new Dimension(17,17));
 		bIncKnots.addActionListener(this);
 		FreeModFields.add(bIncKnots,c);
 
 		c.gridx++;
-		bDecKnots = new JButton("-");
+		bDecKnots = new JButton(new ImageIcon(IconDir+"minus16.png"));
 		bDecKnots.setSize(new Dimension(17,17));
 		bDecKnots.setEnabled(false);
 		FreeModFields.add(bDecKnots,c);
@@ -348,17 +346,15 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		c.gridy++;
 		c.gridx=0;
 		c.gridwidth=1;
-		bRotation = new JButton("R");
+		bRotation = new JButton(new ImageIcon(IconDir+"rotate32.png"));	
 		bRotation.setSize(new Dimension(32,32));
-		bRotation.setPreferredSize(new Dimension(32,32));
-		bRotation.setMaximumSize(new Dimension(38,38));
 		bRotation.addActionListener(this);
 		FreeModFields.add(bRotation,c);
 
 		c.gridx++;
 		c.gridwidth=1;
 		
-		bTranslation = new JButton(new ImageIcon(IconDir+"translation32.png"));	
+		bTranslation = new JButton(new ImageIcon(IconDir+"translate32.png"));	
 		bTranslation.setSize(new Dimension(32,32));
 		bTranslation.addActionListener(this);
 		FreeModFields.add(bTranslation,c);
@@ -372,7 +368,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 
 		c.gridx++;
 		c.gridwidth=1;
-		bScalingDir = new JButton("<html>S<sub>D</sub></html>");
+		bScalingDir = new JButton(new ImageIcon(IconDir+"scaledir32.png"));	
 		bScalingDir.setSize(new Dimension(17,17));
 		bScalingDir.addActionListener(this);
 		FreeModFields.add(bScalingDir,c);

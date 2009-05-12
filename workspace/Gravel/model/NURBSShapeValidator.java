@@ -79,7 +79,7 @@ public class NURBSShapeValidator extends NURBSShape {
 			if (actual.getY()<CPOutside.getY())
 				CPOutside = (Point2D)actual.clone();	
 		}
-		
+		System.err.print(CPOutside+" "+controlPoints.indexOf(CPOutside));
 		initPointSets(vG);
 		
 		//Number of Projections made, 
