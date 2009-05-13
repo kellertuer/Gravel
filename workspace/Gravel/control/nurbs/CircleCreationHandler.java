@@ -10,6 +10,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.util.Iterator;
 import java.util.Vector;
@@ -30,6 +31,7 @@ import model.VQuadCurveEdge;
 import model.VSegmentedEdge;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
+import model.Messages.NURBSCreationMessage;
 import view.VCommonGraphic;
 import view.VGraphic;
 import view.VHyperGraphic;
@@ -61,7 +63,11 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 		gp = GeneralPreferences.getInstance();
 		MouseOffSet = new Point(0,0);
 	}
-	
+	private void reInit()
+	{
+		CircleOrigin = null;
+		size = 0;
+	}
 	public CircleCreationHandler(VHyperGraphic g)
 	{
 		vgc = g;
@@ -79,32 +85,30 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 	{
 		lastcircle=null;
 	}
-	public Vector<Object> getShapeParameters()
+	public NURBSCreationMessage getShapeParameters()
 	{
-		Vector<Object> param = new Vector<Object>();
-		param.setSize(NURBSShapeFactory.MAX_INDEX);
-		param.set(NURBSShapeFactory.SHAPE_TYPE,"circle");
-		param.add(NURBSShapeFactory.CIRCLE_ORIGIN, CircleOrigin);
-		param.add(NURBSShapeFactory.CIRCLE_RADIUS, size);
-		return param;
+		if ((CircleOrigin==null) || (size<=0))
+			return new NURBSCreationMessage();
+		//TODO: CreationCircleHandler : Degree
+		return new NURBSCreationMessage(2, new Point2D.Double(CircleOrigin.x,CircleOrigin.y), size);
 	}
-	public void setShapeParameters(Vector<Object> p)
+	public void setShapeParameters(NURBSCreationMessage nm)
 	{
 		if (dragged())
 			return;
-		Point mp = (Point) p.get(NURBSShapeFactory.CIRCLE_ORIGIN);
-		int rad = Integer.parseInt(p.get(NURBSShapeFactory.CIRCLE_RADIUS).toString());
-		if ((mp!=null)&&(rad>0))
+		Point2D p = nm.getPoints().firstElement();
+		Point mp = new Point(Math.round((float)p.getX()),Math.round((float)p.getY()));
+		int rad = nm.getValues().firstElement();
+		if ( (nm.getType()!=NURBSCreationMessage.CIRCLE) || (nm.getValues().size()==0) || (p==null) || (rad<=0) )
 		{
-			CircleOrigin = mp;
-			size = rad;
-			buildCircle();
-//			if (vg!=null) //Normal Graph
-//				vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
-//			else
-			if (vhg!=null) //Hypergraph
-				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+			reInit();
+			return;
 		}
+		CircleOrigin = mp;
+		size = rad;
+		buildCircle();
+		if (vhg!=null) //Hypergraph
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 	}
 	public NURBSShape getShape()
 	{

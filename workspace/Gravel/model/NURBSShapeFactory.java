@@ -7,6 +7,8 @@ import java.util.Vector;
 
 import javax.vecmath.Point3d;
 
+import model.Messages.NURBSCreationMessage;
+
 /**
  * The NURBSShapeFactory creates specific NURBS-Curves based on the input
  * 
@@ -28,23 +30,6 @@ import javax.vecmath.Point3d;
  *
  */
 public class NURBSShapeFactory {
-
-	public final static int SHAPE_TYPE = 0;
-	public final static int CIRCLE_ORIGIN = 1;
-	public final static int CIRCLE_RADIUS = 2;
-	
-	public final static int DISTANCE_TO_NODE = 3;
-	
-	public final static int POINTS = 4;
-	public final static int ADDPOINTS = 5;
-	public final static int DEGREE = 6;
-	public final static int SIZES = 7;
-
-	public final static int MAX_INDEX = 8;
-	
-	//ADDPOINT Specification
-	public final static int ADD_END = 1;
-	public final static int ADD_BETWEEN = 2;
 	
 	/**
 	 * Create the Shape based on Specification of Type and needed Parameters
@@ -62,104 +47,21 @@ public class NURBSShapeFactory {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static NURBSShape CreateShape(Vector<Object> Parameters)
+	public static NURBSShape CreateShape(NURBSCreationMessage nm)
 	{
-		String type = (String) Parameters.get(SHAPE_TYPE);
-		if (type.toLowerCase().equals("circle"))
+		switch(nm.getType())
 		{
-			int radius;
-			try	{radius = Integer.parseInt(Parameters.get(CIRCLE_RADIUS).toString());}
-			catch (Exception e) {return new NURBSShape();} //Empty Shape
-			return CreateCircle((Point) Parameters.get(CIRCLE_ORIGIN), radius);
+			case NURBSCreationMessage.INTERPOLATION:
+				return CreateInterpolation(nm.getPoints(), nm.getDegree());
+			case NURBSCreationMessage.CIRCLE:
+				return CreateCircle(nm.getPoints().firstElement(), nm.getValues().firstElement());
+			case NURBSCreationMessage.CONVEX_HULL:
+				return CreateConvexHullPolygon(nm.getPoints(), nm.getValues(), nm.getDegree(), nm.getMargin());
+			default:
+				return new NURBSShape(); //Empty Shape
 		}
-		else if (type.toLowerCase().equals("global interpolation"))
-		{
-			Vector<Point2D> IP_Points;
-			try {IP_Points = (Vector<Point2D>) Parameters.get(POINTS);}
-			catch (Exception e) {return new NURBSShape();} //Empty Shape
-			int degree;
-			try	{degree = Integer.parseInt(Parameters.get(DEGREE).toString());}
-			catch (Exception e) {return new NURBSShape();}
-			return CreateInterpolation(IP_Points, degree);
-		}
-		else if (type.toLowerCase().equals("convex hull"))
-		{
-			int distance;
-			try	{distance = Integer.parseInt(Parameters.get(DISTANCE_TO_NODE).toString());}
-			catch (Exception e) {return new NURBSShape();} //EmptyShape
-			Vector<Point2D> nodes;
-			try {nodes = (Vector<Point2D>) Parameters.get(POINTS);}
-			catch (Exception e) {return new NURBSShape();} //Empty Shape
-			Vector<Integer> Sizes;
-			try {Sizes = (Vector<Integer>) Parameters.get(SIZES);}
-			catch (Exception e) {return new NURBSShape();} //Empty Shape
-			int degree;
-			try	{degree = Integer.parseInt(Parameters.get(DEGREE).toString());}
-			catch (Exception e) {return new NURBSShape();}
-			return CreateConvexHullPolygon(nodes, Sizes, degree, distance);
-		}
-		return null;
 	}
 	
-	//Clone a given parameter vector so that no point is referenced twice
-	@SuppressWarnings("unchecked")
-	public static Vector<Object> dublicate(Vector<Object> p)
-	{
-		//Due to the vector-Stuff this is a little bit of work
-		Vector<Object> clone = new Vector<Object>();
-		clone.setSize(MAX_INDEX);
-		if (p.get(SHAPE_TYPE)!=null)
-			clone.set(SHAPE_TYPE, (String) p.get(SHAPE_TYPE));
-		if (p.get(CIRCLE_ORIGIN)!=null)
-			clone.set(CIRCLE_ORIGIN, ((Point) p.get(CIRCLE_ORIGIN)).clone());
-		if (p.get(CIRCLE_RADIUS)!=null)
-		{
-			try	{clone.set(CIRCLE_RADIUS, Integer.parseInt(p.get(CIRCLE_RADIUS).toString()));}
-			catch (Exception e) {clone.set(CIRCLE_RADIUS, null);} //results in Empty Shape later
-		}
-		if (p.get(DISTANCE_TO_NODE)!=null)
-		{
-			try	{clone.set(DISTANCE_TO_NODE, Integer.parseInt(p.get(DISTANCE_TO_NODE).toString()));}
-			catch (Exception e) {clone.set(DISTANCE_TO_NODE, null);} //EmptyShape
-		}
-		if (p.get(POINTS)!=null)
-		{
-			Vector<Point2D> nodes=null;
-			try {nodes = (Vector<Point2D>) p.get(POINTS);}
-			catch (Exception e) {clone.set(POINTS,null);}
-			Vector<Point2D> c = new Vector<Point2D>();
-			if (nodes!=null)
-			{
-				for (int i=0; i<nodes.size(); i++)
-					c.add(new Point2D.Double(nodes.get(i).getX(),nodes.get(i).getY()));
-				clone.set(POINTS,c);
-			}
-		}
-		if (p.get(SIZES)!=null)
-		{
-			Vector<Integer> sizes=null;
-			try {sizes = (Vector<Integer>) p.get(SIZES);}
-			catch (Exception e) {clone.set(SIZES,null);}
-			Vector<Integer> c = new Vector<Integer>();
-			if (sizes!=null)
-			{
-				for (int i=0; i<sizes.size(); i++)
-					c.add(sizes.get(i));
-				clone.set(POINTS,c);
-			}
-		}
-		if (p.get(DEGREE)!=null)
-		{
-			try	{clone.set(DEGREE, Integer.parseInt(p.get(DEGREE).toString()));}
-			catch (Exception e) {clone.set(DEGREE, null);} //EmptyShape
-		}
-		if (p.get(ADDPOINTS)!=null)
-		{
-			try	{clone.set(ADDPOINTS, Integer.parseInt(p.get(ADDPOINTS).toString()));}
-			catch (Exception e) {clone.set(ADDPOINTS, null);} //EmptyShape
-		}
-		return clone;
-	}		
 	/**
 	 * Create a NURBSSHape Circle based on the Information, where its Origin is, its Radius and the Distance to the nodes
 	 * 
@@ -170,8 +72,9 @@ public class NURBSShapeFactory {
 	 * @param dist Distance to the nodes
 	 * @return
 	 */
-	private static NURBSShape CreateCircle(Point origin, int radius)
+	private static NURBSShape CreateCircle(Point2D origin, int radius)
 	{
+		Point p = new Point(Math.round((float)origin.getX()),Math.round((float)origin.getY()));
 		//See L. Piegl, W. Tiller: A Menagerie of rational B-Spline Circles
 		Vector<Double> knots = new Vector<Double>();
 		knots.add(0d);knots.add(0d);knots.add(0d);
@@ -186,13 +89,13 @@ public class NURBSShapeFactory {
 		weights.add(1d);
 		
 		Vector<Point2D> controlPoints = new Vector<Point2D>();
-		controlPoints.add(new Point2D.Double(origin.x+radius, origin.y)); //P0
-		controlPoints.add(new Point2D.Double(origin.x+radius, origin.y-radius)); //P1, Top right
-		controlPoints.add(new Point2D.Double(origin.x-radius, origin.y-radius)); //P2, Top left
-		controlPoints.add(new Point2D.Double(origin.x-radius, origin.y)); //P3
-		controlPoints.add(new Point2D.Double(origin.x-radius, origin.y+radius)); //P4, bottom left
-		controlPoints.add(new Point2D.Double(origin.x+radius, origin.y+radius)); //P5, bottom right
-		controlPoints.add(new Point2D.Double(origin.x+radius, origin.y)); //P6 again P0
+		controlPoints.add(new Point2D.Double(p.x+radius, p.y)); //P0
+		controlPoints.add(new Point2D.Double(p.x+radius, p.y-radius)); //P1, Top right
+		controlPoints.add(new Point2D.Double(p.x-radius, p.y-radius)); //P2, Top left
+		controlPoints.add(new Point2D.Double(p.x-radius, p.y)); //P3
+		controlPoints.add(new Point2D.Double(p.x-radius, p.y+radius)); //P4, bottom left
+		controlPoints.add(new Point2D.Double(p.x+radius, p.y+radius)); //P5, bottom right
+		controlPoints.add(new Point2D.Double(p.x+radius, p.y)); //P6 again P0
 		return new NURBSShape(knots,controlPoints,weights);
 	}
 

@@ -17,6 +17,7 @@ import model.VNode;
 import model.VSubgraph;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
+import model.Messages.NURBSCreationMessage;
 
 /**
  * Additional Action for tracking Creation Parameters for the NURBSShapeInterpolation and other
@@ -40,12 +41,12 @@ public class HyperEdgeShapeAction extends HyperGraphAction {
 	 * @param environment Reference to the VHyperGraph the whole action is happening in
 	 * @throws GraphActionException
 	 */
-	public HyperEdgeShapeAction(Vector<Object> Parameters,boolean local, VHyperEdge e, int action, VHyperGraph environment) throws GraphActionException
+	public HyperEdgeShapeAction(NURBSCreationMessage nm,boolean local, VHyperEdge e, int action, VHyperGraph environment) throws GraphActionException
 	{
 		super(e,action,environment); //Init stuff as a HyperEdge action in superclass			
 		if (environment==null)
 			throw new GraphActionException("Could not Create Action: environmental HyperGraph must not be null.");
-		ActionObject=NURBSShapeFactory.dublicate(Parameters);
+		ActionObject=nm.clone();
 		Action=action;
 		if ((action&(GraphConstraints.REMOVAL|GraphConstraints.ADDITION))>0) //Only Updates possible, neither creation nor deletion of parameters
 		{
@@ -69,7 +70,7 @@ public class HyperEdgeShapeAction extends HyperGraphAction {
 		if (g.modifyHyperEdges.get(VHEdgeRef.getIndex())==null)
 			throw new GraphActionException("Can't doreplace(): Edge nonexistent to replace its shape");
 		//Set shape to the Shape Created by internal paramaters of this action
-		g.modifyHyperEdges.get(VHEdgeRef.getIndex()).setShape(NURBSShapeFactory.CreateShape((Vector<Object>)ActionObject));
+		g.modifyHyperEdges.get(VHEdgeRef.getIndex()).setShape(NURBSShapeFactory.CreateShape((NURBSCreationMessage)ActionObject));
 		g.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, VHEdgeRef.getIndex(), GraphConstraints.UPDATE|GraphConstraints.HISTORY|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION, GraphConstraints.HYPEREDGE));
 		return g;
 	}

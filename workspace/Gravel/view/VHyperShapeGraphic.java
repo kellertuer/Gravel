@@ -156,7 +156,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		}			
 		if (actualMouseState==INTERPOLATION_MOUSEHANDLING)
 		{
-			Vector<Point2D> IP = (Vector<Point2D>) firstModus.getShapeParameters().get(NURBSShapeFactory.POINTS);
+			Vector<Point2D> IP = firstModus.getShapeParameters().getPoints();
 			Iterator<Point2D> iter = IP.iterator();
 			while (iter.hasNext())
 			{
@@ -167,12 +167,15 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		}
 		if (actualMouseState==CIRCLE_MOUSEHANDLING)
 		{
-			Point p = (Point) firstModus.getShapeParameters().get(NURBSShapeFactory.CIRCLE_ORIGIN);
+			NURBSCreationMessage nm = firstModus.getShapeParameters();
+			if (!nm.isValid())
+				return;
+			Point2D p = nm.getPoints().firstElement();
 			Point p2 = firstModus.getMouseOffSet(); //Actual Point in Graph
 			if ((p!=null)&&(p2.x!=0)&&(p2.y!=0)) //Set per Drag
 			{
 				GeneralPath path = new GeneralPath();
-				path.moveTo(p.x*zoomfactor,p.y*zoomfactor);
+				path.moveTo((new Double(p.getX())).floatValue()*zoomfactor,(new Double(p.getY())).floatValue()*zoomfactor);
 				path.lineTo(p2.x,p2.y);
 				g2.draw(path);			
 			}
@@ -312,7 +315,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		firstModus=null;
 		secondModus=null;
 	}
-	public Vector<Object> getShapeParameters()
+	public NURBSCreationMessage getShapeParameters()
 	{
 		if (firstModus!=null)
 			return firstModus.getShapeParameters();
@@ -321,12 +324,12 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	}
 	/**
 	 * Set the parameters for ShapeCreation in the first modus (e.g. when they where changed in the panel to the left)
-	 * @param p
+	 * @param nm
 	 */
-	public void setShapeParameters(Vector<Object> p)
+	public void setShapeParameters(NURBSCreationMessage nm)
 	{
 		if (firstModus!=null)
-			firstModus.setShapeParameters(p);
+			firstModus.setShapeParameters(nm);
 		repaint();
 	}
 	protected Point DragMouseOffSet()
@@ -355,6 +358,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			{
 				if (((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) //Drag just ended -> Set Circle as Shape
 				{
+					NURBSCreationMessage nm = firstModus.getShapeParameters();
+					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(firstModus.getShape());
 					firstModus.resetShape();
 				}
 			}

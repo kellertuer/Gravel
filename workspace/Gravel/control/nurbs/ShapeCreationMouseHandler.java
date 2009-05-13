@@ -5,6 +5,7 @@ import java.util.Vector;
 import control.DragMouseHandler;
 
 import model.NURBSShape;
+import model.Messages.NURBSCreationMessage;
 
 /**
  * mouse drag handling for all mouse modes implementing shape creation
@@ -26,14 +27,14 @@ public interface ShapeCreationMouseHandler extends DragMouseHandler
 	 * Get Parameters for NURBSShapeFactory of the actually created Shape
 	 * @return
 	 */
-	public Vector<Object> getShapeParameters();
+	public NURBSCreationMessage getShapeParameters();
 
 	/**
 	 * Set the Shape externally with NURBSShapeFactory-Parameters
 	 * This method also updates the internal shape, which is provided by @see getShape();
-	 * @param p
+	 * @param nm
 	 */
-	public void setShapeParameters(Vector<Object> p);
+	public void setShapeParameters(NURBSCreationMessage nm);
 
 	/**
 	 * Get Shape for drawing, if not null, else null is returned

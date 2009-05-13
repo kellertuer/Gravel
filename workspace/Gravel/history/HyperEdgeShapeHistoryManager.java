@@ -3,6 +3,7 @@ package history;
 import model.*;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
+import model.Messages.NURBSCreationMessage;
 
 import java.awt.geom.Point2D;
 import java.util.Observable;
@@ -51,16 +52,15 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			this.setObservation(false);
 			if (UndoStack.size()==0)
 			{
-				Vector<Object> p = new Vector<Object>();
-				p.setSize(NURBSShapeFactory.MAX_INDEX);
-				ParameterVectorReference.setShapeParameters(p);
+				NURBSCreationMessage nm = new NURBSCreationMessage();
+				ParameterVectorReference.setShapeParameters(nm);
 				return;
 			}
 			CommonGraphAction act = UndoStack.getLast(); //Last pushed element is the action before the just undone action
 			if (act instanceof HyperEdgeShapeAction)
 			{
-				Vector<Object> param = (Vector<Object>) ((HyperEdgeShapeAction)act).ActionObject;
-				ParameterVectorReference.setShapeParameters(NURBSShapeFactory.dublicate(param));
+				NURBSCreationMessage nm = (NURBSCreationMessage) ((HyperEdgeShapeAction)act).ActionObject;
+				ParameterVectorReference.setShapeParameters(nm.clone());
 			}
 			this.setObservation(true);
 		}
@@ -76,8 +76,8 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			if (act instanceof HyperEdgeShapeAction)
 			{
 				this.setObservation(false);
-				Vector<Object> param = (Vector<Object>) ((HyperEdgeShapeAction)act).ActionObject;
-				ParameterVectorReference.setShapeParameters(NURBSShapeFactory.dublicate(param));
+				NURBSCreationMessage nm = (NURBSCreationMessage) ((HyperEdgeShapeAction)act).ActionObject;
+				ParameterVectorReference.setShapeParameters(nm.clone());
 				this.setObservation(true);
 			}
 		}
@@ -88,14 +88,14 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 	 * @param m the created Action
 	 * @return
 	 */
-	private CommonGraphAction handleSingleAction(GraphMessage m, Vector<Object> param)
+	private CommonGraphAction handleSingleAction(GraphMessage m, NURBSCreationMessage nm)
 	{
 		int noBlockMod = m.getModification()&(GraphConstraints.ACTIONMASK|GraphConstraints.PARTINFORMATIONMASK);
 		if (noBlockMod==(GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION))
 		{ //Only case handled here, HyperEdgeShapeCreation
 			try {
 			return new HyperEdgeShapeAction(
-				param, //These Parameters
+				nm, //These Parameters
 				((m.getModification()&GraphConstraints.LOCAL) == GraphConstraints.LOCAL), //Local Action?
 				((VHyperGraph)lastGraph).modifyHyperEdges.get(m.getElementID()),
 				m.getModification(), //All known action stuff
@@ -114,13 +114,13 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 	 * Create an Action based on tracked Message
 	 * @param m
 	 */
-	private void addAction(GraphMessage m, Vector<Object> param)	{	
+	private void addAction(GraphMessage m, NURBSCreationMessage nm)	{	
 		if ((m.getModification()&GraphConstraints.BLOCK_ABORT)==GraphConstraints.BLOCK_ABORT)
 			return; //Don't handle Block-Abort-Stuff
 		CommonGraphAction act = null;
 		if (m.getElementID() > 0) //Message for single stuff thats the only case of our interest
 		{
-			act = handleSingleAction(m,param);	
+			act = handleSingleAction(m,nm);	
 			if (act==null)
 				return;
 			clonetrackedGraph();

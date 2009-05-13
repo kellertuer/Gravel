@@ -31,6 +31,7 @@ import model.VQuadCurveEdge;
 import model.VSegmentedEdge;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
+import model.Messages.NURBSCreationMessage;
 import view.VCommonGraphic;
 import view.VGraphic;
 import view.VHyperGraphic;
@@ -64,7 +65,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		MouseOffSet = new Point(0,0);
 		degree = 3; //TODO: Define Std-Value for nURBSShape-Degree
 		InterpolationPoints = new Vector<Point2D>();
-		PointAdditionStatus = NURBSShapeFactory.ADD_END;
+		PointAdditionStatus = NURBSCreationMessage.ADD_END;
 		hyperedgeindex = HyperEdgeIndex;
 	}
 	
@@ -92,45 +93,27 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	{
 		lastshape = NURBSShapeFactory.CreateShape(getShapeParameters());
 	}
-	public void setShapeParameters(Vector<Object> p)
+	public void setShapeParameters(NURBSCreationMessage nm)
 	{
 		//if shape type differs, ignore the parameters, because they might be unsuitable
-
-		if ( (p.get(NURBSShapeFactory.SHAPE_TYPE)==null)
-				||(!p.get(NURBSShapeFactory.SHAPE_TYPE).toString().toLowerCase().equals("global interpolation")) )
+		if ((nm.getType()!=NURBSCreationMessage.INTERPOLATION)||(nm.getPoints()==null))
 		{
 			reInit();
 			return;
 		}
 		if (dragged())
-			return;
-		int tempdegree;
-		try	{tempdegree = Integer.parseInt(p.get(NURBSShapeFactory.DEGREE).toString());}
-		catch (Exception e) {reInit(); return;} //Empty Shape
-		int tempaddpoints;
-		try	{tempaddpoints = Integer.parseInt(p.get(NURBSShapeFactory.ADDPOINTS).toString());}
-		catch (Exception e) {reInit(); return;} //Empty Shape
-		Vector<Point2D> tempIP;
-		try {tempIP = (Vector<Point2D>) p.get(NURBSShapeFactory.POINTS);}
-		catch (Exception e) {reInit(); return;} //Empty Shape
-		
-		InterpolationPoints = tempIP;
-		PointAdditionStatus = tempaddpoints;
-		degree = tempdegree;
+			return;	
+		InterpolationPoints = nm.getPoints();
+		PointAdditionStatus = nm.getStatus();
+		degree = nm.getDegree();
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
 		updateShape();
 		vhg.modifyHyperEdges.get(hyperedgeindex).setShape(lastshape);
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_END));			
 	}
-	public Vector<Object> getShapeParameters()
+	public NURBSCreationMessage getShapeParameters()
 	{
-		Vector<Object> param = new Vector<Object>();
-		param.setSize(NURBSShapeFactory.MAX_INDEX);
-		param.set(NURBSShapeFactory.SHAPE_TYPE,"global interpolation");
-		param.set(NURBSShapeFactory.DEGREE, degree);
-		param.set(NURBSShapeFactory.POINTS, InterpolationPoints);
-		param.set(NURBSShapeFactory.ADDPOINTS, PointAdditionStatus);
-		return param;
+		return new NURBSCreationMessage(degree, PointAdditionStatus, InterpolationPoints);
 	}
 
 	public boolean dragged()
@@ -267,7 +250,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 			return;
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
 		
-		if (PointAdditionStatus==NURBSShapeFactory.ADD_END)
+		if (PointAdditionStatus==NURBSCreationMessage.ADD_END)
 			InterpolationPoints.add((Point2D.Double) newPoint.clone()); 
 		else
 			InterpolationPoints.add(getSecondOfNearestPair(InterpolationPoints,newPoint), (Point2D) newPoint.clone());
