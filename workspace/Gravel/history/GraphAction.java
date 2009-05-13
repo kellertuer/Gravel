@@ -126,6 +126,7 @@ public class GraphAction extends CommonGraphAction {
 			throw new GraphActionException("Can't doDelete(): Wrong Type of Graph");
 		VGraph g = (VGraph)graph;
 		VGraph ret;
+		int id=-1;
 		switch(Objecttype)
 		{
 			case GraphConstraints.SELECTION:
@@ -154,6 +155,7 @@ public class GraphAction extends CommonGraphAction {
 				mn = new MNode(n.getIndex(), g.getMathGraph().modifyNodes.get(n.getIndex()).name);
 				g.modifyNodes.replace(n, tempmn);
 				envG.modifyNodes.replace((VNode)ActionObject, mn);
+				id = n.getIndex();
 				exchangeSubgraphMembership(GraphConstraints.NODE,n.getIndex(),env,graph);
 				ret = g; //return graph
 			break;
@@ -174,6 +176,7 @@ public class GraphAction extends CommonGraphAction {
 				MEdge me = g.getMathGraph().modifyEdges.get(e.getIndex());
 				g.modifyEdges.replace(e, tempme);
 				envG.modifyEdges.replace((VEdge)ActionObject, me);
+				id = e.getIndex();
 				exchangeSubgraphMembership(GraphConstraints.EDGE,e.getIndex(),env,graph);
 				ret = g;
 			break;
@@ -186,6 +189,7 @@ public class GraphAction extends CommonGraphAction {
 				ms = g.getMathGraph().modifySubgraphs.get(newSubgraph.getIndex()).clone();
 				g.modifySubgraphs.remove(newSubgraph.getIndex()); //Remove old Subgraph.
 				g.modifySubgraphs.add(newSubgraph, tempms);
+				id = newSubgraph.getIndex();
 				g.pushNotify(new GraphMessage(GraphConstraints.SUBGRAPH,newSubgraph.getIndex(),GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.GRAPH_ALL_ELEMENTS));
 				//Reintroduce all Nodes/Edges
 				Iterator<VNode> ni = g.modifyNodes.getIterator();
@@ -207,6 +211,8 @@ public class GraphAction extends CommonGraphAction {
 				break;
 			default: throw new GraphActionException("GraphAction::doReplace(); Unknown ActionObject");
 		}
+		if (Objecttype!=GraphConstraints.SUBGRAPH)
+			g.pushNotify(new GraphMessage(Objecttype, id, GraphConstraints.UPDATE|GraphConstraints.HISTORY, GraphConstraints.ELEMENT_MASK));
 		return ret;
 	}
 
@@ -215,6 +221,7 @@ public class GraphAction extends CommonGraphAction {
 		if (graph.getType()!=VGraphInterface.GRAPH)
 			throw new GraphActionException("Can't doDelete(): Wrong Type of Graph");
 		VGraph g = (VGraph)graph;
+		int id=-1;
 		switch(Objecttype)
 		{
 			case GraphConstraints.NODE:
@@ -222,6 +229,7 @@ public class GraphAction extends CommonGraphAction {
 				if (g.modifyNodes.get(n.getIndex())!=null) //node exists
 					throw new GraphActionException("Can't create node, already exists.");
 				g.modifyNodes.add(n, mn);
+				id = n.getIndex();
 				//Recreate all Subgraphs
 				Iterator<VSubgraph> si = envG.modifySubgraphs.getIterator();
 				while (si.hasNext())
@@ -251,6 +259,7 @@ public class GraphAction extends CommonGraphAction {
 				if ((g.modifyEdges.get(e.getIndex())!=null)||(g.modifyNodes.get(me.StartIndex)==null)||(g.modifyNodes.get(me.EndIndex)==null)) //edge exists or one of its Nodes does not
 					throw new GraphActionException("Can't create edge, it already exists or one of its Nodes does not.");
 				g.modifyEdges.add(e, me, envG.modifyNodes.get(me.StartIndex).getPosition(),envG.modifyNodes.get(me.EndIndex).getPosition());
+				id = e.getIndex();
 				recreateItemColor(e,g);
 				g.modifyEdges.get(e.getIndex()).setSelectedStatus(envG.modifyEdges.get(e.getIndex()).getSelectedStatus());
 				break;
@@ -261,8 +270,10 @@ public class GraphAction extends CommonGraphAction {
 					throw new GraphActionException("Can't create subgraph, it already exists or one of its Nodes does not.");
 				
 				g.modifySubgraphs.add(vs, ms); //Adds old NOdes and Edges again, too
+				id = vs.getIndex();
 				break;
 		}// End switch
+		g.pushNotify(new GraphMessage(Objecttype, id, GraphConstraints.ADDITION/GraphConstraints.HISTORY, GraphConstraints.ELEMENT_MASK));
 		return graph;
 	}
 
@@ -271,6 +282,7 @@ public class GraphAction extends CommonGraphAction {
 		if (graph.getType()!=VGraphInterface.GRAPH)
 			throw new GraphActionException("Can't doDelete(): Wrong Type of Graph");
 		VGraph g = (VGraph)graph;
+		int id = -1;
 		switch(Objecttype)
 		{
 			case GraphConstraints.NODE:
@@ -278,21 +290,25 @@ public class GraphAction extends CommonGraphAction {
 				if (g.modifyNodes.get(n.getIndex())==null) //node does not exists
 					throw new GraphActionException("Can't delete node, none there.");
 				g.modifyNodes.remove(n.getIndex());
+				id = n.getIndex();
 				break;
 			case GraphConstraints.EDGE:
 				VEdge e = (VEdge)ActionObject;
 				if (g.modifyEdges.get(e.getIndex())==null) //edge does not exists
 					throw new GraphActionException("Can't delete edge, none there.");
 				g.modifyEdges.remove(e.getIndex());
+				id = e.getIndex();
 				break;
 			case GraphConstraints.SUBGRAPH:
 				VSubgraph vs = (VSubgraph)ActionObject;
 				if (g.modifySubgraphs.get(vs.getIndex())==null) //subgraph does not exists
 					throw new GraphActionException("Can't delete subgraph, none there.");
 				g.modifySubgraphs.remove(vs.getIndex());
+				id = vs.getIndex();
 				break;
 			}
 		//Delete does not need to update selection
+		g.pushNotify(new GraphMessage(Objecttype, id, GraphConstraints.REMOVAL|GraphConstraints.HISTORY, GraphConstraints.ELEMENT_MASK));
 		return g;
 	}	
 }

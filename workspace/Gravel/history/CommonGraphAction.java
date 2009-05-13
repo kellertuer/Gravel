@@ -271,7 +271,7 @@ public abstract class CommonGraphAction {
 		if (ActionObject==null)
 			throw new GraphActionException("No Object available for the Action");
 		VGraphInterface ret;
-		switch(Action) 
+		switch(Action&GraphConstraints.ACTIONMASK) //Direct actions 
 		{
 			case GraphConstraints.UPDATE: 
 				ret = doReplace(graph);
@@ -321,7 +321,7 @@ public abstract class CommonGraphAction {
 		if (ActionObject==null)
 			throw new GraphActionException("No Object available for the Action");
 		VGraphInterface ret;
-		switch(Action) 
+		switch(Action&GraphConstraints.ACTIONMASK) //Direct actions 
 		{
 			case GraphConstraints.UPDATE:  //Undo a replace is repace itself
 				ret = doReplace(graph);

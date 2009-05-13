@@ -82,6 +82,7 @@ public class HyperEdgeShapeAction extends HyperGraphAction {
 			throw new GraphActionException("Can't doreplace(): Edge nonexistent to replace its shape");
 		//Set shape to the Shape Created by internal paramaters of this action
 		g.modifyHyperEdges.get(VHEdgeRef.getIndex()).setShape(NURBSShapeFactory.CreateShape(param));
+		g.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, VHEdgeRef.getIndex(), GraphConstraints.UPDATE|GraphConstraints.HISTORY|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION, GraphConstraints.HYPEREDGE));
 		return g;
 	}
 	protected VGraphInterface doCreate(VGraphInterface graph) throws GraphActionException

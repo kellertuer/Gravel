@@ -434,6 +434,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 				param.add(NURBSShapeFactory.CIRCLE_RADIUS, iCRad.getValue());
 				param.add(NURBSShapeFactory.DISTANCE_TO_NODE,HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin()); 			
 				HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).setShape(NURBSShapeFactory.CreateShape(param));
+				HShapeGraphicRef.setShapeParameters(param);
 				HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, HEdgeRefIndex, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION, GraphConstraints.HYPEREDGE)); //HyperEdgeShape Updated
 			}
 		}

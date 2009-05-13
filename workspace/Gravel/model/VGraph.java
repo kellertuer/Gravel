@@ -270,15 +270,15 @@ public class VGraph extends Observable implements VGraphInterface {
 
 		mG = anotherone.mG;
 		mG.pushNotify(
-						new GraphMessage(GraphConstraints.ALL, //Type
+						new GraphMessage(GraphConstraints.ELEMENT_MASK, //Type
 										GraphConstraints.REPLACEMENT, //Status 
-										GraphConstraints.ALL) //Affected		
+										GraphConstraints.ELEMENT_MASK) //Affected		
 		);
 		setChanged();
 		notifyObservers(
-				new GraphMessage(GraphConstraints.ALL, //Type
+				new GraphMessage(GraphConstraints.ELEMENT_MASK, //Type
 						GraphConstraints.REPLACEMENT, //Status 
-						GraphConstraints.ALL) //Affected		
+						GraphConstraints.ELEMENT_MASK) //Affected		
 		);
 	}
 	/**

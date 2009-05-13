@@ -4,13 +4,10 @@ import model.*;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
-import io.GeneralPreferences;
-
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Observable;
-import java.util.Observer;
 import java.util.Vector;
+
+import view.VHyperShapeGraphic;
 
 /**
  * This class tacks all actions happening to a graph and saves the last few ones.
@@ -26,17 +23,25 @@ import java.util.Vector;
  */
 public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 {	
+	private VHyperShapeGraphic ParameterVectorReference;
 	/**
-	 * Create a new GraphHistoryManager for the given VHyperGraph
+	 * Create a new HyperGraphShapeHistoryManager for the given VHyperGraph
+	 * To track changes of the first Modus of shape creation 
+	 * The second modus is tracked by the method already implemented in the
+	 * CommonGraphHistoryManager from which they are passed on to this class
+	 * 
 	 * @param vhg the HyperGraph, that should be extended with a History
+	 * @param vhsg VHyperShapeGraphic which keeps the last Parametervector for creation of shape
 	 */
-	public HyperEdgeShapeHistoryManager(VHyperGraph vhg)
+	public HyperEdgeShapeHistoryManager(VHyperGraph vhg, VHyperShapeGraphic vhsg)
 	{
 		super(vhg);
 		trackedGraph = vhg;
 		lastGraph = vhg.clone();
+		ParameterVectorReference = vhsg;
 		CommonInitialization();
 	}
+	
 	/**
 	 * Create an Action based on the message, that came from the Graph,
 	 * return that Action and update LastGraph
@@ -104,7 +109,7 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 		GraphMessage m = (GraphMessage)arg;
 		if (m==null)
 			return;
-		if (m.getModification()==GraphConstraints.HISTORY) //Ignore them, they'Re from us or another stupid history
+		if ((m.getModification()&GraphConstraints.HISTORY)>0) //Ignore them, they'Re from us
 			return;
 		//Complete Replacement of Graphor Hypergraph Handling (Happens when loading a new graph
 		GraphMessage actualAction;
@@ -127,8 +132,8 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			
 		{// The type of action we want to track here - than it was tracked wrong before
 			UndoStack.removeLast(); //Undo the undo-push from superclass
-
-			addAction(m); //Do our action upon that
+			System.err.println("Shape Creation - handling different.");
+			addAction(m, ParameterVectorReference.getShapeParameters()); //Do our action upon that
 		}
 	}
 }

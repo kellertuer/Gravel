@@ -82,8 +82,8 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 	public Vector<Object> getShapeParameters()
 	{
 		Vector<Object> param = new Vector<Object>();
-		param.set(NURBSShapeFactory.SHAPE_TYPE,"circle");
 		param.setSize(NURBSShapeFactory.MAX_INDEX);
+		param.set(NURBSShapeFactory.SHAPE_TYPE,"circle");
 		param.add(NURBSShapeFactory.CIRCLE_ORIGIN, CircleOrigin);
 		param.add(NURBSShapeFactory.CIRCLE_RADIUS, size);
 		return param;
@@ -174,9 +174,9 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 				notify=vhg;
 
 			if (firstdrag) //If wirst drag - start Block
-				notify.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+				notify.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
 			else		//continnue Block
-				notify.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+				notify.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
 		}
 		MouseOffSet = e.getPoint();
 		firstdrag = false;

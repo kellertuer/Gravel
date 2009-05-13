@@ -127,6 +127,7 @@ public class HyperGraphAction extends CommonGraphAction {
 			throw new GraphActionException("Can't doDelete(): Wrong Type of Graph");
 		VHyperGraph g = (VHyperGraph)graph;
 		VHyperGraph ret;
+		int id=-1;
 		switch(Objecttype)
 		{
 			case GraphConstraints.SELECTION:
@@ -154,6 +155,7 @@ public class HyperGraphAction extends CommonGraphAction {
 				MNode tempmn = mn;
 				mn = new MNode(n.getIndex(), g.getMathGraph().modifyNodes.get(n.getIndex()).name);
 				g.modifyNodes.replace(n, tempmn);
+				id = n.getIndex();
 				envHG.modifyNodes.replace((VNode)ActionObject, mn);
 				exchangeSubgraphMembership(GraphConstraints.NODE,n.getIndex(),env,graph);
 				ret = g; //return graph
@@ -174,6 +176,7 @@ public class HyperGraphAction extends CommonGraphAction {
 				MHyperEdge tempmhe = mhe.clone();
 				MHyperEdge mhe = g.getMathGraph().modifyHyperEdges.get(e.getIndex());
 				g.modifyHyperEdges.replace(e, tempmhe);
+				id = e.getIndex();
 				envHG.modifyHyperEdges.replace((VHyperEdge)ActionObject, mhe);
 				exchangeSubgraphMembership(GraphConstraints.HYPEREDGE,e.getIndex(),env,graph);
 				ret = g;
@@ -187,7 +190,7 @@ public class HyperGraphAction extends CommonGraphAction {
 				ms = g.getMathGraph().modifySubgraphs.get(newSubgraph.getIndex()).clone();
 				g.modifySubgraphs.remove(newSubgraph.getIndex()); //Remove old Subgraph.
 				g.modifySubgraphs.add(newSubgraph, tempms);
-				g.pushNotify(new GraphMessage(GraphConstraints.SUBGRAPH,newSubgraph.getIndex(),GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.HYPERGRAPH_ALL_ELEMENTS));
+				g.pushNotify(new GraphMessage(GraphConstraints.SUBGRAPH,newSubgraph.getIndex(),GraphConstraints.UPDATE|GraphConstraints.BLOCK_START|GraphConstraints.HISTORY,GraphConstraints.HYPERGRAPH_ALL_ELEMENTS));
 				//Reintroduce all Nodes/Edges
 				Iterator<VNode> ni = g.modifyNodes.getIterator();
 				while (ni.hasNext())
@@ -208,6 +211,8 @@ public class HyperGraphAction extends CommonGraphAction {
 				break;
 			default: throw new GraphActionException("HyperGraphAction::doReplace(); Unknown ActionObject:"+ActionObject);
 		}
+		if (Objecttype!=GraphConstraints.SUBGRAPH) //We had a Block on Subgraphs so don't push again then...
+			g.pushNotify(new GraphMessage(Objecttype, id, GraphConstraints.UPDATE|GraphConstraints.HISTORY, GraphConstraints.ELEMENT_MASK));
 		return ret;
 	}
 
@@ -216,6 +221,7 @@ public class HyperGraphAction extends CommonGraphAction {
 		if (graph.getType()!=VGraphInterface.HYPERGRAPH)
 			throw new GraphActionException("HyperGraphAction: Can't doDelete(): Wrong Type of Graph");
 		VHyperGraph g = (VHyperGraph)graph;
+		int id=-1;
 		switch(Objecttype)
 		{
 			case GraphConstraints.NODE:
@@ -223,6 +229,7 @@ public class HyperGraphAction extends CommonGraphAction {
 				if (g.modifyNodes.get(n.getIndex())!=null) //node exists
 					throw new GraphActionException("Can't create node, already exists.");
 				g.modifyNodes.add(n, mn);
+				id = n.getIndex();
 				//Recreate all Subgraphs
 				Iterator<VSubgraph> si = envHG.modifySubgraphs.getIterator();
 				while (si.hasNext())
@@ -257,6 +264,7 @@ public class HyperGraphAction extends CommonGraphAction {
 						throw new GraphActionException("Can't create hyper edge, one of its End nodes does not exist");						
 				}
 				g.modifyHyperEdges.add(e, mhe);
+				id = e.getIndex();
 				recreateItemColor(e,g);
 				g.modifyHyperEdges.get(e.getIndex()).setSelectedStatus(envHG.modifyHyperEdges.get(e.getIndex()).getSelectedStatus());
 				break;
@@ -265,10 +273,11 @@ public class HyperGraphAction extends CommonGraphAction {
 				VSubgraph vs = (VSubgraph)ActionObject;
 				if ((g.modifySubgraphs.get(vs.getIndex())!=null))
 					throw new GraphActionException("Can't create subgraph, it already exists or one of its Nodes does not.");
-				
+				id = vs.getIndex();
 				g.modifySubgraphs.add(vs, ms); //Adds old NOdes and Edges again, too
 				break;
 		}// End switch
+		g.pushNotify(new GraphMessage(Objecttype, id, GraphConstraints.ADDITION|GraphConstraints.HISTORY, GraphConstraints.ELEMENT_MASK));
 		return graph;
 	}
 
@@ -277,6 +286,7 @@ public class HyperGraphAction extends CommonGraphAction {
 		if (graph.getType()!=VGraphInterface.HYPERGRAPH)
 			throw new GraphActionException("Can't doDelete(): Wrong Type of Graph");
 		VHyperGraph g = (VHyperGraph)graph;
+		int id=-1;
 		switch(Objecttype)
 		{
 			case GraphConstraints.NODE:
@@ -284,21 +294,25 @@ public class HyperGraphAction extends CommonGraphAction {
 				if (g.modifyNodes.get(n.getIndex())==null) //node does not exists
 					throw new GraphActionException("Can't delete node, none there.");
 				g.modifyNodes.remove(n.getIndex());
+				id = n.getIndex();
 				break;
 			case GraphConstraints.HYPEREDGE:
 				VHyperEdge e = (VHyperEdge)ActionObject;
 				if (g.modifyHyperEdges.get(e.getIndex())==null) //edge does not exists
 					throw new GraphActionException("Can't delete hyperedge, none there.");
 				g.modifyHyperEdges.remove(e.getIndex());
+				id = e.getIndex();
 				break;
 			case GraphConstraints.SUBGRAPH:
 				VSubgraph vs = (VSubgraph)ActionObject;
 				if (g.modifySubgraphs.get(vs.getIndex())==null) //subgraph does not exists
 					throw new GraphActionException("Can't delete subgraph, none there.");
 				g.modifySubgraphs.remove(vs.getIndex());
+				id = vs.getIndex();
 				break;
 			}
 		//Delete does not need to update selection
+		g.pushNotify(new GraphMessage(Objecttype, id, GraphConstraints.REMOVAL|GraphConstraints.HISTORY, GraphConstraints.ELEMENT_MASK));
 		return g;
 	}	
 }

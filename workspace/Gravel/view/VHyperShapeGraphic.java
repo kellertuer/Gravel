@@ -46,7 +46,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		actualMouseState = NO_MOUSEHANDLING;
 		highlightedHyperEdge = hyperedgeindex;
 
-		vGh = new HyperEdgeShapeHistoryManager(vG);
+		vGh = new HyperEdgeShapeHistoryManager(vG,this);
 	}	
 
 	public void paint(Graphics2D g2)
@@ -343,7 +343,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		if (arg instanceof GraphMessage)
 		{
 			GraphMessage m = (GraphMessage)arg;
- 			if (m.getModification()==GraphConstraints.HISTORY) //We got an undo/redp
+ 			if ((m.getModification()&GraphConstraints.HISTORY)>0)//We got an undo/redp
 			{
  				System.err.println("History Set.");
  				if (secondModus!=null) //Simple, because we just reset the shape to that one from the graph - history updated that
@@ -355,7 +355,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				if (((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) //Drag just ended -> Set Circle as Shape
 				{
 					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(firstModus.getShape());
-					vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
+					vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, highlightedHyperEdge,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION, GraphConstraints.HYPEREDGE)); //HyperEdgeShape Updated
 					firstModus.resetShape();
 				}
 			}
@@ -364,7 +364,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				if (((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) //Drag just ended -> Set Circle as Shape
 				{
 					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(secondModus.getShape());
-					vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
+					vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, highlightedHyperEdge, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE, GraphConstraints.HYPEREDGE)); //HyperEdgeShape Updated
 					secondModus.resetShape();
 				}
 			}

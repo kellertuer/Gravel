@@ -85,7 +85,7 @@ public class CommonGraphHistoryManager implements Observer
 		int action = 0;
 		//Check, which Graph contains the Information for the information, we need to create an Action
 		VGraphInterface InformationalGraph; //which Graph provides information for the action?
-		switch(m.getModification()&(~(GraphConstraints.BLOCK_ALL|GraphConstraints.PARTINFO))) //Action must be status uupdates, neither Block-Info nor Partsinfo
+		switch(m.getModification()&(GraphConstraints.ACTIONMASK)) //Action must be status updates only (neither part nor block info
 		{	case GraphConstraints.ADDITION: //Node added, Create action and modify lastgraph
 				action = GraphConstraints.ADDITION;
 				InformationalGraph = trackedGraph; //get Information from actual Graph;
@@ -292,7 +292,7 @@ public class CommonGraphHistoryManager implements Observer
 	{
 		if (!CanUndo())
 			return;
-		setObservation(false); //Deaktivate Tracking
+		setObservation(false); //Deaktivate Tracking - because the action pushes its undo as history action
 		CommonGraphAction LastAction = UndoStack.removeLast();
 		try{
 			LastAction.UnDoAction(trackedGraph);
@@ -305,10 +305,6 @@ public class CommonGraphHistoryManager implements Observer
 		if (RedoStack.size()>=stacksize)
 			RedoStack.remove();
 		RedoStack.add(LastAction);
-		if (trackedGraph.getType()==VGraphInterface.GRAPH)
-			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.HISTORY));
-		else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
-			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.HISTORY));			
 		setObservation(true); //Activate Tracking again
 	}
 	/**
@@ -328,7 +324,7 @@ public class CommonGraphHistoryManager implements Observer
 	{
 		if (!CanRedo())
 			return;
-		setObservation(false);//Deaktivate Tracking
+		setObservation(false);//Deaktivate Tracking - because the action pushes a notification
 		CommonGraphAction LastAction = RedoStack.removeLast();
 		try{
 			LastAction.redoAction(trackedGraph);
@@ -344,10 +340,6 @@ public class CommonGraphHistoryManager implements Observer
 			UndoStack.remove();
 		}
 		UndoStack.add(LastAction);
-		if (trackedGraph.getType()==VGraphInterface.GRAPH)
-			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.HISTORY));
-		else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
-			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.HISTORY));			
 		setObservation(true); //Activate Tracking again
 	}
 	/**
@@ -401,7 +393,7 @@ public class CommonGraphHistoryManager implements Observer
 		GraphMessage m = (GraphMessage)arg;
 		if (m==null)
 			return;
-		if (m.getModification()==GraphConstraints.HISTORY) //Ignore them, they'Re from us or another stupid history
+		if ((m.getModification()&GraphConstraints.HISTORY)>0) //Ignore them, they'Re from us 
 			return;
 		//Complete Replacement of Graphor Hypergraph Handling (Happens when loading a new graph
 		if ( ((m.getModifiedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getAffectedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getModification()==GraphConstraints.REPLACEMENT))
