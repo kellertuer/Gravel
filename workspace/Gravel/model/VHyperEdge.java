@@ -126,7 +126,7 @@ public class VHyperEdge extends VItem {
 	 */
 	public VHyperEdge clone()
 	{
-		return new VHyperEdge(getIndex(), width, minMargin, shape, text.clone(), linestyle.clone());
+		return new VHyperEdge(getIndex(), width, minMargin, shape.clone(), text.clone(), linestyle.clone());
 	}
 	/**
 	 * getDirectionatPointonEdge
@@ -150,26 +150,6 @@ public class VHyperEdge extends VItem {
 		{
 			return shape.isPointOnCurve(new Point2D.Double(p.x,p.y), variance);			
 		}
-	}
-	/**
-	 * Validate the Shape of the 
-	 * @param nodepoints
-	 * @return
-	 */
-	public boolean validateShape(Vector<Point> nodepoints)
-	{
-		if (shape==null)
-			return false;
-		else
-		{
-			Iterator<Point >ni = nodepoints.iterator();
-			while (ni.hasNext())
-			{
-//				if (!containsPoint(ni.next()))
-					return false;
-			}
-			return true; //All inside
-		}		
 	}
 	/**
 	 * Get the Width of the edge

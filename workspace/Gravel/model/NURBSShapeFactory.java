@@ -101,6 +101,65 @@ public class NURBSShapeFactory {
 		return null;
 	}
 	
+	//Clone a given parameter vector so that no point is referenced twice
+	@SuppressWarnings("unchecked")
+	public static Vector<Object> dublicate(Vector<Object> p)
+	{
+		//Due to the vector-Stuff this is a little bit of work
+		Vector<Object> clone = new Vector<Object>();
+		clone.setSize(MAX_INDEX);
+		if (p.get(SHAPE_TYPE)!=null)
+			clone.set(SHAPE_TYPE, (String) p.get(SHAPE_TYPE));
+		if (p.get(CIRCLE_ORIGIN)!=null)
+			clone.set(CIRCLE_ORIGIN, ((Point) p.get(CIRCLE_ORIGIN)).clone());
+		if (p.get(CIRCLE_RADIUS)!=null)
+		{
+			try	{clone.set(CIRCLE_RADIUS, Integer.parseInt(p.get(CIRCLE_RADIUS).toString()));}
+			catch (Exception e) {clone.set(CIRCLE_RADIUS, null);} //results in Empty Shape later
+		}
+		if (p.get(DISTANCE_TO_NODE)!=null)
+		{
+			try	{clone.set(DISTANCE_TO_NODE, Integer.parseInt(p.get(DISTANCE_TO_NODE).toString()));}
+			catch (Exception e) {clone.set(DISTANCE_TO_NODE, null);} //EmptyShape
+		}
+		if (p.get(POINTS)!=null)
+		{
+			Vector<Point2D> nodes=null;
+			try {nodes = (Vector<Point2D>) p.get(POINTS);}
+			catch (Exception e) {clone.set(POINTS,null);}
+			Vector<Point2D> c = new Vector<Point2D>();
+			if (nodes!=null)
+			{
+				for (int i=0; i<nodes.size(); i++)
+					c.add(new Point2D.Double(nodes.get(i).getX(),nodes.get(i).getY()));
+				clone.set(POINTS,c);
+			}
+		}
+		if (p.get(SIZES)!=null)
+		{
+			Vector<Integer> sizes=null;
+			try {sizes = (Vector<Integer>) p.get(SIZES);}
+			catch (Exception e) {clone.set(SIZES,null);}
+			Vector<Integer> c = new Vector<Integer>();
+			if (sizes!=null)
+			{
+				for (int i=0; i<sizes.size(); i++)
+					c.add(sizes.get(i));
+				clone.set(POINTS,c);
+			}
+		}
+		if (p.get(DEGREE)!=null)
+		{
+			try	{clone.set(DEGREE, Integer.parseInt(p.get(DEGREE).toString()));}
+			catch (Exception e) {clone.set(DEGREE, null);} //EmptyShape
+		}
+		if (p.get(ADDPOINTS)!=null)
+		{
+			try	{clone.set(ADDPOINTS, Integer.parseInt(p.get(ADDPOINTS).toString()));}
+			catch (Exception e) {clone.set(ADDPOINTS, null);} //EmptyShape
+		}
+		return clone;
+	}		
 	/**
 	 * Create a NURBSSHape Circle based on the Information, where its Origin is, its Radius and the Distance to the nodes
 	 * 

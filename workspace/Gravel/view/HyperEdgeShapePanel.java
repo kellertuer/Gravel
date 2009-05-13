@@ -314,7 +314,6 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		InterpolationFields.add(rAddEnd,c);
 		c.gridx++;
 		InterpolationFields.add(rAddBetween,c);
-		System.err.println(java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
 	}
 	
 	private void buildFreeModPanel()

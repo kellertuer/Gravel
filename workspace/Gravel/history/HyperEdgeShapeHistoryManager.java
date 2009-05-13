@@ -4,6 +4,7 @@ import model.*;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 
+import java.awt.geom.Point2D;
 import java.util.Observable;
 import java.util.Vector;
 
@@ -42,6 +43,45 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 		CommonInitialization();
 	}
 	
+	public void Undo()
+	{
+		if (super.CanUndo())
+		{
+			super.Undo();
+			this.setObservation(false);
+			if (UndoStack.size()==0)
+			{
+				Vector<Object> p = new Vector<Object>();
+				p.setSize(NURBSShapeFactory.MAX_INDEX);
+				ParameterVectorReference.setShapeParameters(p);
+				return;
+			}
+			CommonGraphAction act = UndoStack.getLast(); //Last pushed element is the action before the just undone action
+			if (act instanceof HyperEdgeShapeAction)
+			{
+				Vector<Object> param = (Vector<Object>) ((HyperEdgeShapeAction)act).ActionObject;
+				ParameterVectorReference.setShapeParameters(NURBSShapeFactory.dublicate(param));
+			}
+			this.setObservation(true);
+		}
+		
+	}
+
+	public void Redo()
+	{
+		if (super.CanRedo())
+		{
+			super.Redo();
+			CommonGraphAction act = UndoStack.getLast();
+			if (act instanceof HyperEdgeShapeAction)
+			{
+				this.setObservation(false);
+				Vector<Object> param = (Vector<Object>) ((HyperEdgeShapeAction)act).ActionObject;
+				ParameterVectorReference.setShapeParameters(NURBSShapeFactory.dublicate(param));
+				this.setObservation(true);
+			}
+		}
+	}
 	/**
 	 * Create an Action based on the message, that came from the Graph,
 	 * return that Action and update LastGraph
@@ -50,7 +90,8 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 	 */
 	private CommonGraphAction handleSingleAction(GraphMessage m, Vector<Object> param)
 	{
-		if (m.getModification()==(GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION))
+		int noBlockMod = m.getModification()&(GraphConstraints.ACTIONMASK|GraphConstraints.PARTINFORMATIONMASK);
+		if (noBlockMod==(GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION))
 		{ //Only case handled here, HyperEdgeShapeCreation
 			try {
 			return new HyperEdgeShapeAction(
@@ -65,7 +106,7 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 				System.err.println("DEBUG: HyperEdgeshape (#"+m.getElementID()+") Action ("+m.getModification()+") Failed:"+e.getMessage());
 				return null;
 			}
-		}
+		} //else handle as normal
 		return super.handleSingleAction(m);
 	}
 	/**
@@ -111,6 +152,7 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			return;
 		if ((m.getModification()&GraphConstraints.HISTORY)>0) //Ignore them, they'Re from us
 			return;
+		System.err.println(this.blockdepth+" ("+active+") "+m.getModification());
 		//Complete Replacement of Graphor Hypergraph Handling (Happens when loading a new graph
 		GraphMessage actualAction;
 		if ((blockdepth==0)&&(active) //super.update ended a block or we are active either way
@@ -124,16 +166,14 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			actualAction = m;
 		if (((m.getModification() & GraphConstraints.BLOCK_ABORT)==GraphConstraints.BLOCK_ABORT) || (temp==null) || (!active))
 			return;
-
+		int noBlockMod = actualAction.getModification() & (GraphConstraints.ACTIONMASK|GraphConstraints.PARTINFORMATIONMASK);
 		if ((actualAction.getModifiedElementTypes()==GraphConstraints.HYPEREDGE)
-			&& (actualAction.getModification() == (GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION))
+			&& (noBlockMod == (GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION))
 			&& (actualAction.getElementID() != 0)
 			&& (actualAction.getAffectedElementTypes() ==GraphConstraints.HYPEREDGE))
-			
 		{// The type of action we want to track here - than it was tracked wrong before
-			UndoStack.removeLast(); //Undo the undo-push from superclass
-			System.err.println("Shape Creation - handling different.");
-			addAction(m, ParameterVectorReference.getShapeParameters()); //Do our action upon that
+			UndoStack.removeLast(); //Undo the undo-push from superclass and handle seperately
+			addAction(actualAction, ParameterVectorReference.getShapeParameters()); //Do our action upon that
 		}
 	}
 }

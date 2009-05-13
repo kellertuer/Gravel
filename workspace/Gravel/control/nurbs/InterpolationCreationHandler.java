@@ -53,64 +53,74 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	boolean firstdrag = true;
 	Point2D DragOrigin = null;
 	Vector<Point2D> InterpolationPoints;
-	int degree, nodedist, PointAdditionStatus;
+	int degree, PointAdditionStatus, hyperedgeindex;
 	NURBSShape lastshape=null;
 
-	public InterpolationCreationHandler(VHyperGraphic g)
+	public InterpolationCreationHandler(VHyperGraphic g, int HyperEdgeIndex)
 	{
 		vgc = g;
 		vhg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
 		MouseOffSet = new Point(0,0);
 		degree = 3; //TODO: Define Std-Value for nURBSShape-Degree
-		nodedist = 20; //TODO: Get that margin from the respective VHyperEdge
 		InterpolationPoints = new Vector<Point2D>();
 		PointAdditionStatus = NURBSShapeFactory.ADD_END;
+		hyperedgeindex = HyperEdgeIndex;
 	}
 	
+	public void reInit()
+	{
+		degree = 3; //TODO: Define Std-Value for nURBSShape-Degree
+		InterpolationPoints = new Vector<Point2D>();
+		updateShape();
+	}
 	public Rectangle getSelectionRectangle()
 	{ //No Selections possible here
 		return null;
+	}
+
+	public NURBSShape getShape()
+	{
+		return lastshape;
 	}
 
 	public void resetShape()
 	{
 		lastshape=null;
 	}
-	private void UpdateShape()
+	private void updateShape()
 	{
 		lastshape = NURBSShapeFactory.CreateShape(getShapeParameters());
 	}
 	public void setShapeParameters(Vector<Object> p)
 	{
 		//if shape type differs, ignore the parameters, because they might be unsuitable
-		if (!p.get(NURBSShapeFactory.SHAPE_TYPE).toString().toLowerCase().equals("global interpolation"))
+
+		if ( (p.get(NURBSShapeFactory.SHAPE_TYPE)==null)
+				||(!p.get(NURBSShapeFactory.SHAPE_TYPE).toString().toLowerCase().equals("global interpolation")) )
 		{
-			System.err.println("Parameter Shape Type doesn't fit.");
+			reInit();
 			return;
 		}
 		if (dragged())
 			return;
 		int tempdegree;
 		try	{tempdegree = Integer.parseInt(p.get(NURBSShapeFactory.DEGREE).toString());}
-		catch (Exception e) {return;} //Empty Shape
+		catch (Exception e) {reInit(); return;} //Empty Shape
 		int tempaddpoints;
 		try	{tempaddpoints = Integer.parseInt(p.get(NURBSShapeFactory.ADDPOINTS).toString());}
-		catch (Exception e) {return;} //Empty Shape
-		int tempnd;
-		try	{tempnd = Integer.parseInt(p.get(NURBSShapeFactory.DISTANCE_TO_NODE).toString());}
-		catch (Exception e) {return;} //Empty Shape
+		catch (Exception e) {reInit(); return;} //Empty Shape
 		Vector<Point2D> tempIP;
 		try {tempIP = (Vector<Point2D>) p.get(NURBSShapeFactory.POINTS);}
-		catch (Exception e) {return;} //Empty Shape
+		catch (Exception e) {reInit(); return;} //Empty Shape
 		
 		InterpolationPoints = tempIP;
 		PointAdditionStatus = tempaddpoints;
 		degree = tempdegree;
-		nodedist = tempnd;
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
-		UpdateShape();
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
+		updateShape();
+		vhg.modifyHyperEdges.get(hyperedgeindex).setShape(lastshape);
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_END));			
 	}
 	public Vector<Object> getShapeParameters()
 	{
@@ -119,13 +129,10 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		param.set(NURBSShapeFactory.SHAPE_TYPE,"global interpolation");
 		param.set(NURBSShapeFactory.DEGREE, degree);
 		param.set(NURBSShapeFactory.POINTS, InterpolationPoints);
+		param.set(NURBSShapeFactory.ADDPOINTS, PointAdditionStatus);
 		return param;
 	}
 
-	public NURBSShape getShape()
-	{
-		return lastshape;
-	}
 	public boolean dragged()
 	{
 		return (DragOrigin!=null)&&(!firstdrag);
@@ -136,6 +143,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		if ((DragOrigin!=null)&&(!firstdrag)) //We had an Drag an a Circle was created, draw it one final time
 		{
 			DragOrigin=null;
+			vhg.modifyHyperEdges.get(hyperedgeindex).setShape(lastshape);
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 		}
 	}
@@ -218,8 +226,8 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 					return;
 				}
 				InterpolationPoints.add(DragOrigin);
-				UpdateShape();
-				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+				updateShape();
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
 			}
 			else
 			{
@@ -228,10 +236,10 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 					if (!containsPoint(exactPointInGraph))
 					{
 						InterpolationPoints.set(InterpolationPoints.size()-1,exactPointInGraph);
-						UpdateShape();
+						updateShape();
 					}
 				}
-				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
 			}
 		}
 		MouseOffSet = e.getPoint();
@@ -257,12 +265,15 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		Point2D.Double newPoint = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100d),(double)e.getPoint().y/((double)vgc.getZoom()/100));
 		if (containsPoint(newPoint)) //Do not add twice
 			return;
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
+		
 		if (PointAdditionStatus==NURBSShapeFactory.ADD_END)
 			InterpolationPoints.add((Point2D.Double) newPoint.clone()); 
 		else
 			InterpolationPoints.add(getSecondOfNearestPair(InterpolationPoints,newPoint), (Point2D) newPoint.clone());
-		UpdateShape();
+		
+		updateShape();
+		vhg.modifyHyperEdges.get(hyperedgeindex).setShape(lastshape);
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 	}	
 	public Point getMouseOffSet() {

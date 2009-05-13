@@ -244,7 +244,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				actualMouseState = state;
 			break;
 			case INTERPOLATION_MOUSEHANDLING:
-				firstModus = new InterpolationCreationHandler(this);
+				firstModus = new InterpolationCreationHandler(this,highlightedHyperEdge);
 				this.addMouseListener(firstModus);
 				this.addMouseMotionListener(firstModus);
 				actualMouseState = state;
@@ -327,6 +327,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	{
 		if (firstModus!=null)
 			firstModus.setShapeParameters(p);
+		repaint();
 	}
 	protected Point DragMouseOffSet()
 	{
@@ -345,17 +346,15 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			GraphMessage m = (GraphMessage)arg;
  			if ((m.getModification()&GraphConstraints.HISTORY)>0)//We got an undo/redp
 			{
- 				System.err.println("History Set.");
  				if (secondModus!=null) //Simple, because we just reset the shape to that one from the graph - history updated that
+ 				{
  					secondModus.setShape(vG.modifyHyperEdges.get(highlightedHyperEdge).getShape());
- 				//If it 
-			}
+ 				}
+ 			}
  			else if ((firstModus!=null)&&(!firstModus.dragged())) //First Modus and we have no drag
 			{
 				if (((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) //Drag just ended -> Set Circle as Shape
 				{
-					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(firstModus.getShape());
-					vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, highlightedHyperEdge,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION, GraphConstraints.HYPEREDGE)); //HyperEdgeShape Updated
 					firstModus.resetShape();
 				}
 			}

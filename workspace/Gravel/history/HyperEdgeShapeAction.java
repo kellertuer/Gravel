@@ -29,7 +29,6 @@ public class HyperEdgeShapeAction extends HyperGraphAction {
 
 	boolean actionWasLocal;
 	VHyperEdge VHEdgeRef;	
-	Vector<Object> param; 
 	
 	/**
 	 * Record actual Parameters as a new Action
@@ -46,7 +45,7 @@ public class HyperEdgeShapeAction extends HyperGraphAction {
 		super(e,action,environment); //Init stuff as a HyperEdge action in superclass			
 		if (environment==null)
 			throw new GraphActionException("Could not Create Action: environmental HyperGraph must not be null.");
-		ActionObject=Parameters.clone();
+		ActionObject=NURBSShapeFactory.dublicate(Parameters);
 		Action=action;
 		if ((action&(GraphConstraints.REMOVAL|GraphConstraints.ADDITION))>0) //Only Updates possible, neither creation nor deletion of parameters
 		{
@@ -59,17 +58,6 @@ public class HyperEdgeShapeAction extends HyperGraphAction {
 		Action=action|GraphConstraints.HYPEREDGESHAPE;
 		actionWasLocal = local;
 		VHEdgeRef = e;
-		param = Parameters;
-	}
-	public HyperEdgeShapeAction clone()
-	{
-		try {
-			return new HyperEdgeShapeAction(param, actionWasLocal, VHEdgeRef, Action, (VHyperGraph)super.env);
-		}
-		catch (Exception e)
-		{
-			return null;
-		}
 	}
 	
 	protected VGraphInterface doReplace(VGraphInterface graph) throws GraphActionException
@@ -81,7 +69,7 @@ public class HyperEdgeShapeAction extends HyperGraphAction {
 		if (g.modifyHyperEdges.get(VHEdgeRef.getIndex())==null)
 			throw new GraphActionException("Can't doreplace(): Edge nonexistent to replace its shape");
 		//Set shape to the Shape Created by internal paramaters of this action
-		g.modifyHyperEdges.get(VHEdgeRef.getIndex()).setShape(NURBSShapeFactory.CreateShape(param));
+		g.modifyHyperEdges.get(VHEdgeRef.getIndex()).setShape(NURBSShapeFactory.CreateShape((Vector<Object>)ActionObject));
 		g.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, VHEdgeRef.getIndex(), GraphConstraints.UPDATE|GraphConstraints.HISTORY|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION, GraphConstraints.HYPEREDGE));
 		return g;
 	}

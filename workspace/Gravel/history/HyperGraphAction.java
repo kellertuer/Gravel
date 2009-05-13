@@ -69,7 +69,7 @@ public class HyperGraphAction extends CommonGraphAction {
 			throw new GraphActionException("Could not Create Action: Edge and Environment must not be null.");
 		if (environment.modifyHyperEdges.get(o.getIndex())==null)
 			throw new GraphActionException("Could not Create Action: Environment must contain hyper edge");
-		ActionObject=o;
+		ActionObject=o.clone();
 		Action=action;
 		mhe = environment.getMathGraph().modifyHyperEdges.get(o.getIndex());
 		env = environment;
