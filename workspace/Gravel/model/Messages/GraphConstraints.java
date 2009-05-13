@@ -32,12 +32,14 @@ public interface GraphConstraints {
 	public static final int INDEXCHANGED = 64;
 
 	//Special Stati for single parts
-	public static final int HYPEREDGESHAPE = 64;	
-	public static final int PARTINFO = HYPEREDGESHAPE;
+	public static final int HYPEREDGESHAPE = 128;
+	public static final int CREATION = 256; //Is there still just Interpolation Parameters ?
+	public static final int LOCAL = 512;	//Local Shape change if not given, the action is assumed to be shape-global
+	public static final int PARTINFO = HYPEREDGESHAPE|LOCAL|CREATION;
 	
 	//Special Stati for Block Updates
-	public static final int BLOCK_START = 512;
-	public static final int BLOCK_END = 1024;
-	public static final int BLOCK_ABORT = 2048;
+	public static final int BLOCK_START = 1024;
+	public static final int BLOCK_END = 2048;
+	public static final int BLOCK_ABORT = 4096;
 	public static final int BLOCK_ALL = BLOCK_START|BLOCK_END|BLOCK_ABORT; //All 3 Block-Stati
 }

@@ -1,7 +1,7 @@
 package view;
 
 
-import history.GraphHistoryManager;
+import history.CommonGraphHistoryManager;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -51,7 +51,7 @@ public class VHyperGraphic extends VCommonGraphic
 		
 		vG = Graph;
 		vG.addObserver(this); //Die Graphikumgebung als Observer der Datenstruktur eintragen
-		vGh = new GraphHistoryManager(vG);
+		vGh = new CommonGraphHistoryManager(vG);
 	}
 	public void paint(Graphics g) 
 	{
@@ -92,7 +92,12 @@ public class VHyperGraphic extends VCommonGraphic
 		IP.add(new Point2D.Double(185,320));
 		IP.add(new Point2D.Double(80,350));
 		int degree = 4;
-		NURBSShape c = NURBSShapeFactory.CreateInterpolation(IP,degree);
+		Vector<Object> param = new Vector<Object>();
+		param.setSize(NURBSShapeFactory.MAX_INDEX);
+		param.set(NURBSShapeFactory.SHAPE_TYPE,"global interpolation");
+		param.set(NURBSShapeFactory.DEGREE, degree);
+		param.set(NURBSShapeFactory.POINTS, IP);
+		NURBSShape c = NURBSShapeFactory.CreateShape(param);
 		
 		g2.setStroke(new BasicStroke(1.2f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		NURBSShape cs = c.clone();

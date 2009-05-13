@@ -29,6 +29,7 @@ import javax.vecmath.Point3d;
  */
 public class NURBSShapeFactory {
 
+	public final static int SHAPE_TYPE = 0;
 	public final static int CIRCLE_ORIGIN = 1;
 	public final static int CIRCLE_RADIUS = 2;
 	
@@ -61,17 +62,15 @@ public class NURBSShapeFactory {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static NURBSShape CreateShape(String type, Vector<Object> Parameters)
+	public static NURBSShape CreateShape(Vector<Object> Parameters)
 	{
-		int distance;
-		try	{distance = Integer.parseInt(Parameters.get(DISTANCE_TO_NODE).toString());}
-		catch (Exception e) {return new NURBSShape();} //EmptyShape
+		String type = (String) Parameters.get(SHAPE_TYPE);
 		if (type.toLowerCase().equals("circle"))
 		{
 			int radius;
 			try	{radius = Integer.parseInt(Parameters.get(CIRCLE_RADIUS).toString());}
 			catch (Exception e) {return new NURBSShape();} //Empty Shape
-			return CreateCircle((Point) Parameters.get(CIRCLE_ORIGIN), radius, distance);
+			return CreateCircle((Point) Parameters.get(CIRCLE_ORIGIN), radius);
 		}
 		else if (type.toLowerCase().equals("global interpolation"))
 		{
@@ -85,6 +84,9 @@ public class NURBSShapeFactory {
 		}
 		else if (type.toLowerCase().equals("convex hull"))
 		{
+			int distance;
+			try	{distance = Integer.parseInt(Parameters.get(DISTANCE_TO_NODE).toString());}
+			catch (Exception e) {return new NURBSShape();} //EmptyShape
 			Vector<Point2D> nodes;
 			try {nodes = (Vector<Point2D>) Parameters.get(POINTS);}
 			catch (Exception e) {return new NURBSShape();} //Empty Shape
@@ -109,7 +111,7 @@ public class NURBSShapeFactory {
 	 * @param dist Distance to the nodes
 	 * @return
 	 */
-	private static NURBSShape CreateCircle(Point origin, int radius, int dist)
+	private static NURBSShape CreateCircle(Point origin, int radius)
 	{
 		//See L. Piegl, W. Tiller: A Menagerie of rational B-Spline Circles
 		Vector<Double> knots = new Vector<Double>();
@@ -143,12 +145,14 @@ public class NURBSShapeFactory {
 	  * @param degree the degree
 	  * @return
 	 */
-	public static NURBSShape CreateInterpolation(Vector<Point2D> q, int degree)
+	private static NURBSShape CreateInterpolation(Vector<Point2D> q, int degree)
 	{
 		//Based on Algorithm 9.1 from the NURBS-Book
 		//close IP to a closed curve
 		Vector<Point2D> IP = new Vector<Point2D>();
 		int IPCount = q.size();
+		if (IPCount < 2*degree) //we have less then 2*degree IP -> no interpolatin possible due to overlappings needed
+			return new NURBSShape();			
 		for (int i=q.size()-degree; i<q.size(); i++)
 			IP.add((Point2D) q.get(i).clone());
 		for (int i=0; i<q.size(); i++)
@@ -157,8 +161,6 @@ public class NURBSShapeFactory {
 			IP.add((Point2D) q.get(i).clone());
 		int maxIPIndex = IP.size()-1; //highest IP Index
 		int maxKnotIndex = maxIPIndex+degree+1;//highest KnotIndex in the resulting NURBS-Curve
-		if (maxIPIndex < 2*degree) //we have less then 2*degree IP -> no interpolatin possible
-			return new NURBSShape();
 		//Determine Points to evaluate for IP with cetripetal Aproach
 		double d = 0d;
 		for (int i=1; i<=maxIPIndex; i++)
@@ -256,6 +258,7 @@ public class NURBSShapeFactory {
 		}
 		return new NURBSShape(newKnots,newCP,newWeight);
 	}
+
 	/**
 	 * For given Knot-Vector, lgspoints and InterpolationPoints this Method returns the NURBS-Shape
 	 * The Knots define The range and distribution of the ControlPoints in the resulting NURBSShape

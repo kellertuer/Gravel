@@ -23,20 +23,20 @@ import java.util.Observer;
  * @author Ronny Bergmann
  * @since 0.3
  */
-public class GraphHistoryManager implements Observer
+public class CommonGraphHistoryManager implements Observer
 {
 	//Lastgraph is for the creation of actions, for delete especially
-	VGraphInterface trackedGraph, lastGraph;
-	GraphMessage Blockstart;
+	protected VGraphInterface trackedGraph, lastGraph;
+	protected GraphMessage Blockstart;
 	boolean active, trackSelection;
-	int blockdepth, stacksize, SavedUndoStackSize, graphType;
-	LinkedList<CommonGraphAction> UndoStack, RedoStack;
+	protected int blockdepth, stacksize, SavedUndoStackSize, graphType;
+	protected LinkedList<CommonGraphAction> UndoStack, RedoStack;
 	
 	/**
 	 * Create a new GraphHistoryManager for the given VGraph
 	 * @param vg the Graph, that should be extended with a History
 	 */
-	public GraphHistoryManager(VGraph vg)
+	public CommonGraphHistoryManager(VGraph vg)
 	{
 		trackedGraph = vg;
 		lastGraph = vg.clone();
@@ -46,14 +46,14 @@ public class GraphHistoryManager implements Observer
 	 * Create a new GraphHistoryManager for the given VHyperGraph
 	 * @param vhg the HyperGraph, that should be extended with a History
 	 */
-	public GraphHistoryManager(VHyperGraph vhg)
+	public CommonGraphHistoryManager(VHyperGraph vhg)
 	{
 		trackedGraph = vhg;
 		lastGraph = vhg.clone();
 		CommonInitialization();
 	}
 
-	private void CommonInitialization()
+	protected void CommonInitialization()
 	{
 		if (trackedGraph.getType()==VGraphInterface.GRAPH)
 		{
@@ -80,7 +80,7 @@ public class GraphHistoryManager implements Observer
 	 * @param m the created Action
 	 * @return
 	 */
-	private CommonGraphAction handleSingleAction(GraphMessage m)
+	protected CommonGraphAction handleSingleAction(GraphMessage m)
 	{
 		int action = 0;
 		//Check, which Graph contains the Information for the information, we need to create an Action
@@ -211,7 +211,7 @@ public class GraphHistoryManager implements Observer
 	 * Create an Action based on tracked Message
 	 * @param m
 	 */
-	private void addAction(GraphMessage m)	{	
+	protected void addAction(GraphMessage m)	{	
 		if ((m.getModification()&GraphConstraints.BLOCK_ABORT)==GraphConstraints.BLOCK_ABORT)
 			return; //Don't handle Block-Abort-Stuff
 		CommonGraphAction act = null;
@@ -234,6 +234,7 @@ public class GraphHistoryManager implements Observer
 				act=null; System.err.println("DEBUG: Edge.added.GraphAction Creation Failed:"+e.getMessage());				
 			}
 		}
+	
 		if (act==null)
 			return;
 		clonetrackedGraph();
@@ -246,7 +247,7 @@ public class GraphHistoryManager implements Observer
 		}
 		UndoStack.add(act);
 	}
-	private void clonetrackedGraph()
+	protected void clonetrackedGraph()
 	{
 		if (lastGraph.getType()==VGraphInterface.GRAPH)
 			lastGraph = ((VGraph)trackedGraph).clone(); //Actual status as last status.clone

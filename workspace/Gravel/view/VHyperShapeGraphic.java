@@ -1,7 +1,6 @@
 package view;
 
 
-import history.GraphHistoryManager;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -11,10 +10,10 @@ import java.util.Iterator;
 import java.util.Observable;
 import java.util.Vector;
 
+import history.*;
 import control.nurbs.*;
 import model.*;
-import model.Messages.GraphConstraints;
-import model.Messages.GraphMessage;
+import model.Messages.*;
 
 /**
  * - Implementierung der Darstellung eines Hypergraphen in einer Graphics2D Umgebung
@@ -46,7 +45,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		selWidth = gp.getIntValue("vgraphic.selwidth");
 		actualMouseState = NO_MOUSEHANDLING;
 		highlightedHyperEdge = hyperedgeindex;
-//TODO override parental GraphHistoryManager with special ShapeHistoryManager		vGh = new GraphHistoryManager(vG);
+
+		vGh = new HyperEdgeShapeHistoryManager(vG);
 	}	
 
 	public void paint(Graphics2D g2)
@@ -348,6 +348,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
  				System.err.println("History Set.");
  				if (secondModus!=null) //Simple, because we just reset the shape to that one from the graph - history updated that
  					secondModus.setShape(vG.modifyHyperEdges.get(highlightedHyperEdge).getShape());
+ 				//If it 
 			}
  			else if ((firstModus!=null)&&(!firstModus.dragged())) //First Modus and we have no drag
 			{

@@ -1,6 +1,6 @@
 package view;
 
-import history.GraphHistoryManager;
+import history.CommonGraphHistoryManager;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -43,7 +43,7 @@ public class VGraphic extends VCommonGraphic
 		
 		vG = Graph;
 		vG.addObserver(this); //Die Graphikumgebung als Observer der Datenstruktur eintragen
-		vGh = new GraphHistoryManager(vG);
+		vGh = new CommonGraphHistoryManager(vG);
 	}
 	
 	public void paint(Graphics g) 

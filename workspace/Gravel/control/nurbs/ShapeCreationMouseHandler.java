@@ -30,6 +30,7 @@ public interface ShapeCreationMouseHandler extends DragMouseHandler
 
 	/**
 	 * Set the Shape externally with NURBSShapeFactory-Parameters
+	 * This method also updates the internal shape, which is provided by @see getShape();
 	 * @param p
 	 */
 	public void setShapeParameters(Vector<Object> p);

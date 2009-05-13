@@ -1,7 +1,7 @@
   package view;
 
 import help.view.HelpPanel;
-import history.GraphHistoryManager;
+import history.CommonGraphHistoryManager;
 import io.GeneralPreferences;
 
 import java.awt.Dimension;
@@ -62,7 +62,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 	JMenuItem mHIndex,mHAbout;
 	JFileDialogs fileDialogs;
 	VCommonGraphic graphpart;
-	GraphHistoryManager GraphHistory;
+	CommonGraphHistoryManager GraphHistory;
 	int MenuAccModifier;
 	boolean isMac, isGraph;
 	public MainMenu(VCommonGraphic vgraphic)

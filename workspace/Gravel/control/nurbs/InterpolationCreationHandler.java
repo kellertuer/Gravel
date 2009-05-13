@@ -79,15 +79,16 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	}
 	private void UpdateShape()
 	{
-		if (InterpolationPoints.size()<=2*degree)
-		{
-			lastshape = new NURBSShape();
-			return;
-		}
-		lastshape = NURBSShapeFactory.CreateShape("global interpolation", getShapeParameters());
+		lastshape = NURBSShapeFactory.CreateShape(getShapeParameters());
 	}
 	public void setShapeParameters(Vector<Object> p)
 	{
+		//if shape type differs, ignore the parameters, because they might be unsuitable
+		if (!p.get(NURBSShapeFactory.SHAPE_TYPE).toString().toLowerCase().equals("global interpolation"))
+		{
+			System.err.println("Parameter Shape Type doesn't fit.");
+			return;
+		}
 		if (dragged())
 			return;
 		int tempdegree;
@@ -115,8 +116,8 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	{
 		Vector<Object> param = new Vector<Object>();
 		param.setSize(NURBSShapeFactory.MAX_INDEX);
+		param.set(NURBSShapeFactory.SHAPE_TYPE,"global interpolation");
 		param.set(NURBSShapeFactory.DEGREE, degree);
-		param.set(NURBSShapeFactory.DISTANCE_TO_NODE,nodedist);
 		param.set(NURBSShapeFactory.POINTS, InterpolationPoints);
 		return param;
 	}
@@ -170,7 +171,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	 * @param newPoint new point for insertion
 	 * @return
 	 */
-	private int getSecondOfNewarestPair(Vector<Point2D> points, Point2D newPoint)
+	private int getSecondOfNearestPair(Vector<Point2D> points, Point2D newPoint)
 	{
 		if (points.lastElement()==null) //if the last element is null, the point can be inserted there
 			return points.size()-1; 
@@ -260,7 +261,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		if (PointAdditionStatus==NURBSShapeFactory.ADD_END)
 			InterpolationPoints.add((Point2D.Double) newPoint.clone()); 
 		else
-			InterpolationPoints.add(getSecondOfNewarestPair(InterpolationPoints,newPoint), (Point2D) newPoint.clone());
+			InterpolationPoints.add(getSecondOfNearestPair(InterpolationPoints,newPoint), (Point2D) newPoint.clone());
 		UpdateShape();
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 	}	

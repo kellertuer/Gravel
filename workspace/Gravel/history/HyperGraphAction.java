@@ -76,7 +76,6 @@ public class HyperGraphAction extends CommonGraphAction {
 		envHG = environment;
 		Objecttype=GraphConstraints.HYPEREDGE;
 	}
-
 	/**
 	 * Create New Action inducted by a Node
 	 * @param o the node
@@ -89,7 +88,6 @@ public class HyperGraphAction extends CommonGraphAction {
 		super(o,action,environment);
 		envHG = environment;
 	}
-
 	/**
 	 * Create a New Action induced by a Subgraph
 	 * @param o VSubgraph manipulated

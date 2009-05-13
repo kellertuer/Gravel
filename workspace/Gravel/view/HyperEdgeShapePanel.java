@@ -400,11 +400,12 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		}
 		Vector<Object> params = new Vector<Object>();
 		params.setSize(NURBSShapeFactory.MAX_INDEX);
+		params.set(NURBSShapeFactory.SHAPE_TYPE,"convex hull");
 		params.set(NURBSShapeFactory.DEGREE,iDegree.getValue());
 		params.set(NURBSShapeFactory.POINTS, nodepos);
 		params.set(NURBSShapeFactory.SIZES, nodesizes);
 		params.set(NURBSShapeFactory.DISTANCE_TO_NODE, HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin());
-		NURBSShape s = NURBSShapeFactory.CreateShape("convex hull", params);
+		NURBSShape s = NURBSShapeFactory.CreateShape(params);
 		if (s.isEmpty())
 		{
 			IPInfo.setText("<html><p>Polynomgrad "+iDegree.getValue()+" ist zu hoch.</p></html>");
@@ -412,7 +413,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		}
 		else
 			IPInfo.setText("<html><p>&nbsp;</p></html>");
-		HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+		HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HEdgeRefIndex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
 		HShapeGraphicRef.setShapeParameters(params);
 		HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).setShape(s);
 		HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
@@ -428,11 +429,12 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			{
 				Vector<Object> param = new Vector<Object>();
 				param.setSize(NURBSShapeFactory.MAX_INDEX);
+				param.set(NURBSShapeFactory.SHAPE_TYPE,"circle");
 				param.add(NURBSShapeFactory.CIRCLE_ORIGIN, new Point(iCOrigX.getValue(), iCOrigY.getValue()));
 				param.add(NURBSShapeFactory.CIRCLE_RADIUS, iCRad.getValue());
 				param.add(NURBSShapeFactory.DISTANCE_TO_NODE,HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin()); 			
-				HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).setShape(NURBSShapeFactory.CreateShape("Circle",param));
-				HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE)); //HyperEdgeShape Updated
+				HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).setShape(NURBSShapeFactory.CreateShape(param));
+				HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, HEdgeRefIndex, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION, GraphConstraints.HYPEREDGE)); //HyperEdgeShape Updated
 			}
 		}
 		if ((e.getSource()==iDegree)&&(iDegree.getValue()>0))

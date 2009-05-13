@@ -1,6 +1,6 @@
 package view;
 
-import history.GraphHistoryManager;
+import history.CommonGraphHistoryManager;
 import io.GeneralPreferences;
 
 import java.awt.BasicStroke;
@@ -61,7 +61,7 @@ public abstract class VCommonGraphic extends Component implements Observer
 	protected GeneralPreferences gp;
 	private JViewport vp;
 	private VGraphInterface vG;
-	protected GraphHistoryManager vGh;
+	protected CommonGraphHistoryManager vGh;
 
 	public VCommonGraphic(Dimension d, VGraphInterface GeneralGraph)
 	{
@@ -342,7 +342,7 @@ public abstract class VCommonGraphic extends Component implements Observer
 	 * 
 	 * @return GraphHistoryManager
 	 */
-	public GraphHistoryManager getGraphHistoryManager() {
+	public CommonGraphHistoryManager getGraphHistoryManager() {
 		return vGh;
 	}
 }

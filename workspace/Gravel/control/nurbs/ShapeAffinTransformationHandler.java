@@ -1,38 +1,17 @@
 package control.nurbs;
 
-import io.GeneralPreferences;
-
+// import io.GeneralPreferences;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.QuadCurve2D;
-import java.util.Iterator;
-import java.util.Vector;
 
 
-import model.MEdge;
-import model.NURBSShapeFactory;
-import model.VEdge;
-import model.VGraph;
-import model.VGraphInterface;
-import model.VHyperEdge;
-import model.NURBSShape;
-import model.VHyperGraph;
-import model.VItem;
-import model.VNode;
-import model.VOrthogonalEdge;
-import model.VQuadCurveEdge;
-import model.VSegmentedEdge;
+import model.*;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 import view.VCommonGraphic;
-import view.VGraphic;
 import view.VHyperGraphic;
 /**
  * Class for handling Drags for Modification of the given HyperEdge in the VHyperGraph
@@ -67,7 +46,7 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	public final static int SCALE_ONEDIRECTION = 8;
 	private VHyperGraph vhg = null;
 	private VCommonGraphic vgc;
-	private GeneralPreferences gp;
+//	private GeneralPreferences gp;
 	private Point MouseOffSet = new Point(0,0);
 	private Point2D.Double DragOrigin;
 	private boolean firstdrag = true;
@@ -87,7 +66,7 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	{
 		vgc = g;
 		vhg = g.getGraph();
-		gp = GeneralPreferences.getInstance();
+//		gp = GeneralPreferences.getInstance();
 		if (vhg.modifyHyperEdges.get(hyperedgeindex)==null)
 			return; //Nothing can be done here.
 		HyperEdgeRef = vhg.modifyHyperEdges.get(hyperedgeindex);

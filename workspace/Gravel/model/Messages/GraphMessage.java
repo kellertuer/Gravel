@@ -60,13 +60,21 @@ public class GraphMessage {
 	 * @param pType Type of Element(s) changed
 	 * @param pStatus what was the update?
 	 */
-		public GraphMessage(int pType, int pStatus)
+	public GraphMessage(int pType, int pStatus)
 	{
 		this(pType,-1,pStatus,pType);
 	}
+	
+	public GraphMessage clone()
+	{
+		GraphMessage clone = new GraphMessage(type, id, status, affected);
+		clone.setMessage(message);
+		return clone;
+	}
+	
 	/**
 	 * Get the type of Change occured to the graph, it may be one of the Changes
-	 * UPDATED, ADDED, REMOVED
+	 * UPDATED, ADDED, REMOVED or anything else in the GraphConstraints-Modification-Block
 	 * @return status
 	 */
 	public int getModification()

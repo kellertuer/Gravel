@@ -82,10 +82,10 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 	public Vector<Object> getShapeParameters()
 	{
 		Vector<Object> param = new Vector<Object>();
+		param.set(NURBSShapeFactory.SHAPE_TYPE,"circle");
 		param.setSize(NURBSShapeFactory.MAX_INDEX);
 		param.add(NURBSShapeFactory.CIRCLE_ORIGIN, CircleOrigin);
 		param.add(NURBSShapeFactory.CIRCLE_RADIUS, size);
-		param.add(NURBSShapeFactory.DISTANCE_TO_NODE,20); //TODO-Std Value
 		return param;
 	}
 	public void setShapeParameters(Vector<Object> p)
@@ -119,13 +119,10 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 	{
 		if ((CircleOrigin!=null)&&(size > 0))
 		{
-			Vector<Object> param = new Vector<Object>();
-			param.setSize(NURBSShapeFactory.MAX_INDEX);
-			param.add(NURBSShapeFactory.CIRCLE_ORIGIN, CircleOrigin);
-			param.add(NURBSShapeFactory.CIRCLE_RADIUS, size);
-			param.add(NURBSShapeFactory.DISTANCE_TO_NODE,20); //TODO-Std Value
-			lastcircle = NURBSShapeFactory.CreateShape("Circle",param);
+			lastcircle = NURBSShapeFactory.CreateShape(getShapeParameters());
 		}
+		else
+			lastcircle = new NURBSShape();
 	}
 	private void internalReset()
 	{

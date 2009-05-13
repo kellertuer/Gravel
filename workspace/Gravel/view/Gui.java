@@ -1,6 +1,6 @@
 package view;
 
-import history.GraphHistoryManager;
+import history.CommonGraphHistoryManager;
 import io.GeneralPreferences;
 import io.GravelMLReader;
 
@@ -387,7 +387,7 @@ public class Gui implements WindowListener
     * Get the GraphHistoryManager that tracks actions in the actual graph
     * @return the GraphHistoryManager
     */
-   public GraphHistoryManager getGraphHistoryManager()
+   public CommonGraphHistoryManager getGraphHistoryManager()
    {
 	   return graphpart.getGraphHistoryManager();
    }
