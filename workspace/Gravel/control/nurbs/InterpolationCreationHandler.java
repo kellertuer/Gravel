@@ -109,7 +109,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
 		updateShape();
 		vhg.modifyHyperEdges.get(hyperedgeindex).setShape(lastshape);
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_END));			
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 	}
 	public NURBSCreationMessage getShapeParameters()
 	{
