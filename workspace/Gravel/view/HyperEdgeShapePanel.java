@@ -532,6 +532,17 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		cBasicShape.setVisible(visible);
 		BasicShape.setVisible(visible);
 	}
+	
+	private void setFreeModificationFields(boolean visible)
+	{
+ 		FreeModFields.setVisible(visible);
+ 		if (visible) //init always with CP-Movement
+ 		{
+       		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);
+       		//Deactivate all Buttons
+       		deselectButtons();
+ 		}
+	}
 	public void actionPerformed(ActionEvent e) {
 	        if ((e.getSource()==bCancel)||(e.getSource()==bOk))
 	        {
@@ -576,14 +587,13 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        	if (cBasicShape.isVisible()) //We are in mode 1
 	        	{
 	        		bModeChange.setText("neue Grundfrom");
-	        		FreeModFields.setVisible(true);
+	        		setFreeModificationFields(true);
 	        		setCreationFields(false);
-	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);
 	        	}
 	        	else
 	        	{
 	        		bModeChange.setText("Modifikation");
-	        		FreeModFields.setVisible(false);
+	        		setFreeModificationFields(false);
 	        		cBasicShape.setVisible(true);
 	        		BasicShape.setVisible(true);
 	        		actionPerformed(new ActionEvent(cBasicShape,0,"Refresh"));
@@ -596,7 +606,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 					nm.setStatus(NURBSCreationMessage.ADD_BETWEEN);
 				else
 					nm.setStatus(NURBSCreationMessage.ADD_END);
-	       		HShapeGraphicRef.setShapeParameters(nm);
+				HShapeGraphicRef.setShapeParameters(nm);
 	        }	
 	        performSecondModus(e);
 	        if (e.getSource()==bCheckShape)

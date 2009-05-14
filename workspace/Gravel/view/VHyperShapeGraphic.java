@@ -334,14 +334,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			//TODO: Change back to first modus? but how to update HyperEdgeShapePanel?
 			return;
 		}
-		if (nm==null) //no suitable firstmodus available / determinable change to second
-		{ //First Modus but no suitable Modus available keep shape but reset freeModus
-			firstModus.resetShape();
-//			vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(new NURBSShape());			
-			return;
-		}
 		//Is the actual firstmodus right for the Shape descriped in nm?
-		if (!nm.isValid())
+		if ((nm!=null)&&(!nm.isValid()))
 		{	firstModus.resetShape();
 			firstModus.setShapeParameters(nm);
 			vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(new NURBSShape());		

@@ -95,6 +95,11 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	
 	public void setShapeParameters(NURBSCreationMessage nm)
 	{
+		if (nm==null)
+		{
+			reInit();
+			return;
+		}
 		//if shape type differs, ignore the parameters, because they might be unsuitable
 		if ((nm.getType()!=NURBSCreationMessage.INTERPOLATION)||(!nm.isValid()))
 		{

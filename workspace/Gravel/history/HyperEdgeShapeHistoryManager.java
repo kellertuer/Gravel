@@ -65,6 +65,7 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 					NURBSCreationMessage nm = new NURBSCreationMessage();
 					ParameterVectorReference.setShapeParameters(nm);
 				}
+				this.setObservation(true);
 				return;
 			}
 			CommonGraphAction act = UndoStack.getLast(); //Last pushed element is the action before the just undone action
@@ -90,6 +91,10 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 				NURBSCreationMessage nm = (NURBSCreationMessage) ((HyperEdgeShapeAction)act).ActionObject;
 				ParameterVectorReference.setShapeParameters(nm.clone());
 				this.setObservation(true);
+			}
+			else //any noncreational-Stuff means, that we have to push to the second modus: TODO
+			{
+				System.err.println("Change to modus 2");
 			}
 		}
 	}
@@ -163,7 +168,6 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			return;
 		if ((m.getModification()&GraphConstraints.HISTORY)>0) //Ignore them, they'Re from us
 			return;
-		System.err.println(this.blockdepth+" ("+active+") "+m.getModification()+" "+UndoStack.size());
 		//Complete Replacement of Graphor Hypergraph Handling (Happens when loading a new graph
 		GraphMessage actualAction;
 		if ((blockdepth==0)&&(active) //super.update ended a block or we are active either way
@@ -187,6 +191,5 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			addAction(actualAction, ParameterVectorReference.getShapeParameters()); //Do our action upon that
 			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS, GraphConstraints.HISTORY));
 		}
-		System.err.println("-> "+UndoStack.size());
 	}
 }
