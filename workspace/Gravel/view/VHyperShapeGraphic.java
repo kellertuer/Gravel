@@ -26,6 +26,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	// Visual Styles
 	private BasicStroke vHyperEdgeStyle;
 	private ShapeCreationMouseHandler firstModus;
+	private NURBSCreationMessage noModus=null;
 	private ShapeModificationMouseHandler secondModus;
 	private static final long serialVersionUID = 1L;
 	private int actualMouseState, highlightedHyperEdge;
@@ -315,11 +316,14 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		this.removeMouseMotionListener(secondModus);
 		firstModus=null;
 		secondModus=null;
+		noModus=null;
 	}
 	public NURBSCreationMessage getShapeParameters()
 	{
 		if (firstModus!=null)
 			return firstModus.getShapeParameters();
+		else if (getMouseHandling()==NO_MOUSEHANDLING) //without mousehandling this value is stored here
+			return noModus;
 	else
 		return null;		
 	}
@@ -329,21 +333,29 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	 */
 	public void setShapeParameters(NURBSCreationMessage nm)
 	{
-		if (firstModus==null) //we are in second modus and must change to first because history or someone else just got us back to creation
+		if (secondModus!=null) //we are in second modus and must change to first because history or someone else just got us back to creation
 		{
-			//TODO: Change back to first modus? but how to update HyperEdgeShapePanel?
 			return;
 		}
 		//Is the actual firstmodus right for the Shape descriped in nm?
 		if ((nm!=null)&&(!nm.isValid()))
-		{	firstModus.resetShape();
-			firstModus.setShapeParameters(nm);
+		{	
+			if (getMouseHandling()==NO_MOUSEHANDLING)
+				noModus=nm;
+			else
+			{
+				firstModus.resetShape();
+				firstModus.setShapeParameters(nm);
+			}
 			vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(new NURBSShape());		
 			vG.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.HISTORY)); //Notify Panel
 			return;
 		}
 		//Tests if we have to change modus...
-		firstModus.setShapeParameters(nm);
+		if (getMouseHandling()!=NO_MOUSEHANDLING)
+			firstModus.setShapeParameters(nm);
+		else
+			noModus = nm;
 		//if not change to fitting one
 		repaint();
 	}

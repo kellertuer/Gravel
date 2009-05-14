@@ -9,6 +9,7 @@ import java.awt.geom.Point2D;
 import java.util.Observable;
 import java.util.Vector;
 
+import view.VCommonGraphic;
 import view.VHyperShapeGraphic;
 
 /**
@@ -94,7 +95,10 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			}
 			else //any noncreational-Stuff means, that we have to push to the second modus: TODO
 			{
-				System.err.println("Change to modus 2");
+				this.setObservation(false);
+				ParameterVectorReference.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);
+				ParameterVectorReference.setShapeParameters(null);
+				this.setObservation(true);
 			}
 		}
 	}
