@@ -131,6 +131,8 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         buildViewMenu();
 
         buildHelpMenu();
+		mEdUndo.setEnabled(GraphHistory.CanUndo());
+		mEdRedo.setEnabled(GraphHistory.CanRedo());
         validate();
 	}
 	

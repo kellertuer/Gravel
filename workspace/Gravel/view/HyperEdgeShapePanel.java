@@ -524,6 +524,14 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
         }
 	}
 	
+	private void setCreationFields(boolean visible)
+	{
+ 		CircleFields.setVisible(visible);
+		InterpolationFields.setVisible(visible);
+    	DegreeFields.setVisible(visible);
+		cBasicShape.setVisible(visible);
+		BasicShape.setVisible(visible);
+	}
 	public void actionPerformed(ActionEvent e) {
 	        if ((e.getSource()==bCancel)||(e.getSource()==bOk))
 	        {
@@ -568,12 +576,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        	if (cBasicShape.isVisible()) //We are in mode 1
 	        	{
 	        		bModeChange.setText("neue Grundfrom");
-	        		CircleFields.setVisible(false);
-	        		InterpolationFields.setVisible(false);
-		        	DegreeFields.setVisible(false);
-	        		cBasicShape.setVisible(false);
-	        		BasicShape.setVisible(false);
 	        		FreeModFields.setVisible(true);
+	        		setCreationFields(false);
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);
 	        	}
 	        	else
@@ -624,7 +628,16 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
 		if ((nm==null)||(!nm.isValid()))
 		{
-			System.err.println("Setting nothing");
+			//Reset to empty stuff
+			iCOrigX.removeCaretListener(this);
+			iCOrigX.setText("");
+			iCOrigX.addCaretListener(this);
+			iCOrigY.removeCaretListener(this);
+			iCOrigY.setText("");
+			iCOrigY.addCaretListener(this);
+			iCRad.removeCaretListener(this);
+			iCRad.setText("");
+			iCRad.addCaretListener(this);					
 			return;
 		}
 		Point2D p = nm.getPoints().firstElement();
@@ -657,16 +670,34 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	{
 		NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
 		if ((nm==null)||(!nm.isValid()))
-				return;
+		{ //Back to std.
+			rAddEnd.removeActionListener(this);
+			rAddEnd.setSelected(true);
+			rAddEnd.addActionListener(this);
+			return;
+		}
 		int deg = nm.getDegree();
 		if (iDegree.getValue()==deg)
 			return;
 		iDegree.removeCaretListener(this);
 		iDegree.setValue(deg);
 		iDegree.addCaretListener(this);
+		if ((nm.getStatus()==NURBSCreationMessage.ADD_END)&&(rAddBetween.isSelected()))
+		{ //Update
+			rAddEnd.removeActionListener(this);
+			rAddEnd.setSelected(true);
+			rAddEnd.addActionListener(this);
+		}
+		if ((nm.getStatus()==NURBSCreationMessage.ADD_BETWEEN)&&(rAddEnd.isSelected()))
+		{ //Update
+			rAddBetween.removeActionListener(this);
+			rAddBetween.setSelected(true);
+			rAddBetween.addActionListener(this);
+		}
 		updateInfo();
 	}
 	
+
 	private void updateInfo()
 	{
 		NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
@@ -688,9 +719,9 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			if ((m.getModifiedElementTypes()==GraphConstraints.HYPEREDGE)
 				&&(m.getModification()==(GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION)))
 			{
-				if  (cBasicShape.isVisible()) //We're in mode one with circles
+				if  (cBasicShape.isVisible()) //We're in mode one 
 				{
-					if (CircleFields.isVisible())
+					if (CircleFields.isVisible())//with circles
 						updateCircleFields();
 					else if (InterpolationFields.isVisible())
 						updateIPFields();
@@ -706,7 +737,21 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 				bCheckShape.setEnabled(false); CheckResult.setText("<html>&nbsp;</html>"); CheckResult.setOpaque(false);
 			}
 			bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
+			if (!bModeChange.isEnabled()) //Empty Shape
+			{
+				if (cBasicShape.isVisible()) //-> clear values
+				{
+					if (CircleFields.isVisible())//with circles
+						updateCircleFields();
+					else if (InterpolationFields.isVisible())
+						updateIPFields();
+				}
+				else //Second Modus -> change to first
+				{
+					actionPerformed(new ActionEvent(bModeChange,0,"Change Modus"));
+				}
+			}
 			bOk.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
-		}	
+		}	//End Handling Graph Messages
 	}
 }

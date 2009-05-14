@@ -79,6 +79,7 @@ public class NURBSCreationMessage {
 	 */
 	public NURBSCreationMessage(int deg, Point2D origin, int radius)
 	{
+		degree=deg;
 		type = CIRCLE;
 		points.add(origin);
 		values.add(radius);
@@ -100,14 +101,20 @@ public class NURBSCreationMessage {
 		values = sizes;
 	}
 
+	/**
+	 * Clone this Message if it is valid
+	 * Else an invalid Message is created
+	 */
 	public NURBSCreationMessage clone()
 	{
+		if (!isValid())
+			return new NURBSCreationMessage();
 		//all cases have points
 		Vector<Point2D> pclone = new Vector<Point2D>();
 		for (int i=0; i<points.size(); i++)
 			pclone.add(new Point2D.Double(points.get(i).getX(), points.get(i).getY()));
 		Vector<Integer> vclone = new Vector<Integer>();
-		if ((status==CIRCLE)||(status==CONVEX_HULL))
+		if ((type==CIRCLE)||(type==CONVEX_HULL))
 		{
 			for (int i=0; i<values.size(); i++)
 				vclone.add(values.get(i).intValue());

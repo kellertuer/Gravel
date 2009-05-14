@@ -52,28 +52,29 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 	GeneralPreferences gp;
 	Point MouseOffSet;
 	boolean firstdrag = true;
-	Point CircleOrigin = null;
-	int size = 0;
+	Point2D CircleOrigin = null;
+	Point DragOrigin=null; //Both Points CircleOrigin and DragOrigin keep the same point, the reset is at different stages and the tye differs
+	int size = 0, hyperedgeindex;
 	NURBSShape lastcircle=null;
 
-	public CircleCreationHandler(VGraphic g)
-	{
-		vgc = g;
-		vg = g.getGraph();
-		gp = GeneralPreferences.getInstance();
-		MouseOffSet = new Point(0,0);
-	}
 	private void reInit()
 	{
 		CircleOrigin = null;
 		size = 0;
 	}
-	public CircleCreationHandler(VHyperGraphic g)
+	/**
+	 * Initialize the Controller to a given VHYperGraphic and a specified VHyperEdge,
+	 * whose shape should be modified
+	 * @param g
+	 * @param vheI
+	 */
+	public CircleCreationHandler(VHyperGraphic g, int vheI)
 	{
 		vgc = g;
 		vhg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
 		MouseOffSet = new Point(0,0);
+		hyperedgeindex = vheI;
 	}
 	
 	public Rectangle getSelectionRectangle()
@@ -90,25 +91,30 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 		if ((CircleOrigin==null) || (size<=0))
 			return new NURBSCreationMessage();
 		//TODO: CreationCircleHandler : Degree
-		return new NURBSCreationMessage(2, new Point2D.Double(CircleOrigin.x,CircleOrigin.y), size);
+		return new NURBSCreationMessage(2, new Point2D.Double(CircleOrigin.getX(),CircleOrigin.getY()), size);
 	}
 	public void setShapeParameters(NURBSCreationMessage nm)
 	{
 		if (dragged())
 			return;
-		Point2D p = nm.getPoints().firstElement();
-		Point mp = new Point(Math.round((float)p.getX()),Math.round((float)p.getY()));
-		int rad = nm.getValues().firstElement();
-		if ( (nm.getType()!=NURBSCreationMessage.CIRCLE) || (nm.getValues().size()==0) || (p==null) || (rad<=0) )
+		if ((!nm.isValid()) || (nm.getType()!=NURBSCreationMessage.CIRCLE)) //nonsiutable
 		{
 			reInit();
 			return;
 		}
-		CircleOrigin = mp;
+		Point2D p = (Point2D) nm.getPoints().firstElement().clone();
+		int rad = nm.getValues().firstElement();
+		if ((p==null) || (rad<=0) )
+		{
+			reInit();
+			return;
+		}
+		CircleOrigin = p;
 		size = rad;
 		buildCircle();
+		vhg.modifyHyperEdges.get(hyperedgeindex).setShape(lastcircle);
 		if (vhg!=null) //Hypergraph
-			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
 	}
 	public NURBSShape getShape()
 	{
@@ -116,7 +122,7 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 	}
 	public boolean dragged()
 	{
-		return (CircleOrigin!=null)&&(!firstdrag);
+		return (DragOrigin!=null)&&(!firstdrag);
 	}
 
 	private void buildCircle()
@@ -131,17 +137,17 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 	private void internalReset()
 	{
 		//Only if a Block was started: End it...
-		if ((CircleOrigin!=null)&&(!firstdrag)) //We had an Drag an a Circle was created, draw it one final time
+		if ((DragOrigin!=null)&&(!firstdrag)) //We had an Drag an a Circle was created, draw it one final time
 		{
-			CircleOrigin=null;
-			size = 0;
 			if (vg!=null)
 				vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 			else if (vhg!=null)
+			{
+				vhg.modifyHyperEdges.get(hyperedgeindex).setShape(lastcircle);
 				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
+			}
 		}
-		CircleOrigin=null;
-		size = 0;
+		DragOrigin=null;
 	}
 	//One every Click a potental Drag is initialized but firstdrag = true signals, that no Drag-Movement happened yet
 	public void mousePressed(MouseEvent e) {
@@ -151,7 +157,8 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 		if (alt||shift)
 			return;
 		MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed
-		CircleOrigin = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //Rausrechnen des zooms
+		DragOrigin = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //Rausrechnen des zooms
+		CircleOrigin = new Point2D.Double((double)e.getPoint().x/(vgc.getZoom()/100d),(double)e.getPoint().y/(vgc.getZoom()/100d));
 		size=0;
 	}
 
@@ -164,9 +171,9 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 		}
 		
 		//Handling selection Rectangle
-		if (CircleOrigin!=null)
+		if (DragOrigin!=null)
 		{
-			//Update Rectangle
+			//Update Values
 			MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed
 			Point pointInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //Rausrechnen des zooms
 			size = Math.round((float)CircleOrigin.distance(pointInGraph));
@@ -178,9 +185,9 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 				notify=vhg;
 
 			if (firstdrag) //If wirst drag - start Block
-				notify.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
+				notify.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
 			else		//continnue Block
-				notify.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
+				notify.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
 		}
 		MouseOffSet = e.getPoint();
 		firstdrag = false;

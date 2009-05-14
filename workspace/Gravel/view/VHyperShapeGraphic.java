@@ -46,7 +46,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		actualMouseState = NO_MOUSEHANDLING;
 		highlightedHyperEdge = hyperedgeindex;
 
-		vGh = new HyperEdgeShapeHistoryManager(vG,this);
+		vGh = new HyperEdgeShapeHistoryManager(vG,this,hyperedgeindex);
 	}	
 
 	public void paint(Graphics2D g2)
@@ -140,7 +140,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			paintModificationDetails(g2);
 		}
 	}
-	@SuppressWarnings("unchecked")
 	private void paintCreationDetails(Graphics2D g2)
 	{
 		if (firstModus==null)
@@ -168,7 +167,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		if (actualMouseState==CIRCLE_MOUSEHANDLING)
 		{
 			NURBSCreationMessage nm = firstModus.getShapeParameters();
-			if (!nm.isValid())
+			if ((!nm.isValid()) || (!firstModus.dragged())) //Draw these only when dragging
 				return;
 			Point2D p = nm.getPoints().firstElement();
 			Point p2 = firstModus.getMouseOffSet(); //Actual Point in Graph
@@ -186,6 +185,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	{
 		if (secondModus==null)
 			return;
+		if (!secondModus.dragged())
+			return;
 		g2.setColor(selColor);
 		if ((actualMouseState&SHAPE) > 0) //ShapeModification always means to indicate the Drag with a line
 		{
@@ -197,7 +198,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		}
 		//All cases (Shape & CurvePointMod) draw tempshape
 		NURBSShape tempshape = secondModus.getShape();
-		if ((tempshape!=null)&&(secondModus.dragged()))
+		if (tempshape!=null)
 		{
 			NURBSShape draw = tempshape.clone();
 			draw.scale(zoomfactor);
@@ -241,7 +242,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		switch (state) 
 		{
 			case CIRCLE_MOUSEHANDLING:
-				firstModus = new CircleCreationHandler(this);
+				firstModus = new CircleCreationHandler(this,highlightedHyperEdge);
 				this.addMouseListener(firstModus);
 				this.addMouseMotionListener(firstModus);
 				actualMouseState = state;
@@ -328,8 +329,28 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	 */
 	public void setShapeParameters(NURBSCreationMessage nm)
 	{
-		if (firstModus!=null)
+		if (firstModus==null) //we are in second modus and must change to first because history or someone else just got us back to creation
+		{
+			//TODO: Change back to first modus? but how to update HyperEdgeShapePanel?
+			return;
+		}
+		if (nm==null) //no suitable firstmodus available / determinable change to second
+		{ //First Modus but no suitable Modus available keep shape but reset freeModus
+			firstModus.resetShape();
+//			vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(new NURBSShape());			
+			return;
+		}
+		//Is the actual firstmodus right for the Shape descriped in nm?
+		if (!nm.isValid())
+		{	firstModus.resetShape();
 			firstModus.setShapeParameters(nm);
+			vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(new NURBSShape());		
+			vG.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.HISTORY)); //Notify Panel
+			return;
+		}
+		//Tests if we have to change modus...
+		firstModus.setShapeParameters(nm);
+		//if not change to fitting one
 		repaint();
 	}
 	protected Point DragMouseOffSet()

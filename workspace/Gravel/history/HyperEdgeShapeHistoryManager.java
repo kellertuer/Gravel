@@ -26,6 +26,7 @@ import view.VHyperShapeGraphic;
 public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 {	
 	private VHyperShapeGraphic ParameterVectorReference;
+	private int VHyperEdgeIndex;
 	/**
 	 * Create a new HyperGraphShapeHistoryManager for the given VHyperGraph
 	 * To track changes of the first Modus of shape creation 
@@ -35,13 +36,14 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 	 * @param vhg the HyperGraph, that should be extended with a History
 	 * @param vhsg VHyperShapeGraphic which keeps the last Parametervector for creation of shape
 	 */
-	public HyperEdgeShapeHistoryManager(VHyperGraph vhg, VHyperShapeGraphic vhsg)
+	public HyperEdgeShapeHistoryManager(VHyperGraph vhg, VHyperShapeGraphic vhsg, int vheIndex)
 	{
 		super(vhg);
 		trackedGraph = vhg;
 		lastGraph = vhg.clone();
 		ParameterVectorReference = vhsg;
 		CommonInitialization();
+		VHyperEdgeIndex=vheIndex;
 	}
 	
 	public void Undo()
@@ -52,8 +54,17 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			this.setObservation(false);
 			if (UndoStack.size()==0)
 			{
-				NURBSCreationMessage nm = new NURBSCreationMessage();
-				ParameterVectorReference.setShapeParameters(nm);
+				if ( ((VHyperGraph)trackedGraph).modifyHyperEdges.get(VHyperEdgeIndex).getShape().isEmpty() )
+				{
+					ParameterVectorReference.setShapeParameters(null);
+				}
+				else
+				{	//Creation started with modification perhaps this is also a state of CreationModus
+					//but we can't recreate parameters, so force a change to the second modus
+					//Creation started with an empty shape -> Set all ShapeParameters to initial value
+					NURBSCreationMessage nm = new NURBSCreationMessage();
+					ParameterVectorReference.setShapeParameters(nm);
+				}
 				return;
 			}
 			CommonGraphAction act = UndoStack.getLast(); //Last pushed element is the action before the just undone action
@@ -152,7 +163,7 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			return;
 		if ((m.getModification()&GraphConstraints.HISTORY)>0) //Ignore them, they'Re from us
 			return;
-		System.err.println(this.blockdepth+" ("+active+") "+m.getModification());
+		System.err.println(this.blockdepth+" ("+active+") "+m.getModification()+" "+UndoStack.size());
 		//Complete Replacement of Graphor Hypergraph Handling (Happens when loading a new graph
 		GraphMessage actualAction;
 		if ((blockdepth==0)&&(active) //super.update ended a block or we are active either way
@@ -174,6 +185,8 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 		{// The type of action we want to track here - than it was tracked wrong before
 			UndoStack.removeLast(); //Undo the undo-push from superclass and handle seperately
 			addAction(actualAction, ParameterVectorReference.getShapeParameters()); //Do our action upon that
+			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS, GraphConstraints.HISTORY));
 		}
+		System.err.println("-> "+UndoStack.size());
 	}
 }

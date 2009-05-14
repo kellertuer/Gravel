@@ -84,7 +84,6 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	{
 		return lastshape;
 	}
-
 	public void resetShape()
 	{
 		lastshape=null;
@@ -93,10 +92,11 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	{
 		lastshape = NURBSShapeFactory.CreateShape(getShapeParameters());
 	}
+	
 	public void setShapeParameters(NURBSCreationMessage nm)
 	{
 		//if shape type differs, ignore the parameters, because they might be unsuitable
-		if ((nm.getType()!=NURBSCreationMessage.INTERPOLATION)||(nm.getPoints()==null))
+		if ((nm.getType()!=NURBSCreationMessage.INTERPOLATION)||(!nm.isValid()))
 		{
 			reInit();
 			return;
