@@ -150,7 +150,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		{
 			NURBSShape draw = tempshape.clone();
 			draw.scale(zoomfactor);
-			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			g2.setStroke(new BasicStroke(1*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.setColor(selColor);
 			g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
 		}			
@@ -234,6 +234,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	}
 	//MOdified to only Handle those shape stati
 	public void setMouseHandling(int state) {
+		if (state==getMouseHandling()) //don't refresh state if its already right
+			return;
 		MouseEvent e = new MouseEvent(this,111,System.nanoTime(),0,-1,-1,1,false);		
 		if (firstModus!=null)
 			firstModus.mouseReleased(e);
@@ -349,14 +351,14 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		{
 			if ((nm!=null) && (nm.isValid())) //Change to modus 1
 			{
-				System.err.println("ShapeGraphic, switching 2->1");
+//				System.err.println("ShapeGraphic, switching 2->1");
 			}
 			else 
 				return;
 		}
 		else if ((nm!=null)&&(!nm.isValid())) //Invalid message, change to Std. MouseHandler for second modus
 		{
-			System.err.println("ShapeGraphic, switching 1->2");
+//			System.err.println("ShapeGraphic, switching 1->2");
 			setMouseHandling(CURVEPOINT_MOVEMENT_MOUSEHANDLING);
 			vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HISTORY)); //Notify Panel
 			return;
@@ -381,7 +383,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	{
 		if ((nm==null)||(!nm.isValid()))
 			return;
-		GraphMessage history = new GraphMessage(GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HISTORY);
 		switch (nm.getType())
 		{
 			case NURBSCreationMessage.INTERPOLATION:

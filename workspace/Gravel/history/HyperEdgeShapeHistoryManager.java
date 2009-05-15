@@ -63,15 +63,13 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			}
 			CommonGraphAction status = UndoStack.getLast(); //Last pushed element is the action before the just undone action, so the actual status
 			CommonGraphAction previousStatus = RedoStack.getLast();
-			if (status instanceof HyperEdgeShapeAction) //We should be in modus 1
+			if (status instanceof HyperEdgeShapeAction) //We should be in modus 1, this is solved by setting to correct parameters
 			{
 				NURBSCreationMessage nm = (NURBSCreationMessage) ((HyperEdgeShapeAction)status).ActionObject;
 				ParameterVectorReference.setShapeParameters(nm.clone());
 			}
 			else if ((!(status instanceof HyperEdgeShapeAction)) && (previousStatus instanceof HyperEdgeShapeAction))
-			{ //Last action was modus 1 status is modus 2
-				System.err.println("Change to modus 2, because we're in 1,");
-				//Send invalid message
+			{ //Last action was modus 1 status is modus => Send invalid message
 				ParameterVectorReference.setShapeParameters(new NURBSCreationMessage());			
 			}
 			this.setObservation(true);
@@ -100,15 +98,13 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 				//I'm coming from the status that is now undo(undo())
 				CommonGraphAction status = UndoStack.getLast(); //Last pushed element is the action before the just undone action, so the actual status
 				CommonGraphAction previousStatus = UndoStack.get(UndoStack.size()-2);
-				if (status instanceof HyperEdgeShapeAction) //We should be in modus 1
+				if (status instanceof HyperEdgeShapeAction) //We should be in modus 1, solved by correct parameters
 				{
-					//Because that should be valid the change here happens automatically
 					NURBSCreationMessage nm = (NURBSCreationMessage) ((HyperEdgeShapeAction)status).ActionObject;
 					ParameterVectorReference.setShapeParameters(nm.clone());
 				}
 				else if ((!(status instanceof HyperEdgeShapeAction)) && (previousStatus instanceof HyperEdgeShapeAction))
-				{ //Last action was modus 1 status is modus 2
-					System.err.println("Change to modus 2, because we're in 1, (invalidate");				
+				{ //Last action was modus 1 status is modus 2, so change modus to 2
 					ParameterVectorReference.setShapeParameters(new NURBSCreationMessage());
 				}
 				this.setObservation(true);

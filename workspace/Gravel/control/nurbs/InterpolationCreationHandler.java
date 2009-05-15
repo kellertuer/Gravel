@@ -266,7 +266,6 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		if (containsPoint(newPoint)!=-1) //Do not add twice
 			return;
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
-		
 		if (PointAdditionStatus==NURBSCreationMessage.ADD_END)
 			InterpolationPoints.add((Point2D.Double) newPoint.clone()); 
 		else

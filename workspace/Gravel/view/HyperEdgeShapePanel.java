@@ -445,7 +445,11 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		{
 	       	String Shape = (String)cBasicShape.getSelectedItem();
        		NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
-	       	if (Shape.equals("Interpolation"))
+       		if (nm==null)
+       			return;
+       		if (iDegree.getValue()==nm.getDegree())
+       			return; //No Change
+       		if (Shape.equals("Interpolation"))
         	{    		
 	       		nm.setDegree(iDegree.getValue());
 	       		HShapeGraphicRef.setShapeParameters(nm);
@@ -661,6 +665,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		iDegree.setValue(deg);
 		iDegree.addCaretListener(this);
 	}
+	
 	private void updateCircleFields(NURBSCreationMessage nm)
 	{
 		if ((nm==null)||(!nm.isValid()))
@@ -704,6 +709,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			iCRad.addCaretListener(this);					
 		}
 	}
+	
 	private void updateIPFields(NURBSCreationMessage nm)
 	{
 		if ((nm==null)||(!nm.isValid()))
@@ -727,6 +733,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			rAddBetween.setSelected(true);
 			rAddBetween.addActionListener(this);
 		}
+		System.err.println(nm.getPoints().size()+"");
 		updateInfo(nm);
 	}
 	private void updateInfo(NURBSCreationMessage nm)
@@ -737,8 +744,9 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		Vector<Point2D> p= nm.getPoints();
 		if (p==null)
 			return;
-		if (p.size()<=deg)
-			IPInfo.setText("<html><p>Grad "+deg+" ben"+CONST.html_oe+"tigt "+(2*deg+1-p.size())+" weitere Punkt(e).</p></html>");
+		int i = 2*deg-p.size();
+		if (i>0)
+			IPInfo.setText("<html><p>Grad "+deg+" ben"+CONST.html_oe+"tigt "+i+" weitere Punkt(e).</p></html>");
 		else
 			IPInfo.setText("");
 	}
@@ -777,9 +785,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 				updateDegreeFields(nm);
 			break;
 		}
-		getContent().repaint();
 	}
-	
 	public void update(Observable o, Object arg) {
 		if (arg instanceof GraphMessage) //All Other GraphUpdates are handled in VGRaphCommons
 		{
