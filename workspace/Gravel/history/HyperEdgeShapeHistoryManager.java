@@ -37,11 +37,11 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 	 * @param vhg the HyperGraph, that should be extended with a History
 	 * @param vhsg VHyperShapeGraphic which keeps the last Parametervector for creation of shape
 	 */
-	public HyperEdgeShapeHistoryManager(VHyperGraph vhg, VHyperShapeGraphic vhsg, int vheIndex)
+	public HyperEdgeShapeHistoryManager(VHyperShapeGraphic vhsg, int vheIndex)
 	{
-		super(vhg);
-		trackedGraph = vhg;
-		lastGraph = vhg.clone();
+		super(vhsg.getGraph());
+		trackedGraph = vhsg.getGraph();
+		lastGraph = vhsg.getGraph().clone();
 		ParameterVectorReference = vhsg;
 		CommonInitialization();
 		VHyperEdgeIndex=vheIndex;
@@ -55,25 +55,24 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			this.setObservation(false);
 			if (UndoStack.size()==0)
 			{
-				if ( ((VHyperGraph)trackedGraph).modifyHyperEdges.get(VHyperEdgeIndex).getShape().isEmpty() )
-				{
-					ParameterVectorReference.setShapeParameters(null);
-				}
-				else
-				{	//Creation started with modification perhaps this is also a state of CreationModus
-					//but we can't recreate parameters, so force a change to the second modus
-					//Creation started with an empty shape -> Set all ShapeParameters to initial value
-					NURBSCreationMessage nm = new NURBSCreationMessage();
-					ParameterVectorReference.setShapeParameters(nm);
-				}
+				//Either the Shape Editing was started with a shape or not - in both cases reset to initial stuff
+				ParameterVectorReference.setShapeParameters(null);
+				ParameterVectorReference.repaint();
 				this.setObservation(true);
 				return;
 			}
-			CommonGraphAction act = UndoStack.getLast(); //Last pushed element is the action before the just undone action
-			if (act instanceof HyperEdgeShapeAction)
+			CommonGraphAction status = UndoStack.getLast(); //Last pushed element is the action before the just undone action, so the actual status
+			CommonGraphAction previousStatus = RedoStack.getLast();
+			if (status instanceof HyperEdgeShapeAction) //We should be in modus 1
 			{
-				NURBSCreationMessage nm = (NURBSCreationMessage) ((HyperEdgeShapeAction)act).ActionObject;
+				NURBSCreationMessage nm = (NURBSCreationMessage) ((HyperEdgeShapeAction)status).ActionObject;
 				ParameterVectorReference.setShapeParameters(nm.clone());
+			}
+			else if ((!(status instanceof HyperEdgeShapeAction)) && (previousStatus instanceof HyperEdgeShapeAction))
+			{ //Last action was modus 1 status is modus 2
+				System.err.println("Change to modus 2, because we're in 1,");
+				//Send invalid message
+				ParameterVectorReference.setShapeParameters(new NURBSCreationMessage());			
 			}
 			this.setObservation(true);
 		}
@@ -93,11 +92,25 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 				ParameterVectorReference.setShapeParameters(nm.clone());
 				this.setObservation(true);
 			}
-			else //any noncreational-Stuff means, that we have to push to the second modus: TODO
+			else //TODO: react on changes of normal Graph and change to second modus if the actual status before was creational
 			{
+				if (UndoStack.size()<2) //there is no change to be fond of
+					return;
 				this.setObservation(false);
-				ParameterVectorReference.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);
-				ParameterVectorReference.setShapeParameters(null);
+				//I'm coming from the status that is now undo(undo())
+				CommonGraphAction status = UndoStack.getLast(); //Last pushed element is the action before the just undone action, so the actual status
+				CommonGraphAction previousStatus = UndoStack.get(UndoStack.size()-2);
+				if (status instanceof HyperEdgeShapeAction) //We should be in modus 1
+				{
+					//Because that should be valid the change here happens automatically
+					NURBSCreationMessage nm = (NURBSCreationMessage) ((HyperEdgeShapeAction)status).ActionObject;
+					ParameterVectorReference.setShapeParameters(nm.clone());
+				}
+				else if ((!(status instanceof HyperEdgeShapeAction)) && (previousStatus instanceof HyperEdgeShapeAction))
+				{ //Last action was modus 1 status is modus 2
+					System.err.println("Change to modus 2, because we're in 1, (invalidate");				
+					ParameterVectorReference.setShapeParameters(new NURBSCreationMessage());
+				}
 				this.setObservation(true);
 			}
 		}
@@ -193,6 +206,7 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 		{// The type of action we want to track here - than it was tracked wrong before
 			UndoStack.removeLast(); //Undo the undo-push from superclass and handle seperately
 			addAction(actualAction, ParameterVectorReference.getShapeParameters()); //Do our action upon that
+			//Update Menu, 
 			trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS, GraphConstraints.HISTORY));
 		}
 	}

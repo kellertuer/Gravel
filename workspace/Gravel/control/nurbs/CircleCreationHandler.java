@@ -93,17 +93,27 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 		//TODO: CreationCircleHandler : Degree
 		return new NURBSCreationMessage(2, new Point2D.Double(CircleOrigin.getX(),CircleOrigin.getY()), size);
 	}
+	/**
+	 * Set the internal values to another circle specified in the CreationMessage
+	 * 
+	 * If there is a drag-happening, nothing happens
+	 * If the Message is null, invalid or not a Circle-Message, the internal Values are reset 
+	 * 
+	 * Else the values are set and can directly after this method be obtained by getShapeParameters
+	 * or to get the Shape after that use getShape();
+	 */
 	public void setShapeParameters(NURBSCreationMessage nm)
 	{
 		if (dragged())
 			return;
-		if ((!nm.isValid()) || (nm.getType()!=NURBSCreationMessage.CIRCLE)) //nonsiutable
-		{
+		if ((nm==null) ||(!nm.isValid()) || (nm.getType()!=NURBSCreationMessage.CIRCLE)) //nonsiutable
+		{ //Reset values
 			reInit();
 			return;
 		}
-		Point2D p = (Point2D) nm.getPoints().firstElement().clone();
-		int rad = nm.getValues().firstElement();
+		NURBSCreationMessage local = nm.clone();
+		Point2D p = (Point2D) local.getPoints().firstElement().clone();
+		int rad = local.getValues().firstElement();
 		if ((p==null) || (rad<=0) )
 		{
 			reInit();

@@ -47,7 +47,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		actualMouseState = NO_MOUSEHANDLING;
 		highlightedHyperEdge = hyperedgeindex;
 
-		vGh = new HyperEdgeShapeHistoryManager(vG,this,hyperedgeindex);
+		vGh = new HyperEdgeShapeHistoryManager(this,hyperedgeindex);
 	}	
 
 	public void paint(Graphics2D g2)
@@ -165,7 +165,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				this.drawCP(g2, p2, Color.BLUE);
 			}
 		}
-		if (actualMouseState==CIRCLE_MOUSEHANDLING)
+		else if (actualMouseState==CIRCLE_MOUSEHANDLING)
 		{
 			NURBSCreationMessage nm = firstModus.getShapeParameters();
 			if ((!nm.isValid()) || (!firstModus.dragged())) //Draw these only when dragging
@@ -318,6 +318,12 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		secondModus=null;
 		noModus=null;
 	}
+	/**
+	 * get actial ShapeParameters that are used for computation of the shape
+	 * These Values are valid in every Modus of Creation
+	 * These Values are null in every Modus of Modification
+	 * @return
+	 */
 	public NURBSCreationMessage getShapeParameters()
 	{
 		if (firstModus!=null)
@@ -328,37 +334,74 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		return null;		
 	}
 	/**
-	 * Set the parameters for ShapeCreation in the first modus (e.g. when they where changed in the panel to the left)
+	 * Set the parameters for ShapeCreation in the first modus 
+	 * (e.g. when they where changed in the panel to the left)
+	 * 
+	 * If the Message is valid the MouseHandler is set to the specified Type and the Parameters in the MouseHandler are updated
+	 * If the Message is invalid the MouseHandler is set to the standard-value of second modus (modification)
+	 * If the Message is null, the MouseHandler is set to first modus or left as is (if already in first modus) and all values in the Handler are cleared
+	 * 
 	 * @param nm
 	 */
 	public void setShapeParameters(NURBSCreationMessage nm)
 	{
 		if (secondModus!=null) //we are in second modus and must change to first because history or someone else just got us back to creation
 		{
-			return;
-		}
-		//Is the actual firstmodus right for the Shape descriped in nm?
-		if ((nm!=null)&&(!nm.isValid()))
-		{	
-			if (getMouseHandling()==NO_MOUSEHANDLING)
-				noModus=nm;
-			else
+			if ((nm!=null) && (nm.isValid())) //Change to modus 1
 			{
-				firstModus.resetShape();
-				firstModus.setShapeParameters(nm);
+				System.err.println("ShapeGraphic, switching 2->1");
 			}
-			vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(new NURBSShape());		
-			vG.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.HISTORY)); //Notify Panel
+			else 
+				return;
+		}
+		else if ((nm!=null)&&(!nm.isValid())) //Invalid message, change to Std. MouseHandler for second modus
+		{
+			System.err.println("ShapeGraphic, switching 1->2");
+			setMouseHandling(CURVEPOINT_MOVEMENT_MOUSEHANDLING);
+			vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HISTORY)); //Notify Panel
 			return;
 		}
-		//Tests if we have to change modus...
-		if (getMouseHandling()!=NO_MOUSEHANDLING)
-			firstModus.setShapeParameters(nm);
-		else
-			noModus = nm;
-		//if not change to fitting one
+		int prevMouseHandling = getMouseHandling();
+		//So now it is existent and valid, update to correct modus and notify panel
+		updateMouseHandling(nm); //Update to correct modus
+		if (getMouseHandling()==NO_MOUSEHANDLING)
+			noModus=nm;
+		else //so here firstmodus is not null
+			firstModus.setShapeParameters(nm); //Update new Modus' values
+		if (nm!=null) //Set to new shape
+			vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(NURBSShapeFactory.CreateShape(nm));		
+		else //clear
+			vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(new NURBSShape());
+		//Notify all despite History (e.g. for update of Panel) if we changed CreationModus
+		if ((getMouseHandling()!=prevMouseHandling)||(nm==null)) //Either MOuse Modus Change or Parameter Reset
+			vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HISTORY)); //Notify Panel
 		repaint();
 	}
+	private void updateMouseHandling(NURBSCreationMessage nm)
+	{
+		if ((nm==null)||(!nm.isValid()))
+			return;
+		GraphMessage history = new GraphMessage(GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HISTORY);
+		switch (nm.getType())
+		{
+			case NURBSCreationMessage.INTERPOLATION:
+				if (getMouseHandling()!=INTERPOLATION_MOUSEHANDLING) //really change
+				{
+					setMouseHandling(INTERPOLATION_MOUSEHANDLING);
+				}
+				break;			
+			case NURBSCreationMessage.CIRCLE:
+			if (getMouseHandling()!=CIRCLE_MOUSEHANDLING)
+				setMouseHandling(CIRCLE_MOUSEHANDLING);
+			break;
+			case NURBSCreationMessage.CONVEX_HULL:
+				if (getMouseHandling()!=NO_MOUSEHANDLING)
+					setMouseHandling(NO_MOUSEHANDLING);
+			break;
+		}
+	}
+	
+	
 	protected Point DragMouseOffSet()
 	{
 		if ((firstModus!=null)&&(firstModus.dragged()))

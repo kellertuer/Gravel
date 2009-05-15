@@ -95,26 +95,27 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	
 	public void setShapeParameters(NURBSCreationMessage nm)
 	{
-		if (nm==null)
-		{
-			reInit();
-			return;
-		}
-		//if shape type differs, ignore the parameters, because they might be unsuitable
-		if ((nm.getType()!=NURBSCreationMessage.INTERPOLATION)||(!nm.isValid()))
-		{
+		if ( (nm==null) || (nm.getType()!=NURBSCreationMessage.INTERPOLATION) || (!nm.isValid()))
+		{ //Unsuitable, reset to initial Values
 			reInit();
 			return;
 		}
 		if (dragged())
 			return;	
-		InterpolationPoints = nm.getPoints();
-		PointAdditionStatus = nm.getStatus();
+		//really something changed
+			boolean notify = ((InterpolationPoints!=nm.getPoints())||(degree!=nm.getDegree()));	
+		NURBSCreationMessage local = nm.clone();
+		InterpolationPoints = local.getPoints();
+		PointAdditionStatus = local.getStatus();
 		degree = nm.getDegree();
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
-		updateShape();
-		vhg.modifyHyperEdges.get(hyperedgeindex).setShape(lastshape);
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
+		
+		if (notify)
+		{
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
+			updateShape();
+			vhg.modifyHyperEdges.get(hyperedgeindex).setShape(lastshape);
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
+		}
 	}
 	public NURBSCreationMessage getShapeParameters()
 	{

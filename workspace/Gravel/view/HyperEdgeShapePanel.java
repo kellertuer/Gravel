@@ -419,13 +419,18 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	
 	public void caretUpdate(CaretEvent e)
 	{
-		
 		if ((e.getSource()==iCOrigX)||(e.getSource()==iCOrigY)||(e.getSource()==iCRad))
 		{
 			
 			if ((iCOrigX.getValue()!=-1)&&(iCOrigY.getValue()!=-1)&&(iCRad.getValue()!=-1))
-			{
-				Vector<Object> param = new Vector<Object>();
+			{ //All valid
+				NURBSCreationMessage old = HShapeGraphicRef.getShapeParameters();
+				if ((old==null)||(!old.isValid())||(old.getType()!=NURBSCreationMessage.CIRCLE))
+					return; //invalid
+				if  (  (iCOrigX.getValue()==Math.round((float)old.getPoints().firstElement().getX()))
+					&& (iCOrigY.getValue()==Math.round((float)old.getPoints().firstElement().getY()))
+					&& (iCRad.getValue()==old.getValues().firstElement().intValue())	)
+					return; //No Value changed
 				NURBSCreationMessage nm = new NURBSCreationMessage(
 						2, //TODO: Enable Circles with Degree
 						new Point2D.Double((new Integer(iCOrigX.getValue())).doubleValue(), (new Integer(iCOrigY.getValue())).doubleValue()),
@@ -439,17 +444,23 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		if ((e.getSource()==iDegree)&&(iDegree.getValue()>0))
 		{
 	       	String Shape = (String)cBasicShape.getSelectedItem();
+       		NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
 	       	if (Shape.equals("Interpolation"))
         	{    		
-	       		NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
 	       		nm.setDegree(iDegree.getValue());
 	       		HShapeGraphicRef.setShapeParameters(nm);
+				HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, HEdgeRefIndex, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION, GraphConstraints.HYPEREDGE)); //HyperEdgeShape Updated
         	}
         	else if (Shape.equals("konvexe Hülle"))
         	{
         		CalculateConvexHullShape();
+	       		nm.setDegree(iDegree.getValue());
+	       		HShapeGraphicRef.setShapeParameters(nm);
+				HGraphRef.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, HEdgeRefIndex, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION, GraphConstraints.HYPEREDGE)); //HyperEdgeShape Updated
         	}
-	       	updateInfo();
+        	else //no Degree Stuff
+        		return;
+	       	updateInfo(nm);
 		}
 	}
 	private void deselectButtons()
@@ -532,7 +543,6 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		cBasicShape.setVisible(visible);
 		BasicShape.setVisible(visible);
 	}
-	
 	private void setFreeModificationFields(boolean visible)
 	{
  		FreeModFields.setVisible(visible);
@@ -633,9 +643,26 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        getContent().validate();
 	        getContent().repaint();
 	}
-	private void updateCircleFields()
+
+	//Update Fields to fit the values of a message
+	private void updateDegreeFields(NURBSCreationMessage nm)
 	{
-		NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
+		if ((nm==null)||(!nm.isValid()))
+		{
+			iDegree.removeCaretListener(this);
+			iDegree.setValue(3); //TODO: Degree Std value in Panel Update
+			iDegree.addCaretListener(this);
+			return;
+		}
+		int deg = nm.getDegree();
+		if (iDegree.getValue()==deg)
+			return;
+		iDegree.removeCaretListener(this);
+		iDegree.setValue(deg);
+		iDegree.addCaretListener(this);
+	}
+	private void updateCircleFields(NURBSCreationMessage nm)
+	{
 		if ((nm==null)||(!nm.isValid()))
 		{
 			//Reset to empty stuff
@@ -650,6 +677,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			iCRad.addCaretListener(this);					
 			return;
 		}
+		if (nm.getType()!=NURBSCreationMessage.CIRCLE)
+			return; //unsuitable->ignore
 		Point2D p = nm.getPoints().firstElement();
 		if (p==null)
 			return;
@@ -675,10 +704,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			iCRad.addCaretListener(this);					
 		}
 	}
-	
-	private void updateIPFields()
+	private void updateIPFields(NURBSCreationMessage nm)
 	{
-		NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
 		if ((nm==null)||(!nm.isValid()))
 		{ //Back to std.
 			rAddEnd.removeActionListener(this);
@@ -686,12 +713,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			rAddEnd.addActionListener(this);
 			return;
 		}
-		int deg = nm.getDegree();
-		if (iDegree.getValue()==deg)
-			return;
-		iDegree.removeCaretListener(this);
-		iDegree.setValue(deg);
-		iDegree.addCaretListener(this);
+		if (nm.getType()!=NURBSCreationMessage.INTERPOLATION)
+			return; //unsuitable->ignore
 		if ((nm.getStatus()==NURBSCreationMessage.ADD_END)&&(rAddBetween.isSelected()))
 		{ //Update
 			rAddEnd.removeActionListener(this);
@@ -704,13 +727,10 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			rAddBetween.setSelected(true);
 			rAddBetween.addActionListener(this);
 		}
-		updateInfo();
+		updateInfo(nm);
 	}
-	
-
-	private void updateInfo()
+	private void updateInfo(NURBSCreationMessage nm)
 	{
-		NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
 		if ((nm==null)||(!nm.isValid()))
 			return;
 		int deg= nm.getDegree();
@@ -718,50 +738,102 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		if (p==null)
 			return;
 		if (p.size()<=deg)
-			IPInfo.setText("<html><p>Grad "+deg+" ben"+CONST.html_oe+"tigt "+(deg+1-p.size())+" weitere Punkt(e).</p></html>");
+			IPInfo.setText("<html><p>Grad "+deg+" ben"+CONST.html_oe+"tigt "+(2*deg+1-p.size())+" weitere Punkt(e).</p></html>");
 		else
 			IPInfo.setText("");
 	}
+
+	private void updatePanel(NURBSCreationMessage nm)
+	{
+		if (nm==null) //Init to second Modus
+		{
+			if (cBasicShape.isVisible())
+				actionPerformed(new ActionEvent(bModeChange,0,"Change Modus"));
+			deselectButtons();
+			return;
+		}
+		if (!nm.isValid()) //update all to std
+		{
+			updateDegreeFields(nm); updateIPFields(nm); updateCircleFields(nm);
+			return;
+		}
+		//Init the correct modus in first...
+		if (!cBasicShape.isVisible()) //We're in second modus
+			actionPerformed(new ActionEvent(bModeChange,0,"Change Modus"));			
+		switch(nm.getType())
+		{
+			default:
+			case NURBSCreationMessage.INTERPOLATION: //Init to that
+				cBasicShape.setSelectedIndex(1);
+				updateDegreeFields(nm);
+				updateIPFields(nm);
+				break;
+			case NURBSCreationMessage.CIRCLE: //Init to that
+				cBasicShape.setSelectedIndex(0);
+				updateCircleFields(nm);
+			break;
+			case NURBSCreationMessage.CONVEX_HULL: //Init to that
+				cBasicShape.setSelectedIndex(2);
+				updateDegreeFields(nm);
+			break;
+		}
+		getContent().repaint();
+	}
+	
 	public void update(Observable o, Object arg) {
 		if (arg instanceof GraphMessage) //All Other GraphUpdates are handled in VGRaphCommons
 		{
 			GraphMessage m = (GraphMessage) arg;
+			if ( ((m.getModifiedElementTypes()&(GraphConstraints.HYPEREDGESHAPE))==GraphConstraints.HYPEREDGESHAPE)
+					&&(m.getModification()==GraphConstraints.HISTORY))
+			{ //Shape changed by History - Check For correct Modus and right buttons
+				updatePanel(HShapeGraphicRef.getShapeParameters());
+				return;
+			}
 			if ((m.getModifiedElementTypes()==GraphConstraints.HYPEREDGE)
-				&&(m.getModification()==(GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION)))
+					&&(m.getModification()==(GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION))) 
 			{
-				if  (cBasicShape.isVisible()) //We're in mode one 
+				if  (cBasicShape.isVisible()) //We're in mode one and got an HyperEdgeShape Creation Update
 				{
+					NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
+					if (DegreeFields.isVisible())
+						updateDegreeFields(nm);
 					if (CircleFields.isVisible())//with circles
-						updateCircleFields();
+						updateCircleFields(nm);
 					else if (InterpolationFields.isVisible())
-						updateIPFields();
+						updateIPFields(nm);
 				}
 			}
+			//Button Activity
+			boolean shape = false;
 			if ((HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape()!=null)&&(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty()))
-			{
+			{ //We have a given nonempty shape
 				IPInfo.setText("<html><p>&nbsp;</p></html>");
-				bCheckShape.setEnabled(true);
+				shape = true;
 			}
 			else
 			{
-				bCheckShape.setEnabled(false); CheckResult.setText("<html>&nbsp;</html>"); CheckResult.setOpaque(false);
+				shape = false;
+				CheckResult.setText("<html>&nbsp;</html>");
 			}
-			bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
-			if (!bModeChange.isEnabled()) //Empty Shape
+			bCheckShape.setEnabled(shape);
+			bModeChange.setEnabled(shape);
+			bOk.setEnabled(shape);
+			if (!shape) //Empty Shape
 			{
 				if (cBasicShape.isVisible()) //-> clear values
 				{
+					NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
 					if (CircleFields.isVisible())//with circles
-						updateCircleFields();
+						updateCircleFields(nm);
 					else if (InterpolationFields.isVisible())
-						updateIPFields();
+						updateIPFields(nm);
 				}
 				else //Second Modus -> change to first
 				{
 					actionPerformed(new ActionEvent(bModeChange,0,"Change Modus"));
 				}
 			}
-			bOk.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 		}	//End Handling Graph Messages
 	}
 }
