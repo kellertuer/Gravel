@@ -72,7 +72,66 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-//	paintDEBUG(g2);
+	paintSubCurveDEBUG(g2);
+	}
+	private void paintSubCurveDEBUG(Graphics2D g2)
+	{
+		if ((vG.modifyNodes.get(1)==null)||(vG.modifyNodes.get(2)==null))
+			return;
+		Vector<Point2D> IP = new Vector<Point2D>();
+		IP.add(new Point2D.Double(60,200));
+		IP.add(new Point2D.Double(50,130));
+		IP.add(new Point2D.Double(150,60));
+		IP.add(new Point2D.Double(270,80));
+		IP.add(new Point2D.Double(270,120));
+		IP.add(new Point2D.Double(220,130));
+		IP.add(new Point2D.Double(200,200));
+		IP.add(new Point2D.Double(200,230));
+		IP.add(new Point2D.Double(270,230));
+		IP.add(new Point2D.Double(230,290));
+		IP.add(new Point2D.Double(200,280));
+		IP.add(new Point2D.Double(175,290));
+		IP.add(new Point2D.Double(185,320));
+		IP.add(new Point2D.Double(80,350));
+		int degree = 4;
+		NURBSCreationMessage nm = new NURBSCreationMessage(degree, NURBSCreationMessage.ADD_END, IP);
+		NURBSShape c = NURBSShapeFactory.CreateShape(nm);
+		
+		g2.setStroke(new BasicStroke(1.2f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		NURBSShape cs = c.clone();
+		cs.scale(zoomfactor);
+		g2.setColor(Color.black);
+		g2.draw(cs.getCurve(5d/(double)zoomfactor));
+		
+		Point2D p1 = new Point2D.Double(vG.modifyNodes.get(1).getPosition().x,vG.modifyNodes.get(1).getPosition().y);
+		Point2D p2 = new Point2D.Double(vG.modifyNodes.get(2).getPosition().x,vG.modifyNodes.get(2).getPosition().y);
+		NURBSShapeProjection proj1 = new NURBSShapeProjection(c,p1);
+		NURBSShapeProjection proj2 = new NURBSShapeProjection(c,p2);
+		Point2D pp1 = proj1.getResultPoint();
+		Point2D pp2 = proj2.getResultPoint();
+		Color cross = Color.magenta;
+		if (p1.distance(pp1)<=2.0)
+			cross = Color.green.darker().darker();
+		drawCP(g2,new Point(Math.round((float)p2.getX()),Math.round((float)p2.getY())),cross);
+		drawCP(g2,new Point(Math.round((float)pp1.getX()), Math.round((float)pp1.getY())), Color.ORANGE);
+		if (p2.distance(pp2)<=2.0)
+			cross = Color.green.darker().darker();
+		drawCP(g2,new Point(Math.round((float)p2.getX()),Math.round((float)p2.getY())),cross);
+		drawCP(g2,new Point(Math.round((float)pp2.getX()), Math.round((float)pp2.getY())), Color.ORANGE);
+		for (int i=0; i<c.controlPoints.size(); i++)
+		{
+			drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())),Color.cyan.darker());
+		}
+
+		double u1 = proj1.getResultParameter(), u2 = proj2.getResultParameter();
+		System.err.println("SubCurve from "+u1+" to "+u2);
+		NURBSShape subc = c.ClampedSubCurve(u1, u2);
+//		subc.translate(p1.getX()-pp1.getX(), p1.getY()-pp1.getY());
+		g2.setStroke(new BasicStroke(1.2f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		NURBSShape subcs = subc.clone();
+		subcs.scale(zoomfactor);
+		g2.setColor(Color.red);
+		g2.draw(subcs.getCurve(5d/(double)zoomfactor));
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
@@ -169,7 +228,6 @@ public class VHyperGraphic extends VCommonGraphic
 					Math.round((float)(p.getY()+normps.getX()*length)*zoomfactor));
 		}
 	}
-	
 	private void paintPIDEBUG(Graphics2D g2)
 	{
 		Vector<Double> knots = new Vector<Double>();

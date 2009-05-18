@@ -330,13 +330,24 @@ public class NURBSShape {
 	 */
 	public NURBSShape ClampedSubCurve(double u1, double u2)
 	{
+		boolean closed=true;
+		closed &= (getType()==UNCLAMPED); //not closed if not unclamped
+		for (int i=0; i<degree; i++)
+			closed &= ((controlPoints.get(i).getX()==controlPoints.get(maxCPIndex-degree+1+i).getX())
+						&& (controlPoints.get(i).getY()==controlPoints.get(maxCPIndex-degree+1+i).getY()));
+
+		if  ( ((getType()==CLAMPED)||(!closed)) && (u2>u1))
+		{
+			double t=u1; u1=u2; u2=t; System.err.println("Clamped or c:"+closed);
+		}
 		int Start = findSpan(u1);
 		int End = findSpan(u2);
 		if (u2==Knots.get(maxKnotIndex-degree)) //Last possible Value the Curve is evaluated
 			End++;
-		if ((Start==-1)||(End==-1)||(u1>=u2)) //Ohne u out of range or invalid interval
+		if (u1==Knots.get(maxKnotIndex-degree)) //Last possible Value the Curve is evaluated
+			Start++; //Happens only if closed
+		if ((Start==-1)||(End==-1)||(u1==u2)) //Ohne u out of range or invalid interval
 			return new NURBSShape(); //Return amepty Shape
-		
 		//Raise both endvalues to multiplicity d to get an clamped curve
 		int multStart = 0;
 		while (Knots.get(Start+multStart).doubleValue()==u1)
@@ -345,31 +356,70 @@ public class NURBSShape {
 		while (Knots.get(End-multEnd).doubleValue()==u2)
 			multEnd++;
 		Vector<Double> Refinement = new Vector<Double>();
+		double min = Math.min(u1,u2);
 		for (int i=0; i<=degree-multStart; i++)
-			Refinement.add(u1);
+			Refinement.add(min);
+		double max = Math.max(u1,u2);
 		for (int i=0; i<=degree-multEnd; i++)
-			Refinement.add(u2);
+			Refinement.add(max);
 		//Nun wird der Start- und der Endpunkt
 		NURBSShape subcurve = clone();
 		subcurve.RefineKnots(Refinement); //Now it interpolates subcurve(u1) and subcurve(u2)
 		Vector<Point2D> newCP = new Vector<Point2D>();
 		Vector<Double> newWeight= new Vector<Double>();
-		for (int i=Start; i<(End+degree+1-multStart); i++)
+		boolean specialcase = closed&&(u2<u1);
+		if (!specialcase)//normal clamped or unclosed or u1<u2
 		{
-			newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
-			newWeight.add(subcurve.cpWeight.get(i).doubleValue());
+			for (int i=Start; i<(End+degree+1-multStart); i++)
+			{
+				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
+				newWeight.add(subcurve.cpWeight.get(i).doubleValue());
+			}
+		}
+		else
+		{
+			for (int i=Start+multEnd+multStart; i<=subcurve.maxCPIndex; i++)
+			{
+				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
+				newWeight.add(subcurve.cpWeight.get(i).doubleValue());
+			}
+			for (int i=degree+1; i<End; i++)
+			{
+				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
+				newWeight.add(subcurve.cpWeight.get(i).doubleValue());				
+			}	
 		}
 		//Copy needed Knots
-		int index = 0;
 		Vector<Double> newKnots = new Vector<Double>();
-		while (subcurve.Knots.get(index)<u1)
-			index++;
-		while (subcurve.Knots.get(index)<=u2)
+		if (!specialcase)
+		{	int index = 0;
+			while (subcurve.Knots.get(index)<u1)
+				index++;
+			while (subcurve.Knots.get(index)<=u2)
+			{
+				newKnots.add(subcurve.Knots.get(index).doubleValue());
+				index++;
+			}
+		}
+		else
 		{
-			newKnots.add(subcurve.Knots.get(index).doubleValue());
-			index++;
+			int index=0;
+			while (subcurve.Knots.get(index)<u1)
+				index++;
+			while (index<=subcurve.maxKnotIndex)
+			{
+				newKnots.add(subcurve.Knots.get(index).doubleValue());
+				index++;
+			}
+			index=degree; double offset = subcurve.Knots.get(subcurve.maxKnotIndex)-subcurve.Knots.get(degree-1);
+			while (subcurve.Knots.get(index)<=u2)
+			{
+				newKnots.add(subcurve.Knots.get(index).doubleValue()+offset);
+				index++;
+			}
 		}
 		NURBSShape c = new NURBSShape(newKnots,newCP,newWeight);
+		System.err.println(c.degree);
 		return c;
 	}
 	/**
@@ -439,7 +489,7 @@ public class NURBSShape {
 	 * @param u
 	 * @return
 	 */
-	public int findSpan(double u)
+	protected int findSpan(double u)
 	{
 		if ((u<Knots.firstElement())||(u>Knots.lastElement())) //Out of range for all types
 				return -1;
@@ -684,7 +734,7 @@ public class NURBSShape {
 	 * @param u
 	 * @return All nonzero Values of BSpline-Basis-Functions at u
 	 */
-	public Vector<Double> BasisBSpline(double u)
+	protected Vector<Double> BasisBSpline(double u)
 	{
 		//Calculate all Needed Values
 		int max = findSpan(u); //Only constant function that is nonzero
@@ -729,7 +779,7 @@ public class NURBSShape {
 	 * @param number
 	 * @return
 	 */
-	public double BasisR(double u, int number)
+	private double BasisR(double u, int number)
 	{
 		int max = findSpan(u);
 		int min = max - degree;
@@ -808,25 +858,6 @@ public class NURBSShape {
 		return x.distance(ProjectionPoint(x))<=variance;
 	}
 	
-	public void refineMiddleKnots()
-	{
-		if (isEmpty())
-			return;
-		Vector<Double> newknots = new Vector<Double>();
-		Iterator<Double> knotIter = Knots.iterator();
-		Double lastvalue = Knots.firstElement();
-		while (knotIter.hasNext())
-		{
-			Double d = knotIter.next();
-			if (lastvalue.doubleValue()!=d.doubleValue()) //We have a real distance between last and this value
-			{
-				newknots.addElement(lastvalue.doubleValue() + (d.doubleValue()-lastvalue.doubleValue())/2.0d);				
-			}
-			
-			lastvalue = d;
-		}
-		RefineKnots(newknots);
-	}
 	/**
 	 * Refine the Curve to add some new knots contained in X from wich each is between t[0] and t[m]
 	 * @param X

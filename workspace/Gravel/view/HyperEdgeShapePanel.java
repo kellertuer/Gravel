@@ -474,8 +474,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	{
         if (e.getSource()==bIncKnots)
         {
-        	HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().refineMiddleKnots();
-        	HShapeGraphicRef.setMouseHandling(HShapeGraphicRef.getMouseHandling()); //ReInit Drag/Click
+        	// 	HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().refineMiddleKnots();
         }
         else if (e.getSource()==bRotation)
         {
