@@ -621,7 +621,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        performSecondModus(e);
 	        if (e.getSource()==bCheckShape)
 	        {
-	        	NURBSShapeValidator validator = new NURBSShapeValidator(HGraphRef, HEdgeRefIndex, null); //Check actual Shape of the Edge
+	        	NURBSShapeValidator validator = new NURBSShapeValidator(HGraphRef, HEdgeRefIndex, null, HShapeGraphicRef); //Check actual Shape of the Edge
 	    		if (validator.isShapeValid())
 	    		{
 	    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><center>Der Umriss ist korrekt.</center><br><br><ul><li>Alle Knoten der Hyperkante sind innerhalb des Umrisses</li><li>Alle Knoten der Hyperkante sind mindestens "+HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin()+"px</li><li>Alle anderen Knoten sind außerhalb des Umrisses</li></ul></html>", "Der Umriss ist korrekt.", JOptionPane.INFORMATION_MESSAGE);
@@ -634,6 +634,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		    		Vector<Integer> WrongNodes = validator.getInvalidNodeIndices();
 		    		for (int j=0; j<WrongNodes.size(); j++)
 		    				msg+="#"+WrongNodes.get(j);
+		    		if (WrongNodes.size()==0)
+		    			msg += "Es gab keine eindeutige Entscheidung, am Ende mehr als 2 Mengen verblieben.";
 		    		msg+="</html>";
 	    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), msg, "Der Umriss ist nicht korrekt.", JOptionPane.ERROR_MESSAGE);
 	    			HShapeGraphicRef.setHighlightedNodes(WrongNodes);

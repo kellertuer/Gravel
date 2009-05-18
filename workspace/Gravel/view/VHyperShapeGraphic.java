@@ -107,7 +107,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			if (hEdge.containsNode(temp.getIndex())) //Colored Node?
 				g2.setColor(temp.getColor());
 			else
-				g2.setColor(this.selColor.brighter().brighter());
+				g2.setColor(this.selColor.brighter());
 			if (invalidNodesforShape.contains(temp.getIndex()))
 				g2.setColor(Color.red.darker());
 			g2.fillOval(Math.round(temp.getdrawpoint().x*zoomfactor), Math.round(temp.getdrawpoint().y*zoomfactor), Math.round(temp.getSize()*zoomfactor), Math.round(temp.getSize()*zoomfactor));

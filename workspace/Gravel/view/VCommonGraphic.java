@@ -141,7 +141,7 @@ public abstract class VCommonGraphic extends Component implements Observer
 	 * @param g the Graphic g
 	 * @param p at the Position of this point
 	 */
-	protected void drawCP(Graphics g, Point p, Color c)
+	public void drawCP(Graphics g, Point p, Color c)
 	{
 		int cpsize = gp.getIntValue("vgraphic.cpsize");
 		Graphics2D g2 = (Graphics2D) g;
