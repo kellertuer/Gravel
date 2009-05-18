@@ -208,7 +208,7 @@ public abstract class CommonGraphAction {
 					if (vsubs.get(actual.getIndex())==null)
 						throw new GraphActionException("Can't replace edge, replacements belongs to Subgraphs, that don't exists in given parameter graph");
 					vsubs.addEdgetoSubgraph(i.getIndex(), actual.getIndex());
-					System.err.println("Adding e "+i.getIndex()+" to Subgraph "+actual.getIndex());
+//					System.err.println("Adding e "+i.getIndex()+" to Subgraph "+actual.getIndex());
 				}
 			}
 			else if (i.getType()==VItem.NODE)
@@ -218,7 +218,7 @@ public abstract class CommonGraphAction {
 					if (vsubs.get(actual.getIndex())==null)
 						throw new GraphActionException("Can't replace edge, replacements belongs to Subgraphs, that don't exists in given parameter graph");
 					vsubs.addNodetoSubgraph(i.getIndex(), actual.getIndex());
-					System.err.println("Adding n "+i.getIndex()+" to Subgraph "+actual.getIndex());
+//					System.err.println("Adding n "+i.getIndex()+" to Subgraph "+actual.getIndex());
 				}				
 			}
 			else

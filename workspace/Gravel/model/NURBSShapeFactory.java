@@ -361,7 +361,7 @@ public class NURBSShapeFactory {
 	 * 
 	 * @return
 	 */
-	private static NURBSShape CreateConvexHullPolygon(Vector<Point2D> nodes, Vector<Integer> sizes, int degree, int distance)
+	private static NURBSShape CreateConvexHullPolygon(Vector<Point2D> nodes, Vector<Integer> sizes, int degree, double distance)
 	{
 		if (nodes.size()<2) //mindestens 3 Knoten nötig
 			return new NURBSShape();
@@ -402,7 +402,7 @@ public class NURBSShapeFactory {
 			IPoints.add(new Point2D.Double(thisX - direction3.getX()/dir3l*(distance+(double)sizes.get(pos)/2d), thisY - direction3.getY()/dir3l*(distance+(double)sizes.get(pos)/2d)));
 		}
 		IPoints = GrahamsScan(IPoints); //Make convex again
-		if (IPoints.size()<=degree)
+		if (IPoints.size()<=(2*degree))
 			return new NURBSShape();
 		return CreateInterpolation(IPoints, degree);
 	}

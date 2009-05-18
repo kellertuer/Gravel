@@ -77,16 +77,12 @@ public class NURBSShapeProjection extends NURBSShape
 				if (qcControlPoints.get(i)<min)
 					min = qcControlPoints.get(i);
 			}
-			if (min>alpha)
-			{	//System.err.println(min+" out)");// - outside");
-			}
-			else if (min==partAlpha)
+			if (min>alpha) //definetly outside -> do nothing
+			{}
+			else if (min==partAlpha) //might be projected onto end-element -> do nothing
+			{}
+			else //may be inside polygon
 			{
-				//System.err.println("Endknot candidate");
-			}
-			else
-			{
-		//		System.err.print(" - inside");
 				int k=0; //None found
 				boolean prop2=true;
 				double lastP = qcControlPoints.firstElement();
@@ -106,8 +102,6 @@ public class NURBSShapeProjection extends NURBSShape
 				if (!prop2) //Split in the middle
 				{
 					double refinement = (actualPart.Knots.firstElement() + actualPart.Knots.lastElement())/2d;
-//					if ((actualPart.Knots.lastElement()-actualPart.Knots.firstElement())<0.002d)
-//						System.err.println((actualPart.Knots.firstElement()-actualPart.Knots.lastElement())+" addin "+refinement+" on ["+actualPart.Knots.firstElement()+" "+actualPart.Knots.lastElement()+"]");
 					Vector<Double> ref = new Vector<Double>();
 					ref.add(refinement);
 					actualPart.RefineKnots(ref);

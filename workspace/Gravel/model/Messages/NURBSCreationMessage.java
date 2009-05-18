@@ -63,10 +63,14 @@ public class NURBSCreationMessage {
 	 */
 	public NURBSCreationMessage(int deg, int status, Vector<Point2D> IP)
 	{
+		if ((status!=ADD_END)&&(status!=ADD_BETWEEN))
+		{ //set to invalid
+			type=-1;
+			return;
+		}
 		type = INTERPOLATION;
 		degree = deg;
-		if ((status!=ADD_END)&&(status!=ADD_BETWEEN))
-				System.err.println("Moep");
+			
 		this.status = status;
 		points = IP;
 	}

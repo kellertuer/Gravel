@@ -202,7 +202,6 @@ public class VHyperGraphic extends VCommonGraphic
 		}
 		g2.setColor(Color.black);
 		NURBSShape c = new  NURBSShape(knots,points,weights);
-//		System.err.println(c.degree);
 		g2.setStroke(new BasicStroke(2,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		NURBSShape cs = c.clone();
 		cs.scale(zoomfactor);

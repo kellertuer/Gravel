@@ -27,6 +27,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
@@ -79,7 +80,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	private JRadioButton rAddEnd, rAddBetween;
 
 	//FreeModFields
-	private JLabel knots, CheckResult;
+	private JLabel knots;
 	private JButton bIncKnots, bDecKnots, bCheckShape;
 	
 	private JButton bModeChange, bOk, bCancel;
@@ -182,12 +183,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		cont.add(bCheckShape,c);
 		c.gridy++;
 		c.insets.top=0;
-		c.insets.bottom=7;
-		CheckResult = new JLabel("<html>&nbsp;</html>");
-		cont.add(CheckResult,c);
-		c.gridy++;		
-		c.insets.top=5;
-		c.insets.bottom=0;		
+		c.insets.bottom=0;
 		c.gridwidth=1;
 		c.anchor = GridBagConstraints.SOUTHWEST;
 		bCancel = new JButton("Abbrechen");
@@ -400,7 +396,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		}
 		NURBSCreationMessage nm = new NURBSCreationMessage(
 				iDegree.getValue(), 
-				HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin(),
+				HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin()+ (new Double(Math.ceil((double)HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getWidth()/2d))).intValue(),
 				nodepos,
 				nodesizes);
 		NURBSShape s = NURBSShapeFactory.CreateShape(nm);
@@ -628,20 +624,19 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        	NURBSShapeValidator validator = new NURBSShapeValidator(HGraphRef, HEdgeRefIndex, null); //Check actual Shape of the Edge
 	    		if (validator.isShapeValid())
 	    		{
-	    			CheckResult.setOpaque(true);
-	    			CheckResult.setBackground(Color.GREEN.darker());
-	    			CheckResult.setText("<html>Der Umriss ist korrekt.</html>");
+	    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><center>Der Umriss ist korrekt.</center><br><br><ul><li>Alle Knoten der Hyperkante sind innerhalb des Umrisses</li><li>Alle Knoten der Hyperkante sind mindestens "+HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin()+"px</li><li>Alle anderen Knoten sind außerhalb des Umrisses</li></ul></html>", "Der Umriss ist korrekt.", JOptionPane.INFORMATION_MESSAGE);
+	    			HShapeGraphicRef.setHighlightedNodes(new Vector<Integer>());
 	    		}
 	    		else
 	    		{
-	    			CheckResult.setOpaque(true);
-	    			CheckResult.setBackground(Color.RED.darker());
-		    		String msg = "<html>Umriss nicht korrekt.<br>";		    		
+		    		String msg = "<html><center>Der Umriss ist nicht korrekt</center><br><br>Die folgenden Knoten erfüllen nicht die Korrektheit.<br>"+
+		    				"Einer der folgenden F"+CONST.html_ae+"lle trifft also zu:<ul><li>au"+CONST.html_sz+"erhalb des Umrisses und geh"+CONST.html_oe+"ren zur Kante</li><li>im Umriss und geh"+CONST.html_oe+"ren nicht zur Kante</li><li>Sie sind im Umriss, aber erf"+CONST.html_ue+"llen den Innenabstand nicht</li></ul>Diese Knoten werden bis zur n"+CONST.html_ae+"chten Uberpr"+CONST.html_ue+"fung rot hervorgehoben.<br><br>";		    		
 		    		Vector<Integer> WrongNodes = validator.getInvalidNodeIndices();
 		    		for (int j=0; j<WrongNodes.size(); j++)
 		    				msg+="#"+WrongNodes.get(j);
 		    		msg+="</html>";
-		    		CheckResult.setText(msg);
+	    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), msg, "Der Umriss ist nicht korrekt.", JOptionPane.ERROR_MESSAGE);
+	    			HShapeGraphicRef.setHighlightedNodes(WrongNodes);
 	    		}
 	        }
 	        getContent().validate();
@@ -733,7 +728,6 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			rAddBetween.setSelected(true);
 			rAddBetween.addActionListener(this);
 		}
-		System.err.println(nm.getPoints().size()+"");
 		updateInfo(nm);
 	}
 	private void updateInfo(NURBSCreationMessage nm)
@@ -811,21 +805,14 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 				}
 			}
 			//Button Activity
-			boolean shape = false;
-			if ((HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape()!=null)&&(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty()))
-			{ //We have a given nonempty shape
-				IPInfo.setText("<html><p>&nbsp;</p></html>");
-				shape = true;
-			}
-			else
-			{
-				shape = false;
-				CheckResult.setText("<html>&nbsp;</html>");
-			}
+			boolean shape = ((HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape()!=null)&&(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty()));
+
 			bCheckShape.setEnabled(shape);
 			bModeChange.setEnabled(shape);
 			bOk.setEnabled(shape);
-			if (!shape) //Empty Shape
+			if (shape)
+				IPInfo.setText("<html><p>&nbsp;</p></html>");
+			else //empty shape
 			{
 				if (cBasicShape.isVisible()) //-> clear values
 				{

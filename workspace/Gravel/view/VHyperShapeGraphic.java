@@ -30,6 +30,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	private ShapeModificationMouseHandler secondModus;
 	private static final long serialVersionUID = 1L;
 	private int actualMouseState, highlightedHyperEdge;
+	private Vector<Integer> invalidNodesforShape;
 	
 	/**
 	 * Create a New Graphical representation of an VGraph with a given size
@@ -46,7 +47,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		selWidth = gp.getIntValue("vgraphic.selwidth");
 		actualMouseState = NO_MOUSEHANDLING;
 		highlightedHyperEdge = hyperedgeindex;
-
+		invalidNodesforShape = new Vector<Integer>();
 		vGh = new HyperEdgeShapeHistoryManager(this,hyperedgeindex);
 	}	
 
@@ -79,7 +80,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			if (temp.getIndex()==highlightedHyperEdge)
 				g2.setColor(temp.getColor());
 			else
-				g2.setColor(Color.GRAY);
+				g2.setColor(this.selColor.brighter().brighter());
 			g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			if (!temp.getShape().isEmpty())
 			{
@@ -106,7 +107,9 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			if (hEdge.containsNode(temp.getIndex())) //Colored Node?
 				g2.setColor(temp.getColor());
 			else
-				g2.setColor(Color.GRAY); 
+				g2.setColor(this.selColor.brighter().brighter());
+			if (invalidNodesforShape.contains(temp.getIndex()))
+				g2.setColor(Color.red.darker());
 			g2.fillOval(Math.round(temp.getdrawpoint().x*zoomfactor), Math.round(temp.getdrawpoint().y*zoomfactor), Math.round(temp.getSize()*zoomfactor), Math.round(temp.getSize()*zoomfactor));
 			if (temp.isNameVisible())
 			{	
@@ -347,18 +350,14 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	 */
 	public void setShapeParameters(NURBSCreationMessage nm)
 	{
-		if (secondModus!=null) //we are in second modus and must change to first because history or someone else just got us back to creation
+		if (secondModus!=null)
 		{
-			if ((nm!=null) && (nm.isValid())) //Change to modus 1
-			{
-//				System.err.println("ShapeGraphic, switching 2->1");
-			}
-			else 
+			if ((nm==null) || (!nm.isValid())) //If we are in second modus and we get no Message or an invalid one, we stay in this modus
 				return;
+			//Every else case we change to a first modus case few lines below with updateMouseHandling
 		}
-		else if ((nm!=null)&&(!nm.isValid())) //Invalid message, change to Std. MouseHandler for second modus
+		else if ((nm!=null)&&(!nm.isValid())) //Creation Modus and invalid message means we change to modification
 		{
-//			System.err.println("ShapeGraphic, switching 1->2");
 			setMouseHandling(CURVEPOINT_MOVEMENT_MOUSEHANDLING);
 			vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HISTORY)); //Notify Panel
 			return;
@@ -379,6 +378,14 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HISTORY)); //Notify Panel
 		repaint();
 	}
+	/**
+	 * Internal update of Mousehandling depending on an NURBSCreationmessage.
+	 * The NURBSCreationmessage contains
+	 * - either an modus for the creation modus, than that modus is set
+	 * - or the message is inValid or null, than no change is done
+	 * 
+	 * @param nm
+	 */
 	private void updateMouseHandling(NURBSCreationMessage nm)
 	{
 		if ((nm==null)||(!nm.isValid()))
@@ -445,5 +452,9 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			}
  			repaint();
 		}
+	}
+
+	public void setHighlightedNodes(Vector<Integer> nodes) {
+		invalidNodesforShape = nodes;
 	}
 }
