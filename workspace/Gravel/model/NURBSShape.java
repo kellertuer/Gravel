@@ -336,7 +336,7 @@ public class NURBSShape {
 			closed &= ((controlPoints.get(i).getX()==controlPoints.get(maxCPIndex-degree+1+i).getX())
 						&& (controlPoints.get(i).getY()==controlPoints.get(maxCPIndex-degree+1+i).getY()));
 
-		if  ( ((getType()==CLAMPED)||(!closed)) && (u2>u1))
+		if  ( ((getType()==CLAMPED)||(!closed)) && (u1>u2))
 		{
 			double t=u1; u1=u2; u2=t; System.err.println("Clamped or c:"+closed);
 		}
@@ -367,10 +367,12 @@ public class NURBSShape {
 		subcurve.RefineKnots(Refinement); //Now it interpolates subcurve(u1) and subcurve(u2)
 		Vector<Point2D> newCP = new Vector<Point2D>();
 		Vector<Double> newWeight= new Vector<Double>();
+		int subStart = subcurve.findSpan(u1);
+		int subEnd = subcurve.findSpan(u2);
 		boolean specialcase = closed&&(u2<u1);
 		if (!specialcase)//normal clamped or unclosed or u1<u2
 		{
-			for (int i=Start; i<(End+degree+1-multStart); i++)
+			for (int i=subStart-degree; i<subEnd-degree+multEnd; i++)
 			{
 				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
 				newWeight.add(subcurve.cpWeight.get(i).doubleValue());
@@ -378,12 +380,12 @@ public class NURBSShape {
 		}
 		else
 		{
-			for (int i=Start+multEnd+multStart; i<=subcurve.maxCPIndex; i++)
+			for (int i=subStart-degree; i<=subcurve.maxCPIndex; i++)
 			{
 				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
 				newWeight.add(subcurve.cpWeight.get(i).doubleValue());
 			}
-			for (int i=degree+1; i<End; i++)
+			for (int i=degree-1; i<subEnd; i++)
 			{
 				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
 				newWeight.add(subcurve.cpWeight.get(i).doubleValue());				

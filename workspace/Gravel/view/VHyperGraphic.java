@@ -72,7 +72,7 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-	paintSubCurveDEBUG(g2);
+	//paintSubCurveDEBUG(g2);
 	}
 	private void paintSubCurveDEBUG(Graphics2D g2)
 	{
@@ -110,21 +110,21 @@ public class VHyperGraphic extends VCommonGraphic
 		Point2D pp1 = proj1.getResultPoint();
 		Point2D pp2 = proj2.getResultPoint();
 		Color cross = Color.magenta;
-		if (p1.distance(pp1)<=2.0)
-			cross = Color.green.darker().darker();
-		drawCP(g2,new Point(Math.round((float)p2.getX()),Math.round((float)p2.getY())),cross);
-		drawCP(g2,new Point(Math.round((float)pp1.getX()), Math.round((float)pp1.getY())), Color.ORANGE);
-		if (p2.distance(pp2)<=2.0)
-			cross = Color.green.darker().darker();
-		drawCP(g2,new Point(Math.round((float)p2.getX()),Math.round((float)p2.getY())),cross);
-		drawCP(g2,new Point(Math.round((float)pp2.getX()), Math.round((float)pp2.getY())), Color.ORANGE);
+//		if (p1.distance(pp1)<=2.0)
+//			cross = Color.green.darker().darker();
+//		drawCP(g2,new Point(Math.round((float)p2.getX()),Math.round((float)p2.getY())),cross);
+//		drawCP(g2,new Point(Math.round((float)pp1.getX()), Math.round((float)pp1.getY())), Color.ORANGE);
+//		if (p2.distance(pp2)<=2.0)
+//			cross = Color.green.darker().darker();
+//		drawCP(g2,new Point(Math.round((float)p2.getX()),Math.round((float)p2.getY())),cross);
+//		drawCP(g2,new Point(Math.round((float)pp2.getX()), Math.round((float)pp2.getY())), Color.ORANGE);
 		for (int i=0; i<c.controlPoints.size(); i++)
 		{
 			drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())),Color.cyan.darker());
 		}
 
 		double u1 = proj1.getResultParameter(), u2 = proj2.getResultParameter();
-		System.err.println("SubCurve from "+u1+" to "+u2);
+		System.err.println("SubCurve from "+u1+" to "+u2+"("+cs.CurveAt(u2)+")");
 		NURBSShape subc = c.ClampedSubCurve(u1, u2);
 //		subc.translate(p1.getX()-pp1.getX(), p1.getY()-pp1.getY());
 		g2.setStroke(new BasicStroke(1.2f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
@@ -132,6 +132,14 @@ public class VHyperGraphic extends VCommonGraphic
 		subcs.scale(zoomfactor);
 		g2.setColor(Color.red);
 		g2.draw(subcs.getCurve(5d/(double)zoomfactor));
+		
+		if (u2 < u1)
+		{
+			System.err.print("Special: ");
+			u2 += subcs.Knots.get(subcs.maxKnotIndex)-subcs.Knots.get(subcs.degree-1);
+		}
+		drawCP(g2,new Point(Math.round((float)subcs.CurveAt(u2).getX()),Math.round((float)subcs.CurveAt(u2).getY())),Color.cyan.darker());
+		System.err.println("Now u2 is"+subcs.CurveAt(u2));
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
