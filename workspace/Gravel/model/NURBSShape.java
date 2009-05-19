@@ -385,7 +385,7 @@ public class NURBSShape {
 				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
 				newWeight.add(subcurve.cpWeight.get(i).doubleValue());
 			}
-			for (int i=degree-1; i<subEnd; i++)
+			for (int i=degree; i<subEnd; i++)
 			{
 				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
 				newWeight.add(subcurve.cpWeight.get(i).doubleValue());				
@@ -413,7 +413,7 @@ public class NURBSShape {
 				newKnots.add(subcurve.Knots.get(index).doubleValue());
 				index++;
 			}
-			index=degree; double offset = subcurve.Knots.get(subcurve.maxKnotIndex)-subcurve.Knots.get(degree-1);
+			index=degree+1; double offset = subcurve.Knots.get(subcurve.maxKnotIndex)-subcurve.Knots.get(degree);
 			while (subcurve.Knots.get(index)<=u2)
 			{
 				newKnots.add(subcurve.Knots.get(index).doubleValue()+offset);
