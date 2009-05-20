@@ -357,10 +357,10 @@ public class NURBSShape {
 			multEnd++;
 		Vector<Double> Refinement = new Vector<Double>();
 		double min = Math.min(u1,u2);
-		for (int i=0; i<=degree-multStart; i++)
+		for (int i=0; i<degree-multStart; i++)
 			Refinement.add(min);
 		double max = Math.max(u1,u2);
-		for (int i=0; i<=degree-multEnd; i++)
+		for (int i=0; i<degree-multEnd; i++)
 			Refinement.add(max);
 		//Nun wird der Start- und der Endpunkt
 		NURBSShape subcurve = clone();
@@ -372,7 +372,7 @@ public class NURBSShape {
 		boolean specialcase = closed&&(u2<u1);
 		if (!specialcase)//normal clamped or unclosed or u1<u2
 		{
-			for (int i=subStart-degree; i<subEnd-degree+multEnd; i++)
+			for (int i=subStart-degree; i<=subEnd-degree+multEnd; i++)
 			{
 				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
 				newWeight.add(subcurve.cpWeight.get(i).doubleValue());
@@ -380,12 +380,12 @@ public class NURBSShape {
 		}
 		else
 		{
-			for (int i=subStart-degree; i<=subcurve.maxCPIndex; i++)
+			for (int i=subStart-degree; i<=subcurve.maxCPIndex-degree; i++)
 			{
 				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
 				newWeight.add(subcurve.cpWeight.get(i).doubleValue());
 			}
-			for (int i=degree; i<subEnd; i++)
+			for (int i=0; i<=subEnd-degree+multEnd; i++)
 			{
 				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
 				newWeight.add(subcurve.cpWeight.get(i).doubleValue());				
@@ -393,6 +393,7 @@ public class NURBSShape {
 		}
 		//Copy needed Knots
 		Vector<Double> newKnots = new Vector<Double>();
+		newKnots.add(u1);
 		if (!specialcase)
 		{	int index = 0;
 			while (subcurve.Knots.get(index)<u1)
@@ -402,26 +403,29 @@ public class NURBSShape {
 				newKnots.add(subcurve.Knots.get(index).doubleValue());
 				index++;
 			}
+			newKnots.add(u2);
 		}
 		else
 		{
 			int index=0;
 			while (subcurve.Knots.get(index)<u1)
 				index++;
-			while (index<=subcurve.maxKnotIndex)
+			while (index<subcurve.maxKnotIndex-degree)
 			{
 				newKnots.add(subcurve.Knots.get(index).doubleValue());
 				index++;
 			}
-			index=degree+1; double offset = subcurve.Knots.get(subcurve.maxKnotIndex)-subcurve.Knots.get(degree);
+			index=degree; 
+			double offset = subcurve.Knots.get(subcurve.maxKnotIndex-degree)-subcurve.Knots.get(degree);
 			while (subcurve.Knots.get(index)<=u2)
 			{
 				newKnots.add(subcurve.Knots.get(index).doubleValue()+offset);
 				index++;
 			}
+			newKnots.add(u2+offset);
 		}
 		NURBSShape c = new NURBSShape(newKnots,newCP,newWeight);
-		System.err.println(c.degree);
+		System.err.println((subStart-degree)+"->"+(subcurve.maxCPIndex-degree)+ " ("+subStart+") && 0->"+(subEnd-degree+multEnd)+" "+c.degree);
 		return c;
 	}
 	/**
@@ -451,7 +455,6 @@ public class NURBSShape {
 		//
 		//Calculate values in between as long as they are not near enough
 		//
-		int i=0;
 		while(!calculatedPoints.empty())
 		{
 			Point2D comparePoint = calculatedPoints.peek();
@@ -885,9 +888,9 @@ public class NURBSShape {
 		Vector<Double> newt = new Vector<Double>();
 		newt.setSize(Knots.size()+X.size());
 		for (int j=0; j<=a-degree; j++)//Copy the first not changed values of the CPs
-			newPw.set(j, controlPointsHom.get(j));
+			newPw.set(j, (Point3d) controlPointsHom.get(j).clone());
 		for (int j=b-1; j<=maxCPIndex; j++)//Copy the last not changed values of the CPs
-			newPw.set(j+X.size(), controlPointsHom.get(j));
+			newPw.set(j+X.size(), (Point3d) controlPointsHom.get(j).clone());
 		for (int j=0; j<=a; j++)//Copy the first not changed values of t
 			newt.set(j, Knots.get(j));
 		for (int j=b+degree; j<=maxKnotIndex; j++)//Copy the last not changed values of t
@@ -897,7 +900,7 @@ public class NURBSShape {
 		int k=b+degree+X.size()-1; //Last Value that's new in Pw
 		for (int j=X.size()-1; j>=0; j--) //Insert new knots backwards beginning at X.lastElement
 		{ 
-			while (X.get(j) <= Knots.get(i) && i > a) //These Values are not affected by Insertion of actual Not, copy them
+			while ((X.get(j) <= Knots.get(i)) && i > a) //These Values are not affected by Insertion of actual Not, copy them
 			{
 				newPw.set(k-degree-1, (Point3d) controlPointsHom.get(i-degree-1).clone());
 				newt.set(k, Knots.get(i));

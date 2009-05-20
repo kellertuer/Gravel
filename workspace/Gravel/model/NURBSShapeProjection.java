@@ -285,11 +285,12 @@ public class NURBSShapeProjection extends NURBSShape
 				diw += foronepw*mult;
 				//Change the t^P and t^Q, so that t^P its first LV set to FV and t^Q its last FV set to LV
 				int changeindex = 0;
-				while ((changeindex<tP.size())&&(tP.get(changeindex).doubleValue()==FirstValue))
+				while ((changeindex<tP.size()-1)&&(tP.get(changeindex).doubleValue()==FirstValue))
 					changeindex++;
 				tP.set(changeindex-1, LastValue);
 				changeindex = 0;
-				while ((changeindex<tQ.size())&&(tQ.get(changeindex).doubleValue()==FirstValue))
+				//Search for a change
+				while ((changeindex<tQ.size()-1)&&(tQ.get(changeindex).doubleValue()==FirstValue))
 					changeindex++;
 				tQ.set(changeindex, FirstValue);
 			} //End Cases
