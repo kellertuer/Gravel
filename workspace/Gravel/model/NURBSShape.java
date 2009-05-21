@@ -125,6 +125,49 @@ public class NURBSShape {
 		return NURBSType;
 	}
 	/**
+	 * Check, whether the NURBSShape is empty
+	 * if it is empty, many algorithms don't work at all
+	 * @return
+	 */
+	public boolean isEmpty()
+	{
+		return (Knots.isEmpty()||controlPoints.isEmpty()||cpWeight.isEmpty());
+	}
+	/**
+	 * Compares this Curve to another (minDist does not matter)
+	 * if alle values of t,b,w are equal it returns true, else false
+	 * 
+	 * @param s another Shape
+	 * @return true if Shape s is equal to this else false
+	 */
+	public boolean CurveEquals(NURBSShape s)
+	{
+		if ((s.controlPoints.size()!=controlPoints.size())||(Knots.size()!=s.Knots.size()))
+			return false;
+		Iterator<Point2D> bi = controlPoints.iterator();
+		while (bi.hasNext())
+		{
+			Point2D p = bi.next();
+			if (s.controlPoints.get(controlPoints.indexOf(p)).distance(p)!=0.0d)
+				return false;
+		}
+		Iterator<Double> ti = Knots.iterator();
+		while (ti.hasNext())
+		{
+			Double v = ti.next();
+			if (s.Knots.get(Knots.indexOf(v)).compareTo(v)==0) //Equal
+				return false;
+		}
+		Iterator<Double> wi = cpWeight.iterator();
+		while (wi.hasNext())
+		{
+			Double v = wi.next();
+			if (s.cpWeight.get(cpWeight.indexOf(v)).compareTo(v)==0) //Equal
+				return false;
+		}
+		return true;
+	}
+	/**
 	 * Check whether the given Knots, ControlPoints and weight specify a correct NURBS-Curve
 	 * (1) #CP = #weights
 	 * (2) clamped or unclamped Curve
@@ -167,7 +210,9 @@ public class NURBSShape {
 			return CLAMPED;
 		//Check for unclamped needed?
 		else
+		{ 
 			return UNCLAMPED;
+		}
 	}
 	/**
 	 * Empty this shape and set it to nonexistent
@@ -335,10 +380,102 @@ public class NURBSShape {
 		for (int i=0; i<degree; i++)
 			closed &= ((controlPoints.get(i).getX()==controlPoints.get(maxCPIndex-degree+1+i).getX())
 						&& (controlPoints.get(i).getY()==controlPoints.get(maxCPIndex-degree+1+i).getY()));
-
-		if  ( ((getType()==CLAMPED)||(!closed)) && (u1>u2))
+		
+		if ((!closed)||(u2>u1)) //for nonclosed cases or if we don't run over start/end - use simpleClapmedSubCurve
+			return this.simpleClampedSubCurve(u1,u2);
+		//So u1 > u2 and we have to take a subcurve that includes start/end
+		int Start = findSpan(u1);
+		int End = findSpan(u2);
+		if (u2==Knots.get(maxKnotIndex-degree)) //Last possible Value the Curve is evaluated
+			End++;
+		if (u1==Knots.get(maxKnotIndex-degree)) //Last possible Value the Curve is evaluated
+			Start++;
+		if ((Start==-1)||(End==-1)||(u1==u2)) //Ohne u out of range or invalid interval
+			return new NURBSShape(); //Return amepty Shape
+		//Raise both endvalues to multiplicity d to get an clamped curve
+		double offset = Knots.get(maxKnotIndex-degree)-Knots.get(degree);
+		int multStart = 0;
+		while (Knots.get(Start+multStart).doubleValue()==u1)
+			multStart++;
+		int multEnd = 0;
+		NURBSShape subcurve = clone();
+		while (Knots.get(End-multEnd).doubleValue()==u2)
+			multEnd++;
+		Vector<Double> Refinement = new Vector<Double>();
+		for (int i=0; i<degree-multStart; i++)
+			Refinement.add(u1);
+		subcurve.RefineKnots(Refinement); //Now it interpolates subcurve(u1)
+		if (u1>=subcurve.Knots.get(subcurve.maxKnotIndex-2*subcurve.degree)) //Update Circular Part in the subcurve iff u1 too near to the end
 		{
-			double t=u1; u1=u2; u2=t; System.err.println("Clamped or c:"+closed);
+			for (int i=0; i<subcurve.degree; i++)
+				subcurve.Knots.set(i, subcurve.Knots.get(subcurve.maxKnotIndex-2*degree+i).doubleValue()-offset);
+			for (int i=0; i<subcurve.degree; i++)
+			{
+				subcurve.controlPoints.set(i, (Point2D) subcurve.controlPoints.get(subcurve.maxCPIndex-subcurve.degree+1+i).clone());
+				subcurve.cpWeight.set(i, subcurve.cpWeight.get(subcurve.maxCPIndex-subcurve.degree+1+i).doubleValue());
+			}
+			subcurve.InitHomogeneous();
+		}
+		Refinement.clear();
+		for (int i=0; i<degree-multEnd; i++)
+			Refinement.add(u2);
+		subcurve.RefineKnots(Refinement); //Now it interpolates subcurve(u1) and subcurve(u2)		
+		//Handle cases if Start or end are too near to the Curve-Start/End
+		//Startpoint u1 is too near at end, so that it is affected by the startCP
+		//Nun wird der Start- und der Endpunkt
+		Vector<Point2D> newCP = new Vector<Point2D>();
+		Vector<Double> newWeight= new Vector<Double>();
+		int subStart = subcurve.findSpan(u1);
+		int subEnd = subcurve.findSpan(u2);
+		//Add CP from u1 to end of curve
+		for (int i=subStart-degree; i<=subcurve.maxCPIndex-degree; i++)
+		{
+			newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
+			newWeight.add(subcurve.cpWeight.get(i).doubleValue());
+		}
+		//...and from start of curve to u2
+		for (int i=0; i<=subEnd-degree+multEnd; i++)
+		{
+			newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
+			newWeight.add(subcurve.cpWeight.get(i).doubleValue());				
+		}	
+		//Copy needed Knots
+		Vector<Double> newKnots = new Vector<Double>();
+		newKnots.add(u1);
+		int index=0;
+		while (subcurve.Knots.get(index)<u1)
+			index++;
+		//KNots from u^to end of curve
+		while (index<subcurve.maxKnotIndex-degree)
+		{
+			newKnots.add(subcurve.Knots.get(index).doubleValue());
+			index++;
+		}
+		//knots from start of curve to u2
+		index=degree; 
+		while (subcurve.Knots.get(index)<=u2)
+		{
+			newKnots.add(subcurve.Knots.get(index).doubleValue()+offset);
+			index++;
+		}
+		newKnots.add(u2+offset);
+		NURBSShape c = new NURBSShape(newKnots,newCP,newWeight);
+		return c;
+	}
+	/**
+	 * Return the clamped Subcurve between the parameters u1 and u2
+	 * This is realized by knot insertion at u1 and u2 until the multiplicity in these
+	 * points equals Degree+1 and cutting off all parts ouside of [u1,u2] of the Knotvector
+	 * if (u2<u1) the values are exchanged
+	 * @param u1
+	 * @param u2
+	 * @return
+	 */
+	private NURBSShape simpleClampedSubCurve(double u1, double u2)
+	{
+		if (u1>u2)
+		{
+			double t=u1; u1=u2; u2=t;
 		}
 		int Start = findSpan(u1);
 		int End = findSpan(u2);
@@ -356,76 +493,34 @@ public class NURBSShape {
 		while (Knots.get(End-multEnd).doubleValue()==u2)
 			multEnd++;
 		Vector<Double> Refinement = new Vector<Double>();
-		double min = Math.min(u1,u2);
 		for (int i=0; i<degree-multStart; i++)
-			Refinement.add(min);
-		double max = Math.max(u1,u2);
+			Refinement.add(u1);
 		for (int i=0; i<degree-multEnd; i++)
-			Refinement.add(max);
-		//Nun wird der Start- und der Endpunkt
+			Refinement.add(u2);
 		NURBSShape subcurve = clone();
 		subcurve.RefineKnots(Refinement); //Now it interpolates subcurve(u1) and subcurve(u2)
 		Vector<Point2D> newCP = new Vector<Point2D>();
 		Vector<Double> newWeight= new Vector<Double>();
 		int subStart = subcurve.findSpan(u1);
 		int subEnd = subcurve.findSpan(u2);
-		boolean specialcase = closed&&(u2<u1);
-		if (!specialcase)//normal clamped or unclosed or u1<u2
+		for (int i=subStart-degree; i<=subEnd-degree+multEnd; i++) //Copy needed CP
 		{
-			for (int i=subStart-degree; i<=subEnd-degree+multEnd; i++)
-			{
-				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
-				newWeight.add(subcurve.cpWeight.get(i).doubleValue());
-			}
-		}
-		else
-		{
-			for (int i=subStart-degree; i<=subcurve.maxCPIndex-degree; i++)
-			{
-				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
-				newWeight.add(subcurve.cpWeight.get(i).doubleValue());
-			}
-			for (int i=0; i<=subEnd-degree+multEnd; i++)
-			{
-				newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
-				newWeight.add(subcurve.cpWeight.get(i).doubleValue());				
-			}	
+			newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
+			newWeight.add(subcurve.cpWeight.get(i).doubleValue());
 		}
 		//Copy needed Knots
 		Vector<Double> newKnots = new Vector<Double>();
 		newKnots.add(u1);
-		if (!specialcase)
-		{	int index = 0;
-			while (subcurve.Knots.get(index)<u1)
-				index++;
-			while (subcurve.Knots.get(index)<=u2)
-			{
-				newKnots.add(subcurve.Knots.get(index).doubleValue());
-				index++;
-			}
-			newKnots.add(u2);
-		}
-		else
+		int index = 0;
+		while (subcurve.Knots.get(index)<u1)
+			index++;
+		while (subcurve.Knots.get(index)<=u2)
 		{
-			int index=0;
-			while (subcurve.Knots.get(index)<u1)
-				index++;
-			while (index<subcurve.maxKnotIndex-degree)
-			{
-				newKnots.add(subcurve.Knots.get(index).doubleValue());
-				index++;
-			}
-			index=degree; 
-			double offset = subcurve.Knots.get(subcurve.maxKnotIndex-degree)-subcurve.Knots.get(degree);
-			while (subcurve.Knots.get(index)<=u2)
-			{
-				newKnots.add(subcurve.Knots.get(index).doubleValue()+offset);
-				index++;
-			}
-			newKnots.add(u2+offset);
+			newKnots.add(subcurve.Knots.get(index).doubleValue());
+			index++;
 		}
+		newKnots.add(u2);
 		NURBSShape c = new NURBSShape(newKnots,newCP,newWeight);
-		System.err.println((subStart-degree)+"->"+(subcurve.maxCPIndex-degree)+ " ("+subStart+") && 0->"+(subEnd-degree+multEnd)+" "+c.degree);
 		return c;
 	}
 	/**
@@ -483,10 +578,6 @@ public class NURBSShape {
 		}
 		return path;
 	}
-	public boolean isEmpty()
-	{
-		return (Knots.isEmpty()||controlPoints.isEmpty()||cpWeight.isEmpty());
-	}
 	/**
 	 * Find the interval u \in [t.get(j),t.get(j+1)] and return the index j
 	 * 
@@ -529,7 +620,7 @@ public class NURBSShape {
 		Point3d erg = deBoer3D(u); //Result in homogeneous Values on Our Points		
 		if (erg==null)
 		{
-			System.err.println(u+" in "+Knots.firstElement()+","+Knots.lastElement()+" which is out of range");
+			System.err.println(u+" not in "+Knots.firstElement()+","+Knots.lastElement()+"");
 			return null;
 		}
 		if (erg.z==0) //
@@ -801,40 +892,10 @@ public class NURBSShape {
 		return (nomin/denomin);
 	}
 	/**
-	 * Compares this Curve to another (minDist does not matter)
-	 * if alle values of t,b,w are equal it returns true, else false
-	 * 
-	 * @param s another Shape
-	 * @return true if Shape s is equal to this else false
+	 * Get the ControlPoint of the NURBSShape that is the nearest ofthe Point m
+	 * @param m
+	 * @return
 	 */
-	public boolean CurveEquals(NURBSShape s)
-	{
-		if ((s.controlPoints.size()!=controlPoints.size())||(Knots.size()!=s.Knots.size()))
-			return false;
-		Iterator<Point2D> bi = controlPoints.iterator();
-		while (bi.hasNext())
-		{
-			Point2D p = bi.next();
-			if (s.controlPoints.get(controlPoints.indexOf(p)).distance(p)!=0.0d)
-				return false;
-		}
-		Iterator<Double> ti = Knots.iterator();
-		while (ti.hasNext())
-		{
-			Double v = ti.next();
-			if (s.Knots.get(Knots.indexOf(v)).compareTo(v)==0) //Equal
-				return false;
-		}
-		Iterator<Double> wi = cpWeight.iterator();
-		while (wi.hasNext())
-		{
-			Double v = wi.next();
-			if (s.cpWeight.get(cpWeight.indexOf(v)).compareTo(v)==0) //Equal
-				return false;
-		}
-		return true;
-	}
-	
 	public Point2D getNearestCP(Point m) {
 		double mindist = Double.MAX_VALUE;
 		Point2D result = null;
@@ -862,7 +923,7 @@ public class NURBSShape {
 	{
 		return x.distance(ProjectionPoint(x))<=variance;
 	}
-	
+
 	/**
 	 * Refine the Curve to add some new knots contained in X from wich each is between t[0] and t[m]
 	 * @param X
@@ -946,6 +1007,7 @@ public class NURBSShape {
 		degree = Knots.size()-controlPoints.size()-1;
 		InitHomogeneous();
 	}
+
 	
 	public void removeKnot(double knotval)
 	{

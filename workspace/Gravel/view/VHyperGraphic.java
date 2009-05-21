@@ -107,16 +107,7 @@ public class VHyperGraphic extends VCommonGraphic
 		Point2D p2 = new Point2D.Double(vG.modifyNodes.get(2).getPosition().x,vG.modifyNodes.get(2).getPosition().y);
 		NURBSShapeProjection proj1 = new NURBSShapeProjection(c,p1);
 		NURBSShapeProjection proj2 = new NURBSShapeProjection(c,p2);
-		Point2D pp1 = proj1.getResultPoint();
-		Point2D pp2 = proj2.getResultPoint();
-		Color cross = Color.magenta;
-		drawCP(g2,new Point(Math.round((float)p2.getX()),Math.round((float)p2.getY())),cross);
-		drawCP(g2,new Point(Math.round((float)pp1.getX()), Math.round((float)pp1.getY())), Color.ORANGE);
-		drawCP(g2,new Point(Math.round((float)p2.getX()),Math.round((float)p2.getY())),cross);
-		drawCP(g2,new Point(Math.round((float)pp2.getX()), Math.round((float)pp2.getY())), Color.ORANGE);
 		double u1 = proj1.getResultParameter(), u2 = proj2.getResultParameter();
-		drawCP(g2,new Point(Math.round((float)c.CurveAt(u1).getX()),Math.round((float)c.CurveAt(u1).getY())),Color.magenta.brighter());
-		drawCP(g2,new Point(Math.round((float)c.CurveAt(u2).getX()),Math.round((float)c.CurveAt(u2).getY())),Color.magenta.brighter());
 
 		NURBSShape subc = c.ClampedSubCurve(u1, u2);
 		System.err.print("SubCurve ["+u1+","+u2+"] ");
@@ -136,6 +127,28 @@ public class VHyperGraphic extends VCommonGraphic
 		g2.setColor(Color.black);
 		g2.draw(cs.getCurve(5d/(double)zoomfactor));
 		drawCP(g2,new Point(Math.round((float)c.CurveAt(c.Knots.get(degree)).getX()),Math.round((float)c.CurveAt(c.Knots.get(degree)).getY())),Color.green.brighter());
+		Vector<Point> projectionpoints = new Vector<Point>();
+		Iterator<VNode> iter = vG.modifyNodes.getIterator();
+		while (iter.hasNext())
+		{
+			VNode actual = iter.next();
+			projectionpoints.add(actual.getPosition());
+		}
+	    for (int j=0; j<projectionpoints.size(); j++)
+		{
+			Point p = projectionpoints.get(j);
+			NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
+			double dist = p.distance(proj.getResultPoint());
+			Color cross = Color.magenta;
+			if (dist<=2.0)
+				cross = Color.green.darker().darker();
+			drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),cross);
+			drawCP(g2,new Point(Math.round((float)proj.getResultPoint().getX()), Math.round((float)proj.getResultPoint().getY())), Color.ORANGE);
+			g2.setColor(Color.orange);
+			g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
+					Math.round((float)proj.getResultPoint().getX()*zoomfactor), Math.round((float)proj.getResultPoint().getY()*zoomfactor));
+		}
+		
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
