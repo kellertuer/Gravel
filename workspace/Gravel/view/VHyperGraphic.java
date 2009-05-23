@@ -109,7 +109,7 @@ public class VHyperGraphic extends VCommonGraphic
 		NURBSShapeProjection proj2 = new NURBSShapeProjection(c,p2);
 		double u1 = proj1.getResultParameter(), u2 = proj2.getResultParameter();
 
-		NURBSShape subc = c.ClampedSubCurve(u1, u2);
+		NURBSShape subc = (new NURBSShapeFragment(c,u1, u2)).getSubCurve();
 		System.err.print("SubCurve ["+u1+","+u2+"] ");
 		if (u2<u1)
 			System.err.println("And running over Start/End");

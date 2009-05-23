@@ -157,7 +157,7 @@ public class SelectionDragListener
 			Iterator<VHyperEdge> edgeiter = vhg.modifyHyperEdges.getIterator();
 			while (edgeiter.hasNext())
 			{
-				VHyperEdge actualhe = edgeiter.next();
+//				VHyperEdge actualhe = edgeiter.next();
 //TODO Intersection of Shape & rect				if (actualhe.getShape().intersects(selrect)))
 //					actualhe.setSelectedStatus(e.getSelectedStatus() | status);
 //				else

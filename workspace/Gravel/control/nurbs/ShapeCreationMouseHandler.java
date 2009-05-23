@@ -1,6 +1,5 @@
 package control.nurbs;
 
-import java.util.Vector;
 
 import control.DragMouseHandler;
 

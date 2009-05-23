@@ -106,10 +106,6 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 		{
 			DragStartProjection = temporaryShape.ProjectionPointParameter(pointInGraph);
 		}
-		else
-		{
-			Point2D p = temporaryShape.ProjectionPoint(pointInGraph);
-		}
 	}
 
 	public void mouseDragged(MouseEvent e) {

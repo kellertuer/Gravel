@@ -1,23 +1,8 @@
 package history;
 
-import java.util.Iterator;
-import java.util.Vector;
 
-import model.MEdge;
-import model.MHyperEdge;
-import model.MNode;
-import model.MSubgraph;
-import model.NURBSShapeFactory;
-import model.VEdge;
-import model.VGraph;
-import model.VGraphInterface;
-import model.VHyperEdge;
-import model.VHyperGraph;
-import model.VNode;
-import model.VSubgraph;
-import model.Messages.GraphConstraints;
-import model.Messages.GraphMessage;
-import model.Messages.NURBSCreationMessage;
+import model.*;
+import model.Messages.*;
 
 /**
  * Additional Action for tracking Creation Parameters for the NURBSShapeInterpolation and other

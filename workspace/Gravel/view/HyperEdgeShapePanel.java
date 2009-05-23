@@ -1,6 +1,5 @@
 package view;
 
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -9,9 +8,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Observable;
@@ -80,7 +77,6 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	private JRadioButton rAddEnd, rAddBetween;
 
 	//FreeModFields
-	private JLabel knots;
 	private JButton bIncKnots, bDecKnots, bCheckShape;
 	
 	private JButton bModeChange, bOk, bCancel;

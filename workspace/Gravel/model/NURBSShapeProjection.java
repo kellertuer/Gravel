@@ -39,7 +39,8 @@ public class NURBSShapeProjection extends NURBSShape
 		NURBSShape clone = Curve.clone();
 		//If it is unclamped - clamp it!
 		if ((clone.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
-			clone = clone.ClampedSubCurve(clone.Knots.get(clone.degree), clone.Knots.get(clone.maxKnotIndex-clone.degree));
+			clone = 
+				(new NURBSShapeFragment(clone,clone.Knots.get(clone.degree), clone.Knots.get(clone.maxKnotIndex-clone.degree))).getSubCurve();
 		//Set internal Curve to this curve clone
 		setCurveTo(clone.Knots, clone.controlPoints, clone.cpWeight);
 		resultu=Knots.firstElement();

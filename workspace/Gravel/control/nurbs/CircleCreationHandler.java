@@ -6,34 +6,12 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.QuadCurve2D;
-import java.util.Iterator;
-import java.util.Vector;
 
 
-import model.MEdge;
-import model.NURBSShapeFactory;
-import model.VEdge;
-import model.VGraph;
-import model.VGraphInterface;
-import model.VHyperEdge;
-import model.NURBSShape;
-import model.VHyperGraph;
-import model.VItem;
-import model.VNode;
-import model.VOrthogonalEdge;
-import model.VQuadCurveEdge;
-import model.VSegmentedEdge;
-import model.Messages.GraphConstraints;
-import model.Messages.GraphMessage;
-import model.Messages.NURBSCreationMessage;
+import model.*;
+import model.Messages.*;
 import view.VCommonGraphic;
-import view.VGraphic;
 import view.VHyperGraphic;
 /**
  * Class for handling Drags for Creation of a Circle

@@ -395,7 +395,6 @@ public class CommonGraphHistoryManager implements Observer
 			return;
 		if ((m.getModification()&GraphConstraints.HISTORY)>0) //Ignore them, they'Re from us 
 			return;
-		int i = UndoStack.size();
 		//Complete Replacement of Graphor Hypergraph Handling (Happens when loading a new graph
 		if ( ((m.getModifiedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getAffectedElementTypes()==GraphConstraints.GRAPH_ALL_ELEMENTS)&&(m.getModification()==GraphConstraints.REPLACEMENT))
 				|| ((m.getModifiedElementTypes()==GraphConstraints.HYPERGRAPH_ALL_ELEMENTS)&&(m.getAffectedElementTypes()==GraphConstraints.HYPERGRAPH_ALL_ELEMENTS)&&(m.getModification()==GraphConstraints.REPLACEMENT)))

@@ -3,8 +3,6 @@ package model;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Vector;
 
 /**
  * This class represents the visual information of an edge.

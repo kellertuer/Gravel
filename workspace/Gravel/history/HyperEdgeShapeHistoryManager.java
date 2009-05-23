@@ -5,11 +5,8 @@ import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 import model.Messages.NURBSCreationMessage;
 
-import java.awt.geom.Point2D;
 import java.util.Observable;
-import java.util.Vector;
 
-import view.VCommonGraphic;
 import view.VHyperShapeGraphic;
 
 /**

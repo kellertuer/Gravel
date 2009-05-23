@@ -46,7 +46,6 @@ public class NURBSShapeFactory {
 	 * @param Parameters
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public static NURBSShape CreateShape(NURBSCreationMessage nm)
 	{
 		switch(nm.getType())
