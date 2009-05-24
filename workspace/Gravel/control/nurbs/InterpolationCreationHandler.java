@@ -123,7 +123,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		while (iter.hasNext())
 		{
 			Point2D actualPoint = iter.next();
-			if (actualPoint.distance(p)<=(new Integer(gp.getIntValue("vgraphic.cpsize"))).doubleValue())
+			if (actualPoint.distance(p)<=(new Integer(gp.getIntValue("vgraphic.selwidth"))).doubleValue())
 				return InterpolationPoints.indexOf(actualPoint);
 		}
 		return -1;

@@ -72,7 +72,7 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-	paintSubCurveDEBUG(g2);
+//	paintSubCurveDEBUG(g2);
 	}
 	private void paintSubCurveDEBUG(Graphics2D g2)
 	{

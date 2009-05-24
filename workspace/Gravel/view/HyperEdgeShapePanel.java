@@ -30,6 +30,8 @@ import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
+import view.pieces.HESFreeModComponent;
+
 import dialogs.IntegerTextField;
 
 
@@ -76,16 +78,15 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	private ButtonGroup bAddIP;
 	private JRadioButton rAddEnd, rAddBetween;
 
-	//FreeModFields
-	private JButton bIncKnots, bDecKnots, bCheckShape;
-	
-	private JButton bModeChange, bOk, bCancel;
-	private JButton bRotation,bTranslation, bScaling, bScalingDir;
+	private JButton bModeChange, bOk, bCancel,	bCheckShape;
 	private int HEdgeRefIndex; //Reference to the HyperEdge in the Graph that is edited here
 	private VHyperGraph HGraphRef; //Reference to the edited Graph, should be a copy of the Graph from the main GUI because the user might cancel this dialog 
 	private VHyperShapeGraphic HShapeGraphicRef;
 	
-	private Container CircleFields, InterpolationFields, DegreeFields, FreeModFields;
+	private Container CircleFields, InterpolationFields, DegreeFields;
+	
+	private HESFreeModComponent FreeModPanel;
+	
 	/**
 	 * Create the Dialog for an hyperedge with index i
 	 * and the corresponding VHyperGraph
@@ -137,31 +138,36 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 
 		buildCirclePanel();
 		cont.add(CircleFields,c);
-		CircleFields.setVisible(false);
+		CircleFields.setVisible(true);
 
 		c.gridheight=1;
 		buildDegreePanel();
 		cont.add(DegreeFields,c);
-		DegreeFields.setVisible(false);
+		DegreeFields.setVisible(true);
 		c.gridy++;
 		buildInterpolationPanel();
 		cont.add(InterpolationFields,c);
-		InterpolationFields.setVisible(false);
+		InterpolationFields.setVisible(true);
 
 		//
 		//Container for the fields of the second mode
 		//
-		c.gridy--;
+		c.gridy-=2;
 		c.gridx=0;
 		c.gridwidth=2;
-		buildFreeModPanel();
-		cont.add(FreeModFields,c);
-		FreeModFields.setVisible(false);
+		c.gridheight=3;
+		FreeModPanel = new HESFreeModComponent(HEdgeRefIndex, HShapeGraphicRef);
+		cont.add(FreeModPanel.getContent(),c);
+		FreeModPanel.setVisible(false);
 		
-		c.gridy+=2;
+		c.gridy+=3;
 		c.gridx=0;
 		c.gridwidth=2;
-		
+		c.gridheight=1;
+
+		//
+		// General Buttons
+		//
 		c.anchor = GridBagConstraints.SOUTH;
 		bModeChange = new JButton("Modifikation"); //Name suchen!
 		bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
@@ -209,6 +215,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		Gui.getInstance().getParentWindow().getRootPane().setDefaultButton(bOk);
 		
 		cont.validate();
+		cont.doLayout();
+		setCreationFieldVisibility(false);
 		actionPerformed(new ActionEvent(bModeChange,0,"Refresh"));
 	}
 	
@@ -283,6 +291,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		DegreeFields.add(IPInfo,c);
 
 	}
+
 	private void buildInterpolationPanel()
 	{
 		InterpolationFields = new Container();
@@ -309,63 +318,6 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		InterpolationFields.add(rAddBetween,c);
 	}
 	
-	private void buildFreeModPanel()
-	{
-		String IconDir = System.getProperty("user.dir")+"/data/img/icon/";
-		FreeModFields = new Container();
-		FreeModFields.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.insets = new Insets(5,0,5,0);
-		c.anchor = GridBagConstraints.CENTER;
-		c.gridy = 0;
-		c.gridx = 0;
-		c.gridwidth=1;
-		c.gridheight=1;
-
-		c.gridx++;
-		c.gridwidth=1;
-		bIncKnots = new JButton(new ImageIcon(IconDir+"plus16.png"));
-		bIncKnots.setSize(new Dimension(17,17));
-		bIncKnots.addActionListener(this);
-		FreeModFields.add(bIncKnots,c);
-
-		c.gridx++;
-		bDecKnots = new JButton(new ImageIcon(IconDir+"minus16.png"));
-		bDecKnots.setSize(new Dimension(17,17));
-		bDecKnots.setEnabled(false);
-		FreeModFields.add(bDecKnots,c);
-		
-		c.gridy++;
-		c.gridx=0;
-		c.gridwidth=1;
-		bRotation = new JButton(new ImageIcon(IconDir+"rotate32.png"));	
-		bRotation.setSize(new Dimension(32,32));
-		bRotation.addActionListener(this);
-		FreeModFields.add(bRotation,c);
-
-		c.gridx++;
-		c.gridwidth=1;
-		
-		bTranslation = new JButton(new ImageIcon(IconDir+"translate32.png"));	
-		bTranslation.setSize(new Dimension(32,32));
-		bTranslation.addActionListener(this);
-		FreeModFields.add(bTranslation,c);
-
-		c.gridx++;
-		c.gridwidth=1;
-		bScaling = new JButton(new ImageIcon(IconDir+"scale32.png"));	
-		bScaling.setSize(new Dimension(32,32));
-		bScaling.addActionListener(this);
-		FreeModFields.add(bScaling,c);
-
-		c.gridx++;
-		c.gridwidth=1;
-		bScalingDir = new JButton(new ImageIcon(IconDir+"scaledir32.png"));	
-		bScalingDir.setSize(new Dimension(17,17));
-		bScalingDir.addActionListener(this);
-		FreeModFields.add(bScalingDir,c);
-
-	}
 	/**
 	 * get the GUI-Content
 	 * @return
@@ -459,78 +411,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	       	updateInfo(nm);
 		}
 	}
-	private void deselectButtons()
-	{
-		bRotation.setSelected(false);
-		bTranslation.setSelected(false);
-		bScaling.setSelected(false);
-		bScalingDir.setSelected(false);
-	}
-	private void performSecondModus(ActionEvent e)
-	{
-        if (e.getSource()==bIncKnots)
-        {
-        	// 	HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().refineMiddleKnots();
-        }
-        else if (e.getSource()==bRotation)
-        {
-        	if (bRotation.isSelected())
-        	{
-        		bRotation.setSelected(false);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
-        	}
-        	else
-        	{
-        		deselectButtons();
-        		bRotation.setSelected(true);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_ROTATE_MOUSEHANDLING);	        		
-        	}
-        }
-        else if (e.getSource()==bTranslation)
-        {
-        	if (bTranslation.isSelected())
-        	{
-        		bTranslation.setSelected(false);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
-        	}
-        	else
-        	{
-        		deselectButtons();
-        		bTranslation.setSelected(true);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_TRANSLATE_MOUSEHANDLING);	        		
-        	}
-        }
-        else if (e.getSource()==bScaling)
-        {
-        	if (bScaling.isSelected())
-        	{
-        		bScaling.setSelected(false);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
-        	}
-        	else
-        	{
-        		deselectButtons();
-        		bScaling.setSelected(true);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SCALE_MOUSEHANDLING);	        		
-        	}
-        }
-        else if (e.getSource()==bScalingDir)
-        {
-        	if (bScalingDir.isSelected())
-        	{
-        		bScalingDir.setSelected(false);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
-        	}
-        	else
-        	{
-        		deselectButtons();
-        		bScalingDir.setSelected(true);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SCALEDIR_MOUSEHANDLING);	        		
-        	}
-        }
-	}
 	
-	private void setCreationFields(boolean visible)
+	private void setCreationFieldVisibility(boolean visible)
 	{
  		CircleFields.setVisible(visible);
 		InterpolationFields.setVisible(visible);
@@ -538,16 +420,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		cBasicShape.setVisible(visible);
 		BasicShape.setVisible(visible);
 	}
-	private void setFreeModificationFields(boolean visible)
-	{
- 		FreeModFields.setVisible(visible);
- 		if (visible) //init always with CP-Movement
- 		{
-       		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);
-       		//Deactivate all Buttons
-       		deselectButtons();
- 		}
-	}
+	
 	public void actionPerformed(ActionEvent e) {
 	        if ((e.getSource()==bCancel)||(e.getSource()==bOk))
 	        {
@@ -589,16 +462,16 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        }
 	        if (e.getSource()==bModeChange) //Modus Change Button
 	        {
-	        	if (cBasicShape.isVisible()) //We are in mode 1
+	        	if (cBasicShape.isVisible()) //We are in mode 1 -> change to 2
 	        	{
 	        		bModeChange.setText("neue Grundfrom");
-	        		setFreeModificationFields(true);
-	        		setCreationFields(false);
+	        		FreeModPanel.setVisible(true);
+	        		setCreationFieldVisibility(false);
 	        	}
-	        	else
+	        	else //we are in 2 -> change to 1
 	        	{
 	        		bModeChange.setText("Modifikation");
-	        		setFreeModificationFields(false);
+	        		FreeModPanel.setVisible(false);
 	        		cBasicShape.setVisible(true);
 	        		BasicShape.setVisible(true);
 	        		actionPerformed(new ActionEvent(cBasicShape,0,"Refresh"));
@@ -613,7 +486,6 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 					nm.setStatus(NURBSCreationMessage.ADD_END);
 				HShapeGraphicRef.setShapeParameters(nm);
 	        }	
-	        performSecondModus(e);
 	        if (e.getSource()==bCheckShape)
 	        {
 	        	NURBSShapeValidator validator = new NURBSShapeValidator(HGraphRef, HEdgeRefIndex, null, HShapeGraphicRef); //Check actual Shape of the Edge
@@ -727,6 +599,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		}
 		updateInfo(nm);
 	}
+
 	private void updateInfo(NURBSCreationMessage nm)
 	{
 		if ((nm==null)||(!nm.isValid()))
@@ -748,7 +621,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		{
 			if (cBasicShape.isVisible())
 				actionPerformed(new ActionEvent(bModeChange,0,"Change Modus"));
-			deselectButtons();
+ //TODO needed ? FreeModPanel.setVisible(true);
 			return;
 		}
 		if (!nm.isValid()) //update all to std
@@ -777,6 +650,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			break;
 		}
 	}
+
 	public void update(Observable o, Object arg) {
 		if (arg instanceof GraphMessage) //All Other GraphUpdates are handled in VGRaphCommons
 		{

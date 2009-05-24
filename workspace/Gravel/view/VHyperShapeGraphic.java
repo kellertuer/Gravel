@@ -55,6 +55,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	{
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		paintgrid(g2);
+		displaySelection(g2);
 		paintMouseModeDetails(g2);
 		paintHyperEdges(g2);
 		paintNodes(g2);
@@ -64,7 +65,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(firstModus.getSelectionRectangle());
 		}
-		paintDEBUG(g2);
+	//	paintDEBUG(g2);
 	}
 	/**
 	 * @param g
@@ -77,20 +78,37 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		while (ei.hasNext()) // drawEdges
 		{
 			VHyperEdge temp = ei.next();
-			if (temp.getIndex()==highlightedHyperEdge)
-				g2.setColor(temp.getColor());
-			else
-				g2.setColor(this.selColor.brighter().brighter());
-			g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			if (!temp.getShape().isEmpty())
 			{
+				if (temp.getIndex()==highlightedHyperEdge)
+				{
+					g2.setColor(temp.getColor());
+				}
+				else
+					g2.setColor(this.selColor.brighter());
+				g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+
 				NURBSShape s = temp.getShape().clone();
 				s.scale(zoomfactor);
 				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(5d/(double)zoomfactor),temp.getWidth(),zoomfactor));
 			}
 		}
 	}
-
+	private void displaySelection(Graphics2D g2)
+	{
+		NURBSShape shape = vG.modifyHyperEdges.get(highlightedHyperEdge).getShape();
+		if (!(shape instanceof NURBSShapeFragment))
+			return;
+		NURBSShapeFragment s = (NURBSShapeFragment) shape;
+		if (s==null)
+			return;
+		float selSize = (float)selWidth + (float) vG.modifyHyperEdges.get(highlightedHyperEdge).getWidth();
+		NURBSShape drawSel = s.getSubCurve().clone();
+		drawSel.scale(zoomfactor);
+		g2.setColor(selColor);
+		g2.setStroke(new BasicStroke(selSize*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		g2.draw(drawSel.getCurve(5d/(double)zoomfactor)); //draw only a preview				
+	}
 	//@override from VCommonGraphic to only draw Nodes from the hyperedge normal and all other Gray
 	protected void paintNodes(Graphics g)
 	{
@@ -113,7 +131,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			g2.fillOval(Math.round(temp.getdrawpoint().x*zoomfactor), Math.round(temp.getdrawpoint().y*zoomfactor), Math.round(temp.getSize()*zoomfactor), Math.round(temp.getSize()*zoomfactor));
 			if (temp.isNameVisible())
 			{	
-				if (!g2.getColor().equals(Color.GRAY))
+				if (hEdge.containsNode(temp.getIndex()))
 						g2.setColor(Color.black);					
 				Font f = new Font("Arial",Font.PLAIN, Math.round(temp.getNameSize()*zoomfactor));
 				g2.setFont(f);
@@ -204,10 +222,34 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		NURBSShape tempshape = secondModus.getShape();
 		if (tempshape!=null)
 		{
-			NURBSShape draw = tempshape.clone();
-			draw.scale(zoomfactor);
-			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-			g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
+			if (tempshape instanceof NURBSShapeFragment)
+			{
+				NURBSShapeFragment t = (NURBSShapeFragment)tempshape;
+				if (!Double.isNaN(t.getStart()))
+				{
+					Point2D Start = tempshape.CurveAt(t.getStart());
+					Point p2 = new Point(Math.round((float)Start.getX()),Math.round((float)Start.getY()));
+					this.drawCP(g2, p2, Color.GREEN);
+				}
+				if (Double.isNaN(t.getEnd()))
+				{
+					Point2D End = tempshape.CurveAt(t.getEnd());
+					Point p2 = new Point(Math.round((float)End.getX()),Math.round((float)End.getY()));
+					this.drawCP(g2, p2, Color.GREEN);
+				}
+				NURBSShape drawSel = t.getSubCurve().clone();
+				drawSel.scale(zoomfactor);
+				g2.setColor(selColor.darker());
+				g2.setStroke(new BasicStroke(((float)selWidth+(float)vG.modifyHyperEdges.get(highlightedHyperEdge).getWidth())*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+				g2.draw(drawSel.getCurve(5d/(double)zoomfactor)); //draw only a preview				
+			}
+			else
+			{
+				NURBSShape draw = tempshape.clone();
+				draw.scale(zoomfactor);
+				g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+				g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
+			}
 		}			
 	}
 	private void paintDEBUG(Graphics2D g2) //TODO: Remove Debug Controlpoint-polygon
@@ -292,6 +334,12 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				this.addMouseListener(secondModus);
 				this.addMouseMotionListener(secondModus);
 				actualMouseState = state;
+			break;
+			case SHAPE_SUBCURVE_MOUSEHANDLING:
+				secondModus = new ShapeSubcurveSelectionHandler(this, highlightedHyperEdge);
+				this.addMouseListener(secondModus);
+				this.addMouseMotionListener(secondModus);
+				actualMouseState = state;				
 			break;
 			case NO_MOUSEHANDLING:
 			default:

@@ -130,11 +130,11 @@ public class NURBSShapeValidator extends NURBSShape {
 					//If the radius is given and distance of the actualPoint to this is smaller that the sum of both radii - both are in the same set
 					if (actEntry.getKey()!=actualP)
 					{
-						if ((actEntry.getValue().radius!=Double.NaN) && ( (actEntry.getKey().distance(actualP)+radius <actEntry.getValue().radius)) )
+						if ((!Double.isNaN(actEntry.getValue().radius)) && ( (actEntry.getKey().distance(actualP)+radius <actEntry.getValue().radius)) )
 						{
 							circlehandled = true; //The circle around actualP was completely handled by actEntry.getKey()
 						}
-						if ((actEntry.getValue().radius!=Double.NaN) &&(actEntry.getKey().distance(actualP)<(actEntry.getValue().radius+radius)) )
+						if ((!Double.isNaN(actEntry.getValue().radius)) &&(actEntry.getKey().distance(actualP)<(actEntry.getValue().radius+radius)) )
 						{ //Both circles overlap -> union sets
 							int a = actEntry.getValue().set;
 							int b = pointInformation.get(actualP).set;

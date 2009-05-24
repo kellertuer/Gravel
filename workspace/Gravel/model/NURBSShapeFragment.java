@@ -28,14 +28,33 @@ import java.util.Vector;
 public class NURBSShapeFragment extends NURBSShape {
 
 	private NURBSShape subcurve;
-
-	public NURBSShapeFragment(NURBSShape c, double u1, double u2)
+	private double u1,u2;
+	/**
+	 * Initialize the subcurve of c to an intervall of the parameter [start,end]
+	 * (Iff start>end and c is closed and unclamped the subcurve gets [start,b)[a+offset,end+offset] where offset=b-a
+	 * @param c
+	 * @param start
+	 * @param end
+	 */
+	public NURBSShapeFragment(NURBSShape c, double start, double end)
 	{
 		super(c.Knots, c.controlPoints,c.cpWeight); //Init the curve
-		subcurve = ClampedSubCurve(u1,u2);
+		u1=start;
+		u2=end;
+		if ((!Double.isNaN(u1))&&(!Double.isNaN(u2)))
+			subcurve = ClampedSubCurve(u1,u2);
+		else
+			subcurve = new NURBSShape();
 		if (subcurve.isEmpty()) //something went wrong in subcurve creation, set this all to empty
-			clear();
+			clearSubcurve();
 	}
+	
+	private void clearSubcurve()
+	{
+		super.clear();
+		if (subcurve!=null)
+			subcurve.clear();
+	}	
 	/**
 	 * Scale all Controlpoints by factor s, if you want to resize a shape
 	 * make sure to translate its middle to 0,0 before and back afterwards
@@ -73,13 +92,6 @@ public class NURBSShapeFragment extends NURBSShape {
 	{
 		super.rotate(degree); //TODO: rotate only Curve between u1 and u2
 	}	
-	/**
-	 * get the calculated Subcurve
-	 */
-	public NURBSShape getSubCurve()
-	{
-		return subcurve;
-	}
 	/**
 	 * Return the clamped Subcurve between the parameters u1 and u2
 	 * This is realized by knot insertion at u1 and u2 until the multiplicity in these
@@ -239,4 +251,56 @@ public class NURBSShapeFragment extends NURBSShape {
 		return c;
 	}
 
+	//
+	// Get & Set
+	//
+	/**
+	 * get the calculated Subcurve
+	 */
+	public NURBSShape getSubCurve()
+	{
+		return subcurve;
+	}
+	/**
+	 * Update startvalue of the subcurve
+	 * updates internal subcurve and might set the whole curve to empty iff start is not in [a,b]
+	 * @param start new startvalue of subcurve
+	 */
+	public void setStart(double start)
+	{
+		u1=start;
+		//Update subcurve
+		subcurve = ClampedSubCurve(u1,u2);
+		if (subcurve.isEmpty()) //something went wrong in subcurve creation, set this all to empty
+			clearSubcurve();
+	}
+	/**
+	 * Get the value u1\in[a,b] where the subcurve starts 
+	 * @return
+	 */
+	public double getStart()
+	{
+		return u1;
+	}
+	/**
+	 * Update endvalue of the subcurve
+	 * updates internal subcurve and might set the whole curve to empty iff start is not in [a,b]
+	 * @param end new endvalue of the subcurve
+	 */
+	public void setEnd(double end)
+	{
+		u2=end;
+		//Update subcurve
+		subcurve = ClampedSubCurve(u1,u2);
+		if (subcurve.isEmpty()) //something went wrong in subcurve creation, set this all to empty
+			clearSubcurve();		
+	}
+	/**
+	 * Get the value u1\in[a,b] where the subcurve ends
+	 * @return
+	 */
+	public double getEnd()
+	{
+		return u2;
+	}
 }

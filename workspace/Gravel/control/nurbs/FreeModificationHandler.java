@@ -86,7 +86,7 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 	private void internalReset()
 	{
 		//Only if a Block was started: End it...
-		if ((DragStartProjection!=Double.NaN)&&(!firstdrag)) //We had an Drag an a Circle was created, draw it one final time
+		if ((!Double.isNaN(DragStartProjection))&&(!firstdrag)) //We had an Drag an a Circle was created, draw it one final time
 		{
 			DragStartProjection=Double.NaN;
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_END,GraphConstraints.HYPEREDGE));			

@@ -97,7 +97,7 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	{
 		HyperEdgeRef.setShape(s);
 		//This is pushed in side the Drag-Block if it happens while dragging so the whole action is only captured as one
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 		if (dragged()) //End Drag
 			internalReset();
 	}
@@ -255,9 +255,9 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 			}
 			//Finally - notify Graph Observers to redraw, and on first modification start that as a block			
 			if (firstdrag) //If wirst drag - start Block
-				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 			else		//continnue Block
-				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 		}
 		MouseOffSet = e.getPoint();
 		firstdrag = false;
