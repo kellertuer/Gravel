@@ -97,7 +97,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	private void displaySelection(Graphics2D g2)
 	{
 		NURBSShape shape = vG.modifyHyperEdges.get(highlightedHyperEdge).getShape();
-		if (!(shape instanceof NURBSShapeFragment))
+		if ((shape.getDecorationTypes()&NURBSShape.FRAGMENT)!=NURBSShape.FRAGMENT)
 			return;
 		NURBSShapeFragment s = (NURBSShapeFragment) shape;
 		if (s==null)

@@ -222,7 +222,7 @@ public class HESFreeModComponent implements ActionListener {
         	{
         		boolean selectionExists;
         		NURBSShape shape = HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).getShape();
-        		if (shape instanceof NURBSShapeFragment)
+        		if ((shape.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
         		{
         			selectionExists = !((NURBSShapeFragment) shape).getSubCurve().isEmpty();
         		}

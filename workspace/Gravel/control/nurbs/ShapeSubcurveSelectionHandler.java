@@ -85,7 +85,7 @@ public class ShapeSubcurveSelectionHandler implements
 	 */
 	public void setShape(NURBSShape s) {
 		HyperEdgeRef.setShape(s);
-		if (s instanceof NURBSShapeFragment)
+		if ((s.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
 		{
 			NURBSShapeFragment t = (NURBSShapeFragment)s;
 			tempStart = t.getStart();
