@@ -39,11 +39,6 @@ import view.VHyperGraphic;
  */
 public class ShapeAffinTransformationHandler implements ShapeModificationMouseHandler {
 	
-	public final static int NO_MODIFICATION = 0;
-	public final static int ROTATION = 1;
-	public final static int TRANSLATION = 2;
-	public final static int SCALING = 4;
-	public final static int SCALE_ONEDIRECTION = 8;
 	private VHyperGraph vhg = null;
 	private VCommonGraphic vgc;
 //	private GeneralPreferences gp;
@@ -52,9 +47,7 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	private boolean firstdrag = true;
 	private NURBSShape temporaryShape=null, DragBeginShape = null;
 	VHyperEdge HyperEdgeRef;
-
-	private int ModificationState = NO_MODIFICATION;
-	
+	private int ModificationState = VCommonGraphic.NO_DETAIL;
 	/**
 	 * The ShapeModificationDragListener
 	 * Handles Drags in an HyperGraphic-Environment and modifies a specific edge
@@ -130,7 +123,7 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	 */
 	public void setModificationState(int newstate)
 	{
-		ModificationState = newstate;
+		ModificationState = newstate&VCommonGraphic.DETAIL_MASK;
 	}
 	
 	public int getModification()
@@ -214,15 +207,15 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 			temporaryShape = DragBeginShape.clone();
 			switch(ModificationState)
 			{
-				case ROTATION:
+				case VCommonGraphic.ROTATE:
 					temporaryShape.translate(-DragOrigin.getX(),-DragOrigin.getY()); //Origin
 					temporaryShape.rotate(getDegreefromDirection(DragMov)); //Rotate
 					temporaryShape.translate(DragOrigin.getX(),DragOrigin.getY()); //Back
 				break;
-				case TRANSLATION:
+				case VCommonGraphic.TRANSLATE:
 					temporaryShape.translate(DragMov.getX(),DragMov.getY()); //Origin
 				break;
-				case SCALING:
+				case VCommonGraphic.SCALE:
 					//Factor is depending on Distance
 					double dist = DragMov.distance(0d,0d);
 					//And increases size if getX() > 0 else decreases and depends on scale of shape so it does not
@@ -237,7 +230,7 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 					temporaryShape.scale(factor);
 					temporaryShape.translate(DragOrigin.getX(),DragOrigin.getY()); //Back
 				break;
-				case SCALE_ONEDIRECTION:
+				case VCommonGraphic.SCALE_DIR:
 					//Factor is depending on Distance
 					double onedist = DragMov.distance(0d,0d);
 					temporaryShape.translate(-DragOrigin.getX(),-DragOrigin.getY()); //Translate to Origin

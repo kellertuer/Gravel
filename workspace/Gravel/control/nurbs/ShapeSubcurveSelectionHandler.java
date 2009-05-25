@@ -41,9 +41,10 @@ public class ShapeSubcurveSelectionHandler implements
 	private boolean firstdrag = true;
 	private NURBSShape temporaryShape = null;
 	double tempStart=Double.NaN, tempEnd=Double.NaN;
+	//Only used for double click, because double click is no fun in java
+	double lastStart,lastEnd;
 	//For single clicks which value to handle next
-	boolean setStartNext = true;
-	boolean DragsetsStart;
+	boolean setStartNext = true, DragsetsStart, toggleOnClick=true; 
 	GeneralPreferences gp;
 	VHyperEdge HyperEdgeRef;
 	/**
@@ -76,10 +77,7 @@ public class ShapeSubcurveSelectionHandler implements
 
 	public NURBSShape getShape() {
 		NURBSShapeFragment actualFragment = new NURBSShapeFragment(temporaryShape, tempStart, tempEnd);
-		if (actualFragment.isEmpty()) //Don't return empty shape
-			return temporaryShape;
-		else
-			return actualFragment;
+		return actualFragment; //maybe subcurve is empty...that dies not matter
 	}
 	/**
 	 * Set shape to a specific given shape - e.g. when the History-Manager
@@ -129,6 +127,32 @@ public class ShapeSubcurveSelectionHandler implements
 			DragOrigin = null;
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,
 					GraphConstraints.BLOCK_END));
+		}
+	}
+
+	public void setModificationState(int i) {
+		if ((i&VCommonGraphic.SET_START)==VCommonGraphic.SET_START)
+		{
+			setStartNext = true;
+			toggleOnClick = false;
+		}
+		else if ((i&VCommonGraphic.SET_END)==VCommonGraphic.SET_END)
+		{
+			setStartNext = false;
+			toggleOnClick = false;
+		}
+		else if ((i&VCommonGraphic.TOGGLE)==VCommonGraphic.TOGGLE)
+		{
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+			double toggle = tempStart;
+			tempStart = tempEnd;
+			tempEnd = toggle;
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
+		}
+		else //Default
+		{
+			setStartNext = true;
+			toggleOnClick = true;
 		}
 	}
 
@@ -201,7 +225,7 @@ public class ShapeSubcurveSelectionHandler implements
 								| GraphConstraints.HYPEREDGESHAPE,
 						GraphConstraints.HYPEREDGE));
 				if ((Double.isNaN(tempStart))||(Double.isNaN(Double.NaN)))
-						setStartNext ^= true; //We will really set a value so toggle to next
+						setStartNext ^= toggleOnClick; //We will really set a value so toggle to next
 			}
 			else
 				// continnue Block
@@ -236,28 +260,24 @@ public class ShapeSubcurveSelectionHandler implements
 		NURBSShapeProjection proj = new NURBSShapeProjection(temporaryShape.clone(), exactPointInGraph);
 		double tol = (new Integer(gp.getIntValue("vgraphic.selwidth"))).doubleValue() + ((double) HyperEdgeRef.getWidth() / 2d);
 		if (proj.getResultPoint().distance(exactPointInGraph) <= tol)
-		{			// clicked on curve with tol.
+		{			// clicked on curve with tol. -> Update subcurve in a block so that after that VHyperShapeGraphic redraws
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
-			NURBSShapeFragment newShape = null;
-			NURBSShape actualShape = HyperEdgeRef.getShape().clone();
-			if ((e.getClickCount() == 2) && (e.getModifiers() == MouseEvent.BUTTON1_MASK))
-			{ // DoubleClick
-					double newEnd = tempStart;
-					double newStart = tempEnd;
-					newShape = new NURBSShapeFragment(actualShape.clone(),newStart, newEnd);
-					System.err.println("Exchanging");
-			}
-			else
+//			if ((e.getClickCount() == 2) && (e.getModifiers() == MouseEvent.BUTTON1_MASK))
+//			{ // DoubleClick
+//					//last Values exist becaus on the first click the else case happened
+//					double newEnd = lastStart;
+//					double newStart = lastEnd;
+//					System.err.println("Exchanging");
+//			}
+//			else
 			{
 				if (setStartNext)
 					tempStart = proj.getResultParameter();					
 				else
 					tempEnd = proj.getResultParameter();
-				setStartNext ^= true; //Toggle
-				newShape = new NURBSShapeFragment(actualShape.clone(),tempStart, tempEnd);
+				setStartNext ^= toggleOnClick; //Toggle if toggleonclick
 			}
-			if ((newShape!=null)&&(!newShape.isEmpty()))
-				vhg.modifyHyperEdges.get(HyperEdgeRef.getIndex()).setShape(newShape);
+			System.err.println("Clicked on Curve and we set Start "+(!setStartNext)+" and toggled"+toggleOnClick+" ["+tempStart+","+tempEnd+"]");
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 		}
 	}

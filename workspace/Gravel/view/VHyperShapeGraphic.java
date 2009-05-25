@@ -102,7 +102,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		NURBSShapeFragment s = (NURBSShapeFragment) shape;
 		if (s==null)
 			return;
-		float selSize = (float)selWidth + (float) vG.modifyHyperEdges.get(highlightedHyperEdge).getWidth();
+		float selSize = (float)selWidth/2f + (float) vG.modifyHyperEdges.get(highlightedHyperEdge).getWidth();
 		NURBSShape drawSel = s.getSubCurve().clone();
 		drawSel.scale(zoomfactor);
 		g2.setColor(selColor);
@@ -207,10 +207,29 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	{
 		if (secondModus==null)
 			return;
+		//All cases (Shape & CurvePointMod) draw tempshape
+		NURBSShape tempshape = secondModus.getShape();
+		if ((actualMouseState&SUBCURVE_MOUSEHANDLING) > 0)
+		{ //Draw CP always in that modus
+			NURBSShapeFragment t = (NURBSShapeFragment)tempshape;
+			if (!Double.isNaN(t.getStart()))
+			{
+				Point2D Start = tempshape.CurveAt(t.getStart());
+				Point p2 = new Point(Math.round((float)Start.getX()),Math.round((float)Start.getY()));
+				this.drawCP(g2, p2, selColor.darker());
+			}
+			if (!Double.isNaN(t.getEnd()))
+			{
+				Point2D End = tempshape.CurveAt(t.getEnd());
+				Point p2 = new Point(Math.round((float)End.getX()),Math.round((float)End.getY()));
+				this.drawCP(g2, p2, selColor.darker());
+			}
+		}
 		if (!secondModus.dragged())
-			return;
+			return; //Draw all other stuff only while drag
 		g2.setColor(selColor);
-		if ((actualMouseState&SHAPE) > 0) //ShapeModification always means to indicate the Drag with a line
+		g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		if ((actualMouseState&SHAPE_MOUSEHANDLING) > 0) //ShapeModification always means to indicate the Drag with a line
 		{
 			Point2D p = secondModus.getDragStartPoint();
 			Point2D p2 = secondModus.getDragPoint();
@@ -218,29 +237,14 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
 						Math.round((float)p2.getX()*zoomfactor), Math.round((float)p2.getY()*zoomfactor));
 		}
-		//All cases (Shape & CurvePointMod) draw tempshape
-		NURBSShape tempshape = secondModus.getShape();
 		if (tempshape!=null)
 		{
-			if (tempshape instanceof NURBSShapeFragment)
-			{
-				NURBSShapeFragment t = (NURBSShapeFragment)tempshape;
-				if (!Double.isNaN(t.getStart()))
-				{
-					Point2D Start = tempshape.CurveAt(t.getStart());
-					Point p2 = new Point(Math.round((float)Start.getX()),Math.round((float)Start.getY()));
-					this.drawCP(g2, p2, Color.GREEN);
-				}
-				if (Double.isNaN(t.getEnd()))
-				{
-					Point2D End = tempshape.CurveAt(t.getEnd());
-					Point p2 = new Point(Math.round((float)End.getX()),Math.round((float)End.getY()));
-					this.drawCP(g2, p2, Color.GREEN);
-				}
-				NURBSShape drawSel = t.getSubCurve().clone();
+			if ((actualMouseState&SUBCURVE_MOUSEHANDLING) > 0)
+			{ //This modus always delivers the shape including an subcurve, though this might be an empty shape
+				NURBSShape drawSel = ((NURBSShapeFragment)tempshape).getSubCurve().clone();
 				drawSel.scale(zoomfactor);
 				g2.setColor(selColor.darker());
-				g2.setStroke(new BasicStroke(((float)selWidth+(float)vG.modifyHyperEdges.get(highlightedHyperEdge).getWidth())*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+				g2.setStroke(new BasicStroke(((float)selWidth/2f+(float)vG.modifyHyperEdges.get(highlightedHyperEdge).getWidth())*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 				g2.draw(drawSel.getCurve(5d/(double)zoomfactor)); //draw only a preview				
 			}
 			else
@@ -279,80 +283,56 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	}
 	//MOdified to only Handle those shape stati
 	public void setMouseHandling(int state) {
-		if (state==getMouseHandling()) //don't refresh state if its already right
-			return;
 		MouseEvent e = new MouseEvent(this,111,System.nanoTime(),0,-1,-1,1,false);		
 		if (firstModus!=null)
 			firstModus.mouseReleased(e);
 		if (secondModus!=null)
 			secondModus.mouseReleased(e);
-		resetMouseHandling();
-		switch (state) 
+		boolean listenerclasschanged = (state&(~DETAIL_MASK)) != (actualMouseState&(~DETAIL_MASK));
+		if (listenerclasschanged)
+			resetMouseHandling(); //remove old listeners
+		switch (state&(~DETAIL_MASK)) //State without Detail 
 		{
 			case CIRCLE_MOUSEHANDLING:
-				firstModus = new CircleCreationHandler(this,highlightedHyperEdge);
-				this.addMouseListener(firstModus);
-				this.addMouseMotionListener(firstModus);
-				actualMouseState = state;
+				if (listenerclasschanged)
+					firstModus = new CircleCreationHandler(this,highlightedHyperEdge);
 			break;
 			case INTERPOLATION_MOUSEHANDLING:
-				firstModus = new InterpolationCreationHandler(this,highlightedHyperEdge);
-				this.addMouseListener(firstModus);
-				this.addMouseMotionListener(firstModus);
-				actualMouseState = state;
+				if (listenerclasschanged)
+					firstModus = new InterpolationCreationHandler(this,highlightedHyperEdge);
 			break;
 			case CURVEPOINT_MOVEMENT_MOUSEHANDLING:
-				secondModus = new FreeModificationHandler(this, highlightedHyperEdge);
-				this.addMouseListener(secondModus);
-				this.addMouseMotionListener(secondModus);
-				actualMouseState = state;
+				if (listenerclasschanged)
+					secondModus = new FreeModificationHandler(this, highlightedHyperEdge);
 			break;
-			case SHAPE_ROTATE_MOUSEHANDLING:
-				secondModus = new ShapeAffinTransformationHandler(this, highlightedHyperEdge);
-				((ShapeAffinTransformationHandler)secondModus).setModificationState(ShapeAffinTransformationHandler.ROTATION);
-				this.addMouseListener(secondModus);
-				this.addMouseMotionListener(secondModus);
-				actualMouseState = state;
+			case SHAPE_MOUSEHANDLING:
+				if (listenerclasschanged)
+					secondModus = new ShapeAffinTransformationHandler(this, highlightedHyperEdge);
+				((ShapeAffinTransformationHandler)secondModus).setModificationState(state&(DETAIL_MASK));
 			break;
-			case SHAPE_TRANSLATE_MOUSEHANDLING:
-				secondModus = new ShapeAffinTransformationHandler(this, highlightedHyperEdge);
-				((ShapeAffinTransformationHandler)secondModus).setModificationState(ShapeAffinTransformationHandler.TRANSLATION);
-				this.addMouseListener(secondModus);
-				this.addMouseMotionListener(secondModus);
-				actualMouseState = state;
-			break;
-			case SHAPE_SCALE_MOUSEHANDLING:
-				secondModus = new ShapeAffinTransformationHandler(this, highlightedHyperEdge);
-				((ShapeAffinTransformationHandler)secondModus).setModificationState(ShapeAffinTransformationHandler.SCALING);
-				this.addMouseListener(secondModus);
-				this.addMouseMotionListener(secondModus);
-				actualMouseState = state;
-			break;
-			case SHAPE_SCALEDIR_MOUSEHANDLING:
-				secondModus = new ShapeAffinTransformationHandler(this, highlightedHyperEdge);
-				((ShapeAffinTransformationHandler)secondModus).setModificationState(ShapeAffinTransformationHandler.SCALE_ONEDIRECTION);
-				this.addMouseListener(secondModus);
-				this.addMouseMotionListener(secondModus);
-				actualMouseState = state;
-			break;
-			case SHAPE_SUBCURVE_MOUSEHANDLING:
-				secondModus = new ShapeSubcurveSelectionHandler(this, highlightedHyperEdge);
-				this.addMouseListener(secondModus);
-				this.addMouseMotionListener(secondModus);
-				actualMouseState = state;				
+			case SUBCURVE_MOUSEHANDLING:
+				if (listenerclasschanged) //If we are not yet in that modus
+					secondModus = new ShapeSubcurveSelectionHandler(this, highlightedHyperEdge);
+				((ShapeSubcurveSelectionHandler)secondModus).setModificationState(state&(DETAIL_MASK));
 			break;
 			case NO_MOUSEHANDLING:
 			default:
+				resetMouseHandling();
 				actualMouseState = NO_MOUSEHANDLING;
-			break;
+				return;
 		}
-		if (firstModus!=null) //Update Info in the Drag-Handler about the Grid.
+		actualMouseState = state;				
+		if ((firstModus!=null)&&(listenerclasschanged)) //Update Info in the Drag-Handler about the Grid - add actionlistener again
 		{
+			this.addMouseListener(firstModus);
+			this.addMouseMotionListener(firstModus);
 			firstModus.setGrid(gridy,gridy);
 			firstModus.setGridOrientated(gridenabled&&gridorientated);
 		}
-		if (secondModus!=null) //Update Info in the Drag-Handler about the Grid.
+		if ((secondModus!=null)&&(listenerclasschanged)) //Update Info in the Drag-Handler about the Grid - only if it is really new
 		{
+			this.addMouseListener(secondModus);
+			this.addMouseMotionListener(secondModus);
 			secondModus.setGrid(gridy,gridy);
 			secondModus.setGridOrientated(gridenabled&&gridorientated);
 		}

@@ -31,6 +31,7 @@ public class HESFreeModComponent implements ActionListener {
 	private ButtonGroup bModificationModus;
 	private JRadioButton rModGlobal, rModLocal;
 	private JButton bRotation,bTranslation, bScaling, bScalingDir;
+	private JButton bLocalSetStart, bLocalSetEnd, bLocalInvert;
 	private Container FreeModFields;
 
 	private VHyperShapeGraphic HShapeGraphicRef;
@@ -73,6 +74,18 @@ public class HESFreeModComponent implements ActionListener {
 		bScalingDir.setEnabled(activity);
 	}
 	
+	private void setLocalVisibility(boolean visible)
+	{
+		bLocalSetStart.setVisible(visible);
+		bLocalSetEnd.setVisible(visible);
+		bLocalInvert.setVisible(visible);
+	}
+	private void deselectLocalButtons()
+	{
+		bLocalSetStart.setSelected(false);
+		bLocalSetEnd.setSelected(false);
+		bLocalInvert.setSelected(false);		
+	}
 	private void buildFreeModPanel()
 	{
 		String IconDir = System.getProperty("user.dir")+"/data/img/icon/";
@@ -99,7 +112,7 @@ public class HESFreeModComponent implements ActionListener {
 		FreeModFields.add(rModLocal,c);
 
 		c.gridy++;
-		c.gridx=1;
+		c.gridx=0;
 		c.gridwidth=1;
 		bIncKnots = new JButton(new ImageIcon(IconDir+"plus16.png"));
 		bIncKnots.setSize(new Dimension(17,17));
@@ -135,14 +148,64 @@ public class HESFreeModComponent implements ActionListener {
 		bScaling.addActionListener(this);
 		FreeModFields.add(bScaling,c);
 
-		c.gridx++;
+		c.gridy++;
+		c.gridx=0;
 		c.gridwidth=1;
 		bScalingDir = new JButton(new ImageIcon(IconDir+"scaledir32.png"));	
 		bScalingDir.setSize(new Dimension(17,17));
 		bScalingDir.addActionListener(this);
 		FreeModFields.add(bScalingDir,c);
+
+		c.gridy++;
+		c.gridx=0;
+		c.gridwidth=1;
+		
+		bLocalSetStart = new JButton("S");
+		bLocalSetStart.addActionListener(this);
+		FreeModFields.add(bLocalSetStart,c);
+
+		c.gridx++;
+		bLocalInvert = new JButton("I");
+		bLocalInvert.addActionListener(this);
+		FreeModFields.add(bLocalInvert,c);
+
+		c.gridx++;
+		bLocalSetEnd = new JButton("E");
+		bLocalSetEnd.addActionListener(this);
+		FreeModFields.add(bLocalSetEnd,c);
+		
+		setLocalVisibility(rModLocal.isSelected());
 	}
 
+	private void handleLocalAction(ActionEvent e)
+	{
+		if (e.getSource()==bLocalSetStart)
+		{
+			boolean wasSelected = bLocalSetStart.isSelected();
+			deselectLocalButtons();
+			if (wasSelected) //back to default / no DETAIL
+				HShapeGraphicRef.setMouseHandling(VCommonGraphic.SUBCURVE_MOUSEHANDLING|VCommonGraphic.NO_DETAIL);
+			else
+			{
+				bLocalSetStart.setSelected(true);
+				HShapeGraphicRef.setMouseHandling(VCommonGraphic.SUBCURVE_MOUSEHANDLING|VCommonGraphic.SET_START);
+			}
+		}
+		else if (e.getSource()==bLocalSetEnd)
+		{
+			boolean wasSelected = bLocalSetEnd.isSelected();
+			deselectLocalButtons();
+			if (wasSelected) //Back to default
+				HShapeGraphicRef.setMouseHandling(VCommonGraphic.SUBCURVE_MOUSEHANDLING|VCommonGraphic.NO_DETAIL);
+			else
+			{
+				bLocalSetEnd.setSelected(true);
+				HShapeGraphicRef.setMouseHandling(VCommonGraphic.SUBCURVE_MOUSEHANDLING|VCommonGraphic.SET_END);
+			}
+		}
+		else if (e.getSource()==bLocalInvert)
+			HShapeGraphicRef.setMouseHandling(VCommonGraphic.SUBCURVE_MOUSEHANDLING|VCommonGraphic.TOGGLE);
+	}
 	public void actionPerformed(ActionEvent e) {
         if ((e.getSource()==rModGlobal)||(e.getSource()==rModLocal))
         {
@@ -163,11 +226,9 @@ public class HESFreeModComponent implements ActionListener {
         			selectionExists = false;
         		setButtonsDeselectedAndEnable(selectionExists);
         		if (!selectionExists)
-        		{
-        			System.err.println("Setting to new modus");
-        			HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SUBCURVE_MOUSEHANDLING);
-        		}
+        			HShapeGraphicRef.setMouseHandling(VCommonGraphic.SUBCURVE_MOUSEHANDLING);
         	}
+    		setLocalVisibility(rModLocal.isSelected());
         }
 		if (e.getSource()==bIncKnots)
         {
@@ -184,7 +245,7 @@ public class HESFreeModComponent implements ActionListener {
         	{
         		setButtonsDeselectedAndEnable(true);
         		bRotation.setSelected(true);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_ROTATE_MOUSEHANDLING);	        		
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_MOUSEHANDLING|VCommonGraphic.ROTATE);	        		
         	}
         }
         else if (e.getSource()==bTranslation)
@@ -198,7 +259,7 @@ public class HESFreeModComponent implements ActionListener {
         	{
         		setButtonsDeselectedAndEnable(true);
         		bTranslation.setSelected(true);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_TRANSLATE_MOUSEHANDLING);	        		
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_MOUSEHANDLING|VCommonGraphic.TRANSLATE);	        		
         	}
         }
         else if (e.getSource()==bScaling)
@@ -212,7 +273,7 @@ public class HESFreeModComponent implements ActionListener {
         	{
         		setButtonsDeselectedAndEnable(true);
         		bScaling.setSelected(true);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SCALE_MOUSEHANDLING);	        		
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_MOUSEHANDLING|VCommonGraphic.SCALE);	        		
         	}
         }
         else if (e.getSource()==bScalingDir)
@@ -226,8 +287,10 @@ public class HESFreeModComponent implements ActionListener {
         	{
         		setButtonsDeselectedAndEnable(true);
         		bScalingDir.setSelected(true);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_SCALEDIR_MOUSEHANDLING);	        		
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_MOUSEHANDLING|VCommonGraphic.SCALE_DIR);	        		
         	}
         }
+        else
+        	handleLocalAction(e);
 	}
 }

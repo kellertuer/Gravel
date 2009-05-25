@@ -51,7 +51,6 @@ public class NURBSShapeFragment extends NURBSShape {
 	
 	private void clearSubcurve()
 	{
-		super.clear();
 		if (subcurve!=null)
 			subcurve.clear();
 	}	

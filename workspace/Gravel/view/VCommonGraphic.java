@@ -33,21 +33,34 @@ public abstract class VCommonGraphic extends Component implements Observer
 	 * These are Different MODI a VCommonGraphic may depend its controlers on
 	 */
 	private static final long serialVersionUID = 1L;
+	//
+	// Mouse Modi for all subversions
+	//
 	public static final int NO_MOUSEHANDLING = 0;
 	public static final int STD_MOUSEHANDLING = 1;
 	public static final int OCM_MOUSEHANDLING = 2;
 	public static final int CIRCLE_MOUSEHANDLING = 4;
 	public static final int CURVEPOINT_MOVEMENT_MOUSEHANDLING = 8;
 	public static final int INTERPOLATION_MOUSEHANDLING = 16;
-	public static final int SHAPE_ROTATE_MOUSEHANDLING = 32;
-	public static final int SHAPE_SCALE_MOUSEHANDLING = 64;
-	public static final int SHAPE_SCALEDIR_MOUSEHANDLING = 128;
-	public static final int SHAPE_TRANSLATE_MOUSEHANDLING = 256;
-	public static final int SHAPE_SUBCURVE_MOUSEHANDLING = 512;
+	public static final int SHAPE_MOUSEHANDLING = 32;
+	public static final int SUBCURVE_MOUSEHANDLING = 64;
 	
-	public static final int SHAPE = SHAPE_ROTATE_MOUSEHANDLING|SHAPE_SCALE_MOUSEHANDLING|SHAPE_SCALEDIR_MOUSEHANDLING|SHAPE_TRANSLATE_MOUSEHANDLING;
-;
+	//
+	//Detail Info on some MouseHandlers
+	//
+	public static final int SET_START = 128;
+	public static final int SET_END = 256;
+	public static final int TOGGLE = 512;
+	public static final int SCALE = 1024;
+	public static final int ROTATE = 2048;
+	public static final int TRANSLATE = 4096;
+	public static final int SCALE_DIR = 8192;
 
+	public static final int DETAIL_MASK = SET_START|SET_END|TOGGLE|SCALE|ROTATE|TRANSLATE|SCALE_DIR;
+	public static final int NO_DETAIL = 0;
+	//
+	// GetType Subclasses
+	//
 	public static final int VGRAPHIC = 1;
 	public static final int VHYPERGRAPHIC = 2;
 //	public static final int VHYPERSHAPEGRAPHIC = 4;
