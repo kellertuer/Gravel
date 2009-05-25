@@ -68,6 +68,10 @@ public class HESFreeModComponent implements ActionListener {
 		bTranslation.setSelected(false);
 		bScaling.setSelected(false);
 		bScalingDir.setSelected(false);
+		bIncKnots.setSelected(false);
+		bDecKnots.setSelected(false);
+		bIncKnots.setEnabled(activity);
+		bDecKnots.setEnabled(activity);
 		bRotation.setEnabled(activity);
 		bTranslation.setEnabled(activity);
 		bScaling.setEnabled(activity);
@@ -122,7 +126,7 @@ public class HESFreeModComponent implements ActionListener {
 		c.gridx++;
 		bDecKnots = new JButton(new ImageIcon(IconDir+"minus16.png"));
 		bDecKnots.setSize(new Dimension(17,17));
-		bDecKnots.setEnabled(false);
+//		bDecKnots.setEnabled(false);
 		FreeModFields.add(bDecKnots,c);
 		
 		c.gridy++;
@@ -232,7 +236,11 @@ public class HESFreeModComponent implements ActionListener {
         }
 		if (e.getSource()==bIncKnots)
         {
-        	// 	TODO HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().refineMiddleKnots();
+			System.err.println("//TODO Inc/Dec Knots");
+        }
+		if (e.getSource()==bDecKnots)
+        {
+			System.err.println("//TODO Inc/Dec Knots");			
         }
         else if (e.getSource()==bRotation)
         {

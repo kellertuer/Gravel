@@ -136,6 +136,25 @@ public class NURBSShapeProjection extends NURBSShape
 		}
 	}
 	
+	/**
+	 * Strip a NURBSShape off every Decorator
+	 * This class strips itself from the NURBSShape it belongs to
+	 * @return
+	 */
+	public NURBSShape stripDecorations()
+	{
+		return super.stripDecorations();
+	}
+	/**
+	 * Return all Decorations this class has
+	 * That is all decorations the superclass has + validator
+	 * @return
+	 */
+	public int getDecorationTypes()
+	{
+		return super.getDecorationTypes()|NURBSShape.PROJECTION;
+	}
+
 	public double getResultParameter()
 	{
 		return resultu;

@@ -48,7 +48,25 @@ public class NURBSShapeFragment extends NURBSShape {
 		if (subcurve.isEmpty()) //something went wrong in subcurve creation, set this all to empty
 			clearSubcurve();
 	}
-	
+	/**
+	 * Strip a NURBSShape off every Decorator
+	 * This class strips itself from the NURBSShape it belongs to
+	 * @return
+	 */
+	public NURBSShape stripDecorations()
+	{
+		return super.stripDecorations();
+	}
+	/**
+	 * Return all Decorations this class has
+	 * That is all decorations the superclass has + validator
+	 * @return
+	 */
+	public int getDecorationTypes()
+	{
+		return super.getDecorationTypes()|NURBSShape.FRAGMENT;
+	}
+
 	private void clearSubcurve()
 	{
 		if (subcurve!=null)

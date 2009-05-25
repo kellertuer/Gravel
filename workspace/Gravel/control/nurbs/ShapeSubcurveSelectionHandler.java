@@ -277,7 +277,6 @@ public class ShapeSubcurveSelectionHandler implements
 					tempEnd = proj.getResultParameter();
 				setStartNext ^= toggleOnClick; //Toggle if toggleonclick
 			}
-			System.err.println("Clicked on Curve and we set Start "+(!setStartNext)+" and toggled"+toggleOnClick+" ["+tempStart+","+tempEnd+"]");
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 		}
 	}

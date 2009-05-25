@@ -32,6 +32,12 @@ public class NURBSShape {
 
 	public final int CLAMPED = 0;
 	public final static int UNCLAMPED = 1;
+	
+	public final static int NO_DECORATION = 0;
+	public final static int VALIDATOR = 1;
+	public final static int FRAGMENT = 2;
+	public final static int PROJECTION = 4;
+	
 	public Vector<Double> Knots;
 	public Vector<Point2D> controlPoints; //ControlPoints, TODO: Set protected after DEBUG
 	protected Vector<Double> cpWeight;
@@ -123,6 +129,23 @@ public class NURBSShape {
 	public int getType()
 	{
 		return NURBSType;
+	}
+	/**
+	 * Strip a NURBSShape off every Decorator
+	 * This class just returns itself - every Decorator should call upser.strip, because then in the end this method is reached
+	 * @return
+	 */
+	public NURBSShape stripDecorations()
+	{
+		return this;
+	}
+	/**
+	 * Return all Decorations this class has - this class has no decoration
+	 * @return
+	 */
+	public int getDecorationTypes()
+	{
+		return NO_DECORATION;
 	}
 	/**
 	 * Check, whether the NURBSShape is empty
