@@ -256,7 +256,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			}
 		}			
 	}
-	private void paintDEBUG(Graphics2D g2) //TODO: Remove Debug Controlpoint-polygon
+	private void paintDEBUG(Graphics2D g2)
 	{
 		g2.setColor(Color.orange.darker());
 		NURBSShape s =  vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().clone();

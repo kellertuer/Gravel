@@ -154,7 +154,7 @@ public class NURBSShapeProjection extends NURBSShape
 	{
 		return super.getDecorationTypes()|NURBSShape.PROJECTION;
 	}
-
+	
 	public double getResultParameter()
 	{
 		return resultu;

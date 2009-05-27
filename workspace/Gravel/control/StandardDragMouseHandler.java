@@ -100,7 +100,6 @@ public class StandardDragMouseHandler implements DragMouseHandler
 	 * Handle a drag event, update the positions of moved nodes and theis adjacent edges
 	 */
 	public void mouseDragged(MouseEvent e) {
-
 		cSelectionDragActions.mouseDragged(e);
 		cNodeDragActions.mouseDragged(e);
 		sNodeDragActions.mouseDragged(e);

@@ -57,12 +57,12 @@ public class HESFreeModComponent implements ActionListener {
  		if (visible) //init always with CP-Movement TODO Button for that
  		{
        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);
-       		//Deactivate all Buttons
-       		setButtonsDeselectedAndEnable(true);
+       		//Deselect all Buttons
+       		setButtonsDeselected();
  		}
 	}
 	
-	private void setButtonsDeselectedAndEnable(boolean activity)
+	private void setButtonsDeselected()
 	{
 		bRotation.setSelected(false);
 		bTranslation.setSelected(false);
@@ -70,12 +70,15 @@ public class HESFreeModComponent implements ActionListener {
 		bScalingDir.setSelected(false);
 		bIncKnots.setSelected(false);
 		bDecKnots.setSelected(false);
-		bIncKnots.setEnabled(activity);
-		bDecKnots.setEnabled(activity);
-		bRotation.setEnabled(activity);
-		bTranslation.setEnabled(activity);
-		bScaling.setEnabled(activity);
-		bScalingDir.setEnabled(activity);
+	}
+	private void setButtonsEnabled(boolean enabled)
+	{
+		bIncKnots.setEnabled(enabled);
+		bDecKnots.setEnabled(enabled);
+		bRotation.setEnabled(enabled);
+		bTranslation.setEnabled(enabled);
+		bScaling.setEnabled(enabled);
+		bScalingDir.setEnabled(enabled);
 	}
 	
 	private void setLocalVisibility(boolean visible)
@@ -210,13 +213,27 @@ public class HESFreeModComponent implements ActionListener {
 		else if (e.getSource()==bLocalInvert)
 			HShapeGraphicRef.setMouseHandling(VCommonGraphic.SUBCURVE_MOUSEHANDLING|VCommonGraphic.TOGGLE);
 	}
+
+	private void setToStandardMouseHandling()
+	{
+		if (rModLocal.isSelected())
+		{
+			HShapeGraphicRef.setMouseHandling(VCommonGraphic.SUBCURVE_MOUSEHANDLING);
+			deselectLocalButtons();
+		}
+		else
+			HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
+	}
 	public void actionPerformed(ActionEvent e) {
         if ((e.getSource()==rModGlobal)||(e.getSource()==rModLocal))
         {
+        	setButtonsDeselected();
         	if (rModGlobal.isSelected())
         	{
-            	setButtonsDeselectedAndEnable(true);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
+            	setButtonsEnabled(true);
+           		NURBSShape shape = HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).getShape();
+           		HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).setShape(shape.stripDecorations());
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);
         	}
         	else
         	{
@@ -228,7 +245,7 @@ public class HESFreeModComponent implements ActionListener {
         		}
         		else
         			selectionExists = false;
-        		setButtonsDeselectedAndEnable(selectionExists);
+        		setButtonsEnabled(selectionExists);
         		if (!selectionExists)
         			HShapeGraphicRef.setMouseHandling(VCommonGraphic.SUBCURVE_MOUSEHANDLING);
         	}
@@ -247,11 +264,10 @@ public class HESFreeModComponent implements ActionListener {
         	if (bRotation.isSelected())
         	{
         		bRotation.setSelected(false);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
-        	}
+        		setToStandardMouseHandling();        	}
         	else
         	{
-        		setButtonsDeselectedAndEnable(true);
+        		setButtonsDeselected();
         		bRotation.setSelected(true);
         		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_MOUSEHANDLING|VCommonGraphic.ROTATE);	        		
         	}
@@ -261,11 +277,11 @@ public class HESFreeModComponent implements ActionListener {
         	if (bTranslation.isSelected())
         	{
         		bTranslation.setSelected(false);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
+        		setToStandardMouseHandling();      		
         	}
         	else
         	{
-        		setButtonsDeselectedAndEnable(true);
+        		setButtonsDeselected();
         		bTranslation.setSelected(true);
         		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_MOUSEHANDLING|VCommonGraphic.TRANSLATE);	        		
         	}
@@ -275,11 +291,11 @@ public class HESFreeModComponent implements ActionListener {
         	if (bScaling.isSelected())
         	{
         		bScaling.setSelected(false);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
+        		setToStandardMouseHandling();	        		
         	}
         	else
         	{
-        		setButtonsDeselectedAndEnable(true);
+        		setButtonsDeselected();
         		bScaling.setSelected(true);
         		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_MOUSEHANDLING|VCommonGraphic.SCALE);	        		
         	}
@@ -289,16 +305,26 @@ public class HESFreeModComponent implements ActionListener {
         	if (bScalingDir.isSelected())
         	{
         		bScalingDir.setSelected(false);
-        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
+        		setToStandardMouseHandling();
         	}
         	else
         	{
-        		setButtonsDeselectedAndEnable(true);
+        		setButtonsDeselected();
         		bScalingDir.setSelected(true);
         		HShapeGraphicRef.setMouseHandling(VCommonGraphic.SHAPE_MOUSEHANDLING|VCommonGraphic.SCALE_DIR);	        		
         	}
         }
         else
         	handleLocalAction(e);
+	}
+	
+	public void refresh()
+	{
+		//We have a fragment
+		NURBSShape editshape = HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).getShape();
+		if ((editshape.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
+		{
+			 this.setButtonsEnabled(!((NURBSShapeFragment)editshape).getSubCurve().isEmpty());
+		}
 	}
 }

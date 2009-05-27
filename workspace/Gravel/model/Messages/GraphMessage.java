@@ -24,7 +24,6 @@ public class GraphMessage {
 	
 	private int id, status, type, affected;
 	private String message="";
-	
 	/**
 	 * Create a Message with all 4 Values Type, ID, Status and ID
 	 * No Values are checked up to now (though if type is not unique there shouldn't be an ID) 

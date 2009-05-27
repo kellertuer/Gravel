@@ -1,7 +1,10 @@
 package model;
 
 import java.awt.geom.Point2D;
+import java.util.Iterator;
 import java.util.Vector;
+
+import javax.print.attribute.SupportedValuesAttribute;
 
 /**
  * Class for handling any stuff that is ment to only affect a part of a nurbsshape
@@ -32,6 +35,8 @@ public class NURBSShapeFragment extends NURBSShape {
 	/**
 	 * Initialize the subcurve of c to an intervall of the parameter [start,end]
 	 * (Iff start>end and c is closed and unclamped the subcurve gets [start,b)[a+offset,end+offset] where offset=b-a
+	 * 
+	 * The values of start & end are always kept, even if the subcurve is nonexistent (so getSubcurve is empty)
 	 * @param c
 	 * @param start
 	 * @param end
@@ -47,6 +52,11 @@ public class NURBSShapeFragment extends NURBSShape {
 			subcurve = new NURBSShape();
 		if (subcurve.isEmpty()) //something went wrong in subcurve creation, set this all to empty
 			clearSubcurve();
+	}
+	
+	public NURBSShapeFragment clone()
+	{
+		return new NURBSShapeFragment(super.clone(), u1,u2);
 	}
 	/**
 	 * Strip a NURBSShape off every Decorator
@@ -73,6 +83,78 @@ public class NURBSShapeFragment extends NURBSShape {
 			subcurve.clear();
 	}	
 	/**
+	 * Prepares the Fragment for manipulation of only that Part and returns the number of CP to change
+	 * these CP begin with findSpan(u1)+1
+	 * @return
+	 */
+	private int prepareFragment()
+	{
+		int k1 = findSpan(u1);
+		int k2 = findSpan(u2);
+		int returnval;
+		if (u1 < u2)
+		{
+			int r = k2-degree-k1-1; //Number of CP we have (without refinement) inside subcurve
+			System.err.println("Sub ["+u1+""+u2+"] from "+k1+","+k2+" means r="+r+"       ");
+			int minNum = r-degree;
+			if (minNum<=0)
+			{
+				int count = -minNum + 2;
+				Vector<Double> Refinement = new Vector<Double>();
+				for (int i=1; i<count; i++)
+				{ //TODO: Nonlinear refinement that produces more points at start/end then in the middle
+					Refinement.add(u1+ (u2-u1)*(double)i/(double)count);
+				}
+				RefineKnots(Refinement);
+				return prepareFragment();
+			}
+			returnval = r;
+		}
+		else //Thinking about circular and so on
+		{
+			int r = maxCPIndex-degree-k1-1; //Last few values, that are possible, might be -1;
+			r += k2-degree;
+			System.err.println("Sub ["+u1+""+u2+"] from "+k1+","+k2+" (maxCPIndex="+maxCPIndex+") means r="+(maxCPIndex-degree-k1-1)+"+"+(k2-degree)+"="+r+"       ");
+			int minNum = r-degree;
+			if (minNum<=0)
+			{
+				int count = -minNum + 2;
+				Vector<Double> Refinement = new Vector<Double>();
+				double offset = Knots.get(maxKnotIndex-degree)-Knots.get(degree);
+				double newu2 = u2+offset; 
+				int i=1; 
+				while ((i<count)&&( (u1+ (newu2-u1)*(double)i/(double)count)<=Knots.get(maxKnotIndex-degree)))
+				{ //Refine at the end
+					Refinement.add(u1+ (newu2-u1)*(double)i/(double)count);					
+					i++;
+				}
+				if (Refinement.size()>0) //We have something to refine at the end
+				{
+					RefineKnots(Refinement);
+					//Update Circular Part
+					for (int j=0; j<degree; j++)
+						Knots.set(j, Knots.get(maxKnotIndex-2*degree+j).doubleValue()-offset);
+					for (int j=0; j<degree; j++)
+					{
+						controlPoints.set(j, (Point2D) controlPoints.get(maxCPIndex-degree+1+j).clone());
+						cpWeight.set(j, cpWeight.get(maxCPIndex-degree+1+j).doubleValue());
+					}
+					Refinement.clear();
+				}
+				while (i<count) //Rest
+				{
+					Refinement.add(u1+ (newu2-u1)*(double)i/(double)count-offset); //Now at the beginning
+					i++;
+				}
+				if (Refinement.size()>0)
+					RefineKnots(Refinement);
+				return prepareFragment(); //Compute new R
+			}
+			returnval = r;
+		}
+		return returnval;
+	}
+	/**
 	 * Scale all Controlpoints by factor s, if you want to resize a shape
 	 * make sure to translate its middle to 0,0 before and back afterwards
 	 * @param s
@@ -97,7 +179,26 @@ public class NURBSShapeFragment extends NURBSShape {
 	 */
 	public void translate(double x, double y)
 	{
-		super.translate(x, y); //TODO: only ranslate [u1,u2]
+		if (subcurve.isEmpty())
+			super.translate(x, y);
+		int numCP = prepareFragment();
+		int k1 = findSpan(u1);
+		System.err.println(k1+" / "+maxCPIndex);
+		for (int i=k1+1; i<k1+1+numCP; i++)
+		{
+			if (i>maxCPIndex)
+				i -=maxCPIndex; //Circular thinking
+			Point2D p = (Point2D)controlPoints.get(i).clone();
+			Point2D newp = new Point2D.Double(p.getX()+x, p.getY()+y);
+			controlPoints.set(i, newp);
+			//Circular:
+			if (i<degree) //first degree ones
+				controlPoints.set(maxCPIndex-degree+i+1, (Point2D) newp.clone());
+			else if (i > maxCPIndex-degree) // the higher ones of not yet translates at the beginning
+				controlPoints.set(i-1-maxCPIndex+degree, (Point2D) newp.clone());
+	
+		}
+		this.refreshInternalValues();
 	}
 	/**
 	 * Rotate the Curve - due to Rotation Invariance, only the ControlPoints need to be moved
@@ -109,6 +210,16 @@ public class NURBSShapeFragment extends NURBSShape {
 	{
 		super.rotate(degree); //TODO: rotate only Curve between u1 and u2
 	}	
+	
+	public void refreshDecoration()
+	{
+		if ((!Double.isNaN(u1))&&(!Double.isNaN(u2)))
+			subcurve = ClampedSubCurve(u1,u2);
+		else
+			subcurve = new NURBSShape();
+		if (subcurve.isEmpty()) //something went wrong in subcurve creation, set this all to empty
+			clearSubcurve();
+	}
 	/**
 	 * Return the clamped Subcurve between the parameters u1 and u2
 	 * This is realized by knot insertion at u1 and u2 until the multiplicity in these
@@ -142,7 +253,7 @@ public class NURBSShapeFragment extends NURBSShape {
 		while (Knots.get(Start+multStart).doubleValue()==u1)
 			multStart++;
 		int multEnd = 0;
-		NURBSShape sub = clone();
+		NURBSShape sub = super.clone();
 		while (Knots.get(End-multEnd).doubleValue()==u2)
 			multEnd++;
 		Vector<Double> Refinement = new Vector<Double>();
@@ -158,7 +269,7 @@ public class NURBSShapeFragment extends NURBSShape {
 				sub.controlPoints.set(i, (Point2D) sub.controlPoints.get(sub.maxCPIndex-sub.degree+1+i).clone());
 				sub.cpWeight.set(i, sub.cpWeight.get(sub.maxCPIndex-sub.degree+1+i).doubleValue());
 			}
-			sub.InitHomogeneous();
+			sub.refreshInternalValues();
 		}
 		Refinement.clear();
 		for (int i=0; i<degree-multEnd; i++)
@@ -241,7 +352,7 @@ public class NURBSShapeFragment extends NURBSShape {
 			Refinement.add(u1);
 		for (int i=0; i<degree-multEnd; i++)
 			Refinement.add(u2);
-		NURBSShape subcurve = clone();
+		NURBSShape subcurve = super.clone();
 		subcurve.RefineKnots(Refinement); //Now it interpolates subcurve(u1) and subcurve(u2)
 		Vector<Point2D> newCP = new Vector<Point2D>();
 		Vector<Double> newWeight= new Vector<Double>();

@@ -164,7 +164,6 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			super.addAction(m);
 	}
 
-
 	public void update(Observable o, Object arg)
 	{
 		GraphMessage temp = null;

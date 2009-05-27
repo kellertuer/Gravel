@@ -444,7 +444,7 @@ public class CommonGraphHistoryManager implements Observer
 					if ((m.getModifiedElementTypes()==(GraphConstraints.NODE|GraphConstraints.EDGE)) //while that the whole graph
 					&&(m.getModification()==GraphConstraints.TRANSLATION)) //is translated
 					{ //Don't do Node/Edge-Update anymore but graph replacement
-						System.err.println("Switching from Node replacement to graph replacement.");
+//						System.err.println("Switching from Node replacement to graph replacement.");
 						Blockstart = m;
 					}
 				}	

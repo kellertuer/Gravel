@@ -54,10 +54,14 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 	 * @see model.VGraphInterface#deselect()
 	 */
 	public void deselect() {
+		boolean hasSel = hasSelection(); 
 		modifyNodes.deselect();
 		modifyHyperEdges.deselect();
-		setChanged();
-		notifyObservers(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
+		if (hasSel)
+		{ //Only if we really deselected -> notify
+			setChanged();
+			notifyObservers(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
+		}
 	}
 	/* (non-Javadoc)
 	 * @see model.VGraphInterface#removeSelection()

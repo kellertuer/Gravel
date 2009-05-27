@@ -120,7 +120,7 @@ public class NURBSShape {
 		maxKnotIndex = Knots.size()-1;
 		degree = Knots.size()-controlPoints.size()-1;
 		if (!isEmpty())
-			InitHomogeneous();
+			refreshInternalValues();
 	}
 	/**
 	 * Return the type of NURBS-Curve that is contained in here
@@ -252,7 +252,7 @@ public class NURBSShape {
 	 * Initialization of the internal homogeneous Vector
 	 * Should be called everytime either the b or w vector are completly exchanged
 	 */
-	protected void InitHomogeneous()
+	protected void refreshInternalValues()
 	{
 		controlPointsHom = new Vector<Point3d>();
 		Iterator<Point2D> ib =  controlPoints.iterator();
@@ -350,7 +350,7 @@ public class NURBSShape {
 			p.setLocation(p.getX()*sx,p.getY()*sy);
 		}
 		//recalculate Homogeneous
-		InitHomogeneous();		
+		refreshInternalValues();		
 	}
 	/**
 	 * Translate Curve - due to Translation Invariance, only the ControlPoints need to be moved
@@ -870,11 +870,11 @@ public class NURBSShape {
 		maxCPIndex = controlPoints.size()-1;
 		maxKnotIndex = Knots.size()-1;
 		degree = Knots.size()-controlPoints.size()-1;
-		InitHomogeneous();
+		refreshInternalValues();
 	}
 	public void removeKnot(double knotval)
 	{
-		//TODO
+		// TODO Knot removal
 	}
 	public Point2D ProjectionPoint(Point2D d)
 	{
@@ -934,14 +934,17 @@ public class NURBSShape {
 			else if (Pindex > maxCPIndex-degree) // degree ones
 				controlPoints.set(Pindex-1- maxCPIndex+degree, (Point2D) Pnew.clone());
 		}
-		else if ((getType()&CLAMPED)==CLAMPED)
+		boolean closedclamped = ( ((getType()&CLAMPED)==CLAMPED) 
+				&& (controlPoints.get(0).getX()==controlPoints.get(maxCPIndex).getX())
+				&& (controlPoints.get(0).getY()==controlPoints.get(maxCPIndex).getY()));
+		if (closedclamped)
 		{
 			if (Pindex==0) //first -> move last
 				controlPoints.set(maxCPIndex, (Point2D) Pnew.clone());
 			else if (Pindex==maxCPIndex) // last->move first
 				controlPoints.set(0, (Point2D) Pnew.clone());
 		}
-		InitHomogeneous();
+		refreshInternalValues();
 	}
 	// return integer nearest to x
 	long nint(double x)

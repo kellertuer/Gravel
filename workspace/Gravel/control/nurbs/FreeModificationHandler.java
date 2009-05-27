@@ -109,7 +109,7 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		
+
 		if (((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)||((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))
 		{	
 			internalReset();

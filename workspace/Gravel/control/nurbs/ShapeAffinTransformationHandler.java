@@ -213,7 +213,10 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 					temporaryShape.translate(DragOrigin.getX(),DragOrigin.getY()); //Back
 				break;
 				case VCommonGraphic.TRANSLATE:
+				{
+					
 					temporaryShape.translate(DragMov.getX(),DragMov.getY()); //Origin
+				}
 				break;
 				case VCommonGraphic.SCALE:
 					//Factor is depending on Distance
@@ -262,6 +265,8 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 			if (!((e.getPoint().x==-1)||(e.getPoint().y==-1))) //If there was no external reset
 				mouseDragged(e);
 		}
+		if ((temporaryShape.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
+			((NURBSShapeFragment)temporaryShape).refreshDecoration();
 		internalReset();
 	}
 

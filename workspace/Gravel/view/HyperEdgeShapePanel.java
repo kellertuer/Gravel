@@ -466,6 +466,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        	{
 	        		bModeChange.setText("neue Grundfrom");
 	        		FreeModPanel.setVisible(true);
+	        		FreeModPanel.refresh();
 	        		setCreationFieldVisibility(false);
 	        	}
 	        	else //we are in 2 -> change to 1
@@ -649,6 +650,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 				updateDegreeFields(nm);
 			break;
 		}
+		//Update second
+		FreeModPanel.refresh();
 	}
 
 	public void update(Observable o, Object arg) {
@@ -682,7 +685,11 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			bModeChange.setEnabled(shape);
 			bOk.setEnabled(shape);
 			if (shape)
+			{
 				IPInfo.setText("<html><p>&nbsp;</p></html>");
+				if (FreeModPanel.getContent().isVisible())
+					FreeModPanel.refresh();
+			}
 			else //empty shape
 			{
 				if (cBasicShape.isVisible()) //-> clear values

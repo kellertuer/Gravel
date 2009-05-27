@@ -79,14 +79,14 @@ public class SelectionClickListener implements MouseListener {
 		}
 		else if (e.getModifiers() == MouseEvent.BUTTON1_MASK) //Single Click
 		{			
-			if (selectedItem==null) //Left click on background -> Deselect
+			if ((selectedItem==null)) //Left click on background -> Deselect
 			{
-				notify.deselect();		
+				notify.deselect();		//deselect any existing selection
 				return;
 			}
 			if ((selectedItem.getSelectedStatus()&VItem.SELECTED)!=VItem.SELECTED) //Element not selected
 			{
-				notify.deselect();
+				notify.deselect(); //deselect 
 				selectedItem.setSelectedStatus(VItem.SELECTED);
 			}	
 			else //was selected

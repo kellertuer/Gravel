@@ -79,7 +79,6 @@ public class OCMDragMouseHandler implements DragMouseHandler
 			return false;
 	}
 	public void mouseDragged(MouseEvent e) {
-
 		cSelectionDragActions.mouseDragged(e);
 		cNodeDragActions.mouseDragged(e);
 		if (vg!=null)
