@@ -49,12 +49,7 @@ public class NURBSShapeFragment extends NURBSShape {
 		u1=start;
 		u2=end;
 		origCurve = c;
-		if ((!Double.isNaN(u1))&&(!Double.isNaN(u2)))
-			subcurve = ClampedSubCurve(u1,u2);
-		else
-			subcurve = new NURBSShape();
-		if (subcurve.isEmpty()) //something went wrong in subcurve creation, set this all to empty
-			clearSubcurve();
+		refreshDecoration();
 	}
 	
 	@Override
@@ -101,7 +96,6 @@ public class NURBSShapeFragment extends NURBSShape {
 		if (u1 < u2)
 		{
 			int r = k2-degree-k1-1; //Number of CP we have (without refinement) inside subcurve
-			System.err.println("Sub ["+u1+""+u2+"] from "+k1+","+k2+" means r="+r+"       ");
 			int minNum = r-degree;
 			if (minNum<=0)
 			{
@@ -143,7 +137,7 @@ public class NURBSShapeFragment extends NURBSShape {
 					for (int j=0; j<degree; j++)
 					{
 						controlPoints.set(j, (Point2D) controlPoints.get(maxCPIndex-degree+1+j).clone());
-						cpWeight.set(j, cpWeight.get(maxCPIndex-degree+1+j).doubleValue());
+						cpWeight.set(j, cpWeight.get(maxCPIndex-origCurve.degree+1+j).doubleValue());
 					}
 					Refinement.clear();
 				}
@@ -200,6 +194,7 @@ public class NURBSShapeFragment extends NURBSShape {
 			return;
 		int numCP = prepareFragment();
 		int k1 = findSpan(u1);
+		System.err.println((k1+1)+"- "+controlPoints.get(k1+1)+"  "+origCurve.controlPoints.get(k1+1));
 		double rad = val1*Math.PI/180d;
 		for (int i=k1+1; i<k1+1+numCP; i++)
 		{
@@ -213,10 +208,13 @@ public class NURBSShapeFragment extends NURBSShape {
 					double x = p.getX()*Math.cos(rad) + p.getY()*Math.sin(rad);
 					double y = -p.getX()*Math.sin(rad) + p.getY()*Math.cos(rad);
 					newp = new Point2D.Double(x,y);
+					break;
 				case TRANSLATION:
 					newp = new Point2D.Double(p.getX()+val1, p.getY()+val2);
+					break;
 				case SCALING:
 					newp = new Point2D.Double(p.getX()*val1,p.getY()*val2);
+					break;
 			}
 			controlPoints.set(i, newp);
 			//Circular:
@@ -225,12 +223,21 @@ public class NURBSShapeFragment extends NURBSShape {
 			else if (i > maxCPIndex-degree) // the higher ones of not yet translates at the beginning
 				controlPoints.set(i-1-maxCPIndex+degree, (Point2D) newp.clone());
 		}
-		this.refreshInternalValues();
-
+		refreshInternalValues();
+		refreshDecoration();
+		System.err.println((k1+1)+"+ "+controlPoints.get(k1+1)+"  "+origCurve.controlPoints.get(k1+1));
 	}
 	
 	public void refreshDecoration()
 	{
+		//Copy this to origCurve
+		origCurve.controlPoints = controlPoints;
+		origCurve.controlPointsHom = controlPointsHom;
+		origCurve.cpWeight = cpWeight;
+		origCurve.degree = degree;
+		origCurve.Knots = Knots;
+		origCurve.maxCPIndex = maxCPIndex;
+		origCurve.maxKnotIndex = maxKnotIndex;
 		if ((!Double.isNaN(u1))&&(!Double.isNaN(u2)))
 			subcurve = ClampedSubCurve(u1,u2);
 		else
