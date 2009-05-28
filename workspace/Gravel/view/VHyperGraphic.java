@@ -96,7 +96,7 @@ public class VHyperGraphic extends VCommonGraphic
 		NURBSShape c = NURBSShapeFactory.CreateShape(nm);
 		
 		g2.setStroke(new BasicStroke(1.2f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		NURBSShape cs = c.clone();
+		NURBSShape cs = c.stripDecorations().clone();
 		cs.scale(zoomfactor);
 		g2.setStroke(new BasicStroke(1.2f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		g2.setColor(Color.black);
@@ -117,7 +117,7 @@ public class VHyperGraphic extends VCommonGraphic
 			System.err.println(" ");
 //		subc.translate(p1.getX()-pp1.getX(), p1.getY()-pp1.getY());
 		g2.setStroke(new BasicStroke(selWidth,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		NURBSShape subcs = subc.clone();
+		NURBSShape subcs = subc.stripDecorations().clone();
 		subcs.scale(zoomfactor);
 		g2.setColor(selColor);
 		g2.draw(subcs.getCurve(5d/(double)zoomfactor));	
@@ -172,7 +172,7 @@ public class VHyperGraphic extends VCommonGraphic
 		NURBSShape c = NURBSShapeFactory.CreateShape(nm);
 		
 		g2.setStroke(new BasicStroke(1.2f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		NURBSShape cs = c.clone();
+		NURBSShape cs = c.stripDecorations().clone();
 		cs.scale(zoomfactor);
 		g2.setColor(Color.black);
 		g2.draw(cs.getCurve(5d/(double)zoomfactor));
@@ -326,7 +326,7 @@ public class VHyperGraphic extends VCommonGraphic
 			VHyperEdge temp = ei.next();
 			if (!temp.getShape().isEmpty())
 			{
-				NURBSShape s = temp.getShape().clone();
+				NURBSShape s = temp.getShape().stripDecorations().clone();
 				s.scale(zoomfactor);
 				GeneralPath p = s.getCurve(5d/(double)zoomfactor);
 				if ((((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)||((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))&&((temp.getSelectedStatus()&VItem.SOFT_DESELECTED)!=VItem.SOFT_DESELECTED))

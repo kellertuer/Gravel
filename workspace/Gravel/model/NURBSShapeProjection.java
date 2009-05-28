@@ -26,17 +26,18 @@ public class NURBSShapeProjection extends NURBSShape
 	Vector<Double> qcWeights, qcControlPoints;
 	int qcDegree;
 	double umin, umax;
-	
+	NURBSShape origCurve; //Reference to initial Curve we project on - Decorator-pattern
 	double resultu;
 	/**
 	 * Start the NURBSShapeProjection with a given Curve the Point is projected onto
 	 * 
-	 * @param c
-	 * @param p
+	 * @param c Curve which must be stripped off deco before if you want to project on whole curve
+	 * @param p Point that should be projected
 	 */
 	public NURBSShapeProjection(NURBSShape Curve, Point2D p)
 	{
-		NURBSShape clone = Curve.clone();
+		origCurve = Curve;
+		NURBSShape clone = Curve.clone(); //We clone with decorations - if anybody wants to project really only on curve - strip before init
 		//If it is unclamped - clamp it!
 		if ((clone.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
 			clone = 
@@ -53,7 +54,7 @@ public class NURBSShapeProjection extends NURBSShape
 				Parts.offer(partsf.get(i));
 		}
 		else
-			Parts.offer(clone());
+			Parts.offer(clone()); //We are nondecorative so clone is okay
 		double alpha = Math.min(p.distanceSq(controlPoints.firstElement()), p.distanceSq(controlPoints.lastElement()));
 		if (p.distanceSq(controlPoints.firstElement()) > p.distanceSq(controlPoints.lastElement()))
 			resultu=Knots.lastElement();
@@ -65,7 +66,7 @@ public class NURBSShapeProjection extends NURBSShape
 			//
 		{
 			NURBSShape actualPart = Parts.poll();	
-			CalculateSquareDistanceFunction(actualPart.clone(),p);
+			CalculateSquareDistanceFunction(actualPart.clone(),p); //they are nondecorative
 			double partAlpha = Math.min(p.distanceSq(actualPart.controlPoints.firstElement()), p.distanceSq(actualPart.controlPoints.lastElement()));
 			if (partAlpha<alpha)
 				alpha = partAlpha;
@@ -143,7 +144,7 @@ public class NURBSShapeProjection extends NURBSShape
 	 */
 	public NURBSShape stripDecorations()
 	{
-		return super.stripDecorations();
+		return origCurve.stripDecorations();
 	}
 	/**
 	 * Return all Decorations this class has
@@ -152,7 +153,7 @@ public class NURBSShapeProjection extends NURBSShape
 	 */
 	public int getDecorationTypes()
 	{
-		return super.getDecorationTypes()|NURBSShape.PROJECTION;
+		return origCurve.getDecorationTypes()|NURBSShape.PROJECTION;
 	}
 	
 	public double getResultParameter()

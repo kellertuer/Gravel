@@ -622,7 +622,6 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		{
 			if (cBasicShape.isVisible())
 				actionPerformed(new ActionEvent(bModeChange,0,"Change Modus"));
- //TODO needed ? FreeModPanel.setVisible(true);
 			return;
 		}
 		if (!nm.isValid()) //update all to std

@@ -61,19 +61,20 @@ public class NURBSShapeValidator extends NURBSShape {
 	private Vector<Integer> invalidNodeIndices  = new Vector<Integer>();
 	private boolean ResultValidation;
 	
+	private NURBSShape origCurve;
 	public NURBSShapeValidator(VHyperGraph vG, int HyperEdgeIndex, NURBSShape Curve, VCommonGraphic g)
 	{
 		ResultValidation=false;
 		VHyperEdge e = vG.modifyHyperEdges.get(HyperEdgeIndex);
 		if (e==null)
 			return;
-		NURBSShape clone = new NURBSShape(); //local copy
-		if (Curve!=null) //for any given curve we use that curve
-			clone = Curve.clone();
-		else //if the Edge has a shape and we have non given per parameter, we use that one
-			clone = e.getShape().clone();
-		if (clone.isEmpty())
+		if (Curve!=null)
+			origCurve = Curve; //If given use the specific curve
+		else //it is null, use the Curve of the hyperedge
+			origCurve = e.getShape();
+		if ((origCurve==null) || (origCurve.isEmpty()))
 			return;
+		NURBSShape clone = origCurve.stripDecorations().clone();
 		//Now also the curve and the Hyperedge are correct for the check
 		ResultValidation=true;
 		setCurveTo(clone.Knots, clone.controlPoints, clone.cpWeight);
@@ -198,26 +199,18 @@ public class NURBSShapeValidator extends NURBSShape {
 		}
 	}
 	
-	/**
-	 * Strip a NURBSShape off every Decorator
-	 * This class strips itself from the NURBSShape it belongs to
-	 * @return
-	 */
+	@Override
 	public NURBSShape stripDecorations()
 	{
-		return super.stripDecorations();
+		return origCurve.stripDecorations();
 	}
-	/**
-	 * Return all Decorations this class has
-	 * That is all decorations the superclass has + validator
-	 * @return
-	 */
+	
+	@Override
 	public int getDecorationTypes()
 	{
-		return super.getDecorationTypes()|NURBSShape.VALIDATOR;
+		return origCurve.getDecorationTypes()|NURBSShape.VALIDATOR;
 	}
 
-	
 	private Point2D getPointOfNode(int i)
 	{
 		//Iterate over Points and get its nodeindex
@@ -318,9 +311,11 @@ public class NURBSShapeValidator extends NURBSShape {
 	/**
 	 * Find a successor for the point p depending upon its precessor pre
 	 * and the nurbs Curve c (its projection and secod derivative)
-	 * @param p
-	 * @param pre
-	 * @param c
+	 * @param p any point p we want the successor of
+	 * @param pre precessor of that point
+	 * @param c NURBS Shape we are projecting onto
+	 * @param Debug - Debug Graphics
+	 * @param z Debug-Zoom
 	 * @return
 	 */
 	public static Point2D findSuccessor(Point2D p, Point2D pre, NURBSShape c,Graphics2D Debug,float z)

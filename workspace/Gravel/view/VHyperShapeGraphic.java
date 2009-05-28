@@ -88,7 +88,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 					g2.setColor(this.selColor.brighter());
 				g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 
-				NURBSShape s = temp.getShape().clone();
+				NURBSShape s = temp.getShape().stripDecorations().clone(); //really only nurbs
 				s.scale(zoomfactor);
 				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(5d/(double)zoomfactor),temp.getWidth(),zoomfactor));
 			}
@@ -103,7 +103,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		if (s==null)
 			return;
 		float selSize = (float)selWidth/2f + (float) vG.modifyHyperEdges.get(highlightedHyperEdge).getWidth();
-		NURBSShape drawSel = s.getSubCurve().clone();
+		NURBSShape drawSel = s.getSubCurve().stripDecorations().clone(); //really only nurbs
 		drawSel.scale(zoomfactor);
 		g2.setColor(selColor);
 		g2.setStroke(new BasicStroke(selSize*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
@@ -169,7 +169,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		NURBSShape tempshape = firstModus.getShape();
 		if ((tempshape!=null)&&(firstModus.dragged()))
 		{
-			NURBSShape draw = tempshape.clone();
+			NURBSShape draw = tempshape.stripDecorations().clone(); //really only NURBS
 			draw.scale(zoomfactor);
 			g2.setStroke(new BasicStroke(1*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.setColor(selColor);
@@ -241,7 +241,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		{
 			if ((actualMouseState&SUBCURVE_MOUSEHANDLING) > 0)
 			{ //This modus always delivers the shape including an subcurve, though this might be an empty shape
-				NURBSShape drawSel = ((NURBSShapeFragment)tempshape).getSubCurve().clone();
+				NURBSShape drawSel = ((NURBSShapeFragment)tempshape).getSubCurve().clone(); //Is only a NURBS
 				drawSel.scale(zoomfactor);
 				g2.setColor(selColor.darker());
 				g2.setStroke(new BasicStroke(((float)selWidth/2f+(float)vG.modifyHyperEdges.get(highlightedHyperEdge).getWidth())*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
@@ -249,7 +249,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			}
 			else
 			{
-				NURBSShape draw = tempshape.clone();
+				NURBSShape draw = tempshape.stripDecorations().clone(); //Just Curve itself
 				draw.scale(zoomfactor);
 				g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 				g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
@@ -259,7 +259,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	private void paintDEBUG(Graphics2D g2)
 	{
 		g2.setColor(Color.orange.darker());
-		NURBSShape s =  vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().clone();
+		NURBSShape s =  vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().stripDecorations().clone();
 		s.scale(zoomfactor);
 		Iterator<Point2D> pi = s.controlPoints.iterator();
 		Point2D last=null, first=null;

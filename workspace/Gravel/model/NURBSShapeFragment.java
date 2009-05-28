@@ -32,6 +32,8 @@ public class NURBSShapeFragment extends NURBSShape {
 
 	private NURBSShape subcurve;
 	private double u1,u2;
+	private NURBSShape origCurve;
+	private enum affinType {TRANSLATION, ROTATION, SCALING, SCALING_DIR};
 	/**
 	 * Initialize the subcurve of c to an intervall of the parameter [start,end]
 	 * (Iff start>end and c is closed and unclamped the subcurve gets [start,b)[a+offset,end+offset] where offset=b-a
@@ -46,6 +48,7 @@ public class NURBSShapeFragment extends NURBSShape {
 		super(c.Knots, c.controlPoints,c.cpWeight); //Init the curve
 		u1=start;
 		u2=end;
+		origCurve = c;
 		if ((!Double.isNaN(u1))&&(!Double.isNaN(u2)))
 			subcurve = ClampedSubCurve(u1,u2);
 		else
@@ -54,27 +57,30 @@ public class NURBSShapeFragment extends NURBSShape {
 			clearSubcurve();
 	}
 	
+	@Override
 	public NURBSShapeFragment clone()
 	{
-		return new NURBSShapeFragment(super.clone(), u1,u2);
+		return new NURBSShapeFragment(origCurve.clone(), u1,u2);
 	}
 	/**
 	 * Strip a NURBSShape off every Decorator
 	 * This class strips itself from the NURBSShape it belongs to
 	 * @return
 	 */
+	@Override
 	public NURBSShape stripDecorations()
 	{
-		return super.stripDecorations();
+		return origCurve.stripDecorations();
 	}
 	/**
 	 * Return all Decorations this class has
 	 * That is all decorations the superclass has + validator
 	 * @return
 	 */
+	@Override
 	public int getDecorationTypes()
 	{
-		return super.getDecorationTypes()|NURBSShape.FRAGMENT;
+		return origCurve.getDecorationTypes()|NURBSShape.FRAGMENT;
 	}
 
 	private void clearSubcurve()
@@ -110,11 +116,11 @@ public class NURBSShapeFragment extends NURBSShape {
 			}
 			returnval = r;
 		}
-		else //Thinking about circular and so on
+		else //if we are in the area of circular movement and we have to think of moving over start/end the formular is a little bit different and mor difficult
 		{
 			int r = maxCPIndex-degree-k1-1; //Last few values, that are possible, might be -1;
 			r += k2-degree;
-			System.err.println("Sub ["+u1+""+u2+"] from "+k1+","+k2+" (maxCPIndex="+maxCPIndex+") means r="+(maxCPIndex-degree-k1-1)+"+"+(k2-degree)+"="+r+"       ");
+//			System.err.println("Sub ["+u1+""+u2+"] from "+k1+","+k2+" (maxCPIndex="+maxCPIndex+") means r="+(maxCPIndex-degree-k1-1)+"+"+(k2-degree)+"="+r+"       ");
 			int minNum = r-degree;
 			if (minNum<=0)
 			{
@@ -154,62 +160,74 @@ public class NURBSShapeFragment extends NURBSShape {
 		}
 		return returnval;
 	}
-	/**
-	 * Scale all Controlpoints by factor s, if you want to resize a shape
-	 * make sure to translate its middle to 0,0 before and back afterwards
-	 * @param s
-	 */
+	
+	@Override
 	public void scale(double s)
 	{
 		this.scale(s,s);
 	}
-	/**
-	 * Scale all Controlpoints by factor sx and sy in the directions X and Y, if you want to resize a shape
-	 * make sure to translate its middle to 0,0 before and back afterwards
-	 * @param s
-	 */
+	
+	@Override
 	public void scale(double sx, double sy)
 	{
-		super.scale(sx,sy); //TODO scale only [u1,u2]
+		if (subcurve.isEmpty())
+			super.scale(sx,sy);
+		else
+			affinTrans(affinType.SCALING,sx,sy);
 	}
-	/**
-	 * Translate Curve - due to Translation Invariance, only the ControlPoints need to be moved
-	 * @param x
-	 * @param y
-	 */
+	
+	@Override
 	public void translate(double x, double y)
 	{
 		if (subcurve.isEmpty())
-			super.translate(x, y);
+			super.translate(x,y);
+		else
+			affinTrans(affinType.TRANSLATION,x,y);
+	}
+	
+	@Override
+	public void rotate(double deg)
+	{
+		if (subcurve.isEmpty())
+			super.rotate(deg);
+		else
+			affinTrans(affinType.ROTATION, deg, 0d);
+	}	
+	
+	private void affinTrans(affinType typeOfModification, double val1, double val2)
+	{
+		if (subcurve.isEmpty())
+			return;
 		int numCP = prepareFragment();
 		int k1 = findSpan(u1);
-		System.err.println(k1+" / "+maxCPIndex);
+		double rad = val1*Math.PI/180d;
 		for (int i=k1+1; i<k1+1+numCP; i++)
 		{
 			if (i>maxCPIndex)
 				i -=maxCPIndex; //Circular thinking
 			Point2D p = (Point2D)controlPoints.get(i).clone();
-			Point2D newp = new Point2D.Double(p.getX()+x, p.getY()+y);
+			Point2D newp = (Point2D) p.clone(); //for safety purposes - identity-function
+			switch (typeOfModification)
+			{
+				case ROTATION:
+					double x = p.getX()*Math.cos(rad) + p.getY()*Math.sin(rad);
+					double y = -p.getX()*Math.sin(rad) + p.getY()*Math.cos(rad);
+					newp = new Point2D.Double(x,y);
+				case TRANSLATION:
+					newp = new Point2D.Double(p.getX()+val1, p.getY()+val2);
+				case SCALING:
+					newp = new Point2D.Double(p.getX()*val1,p.getY()*val2);
+			}
 			controlPoints.set(i, newp);
 			//Circular:
 			if (i<degree) //first degree ones
 				controlPoints.set(maxCPIndex-degree+i+1, (Point2D) newp.clone());
 			else if (i > maxCPIndex-degree) // the higher ones of not yet translates at the beginning
 				controlPoints.set(i-1-maxCPIndex+degree, (Point2D) newp.clone());
-	
 		}
 		this.refreshInternalValues();
+
 	}
-	/**
-	 * Rotate the Curve - due to Rotation Invariance, only the ControlPoints need to be moved
-	 * Center of Rotation is the Origin (0,0)
-	 * 
-	 * @param degree Amount of rotation - The Rotation is anticlockwise (for positive degree)
-	 */
-	public void rotate(double degree)
-	{
-		super.rotate(degree); //TODO: rotate only Curve between u1 and u2
-	}	
 	
 	public void refreshDecoration()
 	{
@@ -253,7 +271,7 @@ public class NURBSShapeFragment extends NURBSShape {
 		while (Knots.get(Start+multStart).doubleValue()==u1)
 			multStart++;
 		int multEnd = 0;
-		NURBSShape sub = super.clone();
+		NURBSShape sub = origCurve.clone();
 		while (Knots.get(End-multEnd).doubleValue()==u2)
 			multEnd++;
 		Vector<Double> Refinement = new Vector<Double>();
@@ -352,7 +370,7 @@ public class NURBSShapeFragment extends NURBSShape {
 			Refinement.add(u1);
 		for (int i=0; i<degree-multEnd; i++)
 			Refinement.add(u2);
-		NURBSShape subcurve = super.clone();
+		NURBSShape subcurve = origCurve.clone();
 		subcurve.RefineKnots(Refinement); //Now it interpolates subcurve(u1) and subcurve(u2)
 		Vector<Point2D> newCP = new Vector<Point2D>();
 		Vector<Double> newWeight= new Vector<Double>();

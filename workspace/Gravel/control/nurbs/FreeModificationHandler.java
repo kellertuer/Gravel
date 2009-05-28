@@ -43,7 +43,7 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 		if (vhg.modifyHyperEdges.get(hyperedgeindex)==null)
 			return; //Nothing can be done here.
 		HyperEdgeRef = vhg.modifyHyperEdges.get(hyperedgeindex);
-		temporaryShape = HyperEdgeRef.getShape().clone();
+		temporaryShape = HyperEdgeRef.getShape().clone(); //Clone with eventual Decorations (if that decoration clones)
 	}
 	
 	public Rectangle getSelectionRectangle()
@@ -56,7 +56,7 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 	}
 	public void resetShape()
 	{
-		temporaryShape = HyperEdgeRef.getShape().clone(); //Set back to old shape
+		temporaryShape = HyperEdgeRef.getShape().clone(); //Clone with eventual Decorations (if that decoration clones)
 	}
 	public void setShape(NURBSShape s)
 	{

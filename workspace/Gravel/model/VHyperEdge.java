@@ -124,6 +124,7 @@ public class VHyperEdge extends VItem {
 	 */
 	public VHyperEdge clone()
 	{
+		//Clone the shape with decorators iff there are some (don't strip)
 		return new VHyperEdge(getIndex(), width, minMargin, shape.clone(), text.clone(), linestyle.clone());
 	}
 	/**

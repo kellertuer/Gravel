@@ -170,7 +170,8 @@ public class ShapeSubcurveSelectionHandler implements
 				/ ((double) vgc.getZoom() / 100d), (double) e.getPoint().y
 				/ ((double) vgc.getZoom() / 100d));
 		double tol = (new Integer(gp.getIntValue("vgraphic.selwidth"))).doubleValue() + ((double) HyperEdgeRef.getWidth() / 2d);
-		NURBSShapeProjection proj = new NURBSShapeProjection(temporaryShape.clone(), DragOrigin);
+		//Project with real stripped curve
+		NURBSShapeProjection proj = new NURBSShapeProjection(temporaryShape.stripDecorations().clone(), DragOrigin);
 		//One Value not given - set it
 		if ((Double.isNaN(tempStart))||(Double.isNaN(Double.NaN)))
 		{
@@ -209,7 +210,7 @@ public class ShapeSubcurveSelectionHandler implements
 					.getPoint().x
 					/ ((double) vgc.getZoom() / 100d), (double) e.getPoint().y
 					/ ((double) vgc.getZoom() / 100d));
-			NURBSShapeProjection proj = new NURBSShapeProjection(temporaryShape.clone(), exactPointInGraph);
+			NURBSShapeProjection proj = new NURBSShapeProjection(temporaryShape.stripDecorations().clone(), exactPointInGraph);
 			if (DragsetsStart)
 				tempStart = proj.getResultParameter();
 			else
@@ -257,7 +258,7 @@ public class ShapeSubcurveSelectionHandler implements
 		Point2D exactPointInGraph = new Point2D.Double((double) e.getPoint().x
 				/ ((double) vgc.getZoom() / 100d), (double) e.getPoint().y
 				/ ((double) vgc.getZoom() / 100d));
-		NURBSShapeProjection proj = new NURBSShapeProjection(temporaryShape.clone(), exactPointInGraph);
+		NURBSShapeProjection proj = new NURBSShapeProjection(temporaryShape.stripDecorations().clone(), exactPointInGraph);
 		double tol = (new Integer(gp.getIntValue("vgraphic.selwidth"))).doubleValue() + ((double) HyperEdgeRef.getWidth() / 2d);
 		if (proj.getResultPoint().distance(exactPointInGraph) <= tol)
 		{			// clicked on curve with tol. -> Update subcurve in a block so that after that VHyperShapeGraphic redraws
