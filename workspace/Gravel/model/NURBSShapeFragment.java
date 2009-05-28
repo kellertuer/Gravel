@@ -90,7 +90,7 @@ public class NURBSShapeFragment extends NURBSShape {
 	 */
 	private int prepareFragment()
 	{
-		int k1 = findSpan(u1);
+		int k1 = findSpan(u1);	
 		int k2 = findSpan(u2);
 		int returnval;
 		if (u1 < u2)
@@ -103,7 +103,11 @@ public class NURBSShapeFragment extends NURBSShape {
 				Vector<Double> Refinement = new Vector<Double>();
 				for (int i=1; i<count; i++)
 				{ //TODO: Nonlinear refinement that produces more points at start/end then in the middle
-					Refinement.add(u1+ (u2-u1)*(double)i/(double)count);
+					double val = u1+ (u2-u1)*(double)i/(double)count;
+					if (!Knots.contains(val))
+						Refinement.add(val);
+					else 
+						Refinement.add(val+ (u2-u1)/(double)count*Math.random());
 				}
 				RefineKnots(Refinement);
 				return prepareFragment();
@@ -125,25 +129,26 @@ public class NURBSShapeFragment extends NURBSShape {
 				int i=1; 
 				while ((i<count)&&( (u1+ (newu2-u1)*(double)i/(double)count)<=Knots.get(maxKnotIndex-degree)))
 				{ //Refine at the end
-					Refinement.add(u1+ (newu2-u1)*(double)i/(double)count);					
+					double val = u1+ (newu2-u1)*(double)i/(double)count;
+					if (!Knots.contains(val))
+						Refinement.add(val);
+					else 
+						Refinement.add(val+ (u2-u1)/(double)count*Math.random());					
 					i++;
 				}
 				if (Refinement.size()>0) //We have something to refine at the end
 				{
 					RefineKnots(Refinement);
-					//Update Circular Part
-					for (int j=0; j<degree; j++)
-						Knots.set(j, Knots.get(maxKnotIndex-2*degree+j).doubleValue()-offset);
-					for (int j=0; j<degree; j++)
-					{
-						controlPoints.set(j, (Point2D) controlPoints.get(maxCPIndex-degree+1+j).clone());
-						cpWeight.set(j, cpWeight.get(maxCPIndex-origCurve.degree+1+j).doubleValue());
-					}
+					updateCircular(true);
 					Refinement.clear();
 				}
 				while (i<count) //Rest
 				{
-					Refinement.add(u1+ (newu2-u1)*(double)i/(double)count-offset); //Now at the beginning
+					double val = u1+ (newu2-u1)*(double)i/(double)count-offset;
+					if (!Knots.contains(val))
+						Refinement.add(val);
+					else 
+						Refinement.add(val+ (u2-u1)/(double)count*Math.random());					
 					i++;
 				}
 				if (Refinement.size()>0)
@@ -153,6 +158,33 @@ public class NURBSShapeFragment extends NURBSShape {
 			returnval = r;
 		}
 		return returnval;
+	}
+	
+	private void updateCircular(boolean first)
+	{
+		double offset = Knots.get(maxKnotIndex-degree)-Knots.get(degree);
+		//Update Circular Part front
+		if (first)
+		{
+			for (int j=0; j<degree; j++)
+				Knots.set(j, Knots.get(maxKnotIndex-2*degree+j).doubleValue()-offset);
+			for (int j=0; j<degree; j++)
+			{
+				controlPoints.set(j, (Point2D) controlPoints.get(maxCPIndex-degree+1+j).clone());
+				cpWeight.set(j, cpWeight.get(maxCPIndex-degree+1+j).doubleValue());
+			}
+		}
+		else //Update last values
+		{
+			for (int j=0; j<degree; j++)
+				Knots.set(maxKnotIndex-degree+j, Knots.get(degree+j).doubleValue()-offset);
+			for (int j=0; j<degree; j++)
+			{
+				controlPoints.set(maxCPIndex-degree+1+j, (Point2D) controlPoints.get(j).clone());
+				cpWeight.set(maxCPIndex-degree+1+j, cpWeight.get(j).doubleValue());
+			}
+
+		}
 	}
 	
 	@Override
@@ -194,7 +226,6 @@ public class NURBSShapeFragment extends NURBSShape {
 			return;
 		int numCP = prepareFragment();
 		int k1 = findSpan(u1);
-		System.err.println((k1+1)+"- "+controlPoints.get(k1+1)+"  "+origCurve.controlPoints.get(k1+1));
 		double rad = val1*Math.PI/180d;
 		for (int i=k1+1; i<k1+1+numCP; i++)
 		{
@@ -225,7 +256,6 @@ public class NURBSShapeFragment extends NURBSShape {
 		}
 		refreshInternalValues();
 		refreshDecoration();
-		System.err.println((k1+1)+"+ "+controlPoints.get(k1+1)+"  "+origCurve.controlPoints.get(k1+1));
 	}
 	
 	public void refreshDecoration()

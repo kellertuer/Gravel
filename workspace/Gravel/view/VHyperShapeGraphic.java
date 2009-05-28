@@ -337,6 +337,17 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			secondModus.setGridOrientated(gridenabled&&gridorientated);
 		}
 		repaint();
+		if (secondModus==null)
+			return;
+		System.err.print("Shape is on ModusChange"+secondModus.getShape());
+		if ((secondModus.getShape().getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
+		{
+			NURBSShapeFragment t = (NURBSShapeFragment)secondModus.getShape();
+			System.err.println("Sel "+t.getStart()+" -> "+t.getEnd());
+		}
+		else
+			System.err.println(".");
+
 	}
 	/**
 	 * Set the MouseHandling to NO_MOUSEHANDLING

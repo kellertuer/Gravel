@@ -63,8 +63,18 @@ public class ShapeSubcurveSelectionHandler implements
 			return; // Nothing can be done here.
 		HyperEdgeRef = vhg.modifyHyperEdges.get(hyperedgeindex);
 		temporaryShape = HyperEdgeRef.getShape().clone();
+		if ((temporaryShape.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
+		{
+			NURBSShapeFragment t = (NURBSShapeFragment)temporaryShape;
+			tempStart = t.getStart();
+			tempEnd = t.getEnd();
+		}
+		else
+		{
+			tempStart=Double.NaN;
+			tempEnd = Double.NaN;
+		}
 	}
-
 	/**
 	 * Reset shape to last state that was really saved in the graph - doeas not
 	 * push any notification
@@ -76,7 +86,7 @@ public class ShapeSubcurveSelectionHandler implements
 	}
 
 	public NURBSShape getShape() {
-		NURBSShapeFragment actualFragment = new NURBSShapeFragment(temporaryShape, tempStart, tempEnd);
+		NURBSShapeFragment actualFragment = new NURBSShapeFragment(temporaryShape.stripDecorations(), tempStart, tempEnd);
 		return actualFragment; //maybe subcurve is empty...that dies not matter
 	}
 	/**
