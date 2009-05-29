@@ -157,6 +157,8 @@ public class ShapeSubcurveSelectionHandler implements
 			double toggle = tempStart;
 			tempStart = tempEnd;
 			tempEnd = toggle;
+			((NURBSShapeFragment)temporaryShape).setStart(tempStart);
+			((NURBSShapeFragment)temporaryShape).setStart(tempEnd);
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 		}
 		else //Default

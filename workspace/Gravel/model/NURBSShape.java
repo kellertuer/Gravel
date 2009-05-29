@@ -790,7 +790,50 @@ public class NURBSShape {
 	}
 
 	/**
+	 * After working on the front or end of the curve, it might be neccessary for unclamped closed curves to update
+	 * the other end,
+	 * 
+	 * The Parameters specifies, whch values are changed
+	 * if changeFront = true
+	 * 		the last values are taken and updated at the front
+	 * if changeFront = false
+	 * 		the first values are taken and updated at the end
+	 * 
+	 * @param changeFront
+	 */
+	protected void updateCircular(boolean changeFront)
+	{
+		double offset = Knots.get(maxKnotIndex-degree)-Knots.get(degree);
+		//Update Circular Part front
+		if (changeFront)
+		{
+			for (int j=0; j<degree; j++)
+				Knots.set(j, Knots.get(maxKnotIndex-2*degree+j).doubleValue()-offset);
+			for (int j=0; j<degree; j++)
+			{
+				System.err.println("Setting "+j+" to "+(maxCPIndex-degree+1+j));
+				controlPoints.set(j, (Point2D) controlPoints.get(maxCPIndex-degree+1+j).clone());
+				cpWeight.set(j, cpWeight.get(maxCPIndex-degree+1+j).doubleValue());
+			}
+		}
+		else //Update last values
+		{
+			for (int j=0; j<degree; j++)
+				Knots.set(maxKnotIndex-degree+j, Knots.get(degree+j).doubleValue()+offset);
+			for (int j=0; j<degree; j++)
+			{
+				controlPoints.set(maxCPIndex-degree+1+j, (Point2D) controlPoints.get(j).clone());
+				cpWeight.set(maxCPIndex-degree+1+j, cpWeight.get(j).doubleValue());
+			}
+
+		}
+	}
+	
+	/**
 	 * Refine the Curve to add some new knots contained in X from wich each is between t[0] and t[m]
+	 * This Method does not care about circular closed curves
+	 * If you have any vector refining first AND last degree Elements somewhere
+	 * Split it Refine the front, call CircularUpdate(false) and Refine end (and call CircularUpdate(true))
 	 * @param X
 	 */
 	public void RefineKnots(Vector<Double> X)

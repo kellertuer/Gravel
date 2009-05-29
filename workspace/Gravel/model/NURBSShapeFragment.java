@@ -92,6 +92,7 @@ public class NURBSShapeFragment extends NURBSShape {
 	{
 		int k1 = findSpan(u1);	
 		int k2 = findSpan(u2);
+		System.err.println(k1+" and "+k2+" vs."+(maxKnotIndex));
 		int returnval;
 		if (u1 < u2)
 		{
@@ -152,39 +153,15 @@ public class NURBSShapeFragment extends NURBSShape {
 					i++;
 				}
 				if (Refinement.size()>0)
+				{
 					RefineKnots(Refinement);
+					updateCircular(false);
+				}
 				return prepareFragment(); //Compute new R
 			}
 			returnval = r;
 		}
 		return returnval;
-	}
-	
-	private void updateCircular(boolean first)
-	{
-		double offset = Knots.get(maxKnotIndex-degree)-Knots.get(degree);
-		//Update Circular Part front
-		if (first)
-		{
-			for (int j=0; j<degree; j++)
-				Knots.set(j, Knots.get(maxKnotIndex-2*degree+j).doubleValue()-offset);
-			for (int j=0; j<degree; j++)
-			{
-				controlPoints.set(j, (Point2D) controlPoints.get(maxCPIndex-degree+1+j).clone());
-				cpWeight.set(j, cpWeight.get(maxCPIndex-degree+1+j).doubleValue());
-			}
-		}
-		else //Update last values
-		{
-			for (int j=0; j<degree; j++)
-				Knots.set(maxKnotIndex-degree+j, Knots.get(degree+j).doubleValue()-offset);
-			for (int j=0; j<degree; j++)
-			{
-				controlPoints.set(maxCPIndex-degree+1+j, (Point2D) controlPoints.get(j).clone());
-				cpWeight.set(maxCPIndex-degree+1+j, cpWeight.get(j).doubleValue());
-			}
-
-		}
 	}
 	
 	@Override

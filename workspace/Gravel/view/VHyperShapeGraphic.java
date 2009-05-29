@@ -209,6 +209,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			return;
 		//All cases (Shape & CurvePointMod) draw tempshape
 		NURBSShape tempshape = secondModus.getShape();
+		if ((tempshape==null)||(tempshape.isEmpty()))
+				return;
 		if ((actualMouseState&SUBCURVE_MOUSEHANDLING) > 0)
 		{ //Draw CP always in that modus
 			NURBSShapeFragment t = (NURBSShapeFragment)tempshape;
@@ -224,6 +226,9 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				Point p2 = new Point(Math.round((float)End.getX()),Math.round((float)End.getY()));
 				this.drawCP(g2, p2, selColor.darker());
 			}
+			Point2D StartCurve = tempshape.CurveAt(tempshape.Knots.get(tempshape.degree));
+			Point p2 = new Point(Math.round((float)StartCurve.getX()),Math.round((float)StartCurve.getY()));
+			this.drawCP(g2, p2, Color.GREEN);
 		}
 		if (!secondModus.dragged())
 			return; //Draw all other stuff only while drag
@@ -237,24 +242,21 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				g2.drawLine(Math.round((float)p.getX()*zoomfactor),Math.round((float)p.getY()*zoomfactor),
 						Math.round((float)p2.getX()*zoomfactor), Math.round((float)p2.getY()*zoomfactor));
 		}
-		if (tempshape!=null)
+		if ((actualMouseState&SUBCURVE_MOUSEHANDLING) > 0)
+		{ //This modus always delivers the shape including an subcurve, though this might be an empty shape
+			NURBSShape drawSel = ((NURBSShapeFragment)tempshape).getSubCurve().clone(); //Is only a NURBS
+			drawSel.scale(zoomfactor);
+			g2.setColor(selColor.darker());
+			g2.setStroke(new BasicStroke(((float)selWidth/2f+(float)vG.modifyHyperEdges.get(highlightedHyperEdge).getWidth())*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			g2.draw(drawSel.getCurve(5d/(double)zoomfactor)); //draw only a preview				
+		}
+		else
 		{
-			if ((actualMouseState&SUBCURVE_MOUSEHANDLING) > 0)
-			{ //This modus always delivers the shape including an subcurve, though this might be an empty shape
-				NURBSShape drawSel = ((NURBSShapeFragment)tempshape).getSubCurve().clone(); //Is only a NURBS
-				drawSel.scale(zoomfactor);
-				g2.setColor(selColor.darker());
-				g2.setStroke(new BasicStroke(((float)selWidth/2f+(float)vG.modifyHyperEdges.get(highlightedHyperEdge).getWidth())*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-				g2.draw(drawSel.getCurve(5d/(double)zoomfactor)); //draw only a preview				
-			}
-			else
-			{
-				NURBSShape draw = tempshape.stripDecorations().clone(); //Just Curve itself
-				draw.scale(zoomfactor);
-				g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-				g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
-			}
-		}			
+			NURBSShape draw = tempshape.stripDecorations().clone(); //Just Curve itself
+			draw.scale(zoomfactor);
+			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
+		}
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
