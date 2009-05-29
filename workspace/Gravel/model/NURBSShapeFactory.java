@@ -424,12 +424,13 @@ public class NURBSShapeFactory {
 			Point2D pnext = iter.next();
 			if (pnext.getY()<pivot.getY()) //new smallest
 				pivot = (Point2D) pnext.clone();
-			else if ((pnext.getY()==pivot.getY())&&(pnext.getX()<pivot.getX()))
+			else if ((pnext.getY()==pivot.getY())&&(pnext.getX()>pivot.getX())) //Seach top right if both top
 				pivot = (Point2D) pnext.clone();					
 		}
 		//Sort the Points nextP-P by angle with the X-Axis, which is between 0 and 180
 		//Not so fast implemented but that is not so important, i think
 		Vector<Point2D> sortedByAngle = new Vector<Point2D>();
+		
 		iter = nodes.iterator();
 		while (iter.hasNext())
 		{
@@ -459,16 +460,15 @@ public class NURBSShapeFactory {
 		}
 		Vector<Point2D> result = new Vector<Point2D>();
 		result.setSize(2);
-		//Add the first two Elements
+		//Add the first two Elements - the first is pivot per def
 		result.set(0, sortedByAngle.get(0));
 		result.set(1, sortedByAngle.get(1));
 		
 		for (int i=2; i < sortedByAngle.size(); i++)
 		{
 			while ((result.size()>=2)
-					&&(CrossProduct(result.get(result.size()-2), result.lastElement(), sortedByAngle.get(i))<=0))
+					&&(CrossProduct(result.get(result.size()-2), result.lastElement(), sortedByAngle.get(i))<0))
 				result.remove(result.size()-1);
-
 			result.add(sortedByAngle.get(i));
 		}		 
 		return result;
