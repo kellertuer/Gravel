@@ -107,11 +107,13 @@ public class HESFreeModComponent implements ActionListener {
 		c.gridwidth=2;
 		bModificationModus = new ButtonGroup();
 		rModGlobal = new JRadioButton("global");
+		rModGlobal.setSelected(true);
 		rModGlobal.addActionListener(this);
 		bModificationModus.add(rModGlobal);
 		FreeModFields.add(rModGlobal,c);
 		c.gridx+=2;
 		rModLocal = new JRadioButton("lokal");
+		rModLocal.setSelected(false);
 		rModLocal.addActionListener(this);
 		bModificationModus.add(rModLocal);
 		FreeModFields.add(rModLocal,c);

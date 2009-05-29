@@ -389,6 +389,7 @@ public class NURBSShapeFactory {
 			}
 			double thisX = ConvexHull.get(i).getX();
 			double thisY = ConvexHull.get(i).getY();
+			
 			int pos = nodes.indexOf(ConvexHull.get(i));
 			Point2D direction1 = new Point2D.Double(prevX-thisX, prevY-thisY);
 			double dir1l = direction1.distance(0d,0d);
@@ -396,11 +397,38 @@ public class NURBSShapeFactory {
 			double dir2l = direction2.distance(0d,0d);
 			Point2D direction3 = new Point2D.Double(direction1.getX()+direction2.getX(), direction1.getY()+direction2.getY());
 			double dir3l = direction3.distance(0d,0d);
-			IPoints.add(new Point2D.Double(thisX - direction1.getX()/dir1l*(distance+(double)sizes.get(pos)/2d), thisY - direction1.getY()/dir1l*(distance+(double)sizes.get(pos)/2d)));
-			IPoints.add(new Point2D.Double(thisX - direction2.getX()/dir2l*(distance+(double)sizes.get(pos)/2d), thisY - direction2.getY()/dir2l*(distance+(double)sizes.get(pos)/2d)));
-			IPoints.add(new Point2D.Double(thisX - direction3.getX()/dir3l*(distance+(double)sizes.get(pos)/2d), thisY - direction3.getY()/dir3l*(distance+(double)sizes.get(pos)/2d)));
+
+			//get inner degree at this by computing dir1-dir2 and get the degree from that direction
+			double sk = (direction1.getX()*direction2.getX() + direction1.getY()*direction2.getY()) / (dir1l*dir2l);
+			double x = Math.acos(sk);			
+			Point2D p1,p2,p3; //Add these three points depending on arc
+			double scaleby = (distance+Math.ceil((double)(sizes.get(pos))/2d));
+			if (x < Math.PI/4d) //less than 45°
+			{
+				//rotate around thisX to form a kind of circle
+				p1 = new Point2D.Double(thisX - direction3.getY()/dir3l*scaleby, thisY + direction3.getX()/dir3l*scaleby);
+				p2 = new Point2D.Double(thisX - direction3.getX()/dir3l*scaleby, thisY - direction3.getY()/dir3l*scaleby);						
+				p3 = new Point2D.Double(thisX + direction3.getY()/dir3l*scaleby, thisY - direction3.getX()/dir3l*scaleby);
+			}
+			else if (x < Math.PI/(1.5d)) //less than 125°
+			{		
+				p1 = new Point2D.Double(thisX - direction2.getX()/dir2l*scaleby, thisY - direction2.getY()/dir2l*scaleby);
+				p2 = new Point2D.Double(thisX - direction3.getX()/dir3l*scaleby*Math.sqrt(2), thisY - direction3.getY()/dir3l*scaleby*Math.sqrt(2));
+				p3 = new Point2D.Double(thisX - direction1.getX()/dir1l*scaleby*Math.sqrt(2), thisY - direction1.getY()/dir1l*scaleby*Math.sqrt(2));
+			}
+			else
+			{	//rotate dir 3 by 90° ccw
+				direction3 = new Point2D.Double(direction1.getX()-direction2.getX(), direction1.getY()-direction2.getY());
+				direction3 = new Point2D.Double(direction3.getY(),-direction3.getX());
+				dir3l = direction3.distance(0,0);
+				p2 = new Point2D.Double(thisX - direction3.getX()/dir3l*scaleby, thisY - direction3.getY()/dir3l*scaleby);
+				p1 = new Point2D.Double(p2.getX()+(direction1.getX()/5),p2.getY()+(direction1.getY()/5));//parallel to direction1
+				p3 = new Point2D.Double(p2.getX()+(direction2.getX()/5),p2.getY()+(direction2.getY()/5));//parallel to direction2
+			}	
+			IPoints.add(p1);
+			IPoints.add(p2);
+			IPoints.add(p3);
 		}
-		IPoints = GrahamsScan(IPoints); //Make convex again
 		if (IPoints.size()<=(2*degree))
 			return new NURBSShape();
 		return CreateInterpolation(IPoints, degree);
@@ -414,7 +442,7 @@ public class NURBSShapeFactory {
 	 * 
 	 * @return Points of the nodes that from the convex hull in clockwise order
 	 */
-	private static Vector<Point2D> GrahamsScan(Vector<Point2D> nodes)
+	public static Vector<Point2D> GrahamsScan(Vector<Point2D> nodes)
 	{
 		//Find Pivot Point with lowest Y Coordinate. If there are two, take the one with lowest X
 		Point2D pivot = new Point2D.Double(Double.MAX_VALUE,Double.MAX_VALUE);

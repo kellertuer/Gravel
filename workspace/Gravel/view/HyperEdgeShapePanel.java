@@ -119,8 +119,6 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		cBasicShape.setSelectedIndex(0);
 		cBasicShape.setPreferredSize(new Dimension(100, 30));
 		cBasicShape.addActionListener(this);
-		//If we don't have a Shape...set it to visible because it's toggled at the end of this method to init visibility
-		cBasicShape.setVisible(!HGraphRef.modifyHyperEdges.get(index).getShape().isEmpty());
 		BasicShape = new JLabel("<html><p>Grundform</p></html>");
 		cont.add(BasicShape,c);
 		c.gridx++;
@@ -170,7 +168,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		//
 		c.anchor = GridBagConstraints.SOUTH;
 		bModeChange = new JButton("Modifikation"); //Name suchen!
-		bModeChange.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
+		bModeChange.setEnabled(true);
+		//!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 		bModeChange.addActionListener(this);
 		cont.add(bModeChange,c);
 
@@ -217,6 +216,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		cont.validate();
 		cont.doLayout();
 		setCreationFieldVisibility(false);
+		//If we don't have a Shape...set it to visible because it's toggled at the end of this method to init visibility
+		cBasicShape.setVisible(!HGraphRef.modifyHyperEdges.get(index).getShape().isEmpty());
 		actionPerformed(new ActionEvent(bModeChange,0,"Refresh"));
 	}
 	
@@ -344,7 +345,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		}
 		NURBSCreationMessage nm = new NURBSCreationMessage(
 				iDegree.getValue(), 
-				HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin()+ (new Double(Math.ceil((double)HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getWidth()/2d))).intValue(),
+				HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin()+ (new Double(Math.ceil((double)HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getWidth()))).intValue(),
 				nodepos,
 				nodesizes);
 		NURBSShape s = NURBSShapeFactory.CreateShape(nm);
