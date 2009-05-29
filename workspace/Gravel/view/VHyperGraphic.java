@@ -15,6 +15,8 @@ import java.util.Vector;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
+import javax.vecmath.Point3d;
+
 import control.*;
 import model.*;
 import model.Messages.*;
@@ -72,7 +74,7 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-//	paintDEBUG(g2);
+	paintDerivDEBUG(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
@@ -100,16 +102,6 @@ public class VHyperGraphic extends VCommonGraphic
 		cs.scale(zoomfactor);
 		g2.setColor(Color.black);
 		g2.draw(cs.getCurve(5d/(double)zoomfactor));
-		//
-		// Start of Validation-Algorithm
-		//
-		Iterator<VNode> nid = vG.modifyNodes.getIterator();
-		while (nid.hasNext())
-		{
-			VNode n = nid.next();
-			Point2D p = new Point2D.Double(n.getPosition().getX(),n.getPosition().getY());
-			NURBSShapeValidator.findSuccessor(p, null, c,g2,zoomfactor);
-		}
 	}
 	private void paintDerivDEBUG(Graphics2D g2)
 	{
@@ -138,6 +130,7 @@ public class VHyperGraphic extends VCommonGraphic
 		}
 		g2.setColor(Color.black);
 		NURBSShape c = new  NURBSShape(knots,points,weights);
+//		c = NURBSShapeFactory.CreateShape(new NURBSCreationMessage(2, new Point2D.Double(200d,200d),150));
 		g2.setStroke(new BasicStroke(2,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		NURBSShape cs = c.clone();
 		cs.scale(zoomfactor);
@@ -151,23 +144,45 @@ public class VHyperGraphic extends VCommonGraphic
 						Math.round((float)c.controlPoints.get(i-1).getX()*zoomfactor),Math.round((float)c.controlPoints.get(i-1).getY()*zoomfactor));
 			}
 		}
-		for (int i=0; i<1000; i++)
+		if (vG.modifyNodes.get(1)==null)
 		{
-			double pos = c.Knots.get(c.degree) + (c.Knots.get(c.degree)+c.Knots.get(c.maxKnotIndex-c.degree))*((double) i)/1000d;
-			Point2D p = c.CurveAt(pos);
-//			drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),Color.LIGHT_GRAY);
-			Point2D ps = c.DerivateCurveAt(1,pos);
-			g2.setColor(Color.orange.brighter());
-			Point2D normps = new Point2D.Double(ps.getX()/ps.distance(0d,0d),ps.getY()/ps.distance(0d,0d));
-			Point2D deriv2 = c.DerivateCurveAt(2,pos);
-			double length = deriv2.distance(0d,0d)/80;
-			length = Math.abs(length);
-			
-			//Now orthogonal to the first derivate the seconds derivates length
-			g2.drawLine(Math.round((float)p.getX()*zoomfactor), Math.round((float)p.getY()*zoomfactor),
-					Math.round((float)(p.getX()-normps.getY()*length)*zoomfactor),
-					Math.round((float)(p.getY()+normps.getX()*length)*zoomfactor));
+			for (int i=0; i<1000; i++)
+			{
+				DerivateHelper(c, c.Knots.get(c.degree) + (c.Knots.get(c.degree)+c.Knots.get(c.maxKnotIndex-c.degree))*((double) i)/1000d, g2);
+			}
 		}
+		else
+		{
+			Iterator<VNode> iter = vG.modifyNodes.getIterator();
+			while (iter.hasNext())
+			{
+				VNode actual = iter.next();
+				Point2D p = new Point2D.Double(actual.getPosition().x,actual.getPosition().y);
+				NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
+				DerivateHelper(c,proj.getResultParameter(), g2);
+			}
+		}
+	}
+	private void DerivateHelper(NURBSShape c, double pos, Graphics2D g2)
+	{
+		Point2D p = c.CurveAt(pos);
+//		drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),Color.LIGHT_GRAY);
+		Point2D deriv1 = c.DerivateCurveAt(1,pos);
+		g2.setColor(Color.orange.brighter());
+		Point2D deriv2 = c.DerivateCurveAt(2,pos);
+
+		double l = deriv1.getX()*deriv1.getX() + deriv1.getY()*deriv1.getY();
+		double curvature = (deriv1.getX()*deriv2.getY() - deriv2.getX()*deriv1.getY())/ Math.sqrt(l*l*l);
+		curvature = curvature*c.WeightAt(pos);
+		curvature = Math.abs(curvature)*1000;
+		System.err.println(curvature);
+		Point2D normps = new Point2D.Double(deriv1.getX()/deriv1.distance(0d,0d),deriv1.getY()/deriv1.distance(0d,0d));
+
+		//Now orthogonal to the first derivate the seconds derivates length
+		g2.drawLine(Math.round((float)p.getX()*zoomfactor), Math.round((float)p.getY()*zoomfactor),
+				Math.round((float)(p.getX()-normps.getY()*curvature)*zoomfactor),
+				Math.round((float)(p.getY()+normps.getX()*curvature)*zoomfactor));
+
 	}
 	private void paintPIDEBUG(Graphics2D g2)
 	{

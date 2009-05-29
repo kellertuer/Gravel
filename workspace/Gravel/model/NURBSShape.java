@@ -494,6 +494,16 @@ public class NURBSShape {
 			return new Point2D.Double(erg.x/erg.z,erg.y/erg.z);
 		
 	}
+	public double WeightAt(double u)
+	{
+		Point3d erg = deBoer3D(u); //Result in homogeneous Values on Our Points
+		if (erg==null)
+		{
+			System.err.println(u+" not in "+Knots.firstElement()+","+Knots.lastElement()+"");
+			return Double.NaN;
+		}
+			return erg.z;
+	}
 	/**
 	 * get the Value of the degree-th Derivate of this NURBS at Position u
 	 * @param pDegree

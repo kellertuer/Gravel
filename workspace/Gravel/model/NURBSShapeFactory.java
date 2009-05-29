@@ -402,7 +402,7 @@ public class NURBSShapeFactory {
 			double sk = (direction1.getX()*direction2.getX() + direction1.getY()*direction2.getY()) / (dir1l*dir2l);
 			double x = Math.acos(sk);			
 			Point2D p1,p2,p3; //Add these three points depending on arc
-			double scaleby = (distance+Math.ceil((double)(sizes.get(pos))/2d));
+			double scaleby = (distance+Math.ceil((double)(sizes.get(pos))/2d)+2);
 			if (x < Math.PI/4d) //less than 45°
 			{
 				//rotate around thisX to form a kind of circle
@@ -413,8 +413,13 @@ public class NURBSShapeFactory {
 			else if (x < Math.PI/(1.5d)) //less than 125°
 			{		
 				p1 = new Point2D.Double(thisX - direction2.getX()/dir2l*scaleby, thisY - direction2.getY()/dir2l*scaleby);
-				p2 = new Point2D.Double(thisX - direction3.getX()/dir3l*scaleby*Math.sqrt(2), thisY - direction3.getY()/dir3l*scaleby*Math.sqrt(2));
-				p3 = new Point2D.Double(thisX - direction1.getX()/dir1l*scaleby*Math.sqrt(2), thisY - direction1.getY()/dir1l*scaleby*Math.sqrt(2));
+				p2 = new Point2D.Double(thisX - direction3.getX()/dir3l*scaleby, thisY - direction3.getY()/dir3l*scaleby);
+				//Update p2 to get far away from thisX
+				double d2 = p2.distance(thisX,thisY);
+				p2 = new Point2D.Double(thisX + (p2.getX()-thisX)/d2*scaleby,thisY + (p2.getY()-thisY)/d2*scaleby);
+				p3 = new Point2D.Double(thisX - direction1.getX()/dir1l*scaleby, thisY - direction1.getY()/dir1l*scaleby);
+				double d3 = p3.distance(thisX,thisY);
+				p3 = new Point2D.Double(thisX + (p3.getX()-thisX)/d3*scaleby,thisY + (p3.getY()-thisY)/d3*scaleby);
 			}
 			else
 			{	//rotate dir 3 by 90° ccw

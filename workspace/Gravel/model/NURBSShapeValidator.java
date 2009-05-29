@@ -115,9 +115,9 @@ public class NURBSShapeValidator extends NURBSShape {
 			{	
 				pointInformation.get(actualP).radius = radius; //Change radius
 				g2.setColor(Color.gray);
-				g2.drawOval(Math.round((float)(actualP.getX()-radius)),
-					Math.round((float)(actualP.getY()-radius)),
-					Math.round((float)(2*radius)), Math.round((float)(2*radius)));
+				g2.drawOval(Math.round((float)(actualP.getX()-radius)*g.zoomfactor),
+					Math.round((float)(actualP.getY()-radius)*g.zoomfactor),
+					Math.round((float)(2*radius)*g.zoomfactor), Math.round((float)(2*radius)*g.zoomfactor));
 				//Calculate Distance and direction from Point to its projection
 				Point2D ProjDir = new Point2D.Double(ProjP.getX()-actualP.getX(),ProjP.getY()-actualP.getY());
 				double length = ProjDir.distance(0d,0d);
@@ -339,11 +339,19 @@ public class NURBSShapeValidator extends NURBSShape {
 				Math.round((float)(p.getX()+ProjDir.getX())*z),
 				Math.round((float)(p.getY()+ProjDir.getY())*z));
 		
+		Point2D deriv1 = c.DerivateCurveAt(1,hatt);
 		Point2D deriv2 = c.DerivateCurveAt(2,hatt);
-		double kappa = Math.abs(deriv2.distance(0d,0d));
-		kappa /= 4000;
-		System.err.println("  - at "+hatt+" we have Abs2 "+kappa+" that is "+((Math.atan(kappa)+(Math.PI/2))/Math.PI)*180+" Degree");
-		double varphi = Math.atan(kappa)+(Math.PI/2); 
+		double l = deriv1.getX()*deriv1.getX() + deriv1.getY()*deriv1.getY();
+		double curvature = (deriv1.getX()*deriv2.getY() - deriv2.getX()*deriv1.getY())/ Math.sqrt(l*l*l);
+		curvature = curvature*c.WeightAt(hatt);
+		curvature = Math.abs(curvature);
+
+		double varphi = Math.atan(curvature)+(Math.PI/2);
+		System.err.println("curv:"+curvature);
+		if (curvature > 1d/1000d)
+			varphi = Math.PI;
+		else
+			varphi = Math.PI/2d;
 		double newx = ProjDir.getX()* Math.cos(varphi) +  ProjDir.getY()*Math.sin(varphi);
 		double newy = -ProjDir.getX()*Math.sin(varphi) + ProjDir.getY()*Math.cos(varphi);
 		Point2D newp = new Point2D.Double(newx,newy);
