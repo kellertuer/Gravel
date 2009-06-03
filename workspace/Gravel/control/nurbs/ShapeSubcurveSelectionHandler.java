@@ -100,13 +100,14 @@ public class ShapeSubcurveSelectionHandler implements
 			NURBSShapeFragment t = (NURBSShapeFragment)s;
 			tempStart = t.getStart();
 			tempEnd = t.getEnd();
+			temporaryShape = new NURBSShapeFragment(t,tempStart,tempEnd);
 		}
 		else
 		{
 			tempStart=Double.NaN;
 			tempEnd = Double.NaN;
+			temporaryShape = s.clone();
 		}
-		temporaryShape = s.clone();
 		// This is pushed in side the Drag-Block if it happens while dragging so
 		// the whole action is only captured as one
 		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,
@@ -161,6 +162,7 @@ public class ShapeSubcurveSelectionHandler implements
 			{
 				((NURBSShapeFragment)temporaryShape).setStart(tempStart);
 				((NURBSShapeFragment)temporaryShape).setStart(tempEnd);
+				((NURBSShapeFragment)temporaryShape).refreshDecoration();
 			}
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 		}

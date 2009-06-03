@@ -74,7 +74,7 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-	paintDerivDEBUG(g2);
+	paintDEBUG(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
@@ -100,8 +100,70 @@ public class VHyperGraphic extends VCommonGraphic
 		g2.setStroke(new BasicStroke(1.2f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		NURBSShape cs = c.stripDecorations().clone();
 		cs.scale(zoomfactor);
+		if (vG.modifyNodes.get(3)==null)
+		{
+			g2.setColor(Color.black);
+			g2.draw(cs.getCurve(5d/(double)zoomfactor));
+			return;
+		}
+		double u1 = (new NURBSShapeProjection(c, new Point2D.Double(vG.modifyNodes.get(1).getPosition().getX(),vG.modifyNodes.get(1).getPosition().getY()))).getResultParameter();
+		double u2 = (new NURBSShapeProjection(c, new Point2D.Double(vG.modifyNodes.get(2).getPosition().getX(),vG.modifyNodes.get(2).getPosition().getY()))).getResultParameter();
+		drawCP(g2,new Point(Math.round((float)c.CurveAt(u1).getX()), Math.round((float)c.CurveAt(u1).getY())), Color.ORANGE);
+		drawCP(g2,new Point(Math.round((float)c.CurveAt(u2).getX()), Math.round((float)c.CurveAt(u2).getY())), Color.ORANGE);
+
+		Vector<Double> ref = new Vector<Double>();
+//		ref.add(u1);
+//		c.RefineKnots(ref);c.updateCircular(u2<u1);
+		ref.clear(); ref.add(u2);
+		c.RefineKnots(ref);c.updateCircular(u1<u2);
+		
+//		Draw Sel
+		System.err.println(u1+" DEBUG "+u2);
+		NURBSShapeFragment s = new NURBSShapeFragment(c,u2,u1);
+		s.prepareFragment(); //So we have enough CP between u2 and u1
+		s = new NURBSShapeFragment(s.stripDecorations(),u1,u2); //Refine other half, the one selected
+		float selSize = (float)selWidth/2f + (float) 1;
+		NURBSShape drawSel = s.getSubCurve().stripDecorations().clone(); //really only nurbs
+		drawSel.scale(zoomfactor);
+		g2.setColor(selColor);
+		g2.setStroke(new BasicStroke(selSize*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		g2.draw(drawSel.getCurve(5d/(double)zoomfactor)); //draw only a preview				
+
+//		Draw Curve
+		g2.setStroke(new BasicStroke(1.3f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		g2.setColor(Color.black);
 		g2.draw(cs.getCurve(5d/(double)zoomfactor));
+
+//handle Nodes 3,... as IPfor subcurve replacement
+		s.prepareFragment(); //So we have enough CP between u1 and u2
+		int k1 = s.findSpan(u1);
+		int k2 = s.findSpan(u2);
+		double offset = s.Knots.get(s.maxKnotIndex-s.degree)-s.Knots.get(s.degree);
+		for (int i=0; i<=c.degree; i++)
+		{
+			double pos;
+			if ((k1-i)<0)
+				pos = s.Knots.get(k1-i+s.maxKnotIndex-s.degree);
+			else
+				pos = s.Knots.get(k1-i);
+			if (pos<c.Knots.get(degree))
+				pos += offset;
+			else if (pos>s.Knots.get(s.maxKnotIndex-s.degree))
+				pos -= offset;
+			
+			drawCP(g2,new Point(Math.round((float)s.CurveAt(pos).getX()), Math.round((float)s.CurveAt(pos).getY())), Color.RED);
+
+			if ((k2+i)>(s.maxKnotIndex-s.degree))
+				pos = s.Knots.get(k2+i-s.maxKnotIndex+s.degree);
+			else
+				pos = s.Knots.get(k2+i);
+
+			if (pos<s.Knots.get(degree))
+				pos += offset;
+			else if (pos>s.Knots.get(s.maxKnotIndex-s.degree))
+				pos -= offset;
+			drawCP(g2,new Point(Math.round((float)c.CurveAt(pos).getX()), Math.round((float)c.CurveAt(pos).getY())), Color.GREEN);			
+		}
 	}
 	private void paintDerivDEBUG(Graphics2D g2)
 	{
@@ -186,36 +248,27 @@ public class VHyperGraphic extends VCommonGraphic
 	}
 	private void paintPIDEBUG(Graphics2D g2)
 	{
-		Vector<Double> knots = new Vector<Double>();
-		for (int i=0; i<=22; i++)
-			knots.add(((double)i-3d)/6d);
-		
-		Vector<Point2D> points = new Vector<Point2D>();
-		Vector<Double> weights = new Vector<Double>();
-		points.add(new Point2D.Double(30d,5d)); weights.add(.8);
-		points.add(new Point2D.Double(50d,45d)); weights.add(.7);
-		points.add(new Point2D.Double(150d,275d)); weights.add(1d);
-		points.add(new Point2D.Double(160d,275d)); weights.add(1d);
-		points.add(new Point2D.Double(170d,275d)); weights.add(1d);
-		points.add(new Point2D.Double(300d,75d)); weights.add(1d);
-		points.add(new Point2D.Double(400d,175d)); weights.add(2d);
-		points.add(new Point2D.Double(500d,75d)); weights.add(2d);
-		points.add(new Point2D.Double(500d,100d)); weights.add(2d);
-		points.add(new Point2D.Double(550d,65d)); weights.add(2d);
-		points.add(new Point2D.Double(400d,50d)); weights.add(2d);
-		points.add(new Point2D.Double(200d,95d));weights.add(3d);
-		for (int i=0; i<3; i++)
-		{
-			points.add((Point2D)points.get(i).clone());
-			weights.add(weights.get(i).doubleValue());
-		}
-		for (int i=0; i<points.size(); i++)
-		{
-			float gv = 0f;
-			drawCP(g2,new Point(Math.round((float)points.get(i).getX()),Math.round((float)points.get(i).getY())),new Color(gv,gv,gv));
-		}
-		g2.setColor(Color.black);
-		NURBSShape c = new  NURBSShape(knots,points,weights);
+		Vector<Point2D> IP = new Vector<Point2D>();
+		IP.add(new Point2D.Double(60,200));
+		IP.add(new Point2D.Double(50,130));
+		IP.add(new Point2D.Double(150,60));
+		IP.add(new Point2D.Double(270,80));
+		IP.add(new Point2D.Double(270,120));
+		IP.add(new Point2D.Double(220,130));
+		IP.add(new Point2D.Double(200,200));
+		IP.add(new Point2D.Double(200,230));
+		IP.add(new Point2D.Double(270,230));
+		IP.add(new Point2D.Double(400,200));
+		IP.add(new Point2D.Double(400,300));
+		IP.add(new Point2D.Double(230,290));
+		IP.add(new Point2D.Double(200,280));
+		IP.add(new Point2D.Double(175,290));
+		IP.add(new Point2D.Double(185,320));
+		IP.add(new Point2D.Double(80,350));
+		int degree = 6;
+		NURBSCreationMessage nm = new NURBSCreationMessage(degree, NURBSCreationMessage.ADD_END, IP);
+		NURBSShape c = NURBSShapeFactory.CreateShape(nm);
+
 		g2.setStroke(new BasicStroke(2,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		NURBSShape cs = c.clone();
 		cs.scale(zoomfactor);
@@ -231,8 +284,8 @@ public class VHyperGraphic extends VCommonGraphic
 			VNode actual = iter.next();
 			projectionpoints.add(actual.getPosition());
 		}
-	    long time = System.currentTimeMillis();
 	    System.err.print("#"+projectionpoints.size()+" ");
+	    long time = System.currentTimeMillis();
 	    for (int j=0; j<projectionpoints.size(); j++)
 		{
 			Point p = projectionpoints.get(j);
@@ -252,7 +305,6 @@ public class VHyperGraphic extends VCommonGraphic
         SimpleDateFormat sdf = new SimpleDateFormat("ss:SSS");
         System.err.println(" "+sdf.format(time)+" Sekunden");  
 	}
-	
 	/**
 	 * @param g
 	 */

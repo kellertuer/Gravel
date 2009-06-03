@@ -474,7 +474,11 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			{
 				if (((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) //Drag just ended -> Set Circle as Shape
 				{
-					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(secondModus.getShape());
+					NURBSShape s = secondModus.getShape();
+					if ((s.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
+						((NURBSShapeFragment)s).refreshDecoration();
+
+					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(s);
 					vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, highlightedHyperEdge, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE, GraphConstraints.HYPEREDGE)); //HyperEdgeShape Updated
 					secondModus.resetShape();
 				}

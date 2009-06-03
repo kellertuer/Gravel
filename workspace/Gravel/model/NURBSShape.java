@@ -42,7 +42,7 @@ public class NURBSShape {
 	public Vector<Point2D> controlPoints; //ControlPoints, TODO: Set protected after DEBUG
 	protected Vector<Double> cpWeight;
 	protected Vector<Point3d> controlPointsHom; //b in homogeneous coordinates multiplied by weight
-	private int NURBSType; //May be clamped or unclamped	
+	protected int NURBSType; //May be clamped or unclamped	
 	//TODO: Set Protected after finishing debug
 	public int maxKnotIndex, //The Knots are numbered 0,1,...,maxKnotIndex
 				maxCPIndex, //The ControlPoints are numbered 0,1,...,maxCPIndex
@@ -444,19 +444,19 @@ public class NURBSShape {
 		return path;
 	}
 	/**
-	 * Find the interval u \in [t.get(j),t.get(j+1)] and return the index j
+	 * Find the interval u \in [t.get(j),t.get(j+1)) and return the index j
 	 * 
 	 * because the first and last d+1 values of t are assumed equal, the 
 	 * @param u
 	 * @return
 	 */
-	protected int findSpan(double u)
+	public int findSpan(double u) //TODO Set protected again after debug
 	{
 		if ((u<Knots.firstElement())||(u>Knots.lastElement())) //Out of range for all types
 				return -1;
 		if ((NURBSType&UNCLAMPED)==UNCLAMPED) //Unclamped Curve, starts with Knots.get(d) ends with maxCPIndex-d
 		{
-			if ((u<Knots.get(degree)||(u>Knots.get(maxKnotIndex-degree))))
+			if ((u<Knots.get(degree))||(u>Knots.get(maxKnotIndex-degree)))
 					return -1;			
 		}
 		//Binary Search for the intervall
@@ -485,7 +485,7 @@ public class NURBSShape {
 		Point3d erg = deBoer3D(u); //Result in homogeneous Values on Our Points		
 		if (erg==null)
 		{
-			System.err.println(u+" not in "+Knots.firstElement()+","+Knots.lastElement()+"");
+			System.err.println(u+" not in "+Knots.get(degree)+","+Knots.get(maxKnotIndex-degree)+"");
 			return null;
 		}
 		if (erg.z==0) //
@@ -811,7 +811,7 @@ public class NURBSShape {
 	 * 
 	 * @param changeFront
 	 */
-	protected void updateCircular(boolean changeFront)
+	public void updateCircular(boolean changeFront)//TODO Set protected after debug
 	{
 		double offset = Knots.get(maxKnotIndex-degree)-Knots.get(degree);
 		//Update Circular Part front
@@ -821,7 +821,6 @@ public class NURBSShape {
 				Knots.set(j, Knots.get(maxKnotIndex-2*degree+j).doubleValue()-offset);
 			for (int j=0; j<degree; j++)
 			{
-				System.err.println("Setting "+j+" to "+(maxCPIndex-degree+1+j));
 				controlPoints.set(j, (Point2D) controlPoints.get(maxCPIndex-degree+1+j).clone());
 				cpWeight.set(j, cpWeight.get(maxCPIndex-degree+1+j).doubleValue());
 			}
@@ -837,6 +836,7 @@ public class NURBSShape {
 			}
 
 		}
+		refreshInternalValues();
 	}
 	
 	/**
@@ -871,30 +871,30 @@ public class NURBSShape {
 		for (int j=b-1; j<=maxCPIndex; j++)//Copy the last not changed values of the CPs
 			newPw.set(j+X.size(), (Point3d) controlPointsHom.get(j).clone());
 		for (int j=0; j<=a; j++)//Copy the first not changed values of t
-			newt.set(j, Knots.get(j));
+			newt.set(j, Knots.get(j).doubleValue());
 		for (int j=b+degree; j<=maxKnotIndex; j++)//Copy the last not changed values of t
-			newt.set(j+X.size(), Knots.get(j));
+			newt.set(j+X.size(), Knots.get(j).doubleValue());
 		
 		int i=b+degree-1; //Last Value that's new in t
 		int k=b+degree+X.size()-1; //Last Value that's new in Pw
 		for (int j=X.size()-1; j>=0; j--) //Insert new knots backwards beginning at X.lastElement
 		{ 
-			while ((X.get(j) <= Knots.get(i)) && i > a) //These Values are not affected by Insertion of actual Not, copy them
+			while ((X.get(j) <= Knots.get(i)) && (i > a)) //These Values are not affected by Insertion of actual Not, copy them
 			{
 				newPw.set(k-degree-1, (Point3d) controlPointsHom.get(i-degree-1).clone());
-				newt.set(k, Knots.get(i));
+				newt.set(k, Knots.get(i).doubleValue());
 				k--;i--;
 			}
 			newPw.set(k-degree-1, (Point3d) newPw.get(k-degree).clone());
 			for (int l=1; l<=degree; l++)
 			{
 				int actualindex = k-degree+l;
-				double alpha = newt.get(k+l)-X.get(j);
+				double alpha = newt.get(k+l).doubleValue()-X.get(j).doubleValue();
 				if (Math.abs(alpha) == 0.0d)
 					newPw.set(actualindex-1, (Point3d) newPw.get(actualindex).clone());
 				else
 				{
-					alpha = alpha/(newt.get(k+l)-Knots.get(i-degree+l));
+					alpha = alpha/(newt.get(k+l).doubleValue()-Knots.get(i-degree+l).doubleValue());
 					Point3d p1 = (Point3d) newPw.get(actualindex-1).clone();
 					p1.scale(alpha);
 					Point3d p2 = (Point3d) newPw.get(actualindex).clone();
@@ -903,7 +903,7 @@ public class NURBSShape {
 					newPw.set(actualindex-1,p1);
 				}
 			} //All Points recomputed for this insertion
-			newt.set(k, X.get(j));
+			newt.set(k, X.get(j).doubleValue());
 			k--;
 		}
 		//Recompute Points & weights
