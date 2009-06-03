@@ -165,6 +165,7 @@ public class NURBSShapeFactory {
 			c.controlPoints.set(i,(Point2D)middle.clone());
 			c.controlPoints.set(c.maxCPIndex-degree+1+i,middle);
 		}
+		c.refreshInternalValues();
 		return c;
 	}
 

@@ -252,7 +252,7 @@ public class NURBSShape {
 	 * Initialization of the internal homogeneous Vector
 	 * Should be called everytime either the b or w vector are completly exchanged
 	 */
-	protected void refreshInternalValues()
+	public void refreshInternalValues() //TODO Set protected after DEBUG
 	{
 		controlPointsHom = new Vector<Point3d>();
 		Iterator<Point2D> ib =  controlPoints.iterator();
@@ -485,7 +485,7 @@ public class NURBSShape {
 		Point3d erg = deBoer3D(u); //Result in homogeneous Values on Our Points		
 		if (erg==null)
 		{
-			System.err.println(u+" not in "+Knots.get(degree)+","+Knots.get(maxKnotIndex-degree)+"");
+			System.err.println("NURBSShape::CurveAt "+u+" not in "+Knots.get(degree)+","+Knots.get(maxKnotIndex-degree)+"");
 			return null;
 		}
 		if (erg.z==0) //
@@ -499,7 +499,7 @@ public class NURBSShape {
 		Point3d erg = deBoer3D(u); //Result in homogeneous Values on Our Points
 		if (erg==null)
 		{
-			System.err.println(u+" not in "+Knots.firstElement()+","+Knots.lastElement()+"");
+			System.err.println("NURBSShape::WeightAt3D: "+u+" not in "+Knots.get(degree)+","+Knots.get(maxKnotIndex-degree)+"");
 			return Double.NaN;
 		}
 			return erg.z;

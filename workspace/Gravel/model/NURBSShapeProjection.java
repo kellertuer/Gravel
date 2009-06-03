@@ -40,8 +40,7 @@ public class NURBSShapeProjection extends NURBSShape
 		NURBSShape clone = Curve.clone(); //We clone with decorations - if anybody wants to project really only on curve - strip before init
 		//If it is unclamped - clamp it!
 		if ((clone.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
-			clone = 
-				(new NURBSShapeFragment(clone,clone.Knots.get(clone.degree), clone.Knots.get(clone.maxKnotIndex-clone.degree))).getSubCurve();
+			clone = clamp(clone);
 		//Set internal Curve to this curve clone
 		setCurveTo(clone.Knots, clone.controlPoints, clone.cpWeight);
 		resultu=Knots.firstElement();
@@ -471,7 +470,55 @@ public class NURBSShapeProjection extends NURBSShape
 		BezierSegments.add(new NURBSShape(bezierKnots, bezierCP));
 		return BezierSegments;
 	}
-
+	
+	private NURBSShape clamp(NURBSShape c)
+	{
+		double u1 = c.Knots.get(c.degree);
+		double u2 = c.Knots.get(c.maxKnotIndex-c.degree);
+		int Start = c.findSpan(u1);
+		int End = c.findSpan(u2);
+		int multStart=0, multEnd=0;
+		if (c.Knots.get(c.maxKnotIndex-c.degree)==u2) //Last possible Value the Curve is evaluated
+			End++; //Becaue the intervall per se is open but we need the next interval
+		//Raise both endvalues to multiplicity d to get an clamped curve
+		while (c.Knots.get(Start+multStart).doubleValue()==u1)
+			multStart++;
+		while (c.Knots.get(End-multEnd).doubleValue()==u2)
+			multEnd++;
+		Vector<Double> Refinement = new Vector<Double>();
+		NURBSShape subcurve = c.clone();
+		for (int i=0; i<c.degree-multStart; i++)
+			Refinement.add(u1);
+		for (int i=0; i<c.degree-multEnd; i++)
+			Refinement.add(u2);
+		subcurve.RefineKnots(Refinement);
+		Vector<Point2D> newCP = new Vector<Point2D>();
+		Vector<Double> newWeight= new Vector<Double>();
+		int subStart = subcurve.findSpan(u1);
+		int subEnd = subcurve.findSpan(u2);
+		if (subcurve.Knots.get(subcurve.maxKnotIndex-subcurve.degree)==u2)
+			subEnd++;
+		for (int i=subStart-c.degree; i<=subEnd-c.degree; i++) //Copy needed CP
+		{
+			newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
+			newWeight.add(subcurve.cpWeight.get(i).doubleValue());
+		}
+		//Copy needed Knots
+		Vector<Double> newKnots = new Vector<Double>();
+		newKnots.add(u1);
+		int index = 0;
+		while (subcurve.Knots.get(index)<u1)
+			index++;
+		while (subcurve.Knots.get(index)<=u2)
+		{
+			newKnots.add(subcurve.Knots.get(index).doubleValue());
+			index++;
+		}
+		newKnots.add(u2);
+		NURBSShape retval = new NURBSShape(newKnots,newCP,newWeight);
+		return retval;
+	}
+	
 	long nint(double x)
 	{
 		if (x < 0.0) return (long) Math.ceil(x - 0.5);
