@@ -148,7 +148,7 @@ public class VHyperGraphic extends VCommonGraphic
 		g2.draw(cs.getCurve(5d/(double)zoomfactor));
 		
 //handle Nodes 3,... as IPfor subcurve replacement
-		s2.prepareFragment(); //So we have enough CP between u1 and u2
+//		s2.prepareFragment(); //So we have enough CP between u1 and u2
 		int k1 = s2.findSpan(u1);
 		int k2 = s2.findSpan(u2);
 		double offset = s2.Knots.get(s2.maxKnotIndex-s2.degree)-s2.Knots.get(s2.degree);
@@ -257,15 +257,21 @@ public class VHyperGraphic extends VCommonGraphic
 
 		//On Top draw new Curve
 		NURBSShape c2 = NURBSShapeFactory.CreateSubCurveInterpolation(s,q,g2);
+		if (c2.isEmpty())
+			return;
 		for (int i=0; i<=c2.maxCPIndex; i++)
 		{
-			drawCP(g2, new Point(Math.round((float)c2.controlPoints.get(i).getX()), Math.round((float)c2.controlPoints.get(i).getY())), Color.orange.brighter().brighter().brighter());
-			if (i>0)
-				g2.drawLine(Math.round((float)c2.controlPoints.get(i).getX()), 
-							Math.round((float)c2.controlPoints.get(i).getY()), 
-							Math.round((float)c2.controlPoints.get(i-1).getX()), 
-							Math.round((float)c2.controlPoints.get(i-1).getY()));
-			System.err.println(c2.controlPoints.get(i));
+//			drawCP(g2, new Point(Math.round((float)c2.controlPoints.get(i).getX()), Math.round((float)c2.controlPoints.get(i).getY())), Color.orange.brighter().brighter().brighter());
+//			if (i>0)
+//				g2.drawLine(Math.round((float)c2.controlPoints.get(i).getX()), 
+//							Math.round((float)c2.controlPoints.get(i).getY()), 
+//							Math.round((float)c2.controlPoints.get(i-1).getX()), 
+//							Math.round((float)c2.controlPoints.get(i-1).getY()));
+		}
+		for (int i=0; i<=c.maxKnotIndex; i++)
+		{
+			if (c.findSpan(c.Knots.get(i))!=-1)
+			drawCP(g2, new Point(Math.round((float)c.CurveAt(c.Knots.get(i)).getX()), Math.round((float)c.CurveAt(c.Knots.get(i)).getY())), Color.orange.brighter().brighter().brighter());
 		}
 		NURBSShape cs2 = c2.stripDecorations().clone();
 		cs2.scale(zoomfactor);

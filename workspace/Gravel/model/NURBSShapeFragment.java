@@ -83,19 +83,22 @@ public class NURBSShapeFragment extends NURBSShape {
 		if (subcurve!=null)
 			subcurve.clear();
 	}	
+	protected int prepareFragment()
+	{
+		return prepareFragment(u1,u2);
+	}
 	/**
 	 * Prepares the Fragment for manipulation of only that Part and returns the number of CP to change
 	 * these CP begin with findSpan(u1)+1
 	 * @return
 	 */
-	public int prepareFragment()
+	protected int prepareFragment(double t1, double t2)
 	{
 		Vector<Double> Refinement = new Vector<Double>();
-		int k1 = findSpan(u1);
-		int k2 = findSpan(u2);
-//		System.err.println(k1+" and "+k2+" vs."+(maxKnotIndex));
+		int k1 = findSpan(t1);
+		int k2 = findSpan(t2);
 		int returnval;
-		if (u1 < u2)
+		if (t1 < t2)
 		{
 			int r = k2-degree-k1-1; //Number of CP we have (without refinement) inside subcurve
 			int minNum = r-degree;
@@ -105,14 +108,14 @@ public class NURBSShapeFragment extends NURBSShape {
 				Refinement.clear();
 				for (int i=1; i<count; i++)
 				{ //TODO: Nonlinear refinement that produces more points at start/end then in the middle
-					double val = u1+ (u2-u1)*(double)i/(double)count;
+					double val = t1+ (t2-t1)*(double)i/(double)count;
 					if (!Knots.contains(val))
 						Refinement.add(val);
 					else 
-						Refinement.add(val+ (u2-u1)/(double)count*Math.random());
+						Refinement.add(val+ (t2-t1)/(double)count*Math.random());
 				}
 				RefineKnots(Refinement);
-				return prepareFragment();
+				return prepareFragment(t1,t2);
 			}
 			returnval = r;
 		}
@@ -120,22 +123,21 @@ public class NURBSShapeFragment extends NURBSShape {
 		{
 			int r = maxCPIndex-degree-k1-1; //Last few values, that are possible, might be -1;
 			r += k2-degree;
-//			System.err.println("Sub ["+u1+""+u2+"] from "+k1+","+k2+" (maxCPIndex="+maxCPIndex+") means r="+(maxCPIndex-degree-k1-1)+"+"+(k2-degree)+"="+r+"       ");
 			int minNum = r-degree;
 			if (minNum<=0)
 			{
 				int count = -minNum + 2;
 				Refinement.clear();
 				double offset = Knots.get(maxKnotIndex-degree)-Knots.get(degree);
-				double newu2 = u2+offset; 
+				double newt2 = t2+offset; 
 				int i=1; 
-				while ((i<count)&&( (u1+ (newu2-u1)*(double)i/(double)count)<=Knots.get(maxKnotIndex-degree)))
+				while ((i<count)&&( (t1+ (newt2-t1)*(double)i/(double)count)<=Knots.get(maxKnotIndex-degree)))
 				{ //Refine at the end
-					double val = u1+ (newu2-u1)*(double)i/(double)count;
+					double val = t1+ (newt2-t1)*(double)i/(double)count;
 					if (!Knots.contains(val))
 						Refinement.add(val);
 					else 
-						Refinement.add(val+ (u2-u1)/(double)count*Math.random());					
+						Refinement.add(val+ (t2-t1)/(double)count*Math.random());					
 					i++;
 				}
 				if (Refinement.size()>0) //We have something to refine at the end
@@ -146,11 +148,11 @@ public class NURBSShapeFragment extends NURBSShape {
 				}
 				while (i<count) //Rest
 				{
-					double val = u1+ (newu2-u1)*(double)i/(double)count-offset;
+					double val = t1+ (newt2-t1)*(double)i/(double)count-offset;
 					if (!Knots.contains(val))
 						Refinement.add(val);
 					else 
-						Refinement.add(val+ (u2-u1)/(double)count*Math.random());					
+						Refinement.add(val+ (t2-t1)/(double)count*Math.random());					
 					i++;
 				}
 				if (Refinement.size()>0)
@@ -158,7 +160,7 @@ public class NURBSShapeFragment extends NURBSShape {
 					RefineKnots(Refinement);
 					updateCircular(false);
 				}
-				return prepareFragment(); //Compute new R
+				return prepareFragment(t1,t2); //Compute new R
 			}
 			returnval = r;
 		}
