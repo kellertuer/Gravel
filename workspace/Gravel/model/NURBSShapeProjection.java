@@ -476,10 +476,8 @@ public class NURBSShapeProjection extends NURBSShape
 		double u1 = c.Knots.get(c.degree);
 		double u2 = c.Knots.get(c.maxKnotIndex-c.degree);
 		int Start = c.findSpan(u1);
-		int End = c.findSpan(u2);
+		int End = c.findSpan(u2)+1;
 		int multStart=0, multEnd=0;
-		if (c.Knots.get(c.maxKnotIndex-c.degree)==u2) //Last possible Value the Curve is evaluated
-			End++; //Becaue the intervall per se is open but we need the next interval
 		//Raise both endvalues to multiplicity d to get an clamped curve
 		while (c.Knots.get(Start+multStart).doubleValue()==u1)
 			multStart++;
@@ -492,12 +490,11 @@ public class NURBSShapeProjection extends NURBSShape
 		for (int i=0; i<c.degree-multEnd; i++)
 			Refinement.add(u2);
 		subcurve.RefineKnots(Refinement);
+		//Do not care about circular stuff, it's clamped after that anyway
 		Vector<Point2D> newCP = new Vector<Point2D>();
 		Vector<Double> newWeight= new Vector<Double>();
 		int subStart = subcurve.findSpan(u1);
-		int subEnd = subcurve.findSpan(u2);
-		if (subcurve.Knots.get(subcurve.maxKnotIndex-subcurve.degree)==u2)
-			subEnd++;
+		int subEnd = subcurve.findSpan(u2)+1;
 		for (int i=subStart-c.degree; i<=subEnd-c.degree; i++) //Copy needed CP
 		{
 			newCP.add((Point2D)subcurve.controlPoints.get(i).clone());

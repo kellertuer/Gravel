@@ -1,6 +1,11 @@
 package model;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
@@ -133,12 +138,167 @@ public class NURBSShapeFactory {
 		for (int i=1; i<maxIPIndex; i++)
 			lgspoints.set(i, lgspoints.get(i-1).doubleValue() + Math.sqrt(IP.get(i).distance(IP.get(i-1)))/d);
 		//At the lgspoints we evaluate the Curve, get an LGS, that is totally positive and banded
+		Vector<Double> Knots = calculateKnotVector(degree, maxKnotIndex, lgspoints);
+		NURBSShape c = solveLGS(Knots, lgspoints, IP);
+		c = unclamp(cutoverlaps(c,lgspoints.get(degree), lgspoints.get(degree+IPCount)));
+		for (int i=0; i<degree; i++)
+		{
+			Point2D a = c.controlPoints.get(i);
+			double aw = c.cpWeight.get(i);
+			Point2D b = c.controlPoints.get(c.maxCPIndex-degree+1+i);
+			double bw = c.cpWeight.get(c.maxCPIndex-degree+1+i);
+			
+			Point2D middle = new Point2D.Double((a.getX()+b.getX())/2d,	(a.getY()+b.getY())/2d);
+			c.cpWeight.set(i, (aw+bw)/2d); //Update Circular to middle value
+			c.cpWeight.set(c.maxCPIndex-degree+1+i, (aw+bw)/2d);
+			c.controlPoints.set(i,(Point2D)middle.clone());
+			c.controlPoints.set(c.maxCPIndex-degree+1+i,middle);
+		}
+		c.refreshInternalValues();
+		return c;
+	}
+
+	/**
+	 * Create an replacement for the subcurve specified by the Interpolationpoints.
+	 * The parts before and following the subcurve-part are taken to get a smooth transition from the
+	 * nonselected part (which stays the same) to the replacement.
+	 * 
+	 * @param fragment
+	 * @param q
+	 * @return
+	 */
+	public static NURBSShape CreateSubCurveInterpolation(NURBSShapeFragment fragment, Vector<Point2D> q, Graphics2D g2)
+	{
+		if ((fragment.isEmpty())||(q.size()==0))
+			return new NURBSShape();
+		else if (fragment.getSubCurve().isEmpty())
+			return fragment.stripDecorations().clone();
+		//So we have a real existing subcurve
+		double u1 = fragment.getStart(), u2 = fragment.getEnd();
+		NURBSShape origCurve = fragment.stripDecorations().clone();
+		// refine Endpoints if not yet done
+		refineCircular(origCurve,u1); refineCircular(origCurve,u2);
+
+		//Claculate part that is kept
+		NURBSShapeFragment keptFragment = new NURBSShapeFragment(origCurve.clone(),u2,u1); //From this part we need the IP, so calulate that too for their determination
+		
+		keptFragment.prepareFragment(); //So we have enough CP in the kept Part
+		int k1 = keptFragment.findSpan(u1);
+		int k2 = keptFragment.findSpan(u2);
+		double offset = keptFragment.Knots.get(keptFragment.maxKnotIndex-keptFragment.degree)-keptFragment.Knots.get(keptFragment.degree);
+		Vector<Double> lgspoints = new Vector<Double>(); Vector<Point2D> IP = new Vector<Point2D>();
+		//
+		// Prepare first degree+1 IP and lgspoints
+		//
+		for (int i=origCurve.degree; i>=0; i--)
+		{
+			double pos;
+			if ((k1-i)<0)
+				pos = keptFragment.Knots.get(k1-i+keptFragment.maxKnotIndex-keptFragment.degree);
+			else
+				pos = keptFragment.Knots.get(k1-i);
+			
+			if (i<origCurve.degree)
+			{
+				double pos2 = (lgspoints.lastElement()+pos)/2;
+				lgspoints.add(pos2);
+				pos2 = refineIntoKnotRange(origCurve,pos2);
+				IP.add((Point2D) origCurve.CurveAt(pos2).clone());
+			}
+			
+			lgspoints.add(pos);
+			pos = refineIntoKnotRange(origCurve,pos);
+			IP.add((Point2D) origCurve.CurveAt(pos).clone());
+			drawCP(g2,new Point(Math.round((float)IP.lastElement().getX()),Math.round((float)IP.lastElement().getY())),Color.BLUE);
+		}
+		System.err.println(IP.size());
+		//
+		//Calculate New part to replace subCurve
+		// distance for nice fitting of lgspoints
+		//
+		double d = Math.sqrt(IP.lastElement().distance(q.firstElement()));
+		for (int i=1; i<q.size(); i++)
+			d += Math.sqrt(q.get(i).distance(q.get(i-1)));
+		d += Math.sqrt(origCurve.CurveAt(u2).distance(q.lastElement()));
+		double oldseglength;
+		if (u1<u2)
+			oldseglength = u2-u1;
+		else
+			oldseglength = (keptFragment.Knots.get(keptFragment.maxKnotIndex-keptFragment.degree)-u1)+(u2-keptFragment.Knots.get(keptFragment.degree));
+		d /= oldseglength; //Scale, TODO: for better fitting approximate old and new cordlength
+		for (int i=0; i<q.size(); i++)
+		{
+			if (i==0)
+				lgspoints.add(lgspoints.lastElement().doubleValue() + Math.sqrt(q.firstElement().distance(IP.lastElement()))/d);
+			else
+				lgspoints.add(lgspoints.lastElement().doubleValue() + Math.sqrt(q.get(i).distance(q.get(i-1)))/d);
+			IP.add((Point2D)q.get(i).clone());
+		}
+		//
+		// Prepare last degree+1 IP and lgsPoints
+		// Replace old length by d
+		//
+		for (int i=0; i<=origCurve.degree; i++)
+		{
+			double pos;
+			if ((k2+i)>keptFragment.maxKnotIndex)
+				pos = keptFragment.Knots.get(k2+i-keptFragment.maxKnotIndex+keptFragment.degree);
+			else
+				pos = keptFragment.Knots.get(k2+i);
+			if (u2<u1)
+				pos += offset;
+			if (i>0)
+			{
+				double pos2 = (lgspoints.lastElement()+pos)/2;
+				lgspoints.add(pos2);
+				pos2 = refineIntoKnotRange(origCurve,pos2);
+				IP.add((Point2D) origCurve.CurveAt(pos2).clone());
+			}
+			lgspoints.add(pos);
+			pos = refineIntoKnotRange(origCurve,pos);
+			IP.add((Point2D) origCurve.CurveAt(pos).clone());
+		}
+		int maxIPIndex = IP.size()-1; //highest IP Index
+		int maxKnotIndex = maxIPIndex+origCurve.degree+1;//highest KnotIndex in the resulting NURBS-Curve
+		//Determine Points to evaluate for IP with cetripetal Aproach
+		//At the lgspoints we evaluate the Curve, get an LGS, that is totally positive and banded
+		Vector<Double> Knots = calculateKnotVector(origCurve.degree, maxKnotIndex, lgspoints);
+		NURBSShape c = solveLGS(Knots, lgspoints, IP);
+		//TODO Refit with keptFragment
+		System.err.println(c.degree);
+		return c;
+	}
+	/**
+	 * Refine the given Curve by adding value u if u isn't yet inside and update Circular after that if necessary
+	 * @param c NURBSShape to be refined
+	 * @param u with this value
+	 */
+	private static void refineCircular(NURBSShape c, double u)
+	{
+		Vector<Double> ref = new Vector<Double>();
+		ref.add(u);
+		boolean updateCirc = ((u<=c.Knots.get(2*c.degree))||(u>=c.Knots.get(c.maxKnotIndex-2*c.degree)));
+		if (!c.Knots.contains(u))
+		{
+			c.RefineKnots(ref);
+			if (updateCirc)
+				c.updateCircular(u>=c.Knots.get(c.maxKnotIndex-2*c.degree));
+		}
+
+	}
+
+	/**
+	 * Calculate Knot-Vector based on lgspoints, IP and Degree
+	 */
+	private static Vector<Double> calculateKnotVector(int degree, int maxKnotIndex,  Vector<Double> lgspoints)
+	{
 		Vector<Double> Knots = new Vector<Double>();
 		Knots.setSize(maxKnotIndex+1); //Because there are 0,...,macKnotIndex Knots
+		int maxIPIndex = maxKnotIndex-degree-1;
 		for (int i=0; i<=degree; i++)
 		{
-			Knots.set(i,0d); //First degree+1 Entries are zero
-			Knots.set(maxKnotIndex-i,1d); //Last p+1 Entries are 1
+			Knots.set(i,lgspoints.firstElement().doubleValue()); //First degree+1 Entries are zero
+			Knots.set(maxKnotIndex-i,lgspoints.lastElement().doubleValue()); //Last p+1 Entries are 1
 		}
 		for (int j=1; j<=maxIPIndex-degree; j++) //middle values
 		{
@@ -150,25 +310,8 @@ public class NURBSShapeFactory {
 			value /= degree;
 			Knots.set(j+degree, value);
 		}
-		NURBSShape c = solveLGS(Knots, lgspoints, IP);
-		c = unclamp(cutoverlaps(c,lgspoints.get(degree), lgspoints.get(degree+IPCount)));
-		for (int i=0; i<degree; i++)
-		{
-			Point2D a = c.controlPoints.get(i);
-			double aw = c.cpWeight.get(i);
-			Point2D b = c.controlPoints.get(c.maxCPIndex-degree+1+i);
-			double bw = c.cpWeight.get(c.maxCPIndex-degree+1+i);
-			
-			Point2D middle = new Point2D.Double((a.getX()+b.getX())/2d,	(a.getY()+b.getY())/2d);
-			c.cpWeight.set(i, (aw+bw)/2d);
-			c.cpWeight.set(c.maxCPIndex-degree+1+i, (aw+bw)/2d);
-			c.controlPoints.set(i,(Point2D)middle.clone());
-			c.controlPoints.set(c.maxCPIndex-degree+1+i,middle);
-		}
-		c.refreshInternalValues();
-		return c;
+		return Knots;
 	}
-
 	/**
 	 * Cut the additionally added parts from the curve to get an 
 	 * unclamped closed NURBSCurve
@@ -557,5 +700,27 @@ public class NURBSShapeFactory {
 				return 180.0d - Math.asin(Math.abs(y)/length)*180.d/Math.PI; //In Degree
 			else //y>0, 3. Quadrant
 				return 270.0d - Math.acos(Math.abs(y)/length)*180.d/Math.PI; //In Degree
+	}
+	private static double refineIntoKnotRange(NURBSShape c, double pos)
+	{
+		double offset = c.Knots.get(c.maxKnotIndex-c.degree)-c.Knots.get(c.degree);
+		while (pos<c.Knots.get(c.degree))
+			pos += offset;
+		while (pos>c.Knots.get(c.maxKnotIndex-c.degree))
+			pos -= offset;
+		return pos;
+	}
+
+//TODO This function is just for debug
+	public static  void drawCP(Graphics g, Point p, Color c)
+	{
+		int cpsize = 3;
+		float zoomfactor = 1f;
+		Graphics2D g2 = (Graphics2D) g;
+		g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
+		g2.setColor(c);
+		g2.drawLine(Math.round((p.x-cpsize)*zoomfactor),Math.round(p.y*zoomfactor),Math.round((p.x+cpsize)*zoomfactor),Math.round(p.y*zoomfactor));
+		g2.drawLine(Math.round(p.x*zoomfactor),Math.round((p.y-cpsize)*zoomfactor),Math.round(p.x*zoomfactor),Math.round((p.y+cpsize)*zoomfactor));
+		
 	}
 }

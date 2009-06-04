@@ -22,7 +22,7 @@ import javax.print.attribute.SupportedValuesAttribute;
  * If C is unclamped and closed and u1>u2
  * the Intervall C* is living on is a bit complicated:
  * It is [u1,b) and [a,u2] concatenated by shifting [a,u2] by b-a
- * C* [u1,u2+(b-a)]
+ * C* on [u1,u2+(b-a)]
  * 
  * If the subcurve is nonexistent (e.g. u1=u2) also the internal curve is set to empty, not only the subcurve
  * @author ronny

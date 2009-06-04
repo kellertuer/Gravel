@@ -15,8 +15,6 @@ import java.util.Vector;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-import javax.vecmath.Point3d;
-
 import control.*;
 import model.*;
 import model.Messages.*;
@@ -76,7 +74,8 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-		paintDEBUG(g2);
+//		paintDEBUG(g2);
+		paintSubCurveIP(g2);
 	}
 	private void lDCO(NURBSShape c)
 	{
@@ -180,6 +179,100 @@ public class VHyperGraphic extends VCommonGraphic
 
 			drawCP(g2,new Point(Math.round((float)c.CurveAt(pos).getX()), Math.round((float)c.CurveAt(pos).getY())), Color.GREEN);			
 		}
+	}
+	private void paintSubCurveIP(Graphics2D g2)
+	{
+		Vector<Point2D> IP = new Vector<Point2D>();
+		IP.add(new Point2D.Double(60,200));
+		IP.add(new Point2D.Double(50,130));
+		IP.add(new Point2D.Double(150,60));
+		IP.add(new Point2D.Double(270,80));
+		IP.add(new Point2D.Double(270,120));
+		IP.add(new Point2D.Double(220,130));
+		IP.add(new Point2D.Double(200,200));
+		IP.add(new Point2D.Double(200,230));
+		IP.add(new Point2D.Double(270,230));
+		IP.add(new Point2D.Double(230,290));
+		IP.add(new Point2D.Double(200,280));
+		IP.add(new Point2D.Double(175,290));
+		IP.add(new Point2D.Double(185,320));
+		IP.add(new Point2D.Double(80,350));
+		int degree = 4;
+		NURBSCreationMessage nm = new NURBSCreationMessage(degree, NURBSCreationMessage.ADD_END, IP);
+		NURBSShape c = NURBSShapeFactory.CreateShape(nm);
+
+		NURBSShape cs = c.stripDecorations().clone();
+		cs.scale(zoomfactor);
+		
+		if ((vG.modifyNodes.get(2)==null)||(vG.modifyNodes.get(1)==null))
+		{
+			g2.setStroke(new BasicStroke(1.3f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			g2.setColor(Color.black);
+			g2.draw(cs.getCurve(5d/(double)zoomfactor));
+			return;
+		}
+
+		double u1 = (new NURBSShapeProjection(c.clone(), new Point2D.Double(vG.modifyNodes.get(1).getPosition().getX(),vG.modifyNodes.get(1).getPosition().getY()))).getResultParameter();
+		double u2 = (new NURBSShapeProjection(c.clone(), new Point2D.Double(vG.modifyNodes.get(2).getPosition().getX(),vG.modifyNodes.get(2).getPosition().getY()))).getResultParameter();
+		drawCP(g2,new Point(Math.round((float)c.CurveAt(u1).getX()), Math.round((float)c.CurveAt(u1).getY())), Color.ORANGE);
+		drawCP(g2,new Point(Math.round((float)c.CurveAt(u2).getX()), Math.round((float)c.CurveAt(u2).getY())), Color.ORANGE);
+
+		System.err.println(u1+" DEBUG "+u2);
+		
+		NURBSShapeFragment s = new NURBSShapeFragment(c.clone(),u1,u2); //Refine the selected half
+		float selSize = (float)selWidth/2f + (float) 1;
+		NURBSShape drawSel = s.getSubCurve().stripDecorations().clone(); //really only nurbs
+		drawSel.scale(zoomfactor);
+		g2.setColor(selColor);
+		g2.setStroke(new BasicStroke(selSize*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		g2.draw(drawSel.getCurve(5d/(double)zoomfactor)); //draw only a preview				
+
+		Iterator<VNode> iter = vG.modifyNodes.getIterator();
+		Vector<Point2D> q = new Vector<Point2D>();
+		//handle Nodes 3,... as IPfor subcurve replacement
+		while (iter.hasNext())
+		{
+			VNode actual = iter.next();
+			if ((actual.getIndex()!=2)&&(actual.getIndex()!=1))
+				q.add(new Point2D.Double(actual.getPosition().x, actual.getPosition().y));
+		}
+//		Draw Curve
+		for (int i=0; i<c.maxCPIndex; i++)
+		{
+//			drawCP(g2, new Point(Math.round((float)c.controlPoints.get(i).getX()), Math.round((float)c.controlPoints.get(i).getY())), Color.red.brighter().brighter().brighter());
+//			if (i>0)
+//				g2.drawLine(Math.round((float)c.controlPoints.get(i).getX()), 
+//							Math.round((float)c.controlPoints.get(i).getY()), 
+//							Math.round((float)c.controlPoints.get(i-1).getX()), 
+//							Math.round((float)c.controlPoints.get(i-1).getY()));
+//			System.err.println(c2.controlPoints.get(i));
+		}
+
+		g2.setStroke(new BasicStroke(1.3f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		g2.setColor(Color.black);
+		g2.draw(cs.getCurve(5d/(double)zoomfactor));
+
+		if (q.size()==0)
+			return;
+
+		//On Top draw new Curve
+		NURBSShape c2 = NURBSShapeFactory.CreateSubCurveInterpolation(s,q,g2);
+		for (int i=0; i<=c2.maxCPIndex; i++)
+		{
+			drawCP(g2, new Point(Math.round((float)c2.controlPoints.get(i).getX()), Math.round((float)c2.controlPoints.get(i).getY())), Color.orange.brighter().brighter().brighter());
+			if (i>0)
+				g2.drawLine(Math.round((float)c2.controlPoints.get(i).getX()), 
+							Math.round((float)c2.controlPoints.get(i).getY()), 
+							Math.round((float)c2.controlPoints.get(i-1).getX()), 
+							Math.round((float)c2.controlPoints.get(i-1).getY()));
+			System.err.println(c2.controlPoints.get(i));
+		}
+		NURBSShape cs2 = c2.stripDecorations().clone();
+		cs2.scale(zoomfactor);
+		g2.setStroke(new BasicStroke(1.3f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		g2.setColor(Color.magenta);
+		g2.draw(cs2.getCurve(5d/(double)zoomfactor));
+
 	}
 	private void paintDerivDEBUG(Graphics2D g2)
 	{
