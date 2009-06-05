@@ -282,11 +282,6 @@ public class NURBSShapeFragment extends NURBSShape {
 		{
 			boolean actPosEqual = ((controlPoints.get(i).getX()==controlPoints.get(maxCPIndex-degree+1+i).getX())
 			&& (controlPoints.get(i).getY()==controlPoints.get(maxCPIndex-degree+1+i).getY()));
-			if (!actPosEqual)
-			{
-				System.err.println("Position ("+i+") :"+controlPoints.get(i).getX()+"=?="+controlPoints.get(maxCPIndex-degree+1+i).getX()+" and "+
-			controlPoints.get(i).getY()+"=?="+controlPoints.get(maxCPIndex-degree+1+i).getY());
-			}
 			closed &= actPosEqual;
 		}
 		if ((!closed)||(u2>u1)) //for nonclosed cases or if we don't run over start/end - use simpleClapmedSubCurve

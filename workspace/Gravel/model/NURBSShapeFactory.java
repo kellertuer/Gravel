@@ -178,7 +178,7 @@ public class NURBSShapeFactory {
 		//Check iff there is too less stuff to cut away
 		if (u1<u2) //too less stuff to cut away
 		{
-			if (Math.abs(k2-k1)<origCurve.degree+1)
+			if ((k2-k1)<origCurve.degree+1)
 				return new NURBSShape();
 		}
 		else 
@@ -266,51 +266,47 @@ public class NURBSShapeFactory {
 		//At the lgspoints we evaluate the Curve, get an LGS, that is totally positive and banded
 		Vector<Double> Knots = calculateKnotVector(origCurve.degree, maxKnotIndex, lgspoints);
 		NURBSShape c = solveLGS(Knots, lgspoints, IP);
-		//TODO Refit with keptFragment
-		int oldk1 = origCurve.findSpan(u1); //Copy [0,...oldk1] from keeping
-		int newk1 = c.findSpan(u1);
-		int newk2 = c.findSpan(u2); //copy [newk1,newk2] from new curve
-		int oldk2 = origCurve.findSpan(u2); //copy until end of curve from u2;
-		
-		Vector<Double> finalKnots = new Vector<Double>(), finalWeights = new Vector<Double>();
-		Vector<Point2D> finalCP = new Vector<Point2D>();
-		if (u1<u2) //we don't run over start/end with new - but with old part. Start there
+		NURBSShape old = (new NURBSShapeFragment(origCurve,u2,u1)).getSubCurve(); 
+		g2.draw(old.getCurve(5d/2d));
+		if (u2<u1)
 		{
-			for (int i=0; i<=oldk1+1; i++)
-			{
-				finalWeights.add(origCurve.cpWeight.get(i).doubleValue()); finalCP.add(origCurve.controlPoints.get(i));
-				finalKnots.add(origCurve.Knots.get(i));
-			}
-			//Now from newk1 -> newk2 from the new curve
-			for (int i=newk1+1; i<=newk2-c.degree; i++)
-			{
-				System.err.println(i);
-				finalWeights.add(c.cpWeight.get(i).doubleValue()); finalCP.add(c.controlPoints.get(i));
-				finalKnots.add(c.Knots.get(i));
-			}
-			int i=oldk2-c.degree;
-			while (i<=origCurve.maxCPIndex)
-			{
-				finalWeights.add(origCurve.cpWeight.get(i).doubleValue()); finalCP.add(origCurve.controlPoints.get(i));
-				finalKnots.add(origCurve.Knots.get(i));
-				i++;
-			}
-			while (i<=origCurve.maxKnotIndex)
-			{
-				finalKnots.add(origCurve.Knots.get(i)); i++;				
-			}
-			for (i=0; i<finalKnots.size(); i++)
-				System.err.print(finalKnots.get(i)+" ");
-			System.err.println("");
-//			for (i=0; i<finalCP.size(); i++)
-//				System.err.println(finalCP.get(i));
-			
-			System.err.println(finalCP.size()+"/"+finalKnots.size());
-			NURBSShape retval =  new NURBSShape(finalKnots, finalCP, finalWeights);
-			return retval;
+			c = (new NURBSShapeFragment(c,u1,u2+offset)).getSubCurve();
+			combine(old,c);
 		}
-		else //complicated, the selected (and new) part runs over start/end
-			return c; //TODO
+		else
+		{
+			c = (new NURBSShapeFragment(c,u1,u2)).getSubCurve();			
+			combine(c,old);
+		}
+		return c;
+	}
+
+	/**
+	 * 
+	 */
+	private static NURBSShape combine(NURBSShape first, NURBSShape second)
+	{
+		//
+		// Copy unaffected parts
+		//
+		Vector<Double> U = new Vector<Double>();
+		for (int i=0; i<=first.maxKnotIndex-first.degree; i++)
+			U.add(first.Knots.get(i));
+		U.setSize(U.size()+first.degree); //Add null-Elements for the middle
+		for (int i=second.degree+1; i<=second.maxKnotIndex; i++)
+			U.add(second.Knots.get(i));
+
+		Vector<Point3d> Pw = new Vector<Point3d>();
+		for (int i=0; i<=first.maxCPIndex-first.degree; i++)
+			Pw.add((Point3d) first.controlPointsHom.get(i).clone());
+		Pw.setSize(Pw.size()+first.degree); //Add null-Elements for the middle
+		for (int i=second.degree+1; i<=second.maxCPIndex; i++)
+			Pw.add((Point3d) second.controlPointsHom.get(i).clone());
+		
+		int i=0;
+		i++;
+		
+		return new NURBSShape();
 	}
 	/**
 	 * Refine the given Curve by adding value u if u isn't yet inside and update Circular after that if necessary

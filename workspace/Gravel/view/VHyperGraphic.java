@@ -77,16 +77,6 @@ public class VHyperGraphic extends VCommonGraphic
 //		paintDEBUG(g2);
 		paintSubCurveIP(g2);
 	}
-	private void lDCO(NURBSShape c)
-	{
-		for (int i=0; i<c.degree; i++)
-		{
-			boolean actPosEqual = ((c.controlPoints.get(i).getX()==c.controlPoints.get(c.maxCPIndex-c.degree+1+i).getX())
-			&& (c.controlPoints.get(i).getY()==c.controlPoints.get(c.maxCPIndex-c.degree+1+i).getY()));
-			System.err.println("Position ("+i+") equal="+actPosEqual+" :"+c.controlPoints.get(i).getX()+"=?="+c.controlPoints.get(c.maxCPIndex-c.degree+1+i).getX()+" and "+
-			c.controlPoints.get(i).getY()+"=?="+c.controlPoints.get(c.maxCPIndex-c.degree+1+i).getY());
-		}
-	}
 	private void paintDEBUG(Graphics2D g2)
 	{
 		Vector<Point2D> IP = new Vector<Point2D>();
@@ -236,17 +226,6 @@ public class VHyperGraphic extends VCommonGraphic
 			if ((actual.getIndex()!=2)&&(actual.getIndex()!=1))
 				q.add(new Point2D.Double(actual.getPosition().x, actual.getPosition().y));
 		}
-//		Draw Curve
-		for (int i=0; i<c.maxCPIndex; i++)
-		{
-//			drawCP(g2, new Point(Math.round((float)c.controlPoints.get(i).getX()), Math.round((float)c.controlPoints.get(i).getY())), Color.red.brighter().brighter().brighter());
-//			if (i>0)
-//				g2.drawLine(Math.round((float)c.controlPoints.get(i).getX()), 
-//							Math.round((float)c.controlPoints.get(i).getY()), 
-//							Math.round((float)c.controlPoints.get(i-1).getX()), 
-//							Math.round((float)c.controlPoints.get(i-1).getY()));
-//			System.err.println(c2.controlPoints.get(i));
-		}
 
 		g2.setStroke(new BasicStroke(1.3f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		g2.setColor(Color.black);
@@ -259,20 +238,6 @@ public class VHyperGraphic extends VCommonGraphic
 		NURBSShape c2 = NURBSShapeFactory.CreateSubCurveInterpolation(s,q,g2);
 		if (c2.isEmpty())
 			return;
-		for (int i=0; i<=c2.maxCPIndex; i++)
-		{
-//			drawCP(g2, new Point(Math.round((float)c2.controlPoints.get(i).getX()), Math.round((float)c2.controlPoints.get(i).getY())), Color.orange.brighter().brighter().brighter());
-//			if (i>0)
-//				g2.drawLine(Math.round((float)c2.controlPoints.get(i).getX()), 
-//							Math.round((float)c2.controlPoints.get(i).getY()), 
-//							Math.round((float)c2.controlPoints.get(i-1).getX()), 
-//							Math.round((float)c2.controlPoints.get(i-1).getY()));
-		}
-		for (int i=0; i<=c.maxKnotIndex; i++)
-		{
-			if (c.findSpan(c.Knots.get(i))!=-1)
-			drawCP(g2, new Point(Math.round((float)c.CurveAt(c.Knots.get(i)).getX()), Math.round((float)c.CurveAt(c.Knots.get(i)).getY())), Color.orange.brighter().brighter().brighter());
-		}
 		NURBSShape cs2 = c2.stripDecorations().clone();
 		cs2.scale(zoomfactor);
 		g2.setStroke(new BasicStroke(1.3f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
