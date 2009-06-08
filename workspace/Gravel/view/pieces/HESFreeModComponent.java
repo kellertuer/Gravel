@@ -44,6 +44,14 @@ public class HESFreeModComponent implements ActionListener {
 		buildFreeModPanel();
 	}
 
+	public void resetModus()
+	{
+    	setButtonsEnabled(true);
+   		NURBSShape shape = HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).getShape();
+   		HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).setShape(shape.stripDecorations());
+		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);
+		deselectGlobalButtons();
+	}
 	public Container getContent()
 	{
 		return FreeModFields;
@@ -243,7 +251,10 @@ public class HESFreeModComponent implements ActionListener {
         			selectionExists = !((NURBSShapeFragment) shape).getSubCurve().isEmpty();
         		}
         		else
+        		{
+        			HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).setShape(new NURBSShapeFragment(shape,Double.NaN,Double.NaN));
         			selectionExists = false;
+        		}
         		setButtonsEnabled(selectionExists);
         		if (!selectionExists)
         			HShapeGraphicRef.setMouseHandling(VCommonGraphic.SUBCURVE_MOUSEHANDLING);
@@ -332,6 +343,11 @@ public class HESFreeModComponent implements ActionListener {
 		if ((editshape.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
 		{
 			 this.setButtonsEnabled(!((NURBSShapeFragment)editshape).getSubCurve().isEmpty());
+		}
+		else if (rModLocal.isSelected())
+		{
+			setButtonsEnabled(true);
+			rModGlobal.doClick();
 		}
 	}
 }

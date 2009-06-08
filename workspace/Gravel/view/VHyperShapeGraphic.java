@@ -177,7 +177,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		}			
 		if (actualMouseState==INTERPOLATION_MOUSEHANDLING)
 		{
-			Vector<Point2D> IP = firstModus.getShapeParameters().getPoints();
+			NURBSCreationMessage nm = firstModus.getShapeParameters();
+			Vector<Point2D> IP = nm.getPoints();
 			Iterator<Point2D> iter = IP.iterator();
 			while (iter.hasNext())
 			{
@@ -185,6 +186,15 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				Point p2 = new Point(Math.round((float)p.getX()),Math.round((float)p.getY()));
 				this.drawCP(g2, p2, Color.BLUE);
 			}
+			if ((nm.getCurve().getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
+			{
+				NURBSShape draw = ((NURBSShapeFragment)nm.getCurve()).getSubCurve().stripDecorations().clone();
+				draw.scale(zoomfactor);
+				g2.setStroke(new BasicStroke(1*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+				g2.setColor(Color.DARK_GRAY);
+				g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
+			}
+			
 		}
 		else if (actualMouseState==CIRCLE_MOUSEHANDLING)
 		{
@@ -226,7 +236,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				Point p2 = new Point(Math.round((float)End.getX()),Math.round((float)End.getY()));
 				this.drawCP(g2, p2, selColor.darker());
 			}
-			Point2D StartCurve = tempshape.CurveAt(tempshape.Knots.get(tempshape.degree));
+			//TODO Remove DEBUG
+			Point2D StartCurve = tempshape.CurveAt(tempshape.Knots.get(tempshape.getDegree()));
 			Point p2 = new Point(Math.round((float)StartCurve.getX()),Math.round((float)StartCurve.getY()));
 			this.drawCP(g2, p2, Color.GREEN);
 		}

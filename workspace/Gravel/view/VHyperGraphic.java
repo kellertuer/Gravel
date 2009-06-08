@@ -75,7 +75,7 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.draw(Drag.getSelectionRectangle());
 		}
 //		paintDEBUG(g2);
-		paintSubCurveIP(g2);
+//		paintSubCurveIP(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
@@ -96,79 +96,7 @@ public class VHyperGraphic extends VCommonGraphic
 		IP.add(new Point2D.Double(80,350));
 		int degree = 4;
 		NURBSCreationMessage nm = new NURBSCreationMessage(degree, NURBSCreationMessage.ADD_END, IP);
-		NURBSShape c = NURBSShapeFactory.CreateShape(nm);
-		
-		double u1 = (new NURBSShapeProjection(c.clone(), new Point2D.Double(vG.modifyNodes.get(1).getPosition().getX(),vG.modifyNodes.get(1).getPosition().getY()))).getResultParameter();
-		double u2 = (new NURBSShapeProjection(c.clone(), new Point2D.Double(vG.modifyNodes.get(2).getPosition().getX(),vG.modifyNodes.get(2).getPosition().getY()))).getResultParameter();
-		drawCP(g2,new Point(Math.round((float)c.CurveAt(u1).getX()), Math.round((float)c.CurveAt(u1).getY())), Color.ORANGE);
-		drawCP(g2,new Point(Math.round((float)c.CurveAt(u2).getX()), Math.round((float)c.CurveAt(u2).getY())), Color.ORANGE);
-		Vector<Double> ref = new Vector<Double>();
-		ref.add(u1);
-		boolean updateCirc = ((u1<=c.Knots.get(2*c.degree))||(u1>=c.Knots.get(c.maxKnotIndex-2*c.degree)));
-		c.RefineKnots(ref);
-		if (updateCirc)
-			c.updateCircular(u1>=c.Knots.get(c.maxKnotIndex-2*c.degree));
-		ref.clear(); ref.add(u2);
-		updateCirc = ((u2<=c.Knots.get(2*c.degree))||(u2>=c.Knots.get(c.maxKnotIndex-2*c.degree)));
-		c.RefineKnots(ref);
-		if (updateCirc)
-			c.updateCircular(u2>=c.Knots.get(c.maxKnotIndex-2*c.degree));
-		NURBSShape cs = c.stripDecorations().clone();
-		cs.scale(zoomfactor);
-		if (vG.modifyNodes.get(2)==null)
-		{
-			g2.setColor(Color.black);
-			g2.draw(cs.getCurve(5d/(double)zoomfactor));
-			return;
-		}
-		
-		System.err.println(u1+" DEBUG "+u2);
-		NURBSShapeFragment s = new NURBSShapeFragment(c.clone(),u1,u2); //Refine the selected half
-		NURBSShapeFragment s2 = new NURBSShapeFragment(c.clone(),u2,u1); //From this part we need the IP, so calulate that too for their determination
-		float selSize = (float)selWidth/2f + (float) 1;
-		NURBSShape drawSel = s.getSubCurve().stripDecorations().clone(); //really only nurbs
-		drawSel.scale(zoomfactor);
-		g2.setColor(selColor);
-		g2.setStroke(new BasicStroke(selSize*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		g2.draw(drawSel.getCurve(5d/(double)zoomfactor)); //draw only a preview				
-
-//		Draw Curve
-		g2.setStroke(new BasicStroke(1.3f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		g2.setColor(Color.black);
-		g2.draw(cs.getCurve(5d/(double)zoomfactor));
-		
-//handle Nodes 3,... as IPfor subcurve replacement
-//		s2.prepareFragment(); //So we have enough CP between u1 and u2
-		int k1 = s2.findSpan(u1);
-		int k2 = s2.findSpan(u2);
-		double offset = s2.Knots.get(s2.maxKnotIndex-s2.degree)-s2.Knots.get(s2.degree);
-		for (int i=0; i<=c.degree; i++)
-		{
-			double pos;
-			if ((k1-i)<0)
-				pos = s2.Knots.get(k1-i+s2.maxKnotIndex-s2.degree);
-			else
-				pos = s2.Knots.get(k1-i);
-			
-			if (pos<c.Knots.get(degree))
-				pos += offset;
-			else if (pos>s2.Knots.get(s2.maxKnotIndex-s2.degree))
-				pos -= offset;
-			
-			drawCP(g2,new Point(Math.round((float)c.CurveAt(pos).getX()), Math.round((float)c.CurveAt(pos).getY())), Color.RED);
-
-			if ((k2+i)<0)
-				pos = s2.Knots.get(k2+i+s2.maxKnotIndex-s2.degree);
-			else
-				pos = s2.Knots.get(k2+i);
-			
-			if (pos<c.Knots.get(degree))
-				pos += offset;
-			else if (pos>s2.Knots.get(s2.maxKnotIndex-s2.degree))
-				pos -= offset;
-
-			drawCP(g2,new Point(Math.round((float)c.CurveAt(pos).getX()), Math.round((float)c.CurveAt(pos).getY())), Color.GREEN);			
-		}
+		NURBSShape c = NURBSShapeFactory.CreateShape(nm);		
 	}
 	private void paintSubCurveIP(Graphics2D g2)
 	{
@@ -235,7 +163,8 @@ public class VHyperGraphic extends VCommonGraphic
 			return;
 
 		//On Top draw new Curve
-		NURBSShape c2 = NURBSShapeFactory.CreateSubCurveInterpolation(s,q);
+		nm = new NURBSCreationMessage(s,NURBSCreationMessage.ADD_END,q);
+		NURBSShape c2 = NURBSShapeFactory.CreateShape(nm);
 		if (c2.isEmpty())
 			return;
 		NURBSShape cs2 = c2.stripDecorations().clone();
@@ -243,8 +172,8 @@ public class VHyperGraphic extends VCommonGraphic
 		g2.setStroke(new BasicStroke(1.3f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		g2.setColor(Color.magenta);
 		g2.draw(cs2.getCurve(5d/(double)zoomfactor));
-		drawCP(g2,new Point(Math.round((float)c2.CurveAt(c2.Knots.get(c2.degree)).getX()),Math.round((float)c2.CurveAt(c2.Knots.get(c2.degree)).getY())),Color.GREEN);
-		drawCP(g2,new Point(Math.round((float)c.CurveAt(c.Knots.get(c.degree)).getX()),Math.round((float)c.CurveAt(c.Knots.get(c.degree)).getY())),Color.RED);
+		drawCP(g2,new Point(Math.round((float)c2.CurveAt(c2.Knots.get(c2.getDegree())).getX()),Math.round((float)c2.CurveAt(c2.Knots.get(c2.getDegree())).getY())),Color.GREEN);
+		drawCP(g2,new Point(Math.round((float)c.CurveAt(c.Knots.get(c.getDegree())).getX()),Math.round((float)c.CurveAt(c.Knots.get(c.getDegree())).getY())),Color.RED);
 	}
 	private void paintDerivDEBUG(Graphics2D g2)
 	{
@@ -291,7 +220,7 @@ public class VHyperGraphic extends VCommonGraphic
 		{
 			for (int i=0; i<1000; i++)
 			{
-				DerivateHelper(c, c.Knots.get(c.degree) + (c.Knots.get(c.degree)+c.Knots.get(c.maxKnotIndex-c.degree))*((double) i)/1000d, g2);
+				DerivateHelper(c, c.Knots.get(c.getDegree()) + (c.Knots.get(c.getDegree())+c.Knots.get(c.maxKnotIndex-c.getDegree()))*((double) i)/1000d, g2);
 			}
 		}
 		else

@@ -53,6 +53,16 @@ public class NURBSShapeFragment extends NURBSShape {
 	}
 	
 	@Override
+	public boolean CurveEquals(NURBSShape s)
+	{
+		boolean sup = super.CurveEquals(s);
+		if ((!sup)||((s.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT))
+			return false;
+		NURBSShapeFragment s2 = (NURBSShapeFragment)s; //Works because the else case is above
+		return ((s2.getStart()==u1)&&(s2.getEnd()==u2));
+	}
+	
+	@Override
 	public NURBSShapeFragment clone()
 	{
 		return new NURBSShapeFragment(origCurve.clone(), u1,u2);

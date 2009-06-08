@@ -1,11 +1,6 @@
 package model;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
@@ -46,7 +41,12 @@ public class NURBSShapeFactory {
 		switch(nm.getType())
 		{
 			case NURBSCreationMessage.INTERPOLATION:
-				return CreateInterpolation(nm.getPoints(), nm.getDegree());
+				if (nm.getDegree()>0) //Normal
+					return CreateInterpolation(nm.getPoints(), nm.getDegree());
+				else if ((nm.getCurve().getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
+					return CreateSubcurveInterpolation((NURBSShapeFragment)nm.getCurve(),nm.getPoints());
+				else
+					return new NURBSShape();
 			case NURBSCreationMessage.CIRCLE:
 				return CreateCircle(nm.getPoints().firstElement(), nm.getValues().firstElement());
 			case NURBSCreationMessage.CONVEX_HULL:
@@ -157,7 +157,7 @@ public class NURBSShapeFactory {
 	 * @param q
 	 * @return
 	 */
-	public static NURBSShape CreateSubCurveInterpolation(NURBSShapeFragment fragment, Vector<Point2D> q)
+	private static NURBSShape CreateSubcurveInterpolation(NURBSShapeFragment fragment, Vector<Point2D> q)
 	{
 		if ((fragment.isEmpty())||(q.size()==0))
 			return new NURBSShape();
@@ -265,8 +265,8 @@ public class NURBSShapeFactory {
 		//Determine Points to evaluate for IP with cetripetal Aproach
 		//At the lgspoints we evaluate the Curve, get an LGS, that is totally positive and banded
 		Vector<Double> Knots = calculateKnotVector(origCurve.degree, maxKnotIndex, lgspoints);
-		NURBSShape c = solveLGS(Knots, lgspoints, IP);
-		NURBSShape old = (new NURBSShapeFragment(origCurve,u2,u1)).getSubCurve(); 
+		NURBSShape c = solveLGS(Knots, lgspoints, IP); //replacementcurve
+		NURBSShape old = (new NURBSShapeFragment(origCurve,u2,u1)).getSubCurve();  //Unchanged Old part
 		if (u2<u1)
 		{
 			return combine(old,(new NURBSShapeFragment(c,u1,u2+offset)).getSubCurve());
@@ -305,10 +305,9 @@ public class NURBSShapeFactory {
 		for (int i=0; i<=s1.maxCPIndex; i++)
 			newP.add((Point3d)s1.controlPointsHom.get(i).clone());
 		
-		System.err.println("First unclamp with "+newKnots.size()+" Knots and "+newP.size()+" CP ");
 		NURBSShape temp = new NURBSShape(newKnots,newP);
 		temp = unclamp(temp); //So now they are unclamped, we can copy back to get s1 - s2
-		temp.updateCircular(false);
+		temp.updateCircular(false); //Update end.
 		newKnots = new Vector<Double>();
 		newP = new Vector<Point3d>();
 		for (int i=0; i<=s1.degree; i++)
@@ -323,9 +322,7 @@ public class NURBSShapeFactory {
 		for (int i=s2.degree-1; i<s1BeginCP; i++)
 			newP.add((Point3d)temp.controlPointsHom.get(i).clone());
 		
-		System.err.print("Second unclamp with "+newKnots.size()+" Knots and "+newP.size()+" CP ");
 		temp = new NURBSShape(newKnots,newP);
-		System.err.println(" and Degree "+temp.degree);
 		temp = unclamp(temp); //Unclamp the part that stays at endvalues of the combinational curve
 		return temp;
 	}
@@ -515,7 +512,7 @@ public class NURBSShapeFactory {
 	 * @param c
 	 * @return
 	 */
-	public static NURBSShape unclamp(NURBSShape c)
+	private static NURBSShape unclamp(NURBSShape c)
 	{
 		if ((c.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
 			return c; //already unclamped
@@ -652,7 +649,7 @@ public class NURBSShapeFactory {
 	 * 
 	 * @return Points of the nodes that from the convex hull in clockwise order
 	 */
-	public static Vector<Point2D> GrahamsScan(Vector<Point2D> nodes)
+	private static Vector<Point2D> GrahamsScan(Vector<Point2D> nodes)
 	{
 		//Find Pivot Point with lowest Y Coordinate. If there are two, take the one with lowest X
 		Point2D pivot = new Point2D.Double(Double.MAX_VALUE,Double.MAX_VALUE);
@@ -778,18 +775,5 @@ public class NURBSShapeFactory {
 		while (pos>c.Knots.get(c.maxKnotIndex-c.degree))
 			pos -= offset;
 		return pos;
-	}
-
-//TODO This function is just for debug
-	public static  void drawCP(Graphics g, Point p, Color c)
-	{
-		int cpsize = 3;
-		float zoomfactor = 1f;
-		Graphics2D g2 = (Graphics2D) g;
-		g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
-		g2.setColor(c);
-		g2.drawLine(Math.round((p.x-cpsize)*zoomfactor),Math.round(p.y*zoomfactor),Math.round((p.x+cpsize)*zoomfactor),Math.round(p.y*zoomfactor));
-		g2.drawLine(Math.round(p.x*zoomfactor),Math.round((p.y-cpsize)*zoomfactor),Math.round(p.x*zoomfactor),Math.round((p.y+cpsize)*zoomfactor));
-		
 	}
 }

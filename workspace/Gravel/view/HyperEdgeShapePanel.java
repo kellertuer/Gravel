@@ -18,6 +18,7 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
@@ -68,6 +69,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 
 	private Container cont;
 	private JComboBox cBasicShape;
+	private DefaultComboBoxModel cBasicShapeEntries;
 	private JLabel BasicShape;
 	//Circle Fields
 	private JLabel CircleOriginX, CircleOriginY, CircleRadius;
@@ -115,7 +117,8 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		c.gridheight=1;
 		//INput fields besides the Display
 		String[] BasicShapes = {"Kreis", "Interpolation", "konvexe Hülle"};
-		cBasicShape = new JComboBox(BasicShapes);
+		cBasicShapeEntries = new DefaultComboBoxModel(BasicShapes);
+		cBasicShape = new JComboBox(cBasicShapeEntries);
 		cBasicShape.setSelectedIndex(0);
 		cBasicShape.setPreferredSize(new Dimension(100, 30));
 		cBasicShape.addActionListener(this);
@@ -438,7 +441,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        	CircleFields.setVisible(false);
 	        	InterpolationFields.setVisible(false);
 	        	DegreeFields.setVisible(false);
-	        	String Shape = (String)cBasicShape.getSelectedItem();
+	        	String Shape = (String)cBasicShape.getModel().getSelectedItem();
 	        	if (Shape.equals("Kreis"))
 	        	{
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CIRCLE_MOUSEHANDLING);
@@ -469,6 +472,11 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        		FreeModPanel.setVisible(true);
 	        		FreeModPanel.refresh();
 	        		setCreationFieldVisibility(false);
+	        		if ((HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
+	        		{
+	        			FreeModPanel.resetModus();
+	        			FreeModPanel.refresh();
+	        		}
 	        	}
 	        	else //we are in 2 -> change to 1
 	        	{
@@ -476,6 +484,24 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        		FreeModPanel.setVisible(false);
 	        		cBasicShape.setVisible(true);
 	        		BasicShape.setVisible(true);
+	        		//New Subcurve
+	        		if ((HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
+	        		{
+	        			if (cBasicShapeEntries.getIndexOf("Kreis")!=-1)
+	        				cBasicShapeEntries.removeElementAt(cBasicShapeEntries.getIndexOf("Kreis"));
+	        			if (cBasicShapeEntries.getIndexOf("konvexe Hülle")!=-1)	        			
+	        				cBasicShapeEntries.removeElementAt(cBasicShapeEntries.getIndexOf("konvexe Hülle"));
+	        			DegreeFields.setVisible(false);
+	        		}
+	        		else
+	        		{
+	        			if (cBasicShapeEntries.getIndexOf("Kreis")==-1)
+	        				cBasicShapeEntries.insertElementAt("Kreis",0);
+	        			if (cBasicShapeEntries.getIndexOf("konvexe Hülle")==-1)
+	        				cBasicShapeEntries.insertElementAt("konvexe Hülle",2);
+	        			DegreeFields.setVisible(true);
+	        		}
+	        		cont.repaint();
 	        		actionPerformed(new ActionEvent(cBasicShape,0,"Refresh"));
 	        	}
 	        }
@@ -525,7 +551,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			return;
 		}
 		int deg = nm.getDegree();
-		if (iDegree.getValue()==deg)
+		if ((iDegree.getValue()==deg)||(deg<=0))
 			return;
 		iDegree.removeCaretListener(this);
 		iDegree.setValue(deg);
@@ -599,6 +625,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			rAddBetween.setSelected(true);
 			rAddBetween.addActionListener(this);
 		}
+		DegreeFields.setVisible((nm.getCurve().getDecorationTypes()&NURBSShape.FRAGMENT)!=NURBSShape.FRAGMENT);
 		updateInfo(nm);
 	}
 
@@ -610,7 +637,13 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		Vector<Point2D> p= nm.getPoints();
 		if (p==null)
 			return;
-		int i = 2*deg-p.size();
+		
+		int i= p.size();
+		if (nm.getType()==NURBSCreationMessage.CONVEX_HULL)
+			i *= 3;
+			
+		i = 2*deg-i;
+		
 		if (i>0)
 			IPInfo.setText("<html><p>Grad "+deg+" ben"+CONST.html_oe+"tigt "+i+" weitere Punkt(e).</p></html>");
 		else

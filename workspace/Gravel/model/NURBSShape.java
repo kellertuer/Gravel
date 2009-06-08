@@ -45,8 +45,8 @@ public class NURBSShape {
 	protected int NURBSType; //May be clamped or unclamped	
 	//TODO: Set Protected after finishing debug
 	public int maxKnotIndex, //The Knots are numbered 0,1,...,maxKnotIndex
-				maxCPIndex, //The ControlPoints are numbered 0,1,...,maxCPIndex
-				degree; //Order of the piecewise polynomials - depends on the maxIndices Above: degree = maxKnotIndex-maxCPindex-1
+				maxCPIndex; //The ControlPoints are numbered 0,1,...,maxCPIndex
+	protected int	degree; //Order of the piecewise polynomials - depends on the maxIndices Above: degree = maxKnotIndex-maxCPindex-1
 	/**
 	 * Create an empty NURBSShape,
 	 * which has no controlpoints, weights nor knots
@@ -1016,5 +1016,8 @@ public class NURBSShape {
 	long binomial(int n, int k)
 	{
 		return nint(Math.exp(logFactorial(n) - logFactorial(k) - logFactorial(n-k)));
+	}
+	public int getDegree() {
+		return degree;
 	}
 }

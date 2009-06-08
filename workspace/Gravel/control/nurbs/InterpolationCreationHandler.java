@@ -10,6 +10,8 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
 
+import quicktime.std.image.Curve;
+
 
 import model.*;
 import model.Messages.*;
@@ -35,7 +37,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	Point2D DragOrigin = null;
 	Vector<Point2D> InterpolationPoints;
 	int degree, PointAdditionStatus, hyperedgeindex, DragOriginIndex=-1;
-	NURBSShape lastshape=null;
+	NURBSShape lastshape=null, MessageCurve=new NURBSShape();
 
 	public InterpolationCreationHandler(VHyperGraphic g, int HyperEdgeIndex)
 	{
@@ -47,6 +49,9 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		InterpolationPoints = new Vector<Point2D>();
 		PointAdditionStatus = NURBSCreationMessage.ADD_END;
 		hyperedgeindex = HyperEdgeIndex;
+		MessageCurve=vhg.modifyHyperEdges.get(HyperEdgeIndex).getShape();
+		if (MessageCurve.isEmpty()||((MessageCurve.getDecorationTypes()&NURBSShape.FRAGMENT)!=NURBSShape.FRAGMENT))
+			MessageCurve=new NURBSShape(); //Jst keep it if its for an Subcurve Replacement
 	}
 	
 	public void reInit()
@@ -83,10 +88,11 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		if (dragged())
 			return;	
 		//really something changed
-			boolean notify = ((InterpolationPoints!=nm.getPoints())||(degree!=nm.getDegree()));	
+			boolean notify = ((InterpolationPoints!=nm.getPoints())||(degree!=nm.getDegree())||(!MessageCurve.CurveEquals(nm.getCurve())));	
 		NURBSCreationMessage local = nm.clone();
 		InterpolationPoints = local.getPoints();
 		PointAdditionStatus = local.getStatus();
+		MessageCurve = nm.getCurve();
 		degree = nm.getDegree();
 		
 		if (notify)
@@ -97,9 +103,13 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 		}
 	}
+
 	public NURBSCreationMessage getShapeParameters()
 	{
-		return new NURBSCreationMessage(degree, PointAdditionStatus, InterpolationPoints);
+		if (MessageCurve.isEmpty()||((MessageCurve.getDecorationTypes()&NURBSShape.FRAGMENT)!=NURBSShape.FRAGMENT)) //Normal
+			return new NURBSCreationMessage(degree, PointAdditionStatus, InterpolationPoints);
+		else //Subcurve
+			return new NURBSCreationMessage((NURBSShapeFragment)MessageCurve, PointAdditionStatus, InterpolationPoints);			
 	}
 
 	public boolean dragged()
@@ -154,7 +164,11 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	{
 		if (points.lastElement()==null) //if the last element is null, the point can be inserted there
 			return points.size()-1; 
-		double lastdistance = points.lastElement().distance(newPoint);
+		double lastdistance;
+		if (MessageCurve.isEmpty())
+			lastdistance = points.lastElement().distance(newPoint);
+		else 
+			lastdistance = MessageCurve.CurveAt(((NURBSShapeFragment)MessageCurve).getStart()).distance(newPoint);
 		double min = Double.MAX_VALUE;
 		int returnindex = -1;
 		for (int i=0; i<points.size(); i++)
@@ -168,6 +182,11 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 				returnindex = i;
 			}
 			lastdistance = actualdistance;
+		}
+		if (!MessageCurve.isEmpty())
+		{
+			if ((lastdistance + MessageCurve.CurveAt(((NURBSShapeFragment)MessageCurve).getEnd()).distance(newPoint))<min)
+				returnindex = points.size();
 		}
 		return returnindex;
 	}
