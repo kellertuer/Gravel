@@ -205,12 +205,12 @@ public class NURBSShapeFactory {
 				lgspoints.add(pos2);
 				pos2 = refineIntoKnotRange(origCurve,pos2);
 				IP.add((Point2D) origCurve.CurveAt(pos2).clone());
-				drawCP(g2,new Point(Math.round((float)IP.lastElement().getX()),Math.round((float)IP.lastElement().getY())),Color.BLUE);
+			//	drawCP(g2,new Point(Math.round((float)IP.lastElement().getX()),Math.round((float)IP.lastElement().getY())),Color.BLUE);
 			}
 			lgspoints.add(pos);
 			pos = refineIntoKnotRange(origCurve,pos);
 			IP.add((Point2D) origCurve.CurveAt(pos).clone());
-			drawCP(g2,new Point(Math.round((float)IP.lastElement().getX()),Math.round((float)IP.lastElement().getY())),Color.BLUE);
+		//	drawCP(g2,new Point(Math.round((float)IP.lastElement().getX()),Math.round((float)IP.lastElement().getY())),Color.BLUE);
 		}
 		//
 		//Calculate New part to replace subCurve
@@ -253,12 +253,12 @@ public class NURBSShapeFactory {
 				lgspoints.add(pos2);
 				pos2 = refineIntoKnotRange(origCurve,pos2);
 				IP.add((Point2D) origCurve.CurveAt(pos2).clone());
-				drawCP(g2,new Point(Math.round((float)IP.lastElement().getX()),Math.round((float)IP.lastElement().getY())),Color.BLUE);
+	//			drawCP(g2,new Point(Math.round((float)IP.lastElement().getX()),Math.round((float)IP.lastElement().getY())),Color.BLUE);
 			}
 			lgspoints.add(pos);
 			pos = refineIntoKnotRange(origCurve,pos);
 			IP.add((Point2D) origCurve.CurveAt(pos).clone());
-			drawCP(g2,new Point(Math.round((float)IP.lastElement().getX()),Math.round((float)IP.lastElement().getY())),Color.BLUE);
+		//	drawCP(g2,new Point(Math.round((float)IP.lastElement().getX()),Math.round((float)IP.lastElement().getY())),Color.BLUE);
 		}
 		int maxIPIndex = IP.size()-1; //highest IP Index
 		int maxKnotIndex = maxIPIndex+origCurve.degree+1;//highest KnotIndex in the resulting NURBS-Curve
@@ -267,46 +267,64 @@ public class NURBSShapeFactory {
 		Vector<Double> Knots = calculateKnotVector(origCurve.degree, maxKnotIndex, lgspoints);
 		NURBSShape c = solveLGS(Knots, lgspoints, IP);
 		NURBSShape old = (new NURBSShapeFragment(origCurve,u2,u1)).getSubCurve(); 
-		g2.draw(old.getCurve(5d/2d));
+	//	g2.draw(old.getCurve(5d/2d));
 		if (u2<u1)
 		{
-			c = (new NURBSShapeFragment(c,u1,u2+offset)).getSubCurve();
-			combine(old,c);
+			return combine(old,(new NURBSShapeFragment(c,u1,u2+offset)).getSubCurve());
 		}
 		else
 		{
-			c = (new NURBSShapeFragment(c,u1,u2)).getSubCurve();			
-			combine(c,old);
+			c = combine((new NURBSShapeFragment(c,u1,u2)).getSubCurve(),old);
 		}
 		return c;
 	}
 
 	/**
+	 * Combine 2 clamped (nonclosed) NURBSCurves, where the last Knot of s1 is the first Knot of s2
+	 * 
 	 * 
 	 */
-	private static NURBSShape combine(NURBSShape first, NURBSShape second)
+	private static NURBSShape combine(NURBSShape s1, NURBSShape s2)
 	{
 		//
-		// Copy unaffected parts
-		//
-		Vector<Double> U = new Vector<Double>();
-		for (int i=0; i<=first.maxKnotIndex-first.degree; i++)
-			U.add(first.Knots.get(i));
-		U.setSize(U.size()+first.degree); //Add null-Elements for the middle
-		for (int i=second.degree+1; i<=second.maxKnotIndex; i++)
-			U.add(second.Knots.get(i));
-
-		Vector<Point3d> Pw = new Vector<Point3d>();
-		for (int i=0; i<=first.maxCPIndex-first.degree; i++)
-			Pw.add((Point3d) first.controlPointsHom.get(i).clone());
-		Pw.setSize(Pw.size()+first.degree); //Add null-Elements for the middle
-		for (int i=second.degree+1; i<=second.maxCPIndex; i++)
-			Pw.add((Point3d) second.controlPointsHom.get(i).clone());
+		// Copy Both Curves into 1 to unclamp the common part
+		// Therefore the order is reversed (s2 - s1) Copy unaffected parts
+		// And first is shifted by the offset of second
+		Vector<Double> newKnots = new Vector<Double>();
+		Vector<Point3d> newP = new Vector<Point3d>();
+		s1.refreshInternalValues(); s2.refreshInternalValues();
+		double s2offset = s2.Knots.get(s2.maxKnotIndex-s2.degree)-s2.Knots.get(s2.degree);
+		double s1offset = s1.Knots.get(s1.maxKnotIndex-s1.degree)-s1.Knots.get(s1.degree);
+		double shift = s1offset+s2offset;
+		for (int i=0; i<=s2.maxKnotIndex; i++)
+			newKnots.add(s2.Knots.get(i).doubleValue());
+		for (int i=0; i<=s2.maxCPIndex; i++)
+			newP.add((Point3d)s2.controlPointsHom.get(i).clone());
+		int s1BeginKnots = newKnots.size(), s1BeginCP = newP.size();
+		for (int i=s1.degree+1; i<=s1.maxKnotIndex; i++)
+			newKnots.add(s1.Knots.get(i).doubleValue()+shift);
+		for (int i=0; i<=s1.maxCPIndex; i++)
+			newP.add((Point3d)s1.controlPointsHom.get(i).clone());
 		
-		int i=0;
-		i++;
+		NURBSShape temp = new NURBSShape(newKnots,newP);
+		temp = unclamp(temp); //So now they are unclamped, we can copy back to get s1 - s2
+		newKnots = new Vector<Double>();
+		newP = new Vector<Point3d>();
+		for (int i=0; i<=s1.degree; i++)
+			newKnots.add(s1.Knots.get(i)); //Old Clamped Part
+		for (int i=s1BeginKnots; i<=temp.maxKnotIndex-s1.degree; i++) //copy s1 back to beginning
+			newKnots.add(temp.Knots.get(i).doubleValue()-shift); //And shift back
+		for (int i=s2.degree+1; i<s1BeginKnots-1; i++)
+			newKnots.add(temp.Knots.get(i).doubleValue());
 		
-		return new NURBSShape();
+		for (int i=s1BeginCP; i<=temp.maxCPIndex; i++)
+			newP.add((Point3d)temp.controlPointsHom.get(i).clone());
+		for (int i=s2.degree+1; i<s1BeginCP; i++)
+			newP.add((Point3d)temp.controlPointsHom.get(i).clone());
+		
+		temp = new NURBSShape(newKnots,newP);
+		temp = unclamp(temp); //Unclamp the part that stays at endvalues of the combinational curve
+		return temp;
 	}
 	/**
 	 * Refine the given Curve by adding value u if u isn't yet inside and update Circular after that if necessary
