@@ -157,7 +157,7 @@ public class NURBSShapeFactory {
 	 * @param q
 	 * @return
 	 */
-	public static NURBSShape CreateSubCurveInterpolation(NURBSShapeFragment fragment, Vector<Point2D> q, Graphics2D g2)
+	public static NURBSShape CreateSubCurveInterpolation(NURBSShapeFragment fragment, Vector<Point2D> q)
 	{
 		if ((fragment.isEmpty())||(q.size()==0))
 			return new NURBSShape();
@@ -267,8 +267,6 @@ public class NURBSShapeFactory {
 		Vector<Double> Knots = calculateKnotVector(origCurve.degree, maxKnotIndex, lgspoints);
 		NURBSShape c = solveLGS(Knots, lgspoints, IP);
 		NURBSShape old = (new NURBSShapeFragment(origCurve,u2,u1)).getSubCurve(); 
-		g2.setColor(Color.gray);
-		g2.draw(c.getCurve(5d/2d));
 		if (u2<u1)
 		{
 			return combine(old,(new NURBSShapeFragment(c,u1,u2+offset)).getSubCurve());
@@ -310,6 +308,7 @@ public class NURBSShapeFactory {
 		System.err.println("First unclamp with "+newKnots.size()+" Knots and "+newP.size()+" CP ");
 		NURBSShape temp = new NURBSShape(newKnots,newP);
 		temp = unclamp(temp); //So now they are unclamped, we can copy back to get s1 - s2
+		temp.updateCircular(false);
 		newKnots = new Vector<Double>();
 		newP = new Vector<Point3d>();
 		for (int i=0; i<=s1.degree; i++)
@@ -763,6 +762,14 @@ public class NURBSShapeFactory {
 			else //y>0, 3. Quadrant
 				return 270.0d - Math.acos(Math.abs(y)/length)*180.d/Math.PI; //In Degree
 	}
+	/**
+	 * calculate the Value x \in [c.Knots.get(Degree),c.Knots.get(c.maxKnotIndex-c.degree]
+	 * that represents pos
+	 * 
+	 * @param c
+	 * @param pos
+	 * @return
+	 */
 	private static double refineIntoKnotRange(NURBSShape c, double pos)
 	{
 		double offset = c.Knots.get(c.maxKnotIndex-c.degree)-c.Knots.get(c.degree);

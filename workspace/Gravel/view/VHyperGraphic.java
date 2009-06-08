@@ -235,7 +235,7 @@ public class VHyperGraphic extends VCommonGraphic
 			return;
 
 		//On Top draw new Curve
-		NURBSShape c2 = NURBSShapeFactory.CreateSubCurveInterpolation(s,q,g2);
+		NURBSShape c2 = NURBSShapeFactory.CreateSubCurveInterpolation(s,q);
 		if (c2.isEmpty())
 			return;
 		NURBSShape cs2 = c2.stripDecorations().clone();
@@ -244,7 +244,7 @@ public class VHyperGraphic extends VCommonGraphic
 		g2.setColor(Color.magenta);
 		g2.draw(cs2.getCurve(5d/(double)zoomfactor));
 		drawCP(g2,new Point(Math.round((float)c2.CurveAt(c2.Knots.get(c2.degree)).getX()),Math.round((float)c2.CurveAt(c2.Knots.get(c2.degree)).getY())),Color.GREEN);
-		drawCP(g2,new Point(Math.round((float)c2.CurveAt(c2.Knots.get(c2.maxKnotIndex-c2.degree)).getX()),Math.round((float)c2.CurveAt(c2.Knots.get(c2.maxKnotIndex-c2.degree)).getY())),Color.GREEN);
+		drawCP(g2,new Point(Math.round((float)c.CurveAt(c.Knots.get(c.degree)).getX()),Math.round((float)c.CurveAt(c.Knots.get(c.degree)).getY())),Color.RED);
 	}
 	private void paintDerivDEBUG(Graphics2D g2)
 	{
