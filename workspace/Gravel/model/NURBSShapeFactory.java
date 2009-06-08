@@ -267,7 +267,8 @@ public class NURBSShapeFactory {
 		Vector<Double> Knots = calculateKnotVector(origCurve.degree, maxKnotIndex, lgspoints);
 		NURBSShape c = solveLGS(Knots, lgspoints, IP);
 		NURBSShape old = (new NURBSShapeFragment(origCurve,u2,u1)).getSubCurve(); 
-	//	g2.draw(old.getCurve(5d/2d));
+		g2.setColor(Color.gray);
+		g2.draw(c.getCurve(5d/2d));
 		if (u2<u1)
 		{
 			return combine(old,(new NURBSShapeFragment(c,u1,u2+offset)).getSubCurve());
@@ -301,28 +302,31 @@ public class NURBSShapeFactory {
 		for (int i=0; i<=s2.maxCPIndex; i++)
 			newP.add((Point3d)s2.controlPointsHom.get(i).clone());
 		int s1BeginKnots = newKnots.size(), s1BeginCP = newP.size();
-		for (int i=s1.degree+1; i<=s1.maxKnotIndex; i++)
+		for (int i=s1.degree+1; i<=s1.maxKnotIndex; i++) //0...s1.degree are equal to the end of s2
 			newKnots.add(s1.Knots.get(i).doubleValue()+shift);
 		for (int i=0; i<=s1.maxCPIndex; i++)
 			newP.add((Point3d)s1.controlPointsHom.get(i).clone());
 		
+		System.err.println("First unclamp with "+newKnots.size()+" Knots and "+newP.size()+" CP ");
 		NURBSShape temp = new NURBSShape(newKnots,newP);
 		temp = unclamp(temp); //So now they are unclamped, we can copy back to get s1 - s2
 		newKnots = new Vector<Double>();
 		newP = new Vector<Point3d>();
 		for (int i=0; i<=s1.degree; i++)
 			newKnots.add(s1.Knots.get(i)); //Old Clamped Part
-		for (int i=s1BeginKnots; i<=temp.maxKnotIndex-s1.degree; i++) //copy s1 back to beginning
+		for (int i=s1BeginKnots; i<temp.maxKnotIndex-s1.degree; i++) //copy s1 back to beginning
 			newKnots.add(temp.Knots.get(i).doubleValue()-shift); //And shift back
-		for (int i=s2.degree+1; i<s1BeginKnots-1; i++)
+		for (int i=s2.degree; i<s1BeginKnots; i++)
 			newKnots.add(temp.Knots.get(i).doubleValue());
 		
-		for (int i=s1BeginCP; i<=temp.maxCPIndex; i++)
+		for (int i=s1BeginCP; i<temp.maxCPIndex; i++)
 			newP.add((Point3d)temp.controlPointsHom.get(i).clone());
-		for (int i=s2.degree+1; i<s1BeginCP; i++)
+		for (int i=s2.degree-1; i<s1BeginCP; i++)
 			newP.add((Point3d)temp.controlPointsHom.get(i).clone());
 		
+		System.err.print("Second unclamp with "+newKnots.size()+" Knots and "+newP.size()+" CP ");
 		temp = new NURBSShape(newKnots,newP);
+		System.err.println(" and Degree "+temp.degree);
 		temp = unclamp(temp); //Unclamp the part that stays at endvalues of the combinational curve
 		return temp;
 	}

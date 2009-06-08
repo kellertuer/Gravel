@@ -243,7 +243,8 @@ public class VHyperGraphic extends VCommonGraphic
 		g2.setStroke(new BasicStroke(1.3f,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		g2.setColor(Color.magenta);
 		g2.draw(cs2.getCurve(5d/(double)zoomfactor));
-		drawCP(g2,new Point(Math.round((float)c2.CurveAt(c2.Knots.firstElement()).getX()),Math.round((float)c2.CurveAt(c2.Knots.firstElement()).getY())),Color.GREEN);
+		drawCP(g2,new Point(Math.round((float)c2.CurveAt(c2.Knots.get(c2.degree)).getX()),Math.round((float)c2.CurveAt(c2.Knots.get(c2.degree)).getY())),Color.GREEN);
+		drawCP(g2,new Point(Math.round((float)c2.CurveAt(c2.Knots.get(c2.maxKnotIndex-c2.degree)).getX()),Math.round((float)c2.CurveAt(c2.Knots.get(c2.maxKnotIndex-c2.degree)).getY())),Color.GREEN);
 	}
 	private void paintDerivDEBUG(Graphics2D g2)
 	{
