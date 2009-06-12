@@ -713,7 +713,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 			}
 			//Button Activity
 			boolean shape = ((HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape()!=null)&&(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty()));
-			if (FreeModPanel.isLocal())
+			if ((FreeModPanel.isLocal())&&(!cBasicShape.isVisible())) //Mode2 and SubcurveSelection
 			{
 				NURBSShape s = HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape();
 				if ((s.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT) //Looks fuzzy but the Cast next if can't be in the same as this

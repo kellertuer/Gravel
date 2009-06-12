@@ -200,7 +200,7 @@ public class NURBSShapeFactory {
 			return new NURBSShape();
 		else if (fragment.getSubCurve().isEmpty())
 			return fragment.stripDecorations().clone();
-		if (SubcurveSubstitutable(fragment))
+		if (!SubcurveSubstitutable(fragment))
 			return new NURBSShape();
 		//So we have a real existing subcurve
 		double u1 = fragment.getStart(), u2 = fragment.getEnd();
