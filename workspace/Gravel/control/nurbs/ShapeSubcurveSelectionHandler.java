@@ -81,8 +81,7 @@ public class ShapeSubcurveSelectionHandler implements
 	 */
 	public void resetShape() {
 		if ((!Double.isNaN(tempStart)) && (!Double.isNaN(tempEnd)) && (!temporaryShape.isEmpty()))
-
-		temporaryShape = HyperEdgeRef.getShape().clone(); // Reset to actual Edge Shape as NURBSShape
+			temporaryShape = HyperEdgeRef.getShape().clone(); // Reset to actual Edge Shape as NURBSShape
 	}
 
 	public NURBSShape getShape() {
@@ -161,7 +160,7 @@ public class ShapeSubcurveSelectionHandler implements
 			if ((!Double.isNaN(tempStart))&&(!Double.isNaN(tempEnd))&&((temporaryShape.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT))
 			{
 				((NURBSShapeFragment)temporaryShape).setStart(tempStart);
-				((NURBSShapeFragment)temporaryShape).setStart(tempEnd);
+				((NURBSShapeFragment)temporaryShape).setEnd(tempEnd);
 				((NURBSShapeFragment)temporaryShape).refreshDecoration();
 			}
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));

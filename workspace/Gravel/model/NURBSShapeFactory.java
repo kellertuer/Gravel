@@ -307,7 +307,7 @@ public class NURBSShapeFactory {
 		
 		NURBSShape temp = new NURBSShape(newKnots,newP);
 		temp = unclamp(temp); //So now they are unclamped, we can copy back to get s1 - s2
-		temp.updateCircular(false); //Update end.
+		temp.updateCircular(false); //Update end. TODO: Look why sometimes the last 2 might not be interpolated after that
 		newKnots = new Vector<Double>();
 		newP = new Vector<Point3d>();
 		for (int i=0; i<=s1.degree; i++)
@@ -321,9 +321,9 @@ public class NURBSShapeFactory {
 			newP.add((Point3d)temp.controlPointsHom.get(i).clone());
 		for (int i=s2.degree-1; i<s1BeginCP; i++)
 			newP.add((Point3d)temp.controlPointsHom.get(i).clone());
-		
 		temp = new NURBSShape(newKnots,newP);
 		temp = unclamp(temp); //Unclamp the part that stays at endvalues of the combinational curve
+		temp.updateCircular(true); //start to let the prepart unchanged
 		return temp;
 	}
 	/**

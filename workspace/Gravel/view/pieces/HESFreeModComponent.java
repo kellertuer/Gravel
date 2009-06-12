@@ -48,7 +48,9 @@ public class HESFreeModComponent implements ActionListener {
 	{
     	setButtonsEnabled(true);
    		NURBSShape shape = HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).getShape();
-   		HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).setShape(shape.stripDecorations());
+   		if (rModGlobal.isSelected())
+   			shape = shape.stripDecorations();
+   		HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).setShape(shape);
 		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);
 		deselectGlobalButtons();
 	}

@@ -103,7 +103,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		if (s==null)
 			return;
 		float selSize = (float)selWidth/2f + (float) vG.modifyHyperEdges.get(highlightedHyperEdge).getWidth();
-		NURBSShape drawSel = s.getSubCurve().stripDecorations().clone(); //really only nurbs
+		NURBSShape drawSel = s.getSubCurve().clone().stripDecorations(); //really only nurbs
 		drawSel.scale(zoomfactor);
 		g2.setColor(selColor);
 		g2.setStroke(new BasicStroke(selSize*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
@@ -191,7 +191,11 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				NURBSShape draw = ((NURBSShapeFragment)nm.getCurve()).getSubCurve().stripDecorations().clone();
 				draw.scale(zoomfactor);
 				g2.setStroke(new BasicStroke(1*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-				g2.setColor(Color.DARK_GRAY);
+				Color nsel = new Color((selColor.getBlue()+Color.DARK_GRAY.getBlue())/2,
+						(selColor.getBlue()+Color.DARK_GRAY.getBlue())/2,
+						(selColor.getBlue()+Color.DARK_GRAY.getBlue())/2);
+				g2.setColor(nsel);
+				System.err.println(nsel+"  "+selColor);
 				g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
 			}
 			
