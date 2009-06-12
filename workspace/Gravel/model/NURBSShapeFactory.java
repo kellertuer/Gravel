@@ -57,6 +57,43 @@ public class NURBSShapeFactory {
 	}
 	
 	/**
+	 * Check whether Selection is Big enough
+	 * @return
+	 */
+	public static boolean SubcurveSubstitutable(NURBSShapeFragment f)
+	{
+		NURBSShape origCurve = f.stripDecorations().clone();
+		// refine Endpoints if not yet done
+		double u1 = f.getStart(), u2 = f.getEnd();
+		refineCircular(origCurve,f.getStart()); refineCircular(origCurve,u2);
+
+		//Claculate part that is kept
+		NURBSShapeFragment keptFragment = new NURBSShapeFragment(origCurve.clone(),u2,u1); //From this part we need the IP, so calulate that too for their determination
+		keptFragment.prepareFragment(); //So we have enough CP in the kept Part
+
+		int k1 = keptFragment.findSpan(u1);
+		int k2 = keptFragment.findSpan(u2);
+		//Check iff there is too less stuff to cut away
+		if (u1<u2) //too less stuff to cut away
+		{
+			if ((k2-k1)<origCurve.degree+1)
+			{
+//				System.err.println("Wah 1");
+				return false;
+			}
+		}
+		else
+		{
+			if (Math.abs(k1-keptFragment.maxKnotIndex+2*keptFragment.degree-k2)<origCurve.degree+1)
+			{
+//				System.err.println("Wah 2");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Create a NURBSSHape Circle based on the Information, where its Origin is, its Radius and the Distance to the nodes
 	 * 
 	 * TODO: Create an Higher Order Circle
@@ -163,6 +200,8 @@ public class NURBSShapeFactory {
 			return new NURBSShape();
 		else if (fragment.getSubCurve().isEmpty())
 			return fragment.stripDecorations().clone();
+		if (SubcurveSubstitutable(fragment))
+			return new NURBSShape();
 		//So we have a real existing subcurve
 		double u1 = fragment.getStart(), u2 = fragment.getEnd();
 		NURBSShape origCurve = fragment.stripDecorations().clone();
@@ -175,17 +214,6 @@ public class NURBSShapeFactory {
 
 		int k1 = keptFragment.findSpan(u1);
 		int k2 = keptFragment.findSpan(u2);
-		//Check iff there is too less stuff to cut away
-		if (u1<u2) //too less stuff to cut away
-		{
-			if ((k2-k1)<origCurve.degree+1)
-				return new NURBSShape();
-		}
-		else 
-		{
-			if (Math.abs(k1-keptFragment.maxKnotIndex+2*keptFragment.degree-k2)<origCurve.degree+1)					
-				return new NURBSShape();
-		}
 		double offset = keptFragment.Knots.get(keptFragment.maxKnotIndex-keptFragment.degree)-keptFragment.Knots.get(keptFragment.degree);
 		Vector<Double> lgspoints = new Vector<Double>(); Vector<Point2D> IP = new Vector<Point2D>();
 		//
@@ -269,11 +297,11 @@ public class NURBSShapeFactory {
 		NURBSShape old = (new NURBSShapeFragment(origCurve,u2,u1)).getSubCurve();  //Unchanged Old part
 		if (u2<u1)
 		{
-			return combine(old,(new NURBSShapeFragment(c,u1,u2+offset)).getSubCurve());
+			return combine(old,(new NURBSShapeFragment(c,u1,u2+offset)).getSubCurve(), false);
 		}
 		else
 		{
-			c = combine((new NURBSShapeFragment(c,u1,u2)).getSubCurve(),old);
+			c = combine((new NURBSShapeFragment(c,u1,u2)).getSubCurve(),old,true);
 		}
 		return c;
 	}
@@ -283,7 +311,7 @@ public class NURBSShapeFactory {
 	 * 
 	 * 
 	 */
-	private static NURBSShape combine(NURBSShape s1, NURBSShape s2)
+	private static NURBSShape combine(NURBSShape s1, NURBSShape s2, boolean OldOverCirc)
 	{
 		//
 		// Copy Both Curves into 1 to unclamp the common part
@@ -307,7 +335,7 @@ public class NURBSShapeFactory {
 		
 		NURBSShape temp = new NURBSShape(newKnots,newP);
 		temp = unclamp(temp); //So now they are unclamped, we can copy back to get s1 - s2
-		temp.updateCircular(false); //Update end. TODO: Look why sometimes the last 2 might not be interpolated after that
+		temp.updateCircular(OldOverCirc); //Update end if noncirc, else circ. TODO: Look why sometimes the last 2 might not be interpolated after that
 		newKnots = new Vector<Double>();
 		newP = new Vector<Point3d>();
 		for (int i=0; i<=s1.degree; i++)
@@ -323,7 +351,7 @@ public class NURBSShapeFactory {
 			newP.add((Point3d)temp.controlPointsHom.get(i).clone());
 		temp = new NURBSShape(newKnots,newP);
 		temp = unclamp(temp); //Unclamp the part that stays at endvalues of the combinational curve
-		temp.updateCircular(true); //start to let the prepart unchanged
+		temp.updateCircular(OldOverCirc); //update start is noncircular, else end
 		return temp;
 	}
 	/**

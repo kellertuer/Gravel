@@ -191,11 +191,10 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				NURBSShape draw = ((NURBSShapeFragment)nm.getCurve()).getSubCurve().stripDecorations().clone();
 				draw.scale(zoomfactor);
 				g2.setStroke(new BasicStroke(1*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-				Color nsel = new Color((selColor.getBlue()+Color.DARK_GRAY.getBlue())/2,
-						(selColor.getBlue()+Color.DARK_GRAY.getBlue())/2,
-						(selColor.getBlue()+Color.DARK_GRAY.getBlue())/2);
+				Color nsel = new Color((3*selColor.getBlue()+Color.DARK_GRAY.getBlue())/4,
+						(3*selColor.getBlue()+Color.DARK_GRAY.getBlue())/4,
+						(3*selColor.getBlue()+Color.DARK_GRAY.getBlue())/4);
 				g2.setColor(nsel);
-				System.err.println(nsel+"  "+selColor);
 				g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
 			}
 			

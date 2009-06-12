@@ -58,7 +58,10 @@ public class HESFreeModComponent implements ActionListener {
 	{
 		return FreeModFields;
 	}
-	
+	public boolean isLocal()
+	{
+		return rModLocal.isSelected();
+	}
 	public void setVisible(boolean visible)
 	{
  		FreeModFields.setVisible(visible);
