@@ -865,7 +865,93 @@ public class NURBSShape {
 	 */
 	public void removeKnotNear(Point2D p, double tol)
 	{
-
+		int knotIndex=0;
+		if (isEmpty())
+			return;
+		if (maxCPIndex<=2*degree+1)
+			return; //Too less Knots
+		double minDist = Double.MAX_VALUE;
+		for (int i=degree+1; i<maxKnotIndex-degree; i++) //Search for Knot with minimum Distance to p
+		{
+			Point2D actualKnotPoint  = CurveAt(Knots.get(i));
+			if (actualKnotPoint.distance(p) <= minDist)
+			{
+				knotIndex = i;
+				minDist = actualKnotPoint.distance(p);
+			}
+		}
+		if (minDist>tol) //Minimum Knot too far away from p
+		{
+			System.err.println("Too far away");
+			return;
+		}
+		System.err.println("Up to now we still have "+(maxKnotIndex+1)+" Knots and "+(maxCPIndex+1)+" CP");
+		//Multiplicity of knotIndex
+		int mult = knotIndex;
+		while (Knots.get(mult)==Knots.get(knotIndex))
+			mult++;
+		mult = mult - knotIndex; //Is the multiplicity
+		//Removal with a simplificated version of ALGORITHM 5.8 from NURBSBook
+		double knotu = Knots.get(knotIndex);
+		int lastAffected = knotIndex-mult, firstAffected = knotIndex-degree, offSet = firstAffected-1; //OffSet from temporary Vector to original
+		Vector<Point3d> temp = new Vector<Point3d>();
+		temp.setSize(lastAffected-offSet+2);
+		temp.set(0,(Point3d)controlPointsHom.get(offSet).clone()); temp.set(lastAffected-offSet+1, (Point3d)controlPointsHom.get(lastAffected+1).clone());
+		int i=firstAffected, j=lastAffected, ii=1, jj=lastAffected-offSet; //i,j are the values of the actual Controlpoints, ii,jj are those of the temporary Vector
+		while ((j-i) > 0) //Just one removal, t=0 from the algorithm
+		{
+			double alphi = (knotu-Knots.get(i).doubleValue()) / (Knots.get(i+degree+1)-Knots.get(i));
+			double alphj = (knotu-Knots.get(j).doubleValue()) / (Knots.get(j+degree+1)-Knots.get(j));
+			Point3d newii = (Point3d) controlPointsHom.get(i).clone();
+			Point3d newiisummand = (Point3d)temp.get(ii-1).clone();
+			newiisummand.scale(-1d*(1d-alphi));	newii.add(newiisummand);newii.scale(alphi);
+			temp.set(ii,newii);
+			Point3d newjj = (Point3d) controlPointsHom.get(j).clone();
+			Point3d newjjsummand = (Point3d)temp.get(jj+1).clone();
+			newjjsummand.scale(-1d*(alphj)); newjj.add(newjjsummand);newjj.scale(1d-alphj);
+			temp.set(jj,newjj);
+			i++; ii++; j--; jj--;
+		}
+		//Leave out the check for removal, we have undo, save new cp (see algorithm and think about t=1)
+		i=firstAffected; j=lastAffected;
+		while ((j-i) > 0)
+		{
+			controlPointsHom.set(i, temp.get(i-offSet));
+			controlPointsHom.set(j, temp.get(j-offSet));
+			i++; j--;
+		}
+		//Shift unaffected Knots
+		for (int k=knotIndex+1; k<=maxKnotIndex; k++)
+			Knots.set(k-1, Knots.get(k).doubleValue());
+		Knots.setSize(Knots.size()-1); //Remove last Element
+		//Shift all unaffected ControlPoints
+		int firstCPOut = (2*knotIndex-mult-degree)/2;
+		for (int k=firstCPOut+1; k<=maxCPIndex; k++)
+			controlPointsHom.set(k-1, controlPointsHom.get(k));
+		//Remove Last Element
+		controlPointsHom.setSize(controlPointsHom.size()-1);
+		//Recompute Points & weights
+		controlPoints = new Vector<Point2D>(); 
+		cpWeight = new Vector<Double>();
+		Iterator<Point3d> Pwi = controlPointsHom.iterator();
+		while (Pwi.hasNext())
+		{
+			Point3d p1 = Pwi.next();
+			if (p1.z==0)
+				controlPoints.add(new Point2D.Double(p1.x,p1.y));
+			else
+				controlPoints.add(new Point2D.Double(p1.x/p1.z, p1.y/p1.z));
+			cpWeight.add(p1.z);
+		}
+		maxCPIndex = controlPoints.size()-1;
+		maxKnotIndex = Knots.size()-1;
+		degree = Knots.size()-controlPoints.size()-1;
+		refreshInternalValues();
+		if (knotIndex<=2*degree)
+			updateCircular(false);
+		else if (knotIndex>=(maxKnotIndex+1-2*degree)) //+1 for the old values
+			updateCircular(true);
+		System.err.println("Removal done.");
 	}
 	/**
 	 * Refine the Curve to add some new knots contained in X from wich each is between t[0] and t[m]
@@ -953,14 +1039,16 @@ public class NURBSShape {
 		degree = Knots.size()-controlPoints.size()-1;
 		refreshInternalValues();
 	}
-	public void removeKnot(double knotval)
-	{
-		// TODO Knot removal
-	}
-	public Vector<Point2D> getKnotPoints()
+	/**
+	 * For Display-Purposes - get the Points that lie on the curve at the knot-parameter-points
+	 * t[degree+1],...,t[maxKnot-degree-1]
+	 * That displays all Knots that are removable
+	 * @return
+	 */
+	public Vector<Point2D> getRemovableKnotPoints()
 	{
 		Vector<Point2D> KnotPoints = new Vector<Point2D>();
-		for (int i=degree; i<=maxKnotIndex-degree; i++)
+		for (int i=degree+1; i<maxKnotIndex-degree; i++)
 		{
 			KnotPoints.add(CurveAt(Knots.get(i)));
 		}

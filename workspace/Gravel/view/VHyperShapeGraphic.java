@@ -222,7 +222,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		{
 			g2.setColor(selColor);
 			int size = (selWidth+vG.modifyHyperEdges.get(highlightedHyperEdge).getWidth())/2;
-			Vector<Point2D> kP = vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().getKnotPoints();
+			Vector<Point2D> kP = vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().getRemovableKnotPoints();
 			for (int i=0; i<kP.size(); i++)
 			{
 				g2.fillOval(Math.round(((float)kP.get(i).getX()-(float)size)*zoomfactor), Math.round(((float)kP.get(i).getY()-(float)size)*zoomfactor), Math.round(2*size*zoomfactor), Math.round(2*size*zoomfactor));
