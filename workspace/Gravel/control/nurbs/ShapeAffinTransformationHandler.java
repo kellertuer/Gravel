@@ -54,18 +54,21 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	 * The ShapeModificationDragListener
 	 * Handles Drags in an HyperGraphic-Environment and modifies a specific edge
 	 * 
-	 * @param g
+	 * @param modstate Init the Modus of Shape Transformation from the Values in VCommonGraphics
+	 * @param g a HyperGraph the Hyper edge (and its shape belong to
 	 * @param hyperedgeindex the specific edge to be modified
 	 */
-	public ShapeAffinTransformationHandler(VHyperGraph g, int hyperedgeindex)
+	public ShapeAffinTransformationHandler(int modstate,VHyperGraph g, int hyperedgeindex)
 	{
 		vhg = g;
 		gp = GeneralPreferences.getInstance();
 		gp.addObserver(this);
+		zoom = gp.getFloatValue("zoom");
 		if (vhg.modifyHyperEdges.get(hyperedgeindex)==null)
 			return; //Nothing can be done here.
 		HyperEdgeRef = vhg.modifyHyperEdges.get(hyperedgeindex);
 		temporaryShape = HyperEdgeRef.getShape().clone();
+		setModificationState(modstate);
 	}
 	
 	public Rectangle getSelectionRectangle()
@@ -180,7 +183,6 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		
 		if (((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)||((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))
 		{	//When someone presses alt or shift while drag...end it.
 			internalReset();

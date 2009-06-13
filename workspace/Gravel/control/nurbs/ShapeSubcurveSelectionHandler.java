@@ -51,11 +51,12 @@ public class ShapeSubcurveSelectionHandler implements
 	 * The ShapeSubcurveSelectionHanlder Handlers MouseActions for the selection
 	 * of a subcurve
 	 * 
-	 * @param g
+	 * @param modstate specifies the type of modification, specified in VCommonGraphic
+	 * @param g the Hypergraph containing the Hyperedge and its shape
 	 * @param hyperedgeindex
-	 *            the specific edge to be modified
+            	the specific edge to be modified
 	 */
-	public ShapeSubcurveSelectionHandler(VHyperGraph g, int hyperedgeindex) {
+	public ShapeSubcurveSelectionHandler(int modstate, VHyperGraph g, int hyperedgeindex) {
 		vhg = g;
 		gp = GeneralPreferences.getInstance();
 		gp.addObserver(this);
@@ -75,6 +76,7 @@ public class ShapeSubcurveSelectionHandler implements
 			tempStart=Double.NaN;
 			tempEnd = Double.NaN;
 		}
+		setModificationState(modstate);
 	}
 	/**
 	 * Reset shape to last state that was really saved in the graph - doeas not

@@ -840,13 +840,41 @@ public class NURBSShape {
 	}
 	
 	/**
+	 * Add a single Knot at u, if it's in range, update circular if it's an unclamped curve
+	 * @param u
+	 */
+	public void addKnot(double u)
+	{
+		if ((Knots.contains(u))||(u < Knots.firstElement())||(u>Knots.lastElement()))
+			return;
+		int i = findSpan(u);
+		Vector<Double> ref = new Vector<Double>();
+		ref.add(u);
+		RefineKnots(ref);
+		if ((getType()&UNCLAMPED)!=UNCLAMPED)
+			return;
+		if (i<=2*degree) //Front changed
+			updateCircular(false); //Update end
+		else if (i>=maxKnotIndex-2*degree)
+			updateCircular(true); //Update front
+	}
+	/**
+	 * Remove a Knot if the Curve C(Knot(get(i)) is at most tol away from p
+	 * @param p any point p that is in Distance of at most
+	 * @param tol to the Curvepoint represented by a Knot
+	 */
+	public void removeKnotNear(Point2D p, double tol)
+	{
+
+	}
+	/**
 	 * Refine the Curve to add some new knots contained in X from wich each is between t[0] and t[m]
 	 * This Method does not care about circular closed curves
 	 * If you have any vector refining first AND last degree Elements somewhere
 	 * Split it Refine the front, call CircularUpdate(false) and Refine end (and call CircularUpdate(true))
 	 * @param X
 	 */
-	public void RefineKnots(Vector<Double> X)
+	protected void RefineKnots(Vector<Double> X)
 	{
 		if (isEmpty())
 			return;

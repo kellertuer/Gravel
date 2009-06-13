@@ -333,19 +333,21 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			break;
 			case SHAPE_MOUSEHANDLING:
 				if (listenerclasschanged)
-					secondModus = new ShapeAffinTransformationHandler(vG, highlightedHyperEdge);
-				((ShapeAffinTransformationHandler)secondModus).setModificationState(state&(DETAIL_MASK));
+					secondModus = new ShapeAffinTransformationHandler(state&(DETAIL_MASK),vG, highlightedHyperEdge);
+				else //just update State
+					((ShapeAffinTransformationHandler)secondModus).setModificationState(state&(DETAIL_MASK));
 			break;
 			case SUBCURVE_MOUSEHANDLING:
 				if (listenerclasschanged) //If we are not yet in that modus
-					secondModus = new ShapeSubcurveSelectionHandler(vG, highlightedHyperEdge);
-				((ShapeSubcurveSelectionHandler)secondModus).setModificationState(state&(DETAIL_MASK));
+					secondModus = new ShapeSubcurveSelectionHandler(state&(DETAIL_MASK),vG, highlightedHyperEdge);
+				else //just update State
+					((ShapeSubcurveSelectionHandler)secondModus).setModificationState(state&(DETAIL_MASK));
 			break;
 			case KNOT_MODIFICATION_MOUSEHANDLING:
 				if (listenerclasschanged)
-				{
-					secondModus = new FreeModificationHandler(vG, highlightedHyperEdge); //TODO
-				}
+					secondModus = new KnotModificationMouseHandler(state&DETAIL_MASK, vG, highlightedHyperEdge); //TODO
+				else //Just update State
+					((KnotModificationMouseHandler)secondModus).setModificationState(state&(DETAIL_MASK));
 			break;
 			case NO_MOUSEHANDLING:
 			default:
