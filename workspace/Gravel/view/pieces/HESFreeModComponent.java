@@ -142,7 +142,7 @@ public class HESFreeModComponent implements ActionListener {
 		c.gridx++;
 		bDecKnots = new JButton(new ImageIcon(IconDir+"minus16.png"));
 		bDecKnots.setSize(new Dimension(17,17));
-//		bDecKnots.setEnabled(false);
+		bDecKnots.addActionListener(this);
 		FreeModFields.add(bDecKnots,c);
 		
 		c.gridy++;
@@ -236,6 +236,7 @@ public class HESFreeModComponent implements ActionListener {
 		else
 			HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);	        		
 	}
+	
 	public void actionPerformed(ActionEvent e) {
         if ((e.getSource()==rModGlobal)||(e.getSource()==rModLocal))
         {
@@ -268,11 +269,27 @@ public class HESFreeModComponent implements ActionListener {
         }
 		if (e.getSource()==bIncKnots)
         {
-			System.err.println("//TODO Inc/Dec Knots");
+			boolean wasSel = bIncKnots.isSelected();
+			if (wasSel)
+	      		setToStandardMouseHandling();        	
+			else
+			{
+        		deselectGlobalButtons();
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.KNOT_MODIFICATION_MOUSEHANDLING|VCommonGraphic.ADD);	        		
+			}
+			bIncKnots.setSelected(!wasSel);
         }
 		if (e.getSource()==bDecKnots)
         {
-			System.err.println("//TODO Inc/Dec Knots");			
+			boolean wasSel = bDecKnots.isSelected();
+			if (wasSel)
+	      		setToStandardMouseHandling();        	
+			else
+			{
+        		deselectGlobalButtons();
+        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.KNOT_MODIFICATION_MOUSEHANDLING|VCommonGraphic.REMOVE);	        		
+			}
+			bDecKnots.setSelected(!wasSel);
         }
         else if (e.getSource()==bRotation)
         {

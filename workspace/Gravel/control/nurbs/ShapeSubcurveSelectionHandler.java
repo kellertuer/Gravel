@@ -7,6 +7,7 @@ import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.Observable;
 
 import view.VCommonGraphic;
 import view.VHyperGraphic;
@@ -34,8 +35,8 @@ public class ShapeSubcurveSelectionHandler implements
 			ShapeModificationMouseHandler {
 
 	private VHyperGraph vhg = null;
-	private VCommonGraphic vgc;
-	// private GeneralPreferences gp;
+	private float zoom;
+	private GeneralPreferences gp;
 	private Point MouseOffSet = new Point(0, 0);
 	private Point2D.Double DragOrigin;
 	private boolean firstdrag = true;
@@ -45,8 +46,7 @@ public class ShapeSubcurveSelectionHandler implements
 	double lastStart,lastEnd;
 	//For single clicks which value to handle next
 	boolean setStartNext = true, DragsetsStart, toggleOnClick=true; 
-	GeneralPreferences gp;
-	VHyperEdge HyperEdgeRef;
+	private VHyperEdge HyperEdgeRef;
 	/**
 	 * The ShapeSubcurveSelectionHanlder Handlers MouseActions for the selection
 	 * of a subcurve
@@ -55,10 +55,11 @@ public class ShapeSubcurveSelectionHandler implements
 	 * @param hyperedgeindex
 	 *            the specific edge to be modified
 	 */
-	public ShapeSubcurveSelectionHandler(VHyperGraphic g, int hyperedgeindex) {
-		vgc = g;
-		vhg = g.getGraph();
+	public ShapeSubcurveSelectionHandler(VHyperGraph g, int hyperedgeindex) {
+		vhg = g;
 		gp = GeneralPreferences.getInstance();
+		gp.addObserver(this);
+		zoom = gp.getFloatValue("zoom");
 		if (vhg.modifyHyperEdges.get(hyperedgeindex) == null)
 			return; // Nothing can be done here.
 		HyperEdgeRef = vhg.modifyHyperEdges.get(hyperedgeindex);
@@ -88,33 +89,6 @@ public class ShapeSubcurveSelectionHandler implements
 		NURBSShapeFragment actualFragment = new NURBSShapeFragment(temporaryShape.stripDecorations(), tempStart, tempEnd);
 		return actualFragment; //maybe subcurve is empty...that dies not matter
 	}
-	/**
-	 * Set shape to a specific given shape - e.g. when the History-Manager
-	 * resets
-	 */
-	public void setShape(NURBSShape s) {
-		HyperEdgeRef.setShape(s);
-		if ((s.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
-		{
-			NURBSShapeFragment t = (NURBSShapeFragment)s;
-			tempStart = t.getStart();
-			tempEnd = t.getEnd();
-			temporaryShape = new NURBSShapeFragment(t,tempStart,tempEnd);
-		}
-		else
-		{
-			tempStart=Double.NaN;
-			tempEnd = Double.NaN;
-			temporaryShape = s.clone();
-		}
-		// This is pushed in side the Drag-Block if it happens while dragging so
-		// the whole action is only captured as one
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,
-				GraphConstraints.UPDATE | GraphConstraints.HYPEREDGESHAPE,
-				GraphConstraints.HYPEREDGE));
-		if (dragged()) // End Drag
-			internalReset();
-	}
 	public Point2D getDragStartPoint() {
 		if (!dragged())
 			return null;
@@ -123,8 +97,8 @@ public class ShapeSubcurveSelectionHandler implements
 	public Point2D getDragPoint() {
 		if (!dragged())
 			return null;
-		return new Point2D.Double(MouseOffSet.getX()/((double) vgc.getZoom()/100d),
-				MouseOffSet.getY()/((double) vgc.getZoom()/100d));
+		return new Point2D.Double(MouseOffSet.getX()/((double) zoom),
+				MouseOffSet.getY()/((double) zoom));
 	}
 
 	public boolean dragged() {
@@ -183,8 +157,8 @@ public class ShapeSubcurveSelectionHandler implements
 		MouseOffSet = e.getPoint(); // Actual Mouseposition
 		// DragOrigin is the MousePosition in the graph, e.g. without zoom
 		DragOrigin = new Point2D.Double((double) e.getPoint().x
-				/ ((double) vgc.getZoom() / 100d), (double) e.getPoint().y
-				/ ((double) vgc.getZoom() / 100d));
+				/ ((double) zoom), (double) e.getPoint().y
+				/ ((double) zoom));
 		double tol = (new Integer(gp.getIntValue("vgraphic.selwidth"))).doubleValue() + ((double) HyperEdgeRef.getWidth() / 2d);
 		//Project with real stripped curve
 		NURBSShapeProjection proj = new NURBSShapeProjection(temporaryShape.stripDecorations().clone(), DragOrigin);
@@ -224,8 +198,8 @@ public class ShapeSubcurveSelectionHandler implements
 			// Mouse-Position
 			Point2D exactPointInGraph = new Point2D.Double((double) e
 					.getPoint().x
-					/ ((double) vgc.getZoom() / 100d), (double) e.getPoint().y
-					/ ((double) vgc.getZoom() / 100d));
+					/ ((double) zoom), (double) e.getPoint().y
+					/ ((double) zoom));
 			NURBSShapeProjection proj = new NURBSShapeProjection(temporaryShape.stripDecorations().clone(), exactPointInGraph);
 			if (DragsetsStart)
 				tempStart = proj.getResultParameter();
@@ -272,8 +246,8 @@ public class ShapeSubcurveSelectionHandler implements
 	{
 		// Point in Graph (exact, double values) of the actual Mouse-Position
 		Point2D exactPointInGraph = new Point2D.Double((double) e.getPoint().x
-				/ ((double) vgc.getZoom() / 100d), (double) e.getPoint().y
-				/ ((double) vgc.getZoom() / 100d));
+				/ ((double) zoom), (double) e.getPoint().y
+				/ ((double) zoom));
 		NURBSShapeProjection proj = new NURBSShapeProjection(temporaryShape.stripDecorations().clone(), exactPointInGraph);
 		double tol = (new Integer(gp.getIntValue("vgraphic.selwidth"))).doubleValue() + ((double) HyperEdgeRef.getWidth() / 2d);
 		if (proj.getResultPoint().distance(exactPointInGraph) <= tol)
@@ -305,5 +279,9 @@ public class ShapeSubcurveSelectionHandler implements
 	public void setGridOrientated(boolean b) {}
 	public Rectangle getSelectionRectangle() {
 		return null;
+	}
+	public void update(Observable o, Object arg) {
+		if ((o==gp)&&(arg=="zoom"))
+			zoom = gp.getFloatValue("zoom");
 	}
 }

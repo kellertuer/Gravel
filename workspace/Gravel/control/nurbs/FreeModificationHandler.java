@@ -7,6 +7,7 @@ import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.Observable;
 import java.util.Vector;
 
 
@@ -15,8 +16,6 @@ import model.NURBSShape;
 import model.VHyperGraph;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
-import view.VCommonGraphic;
-import view.VHyperGraphic;
 /**
  * Class for handling Drags for Free Modification
  * 
@@ -27,19 +26,20 @@ import view.VHyperGraphic;
  */
 public class FreeModificationHandler implements ShapeModificationMouseHandler {
 	VHyperGraph vhg;
-	VCommonGraphic vgc;
 	VHyperEdge HyperEdgeRef;
+	float zoom;
 	GeneralPreferences gp;
 	Point MouseOffSet = new Point(0,0);;
 	boolean firstdrag = true;
 	double DragStartProjection = Double.NaN;
 	NURBSShape temporaryShape=null;
 	
-	public FreeModificationHandler(VHyperGraphic g, int hyperedgeindex)
+	public FreeModificationHandler(VHyperGraph g, int hyperedgeindex)
 	{
-		vgc = g;
-		vhg = g.getGraph();
+		vhg = g;
 		gp = GeneralPreferences.getInstance();
+		gp.addObserver(this);
+		zoom = gp.getFloatValue("zoom");
 		if (vhg.modifyHyperEdges.get(hyperedgeindex)==null)
 			return; //Nothing can be done here.
 		HyperEdgeRef = vhg.modifyHyperEdges.get(hyperedgeindex);
@@ -58,27 +58,21 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 	{
 		temporaryShape = HyperEdgeRef.getShape().clone(); //Clone with eventual Decorations (if that decoration clones)
 	}
-	public void setShape(NURBSShape s)
-	{
-		if (dragged()) //End Drag
-			internalReset();
-		HyperEdgeRef.setShape(s);
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
-	}
+
 	public Point2D getDragStartPoint()
 	{
 		if (!dragged())
 			return null;
 		return temporaryShape.CurveAt(DragStartProjection);
 	}
-	
+
 	public Point2D getDragPoint()
 	{
 		if (!dragged())
 			return null;
-		return new Point2D.Double(MouseOffSet.getX()/((double)vgc.getZoom()/100d),MouseOffSet.getY()/((double)vgc.getZoom()/100d));
-		
+		return new Point2D.Double(MouseOffSet.getX()/((double)zoom),MouseOffSet.getY()/((double)zoom));
 	}
+
 	public boolean dragged()
 	{
 		return ((!Double.isNaN(DragStartProjection))&&(!firstdrag));
@@ -101,7 +95,7 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 		if (alt||shift)
 			return;
 		MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed
-		Point pointInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //Rausrechnen des zooms
+		Point pointInGraph = new Point(Math.round(e.getPoint().x/((float)zoom)),Math.round(e.getPoint().y/((float)zoom))); //Rausrechnen des zooms
 		if (temporaryShape.isPointOnCurve(pointInGraph, 2.0d)) //Are we near the Curve?
 		{
 			DragStartProjection = temporaryShape.ProjectionPointParameter(pointInGraph);
@@ -121,7 +115,7 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 		{
 			//Update temporary Shape
 			MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed
-			Point2D exactPointInGraph = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100),(double)e.getPoint().y/((double)vgc.getZoom()/100)); //Rausrechnen des zooms
+			Point2D exactPointInGraph = new Point2D.Double((double)e.getPoint().x/((double)zoom),(double)e.getPoint().y/((double)zoom)); //Rausrechnen des zooms
 			temporaryShape.movePoint(DragStartProjection, exactPointInGraph);
 
 			if (firstdrag) //If wirst drag - start Block
@@ -158,4 +152,9 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 	//There are no Parameters for the Factor to be returned in this mode
 	public Vector<Object> getShapeParameters() { return null; }
 	public void setShapeParameters(Vector<Object> p) {}
+
+	public void update(Observable o, Object arg) {
+		if ((o==gp)&&(arg=="zoom"))
+			zoom = gp.getFloatValue("zoom");
+	}
 }

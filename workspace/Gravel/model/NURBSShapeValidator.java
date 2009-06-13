@@ -2,6 +2,8 @@ package model;
 
 import view.VCommonGraphic;
 
+import io.GeneralPreferences;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -51,6 +53,8 @@ public class NURBSShapeValidator extends NURBSShape {
 			this(s,r,-1);
 		}
 	}
+	float zoom = GeneralPreferences.getInstance().getFloatValue("zoom");
+
 	private Point2D CPOutside;
 	//Points we have to work on 
 	private Queue<Point2D> Points = new LinkedList<Point2D>();
@@ -115,9 +119,9 @@ public class NURBSShapeValidator extends NURBSShape {
 			{	
 				pointInformation.get(actualP).radius = radius; //Change radius
 				g2.setColor(Color.gray);
-				g2.drawOval(Math.round((float)(actualP.getX()-radius)*g.zoomfactor),
-					Math.round((float)(actualP.getY()-radius)*g.zoomfactor),
-					Math.round((float)(2*radius)*g.zoomfactor), Math.round((float)(2*radius)*g.zoomfactor));
+				g2.drawOval(Math.round((float)(actualP.getX()-radius)*zoom),
+					Math.round((float)(actualP.getY()-radius)*zoom),
+					Math.round((float)(2*radius)*zoom), Math.round((float)(2*radius)*zoom));
 				//Calculate Distance and direction from Point to its projection
 				Point2D ProjDir = new Point2D.Double(ProjP.getX()-actualP.getX(),ProjP.getY()-actualP.getY());
 				double length = ProjDir.distance(0d,0d);

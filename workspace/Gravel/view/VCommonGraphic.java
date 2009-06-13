@@ -44,19 +44,21 @@ public abstract class VCommonGraphic extends Component implements Observer
 	public static final int INTERPOLATION_MOUSEHANDLING = 16;
 	public static final int SHAPE_MOUSEHANDLING = 32;
 	public static final int SUBCURVE_MOUSEHANDLING = 64;
-	
+	public static final int KNOT_MODIFICATION_MOUSEHANDLING = 128;
 	//
 	//Detail Info on some MouseHandlers
 	//
-	public static final int SET_START = 128;
-	public static final int SET_END = 256;
-	public static final int TOGGLE = 512;
-	public static final int SCALE = 1024;
-	public static final int ROTATE = 2048;
-	public static final int TRANSLATE = 4096;
-	public static final int SCALE_DIR = 8192;
+	public static final int SET_START = 256;
+	public static final int SET_END = 512;
+	public static final int TOGGLE = 1024;
+	public static final int SCALE = 2048;
+	public static final int ROTATE = 4096;
+	public static final int TRANSLATE = 8192;
+	public static final int SCALE_DIR = 16384;
+	public static final int ADD = 32768;
+	public static final int REMOVE = 65536;
 
-	public static final int DETAIL_MASK = SET_START|SET_END|TOGGLE|SCALE|ROTATE|TRANSLATE|SCALE_DIR;
+	public static final int DETAIL_MASK = ADD|REMOVE|SET_START|SET_END|TOGGLE|SCALE|ROTATE|TRANSLATE|SCALE_DIR;
 	public static final int NO_DETAIL = 0;
 	//
 	// GetType Subclasses
@@ -69,7 +71,7 @@ public abstract class VCommonGraphic extends Component implements Observer
 	protected Color selColor; //Color of selected Elements
 	protected int selWidth; //Width of selection border
 
-	public float zoomfactor; //TODO: set private after DEBUG
+	protected float zoomfactor; //TODO: set private after DEBUG
 	protected int gridx,gridy;
 	protected boolean gridenabled,gridorientated;
 	protected GeneralPreferences gp;
@@ -84,7 +86,7 @@ public abstract class VCommonGraphic extends Component implements Observer
 		gp.addObserver(this);
 		this.setSize(d);
 		this.setBounds(0, 0, d.width, d.height);
-		zoomfactor = 1.0f;
+		zoomfactor = gp.getFloatValue("zoom");
 		gridx = gp.getIntValue("grid.x");
 		gridy = gp.getIntValue("grid.y");
 		gridenabled = gp.getBoolValue("grid.enabled");
@@ -317,6 +319,9 @@ public abstract class VCommonGraphic extends Component implements Observer
 					ZoomComponent myZoom = ((ZoomComponent)o);
 					if (myZoom.getZoom()!=getZoom()) //Zoom really changed externally - update here
 						zoomfactor = ((float)myZoom.getZoom())/100.0f;
+					gp.deleteObserver(this);
+					gp.setFloatValue("zoom",zoomfactor);
+					gp.addObserver(this);
 					//internally update scrolls
 					handleGraphUpdate(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
 				}
@@ -326,6 +331,12 @@ public abstract class VCommonGraphic extends Component implements Observer
 					gridy = ((GridComponent)o).getGridY();
 					gridenabled = ((GridComponent)o).isEnabled();
 					gridorientated = ((GridComponent)o).isOrientated();
+					gp.deleteObserver(this);
+					gp.setIntValue("grid.x",gridx);
+					gp.setIntValue("grid.y",gridy);
+					gp.setBoolValue("grid.enabled",gridenabled);
+					gp.setBoolValue("grid.orientated",gridorientated);
+					gp.addObserver(this);
 					repaint();
 					//UpdateGrid
 				}

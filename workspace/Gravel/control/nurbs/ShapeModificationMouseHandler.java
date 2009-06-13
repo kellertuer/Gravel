@@ -1,6 +1,7 @@
 package control.nurbs;
 
 import java.awt.geom.Point2D;
+import java.util.Observer;
 
 import model.NURBSShape;
 import control.DragMouseHandler;
@@ -10,11 +11,14 @@ import control.DragMouseHandler;
  * these are the scond modi of HyperEdgeShape-Stuff where the basic shape is modified
  *
  * Each implementing Class should provide at least one way to Modify shapes
+ * Each implementing Class is also an Observer, because it should react on changes in GeneralPreferences
+ * mainly the zoomfactor, but they also might want to watch other changes
+ *
  *
  * @author Ronny Bergmann
  *
  */
-public interface ShapeModificationMouseHandler extends DragMouseHandler 
+public interface ShapeModificationMouseHandler extends DragMouseHandler, Observer
 {
 	
 	/**
@@ -27,14 +31,6 @@ public interface ShapeModificationMouseHandler extends DragMouseHandler
 	 * @return
 	 */
 	public NURBSShape getShape();
-
-	/**
-	 * Set the Shape to a specific shape - this means, that any drags
-	 * are endet and the shape was set externally to the parameter
-	 *
-	 * @param s New Shape for the GUI
-	 */
-	public void setShape(NURBSShape s);
 	
 	/**
 	 * get the startpoint (without zoom) in the graph, if a drag is active

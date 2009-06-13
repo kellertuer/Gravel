@@ -63,6 +63,10 @@ public class GeneralPreferences extends Observable
 			{
 				IntValues.put(key,(new Integer(val)).intValue());
 			}
+			else if (type.equals("Float"))
+			{
+				FloatValues.put(key,(new Float(val)).floatValue());
+			}
 			else if (type.equals("Boolean"))
 			{
 				BoolValues.put(key,(new Boolean(val)).booleanValue());				
@@ -116,6 +120,7 @@ public class GeneralPreferences extends Observable
 	private static GeneralPreferences instance = null;
 	//Einmal die Standard / Fabrikwerte einmal die aktullen Werte
 	private TreeMap<String,Integer> IntValues;
+	private TreeMap<String,Float> FloatValues;
 	private TreeMap<String,Boolean> BoolValues;
 	private TreeMap<String,String> StringValues;
 	
@@ -137,6 +142,7 @@ public class GeneralPreferences extends Observable
 	private GeneralPreferences()
 	{
 		IntValues = new TreeMap<String, Integer>();
+		FloatValues = new TreeMap<String, Float>();
 		BoolValues = new TreeMap<String, Boolean>();
 		StringValues = new TreeMap<String, String>();
 		readXML(); //load the standard values from 'xml/preferencex.xml'
@@ -173,13 +179,12 @@ public class GeneralPreferences extends Observable
 		t = replace(t, "$EID", ""+eid);
 		return t;
 	}
-	
 	/**
 	 * get the value stored with a key
 	 * @param key
 	 * 			the key of the Int Value
 	 * @return
-	 * 			a number if the Value exists, else null
+	 * 			a number if the Value exists, else Integer.MIN_VALUE
 	 */
 	public int getIntValue(String key)
 	{
@@ -187,7 +192,7 @@ public class GeneralPreferences extends Observable
 		{
 			return IntValues.get(key);
 		}
-			return -1;
+			return Integer.MIN_VALUE;
 	}
 	/**
 	 * Set an Integer Value (if it doesn't exist it is created)
@@ -207,6 +212,42 @@ public class GeneralPreferences extends Observable
 	public void removeIntValue(String key)
 	{
 		IntValues.remove(key);
+		setChanged();
+		notifyObservers(key);		
+	}
+	/**
+	 * get the value stored with a key
+	 * @param key
+	 * 			the key of the Float Value
+	 * @return
+	 * 			a number if the Value exists, else Float.NaN
+	 */
+	public float getFloatValue(String key)
+	{
+		if (FloatValues.get(key)!=null)
+		{
+			return FloatValues.get(key);
+		}
+			return Float.NaN;
+	}
+	/**
+	 * Set an Integer Value (if it doesn't exist it is created)
+	 * @param key the name of the Key
+	 * @param value the Value
+	 */
+	public void setFloatValue(String key, float value)
+	{
+		FloatValues.put(key, value);
+		setChanged();
+		notifyObservers(key);
+	}
+	/**
+	 * Remove a Key from the Preferences. If it does not exist, nothing happens, else it is removed
+	 * @param key name of the key to be removed
+	 */
+	public void removeFloatValue(String key)
+	{
+		FloatValues.remove(key);
 		setChanged();
 		notifyObservers(key);		
 	}
@@ -308,7 +349,7 @@ public class GeneralPreferences extends Observable
 		if (BoolValues.get("edge.text_visible")==null) return false;
 		if (BoolValues.get("edge.text_showvalue")==null) return false;
 		
-		
+		if (FloatValues.get("zoom")==null) return false;
 		
 		if (BoolValues.get("graph.directed")==null) return false;
 		//Dieser Wert ist nicht schlimm, also einfach Std setzen, schon okay
@@ -431,6 +472,8 @@ public class GeneralPreferences extends Observable
 		StringValues.put("graph.fileformat","visual");
 		StringValues.put("node.name", "v_{$ID}");
 		StringValues.put("subgraph.name","Untergraph #$ID");
+
+		FloatValues.put("zoom", 1.0f);
 	}
 	/**
 	 * Read the Preferences from the xml file
@@ -530,6 +573,11 @@ public class GeneralPreferences extends Observable
 			while (booliter.hasNext())
 				AllValues.add(booliter.next());
 
+			//All Float Keys
+			Iterator<String> floatiter = FloatValues.keySet().iterator();
+			while (floatiter.hasNext())
+				AllValues.add(floatiter.next());
+
 			//All String Keys
 			Iterator<String> stringiter = StringValues.keySet().iterator();
 			while (stringiter.hasNext())
@@ -539,43 +587,24 @@ public class GeneralPreferences extends Observable
 				
 	        Iterator<String> iter = AllValues.iterator();
 	        Stack<String> path = new Stack<String>();
-	        if (iter.hasNext()) //wenigstens einer da
-	        {    
-	        	String next = iter.next();
-	        	String form[] = next.split("\\.");
-      	    	for (int i=0; i<form.length-1; i++)
-	        	{
-	        		
-	        		for (int j=0; j<=i; j++) 
+	        boolean start=true;
+	        while (iter.hasNext())
+	        {
+		       	String next = iter.next();
+		       	String form[] = next.split("\\.");
+	        	int i = form.length-2; //length-1 ist das defintiv neue
+	        	if (i==-1) //Base Element
+		    	{
+	        		while (!path.isEmpty())
 	        		{
-	        			out.write("\t");
+	        			for (int j=0; j<=i+1; j++)
+	        				out.write("\t");
+	        			out.write("</group>\r\n");
+	        			path.pop();
 	        		}
-		        	out.write("<group name=\""+form[i]+"\">\r\n");
-        			path.push(form[i]);
-	        	}
-	        	//aktuelle wert schreiben (je nachdem wo die alle existieren
-	        	if (IntValues.get(next)!=null)
-    			{
-	        		for (int j=0; j<form.length; j++)		out.write("\t");
-	        		out.write("<value name=\""+form[form.length-1]+"\" type=\"Integer\">"+IntValues.get(next)+"</value>\r\n");
-    			}
-	        	if (BoolValues.get(next)!=null)
+		    	}
+	        	else
 	        	{
-	        		for (int j=0; j<form.length; j++)		out.write("\t");
-	        		out.write("<value name=\""+form[form.length-1]+"\" type=\"Boolean\">"+BoolValues.get(next)+"</value>\r\n");
-	        	    //out.write("<"+form[form.length-1]+" type=Boolean>"+BoolValues.get(next)+"</"+form[form.length-1]+">\r\n");
-	        	}
-	        	if (StringValues.get(next)!=null)
-	        	{
-	        		for (int j=0; j<form.length; j++)		out.write("\t");
-	        		out.write("<value name=\""+form[form.length-1]+"\" type=\"String\">"+StringValues.get(next)+"</value>\r\n");
-	        	    //out.write("<"+form[form.length-1]+" type=Boolean>"+BoolValues.get(next)+"</"+form[form.length-1]+">\r\n");
-	        	}
-	        	while (iter.hasNext())
-	        	{	
-	        		next = iter.next();
-	        		form = next.split("\\.");
-	        		int i = form.length-2; //length-1 ist das defintiv neue
 	        		while ((!path.isEmpty())&&(!path.peek().equals(form[i])))
 	        		{
 	        			i--;
@@ -583,43 +612,50 @@ public class GeneralPreferences extends Observable
 	        				out.write("\t");
 	        			out.write("</group>\r\n"); 
 	        			path.pop();    		
-	        		} //nun ist der präfix identisch, alle nicht identischen neu einbauen
-	        		i++; 
-	        		for (int i2=i; i2<form.length-1; i2++)
-		        	{
-	        			for (int j=0; j<=i2; j++) 
-	        				out.write("\t");
-		        		out.write("<group name=\""+form[i2]+"\">\r\n");
-		        		path.push(form[i2]);
-		        	}
-//	        		aktuelle wert schreiben (je nachdem wo die alle existieren
-	        		if (IntValues.get(next)!=null)
-	    			{
-		        		for (int j=0; j<form.length; j++)		out.write("\t");
-		        		out.write("<value name=\""+form[form.length-1]+"\" type=\"Integer\">"+IntValues.get(next)+"</value>\r\n");
-	    			}
-		        	if (BoolValues.get(next)!=null)
-		        	{
-		        		for (int j=0; j<form.length; j++)		out.write("\t");
-		        		out.write("<value name=\""+form[form.length-1]+"\" type=\"Boolean\">"+BoolValues.get(next)+"</value>\r\n");
-		        	    //out.write("<"+form[form.length-1]+" type=Boolean>"+BoolValues.get(next)+"</"+form[form.length-1]+">\r\n");
-		        	}
-		        	if (StringValues.get(next)!=null)
-		        	{
-		        		for (int j=0; j<form.length; j++)		out.write("\t");
-		        		out.write("<value name=\""+form[form.length-1]+"\" type=\"String\">"+StringValues.get(next)+"</value>\r\n");
-		        	    //out.write("<"+form[form.length-1]+" type=Boolean>"+BoolValues.get(next)+"</"+form[form.length-1]+">\r\n");
-		        	}
-		        }
+	        		}
+	        	}
+	        	if (start)
+	        		start = false;
+	        	else
+	        		i++;
+	        	//Now Prefixes are equal (in File and Data) rebuild new groups
+	        	for (int i2=i; i2<form.length-1; i2++)
+		       	{
+	        		for (int j=0; j<=i2; j++)
+	        			out.write("\t");
+		       		out.write("<group name=\""+form[i2]+"\">\r\n");
+		       		path.push(form[i2]);
+		       	}
+//	        	aktuelle wert schreiben (je nachdem wo die alle existieren
+	        	if (IntValues.get(next)!=null)
+	    		{
+		       		for (int j=0; j<form.length; j++)		out.write("\t");
+		       		out.write("<value name=\""+form[form.length-1]+"\" type=\"Integer\">"+IntValues.get(next)+"</value>\r\n");
+	    		}
+		       	if (BoolValues.get(next)!=null)
+		       	{
+		       		for (int j=0; j<form.length; j++)		out.write("\t");
+		       		out.write("<value name=\""+form[form.length-1]+"\" type=\"Boolean\">"+BoolValues.get(next)+"</value>\r\n");
+		       	}
+		       	if (FloatValues.get(next)!=null)
+		       	{
+		       		for (int j=0; j<form.length; j++)		out.write("\t");
+		       		out.write("<value name=\""+form[form.length-1]+"\" type=\"Float\">"+FloatValues.get(next)+"</value>\r\n");
+		       	}
+		       	if (StringValues.get(next)!=null)
+		       	{
+		       		for (int j=0; j<form.length; j++)		out.write("\t");
+		       		out.write("<value name=\""+form[form.length-1]+"\" type=\"String\">"+StringValues.get(next)+"</value>\r\n");
+		       	}
+		    } //End While
 //	        	alle noch offenen Schließen
-		        int i = path.size();
-		        while(!path.isEmpty())
-		        {	
-		        	i--;
-        			for (int j=0; j<i+1; j++) out.write("\t");
-        			out.write("</group>\r\n");
-        			path.pop();		        	
-		        }
+	        int i = path.size();
+	        while(!path.isEmpty())
+	        {
+	        	i--;
+       			for (int j=0; j<i+1; j++) out.write("\t");
+       			out.write("</group>\r\n");
+       			path.pop();
 	        }
 	        out.write("</gravel.preferences>\r\n"); 
 	        

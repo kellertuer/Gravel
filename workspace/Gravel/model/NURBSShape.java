@@ -26,7 +26,7 @@ import javax.vecmath.Point3d;
  * 
  * 
  * @author Ronny Bergmann
- *
+ * @since 0.4
  */
 public class NURBSShape {
 
@@ -928,6 +928,15 @@ public class NURBSShape {
 	public void removeKnot(double knotval)
 	{
 		// TODO Knot removal
+	}
+	public Vector<Point2D> getKnotPoints()
+	{
+		Vector<Point2D> KnotPoints = new Vector<Point2D>();
+		for (int i=degree; i<=maxKnotIndex-degree; i++)
+		{
+			KnotPoints.add(CurveAt(Knots.get(i)));
+		}
+		return KnotPoints;
 	}
 	public Point2D ProjectionPoint(Point2D d)
 	{

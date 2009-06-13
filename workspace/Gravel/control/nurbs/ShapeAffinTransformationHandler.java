@@ -1,18 +1,20 @@
 package control.nurbs;
 
-// import io.GeneralPreferences;
+import io.GeneralPreferences;
+
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.Observable;
+
+import view.VCommonGraphic;
 
 
 import model.*;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
-import view.VCommonGraphic;
-import view.VHyperGraphic;
 /**
  * Class for handling Drags for Modification of the given HyperEdge in the VHyperGraph
  * 
@@ -40,13 +42,13 @@ import view.VHyperGraphic;
 public class ShapeAffinTransformationHandler implements ShapeModificationMouseHandler {
 	
 	private VHyperGraph vhg = null;
-	private VCommonGraphic vgc;
-//	private GeneralPreferences gp;
+	private GeneralPreferences gp;
 	private Point MouseOffSet = new Point(0,0);
 	private Point2D.Double DragOrigin;
 	private boolean firstdrag = true;
 	private NURBSShape temporaryShape=null, DragBeginShape = null;
 	VHyperEdge HyperEdgeRef;
+	float zoom;
 	private int ModificationState = VCommonGraphic.NO_DETAIL;
 	/**
 	 * The ShapeModificationDragListener
@@ -55,11 +57,11 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	 * @param g
 	 * @param hyperedgeindex the specific edge to be modified
 	 */
-	public ShapeAffinTransformationHandler(VHyperGraphic g, int hyperedgeindex)
+	public ShapeAffinTransformationHandler(VHyperGraph g, int hyperedgeindex)
 	{
-		vgc = g;
-		vhg = g.getGraph();
-//		gp = GeneralPreferences.getInstance();
+		vhg = g;
+		gp = GeneralPreferences.getInstance();
+		gp.addObserver(this);
 		if (vhg.modifyHyperEdges.get(hyperedgeindex)==null)
 			return; //Nothing can be done here.
 		HyperEdgeRef = vhg.modifyHyperEdges.get(hyperedgeindex);
@@ -83,17 +85,6 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	{
 		return temporaryShape;
 	}
-	/**
-	 * Set shape to a specific given shape - e.g. when the History-Manager resets
-	 */
-	public void setShape(NURBSShape s)
-	{
-		HyperEdgeRef.setShape(s);
-		//This is pushed in side the Drag-Block if it happens while dragging so the whole action is only captured as one
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
-		if (dragged()) //End Drag
-			internalReset();
-	}
 
 	public Point2D getDragStartPoint()
 	{
@@ -106,9 +97,8 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	{
 		if (!dragged())
 			return null;
-		return new Point2D.Double(MouseOffSet.getX()/((double)vgc.getZoom()/100d),MouseOffSet.getY()/((double)vgc.getZoom()/100d));		
+		return new Point2D.Double(MouseOffSet.getX()/((double)zoom),MouseOffSet.getY()/((double)zoom));
 	}
-
 
 	public boolean dragged()
 	{
@@ -184,7 +174,7 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 			return;
 		MouseOffSet = e.getPoint(); //Actual Mouseposition 		
 		//DragOrigin is the MousePosition in the graph, e.g. without zoom
-		DragOrigin = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100d),(double)e.getPoint().y/((double)vgc.getZoom()/100d));
+		DragOrigin = new Point2D.Double((double)e.getPoint().x/((double)zoom),(double)e.getPoint().y/((double)zoom));
 		DragBeginShape = temporaryShape.clone();
 		//if (!temporaryShape.isPointOnCurve(DragOrigin, 2.0d)) //Are we near the Curve?
 	}
@@ -201,7 +191,7 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 		if (DragOrigin!=null)
 		{
 			//Point in Graph (exact, double values) of the actual Mouse-Position
-			Point2D exactPointInGraph = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100d),(double)e.getPoint().y/((double)vgc.getZoom()/100d));
+			Point2D exactPointInGraph = new Point2D.Double((double)e.getPoint().x/((double)zoom),(double)e.getPoint().y/((double)zoom));
 			Point2D DragMov = new Point2D.Double(exactPointInGraph.getX()-DragOrigin.getX(), exactPointInGraph.getY()-DragOrigin.getY());
 			//Handle this Movement-Vector depending on the specific state we're in 
 			temporaryShape = DragBeginShape.clone();
@@ -280,4 +270,9 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	//Ignore Grid
 	public void setGrid(int x, int y) {}
 	public void setGridOrientated(boolean b) {}
+
+	public void update(Observable o, Object arg) {
+		if ((o==gp)&&(arg=="zoom"))
+			zoom = gp.getFloatValue("zoom");
+	}
 }

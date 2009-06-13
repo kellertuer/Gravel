@@ -218,6 +218,16 @@ public class VHyperShapeGraphic extends VHyperGraphic
 
 	private void paintModificationDetails(Graphics2D g2)
 	{
+		if (((actualMouseState&KNOT_MODIFICATION_MOUSEHANDLING)>0)&&(!vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().isEmpty()))
+		{
+			g2.setColor(selColor);
+			int size = (selWidth+vG.modifyHyperEdges.get(highlightedHyperEdge).getWidth())/2;
+			Vector<Point2D> kP = vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().getKnotPoints();
+			for (int i=0; i<kP.size(); i++)
+			{
+				g2.fillOval(Math.round(((float)kP.get(i).getX()-(float)size)*zoomfactor), Math.round(((float)kP.get(i).getY()-(float)size)*zoomfactor), Math.round(2*size*zoomfactor), Math.round(2*size*zoomfactor));
+			}
+		}
 		if (secondModus==null)
 			return;
 		//All cases (Shape & CurvePointMod) draw tempshape
@@ -319,17 +329,23 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			break;
 			case CURVEPOINT_MOVEMENT_MOUSEHANDLING:
 				if (listenerclasschanged)
-					secondModus = new FreeModificationHandler(this, highlightedHyperEdge);
+					secondModus = new FreeModificationHandler(vG, highlightedHyperEdge);
 			break;
 			case SHAPE_MOUSEHANDLING:
 				if (listenerclasschanged)
-					secondModus = new ShapeAffinTransformationHandler(this, highlightedHyperEdge);
+					secondModus = new ShapeAffinTransformationHandler(vG, highlightedHyperEdge);
 				((ShapeAffinTransformationHandler)secondModus).setModificationState(state&(DETAIL_MASK));
 			break;
 			case SUBCURVE_MOUSEHANDLING:
 				if (listenerclasschanged) //If we are not yet in that modus
-					secondModus = new ShapeSubcurveSelectionHandler(this, highlightedHyperEdge);
+					secondModus = new ShapeSubcurveSelectionHandler(vG, highlightedHyperEdge);
 				((ShapeSubcurveSelectionHandler)secondModus).setModificationState(state&(DETAIL_MASK));
+			break;
+			case KNOT_MODIFICATION_MOUSEHANDLING:
+				if (listenerclasschanged)
+				{
+					secondModus = new FreeModificationHandler(vG, highlightedHyperEdge); //TODO
+				}
 			break;
 			case NO_MOUSEHANDLING:
 			default:
@@ -473,7 +489,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			{
  				if (secondModus!=null) //Simple, because we just reset the shape to that one from the graph - history updated that
  				{
- 					secondModus.setShape(vG.modifyHyperEdges.get(highlightedHyperEdge).getShape());
+ 					secondModus.resetShape();
  				}
  			}
  			else if ((firstModus!=null)&&(!firstModus.dragged())) //First Modus and we have no drag
