@@ -862,14 +862,16 @@ public class NURBSShape {
 	 * Remove a Knot if the Curve C(Knot(get(i)) is at most tol away from p
 	 * @param p any point p that is in Distance of at most
 	 * @param tol to the Curvepoint represented by a Knot
+	 * 
+	 * @return success of removal
 	 */
-	public void removeKnotNear(Point2D p, double tol)
+	public boolean removeKnotNear(Point2D p, double tol)
 	{
 		int knotIndex=0;
 		if (isEmpty())
-			return;
+			return false;
 		if (maxCPIndex<=2*degree+1)
-			return; //Too less Knots
+			return false; //Too less Knots
 		double minDist = Double.MAX_VALUE;
 		for (int i=degree+1; i<maxKnotIndex-degree; i++) //Search for Knot with minimum Distance to p
 		{
@@ -881,11 +883,7 @@ public class NURBSShape {
 			}
 		}
 		if (minDist>tol) //Minimum Knot too far away from p
-		{
-			System.err.println("Too far away");
-			return;
-		}
-		System.err.println("Up to now we still have "+(maxKnotIndex+1)+" Knots and "+(maxCPIndex+1)+" CP");
+			return false;
 		//Multiplicity of knotIndex
 		int mult = knotIndex;
 		while (Knots.get(mult)==Knots.get(knotIndex))
@@ -911,6 +909,17 @@ public class NURBSShape {
 			newjjsummand.scale(-1d*(alphj)); newjj.add(newjjsummand);newjj.scale(1d-alphj);
 			temp.set(jj,newjj);
 			i++; ii++; j--; jj--;
+		}
+		for (int k=0; k<temp.size(); k++)
+		{
+			if (temp.get(k)!=null)
+			{
+				if (temp.get(k).z<0)
+				{
+					System.err.println("Wah!");
+					return false;
+				}
+			}
 		}
 		//Leave out the check for removal, we have undo, save new cp (see algorithm and think about t=1)
 		i=firstAffected; j=lastAffected;
@@ -951,7 +960,7 @@ public class NURBSShape {
 			updateCircular(false);
 		else if (knotIndex>=(maxKnotIndex+1-2*degree)) //+1 for the old values
 			updateCircular(true);
-		System.err.println("Removal done.");
+		return true;
 	}
 	/**
 	 * Refine the Curve to add some new knots contained in X from wich each is between t[0] and t[m]
