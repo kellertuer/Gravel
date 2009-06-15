@@ -163,6 +163,8 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	 */
 	private int getSecondOfNearestPair(Vector<Point2D> points, Point2D newPoint)
 	{
+		if (points.size()==0)
+			return 0;
 		if (points.lastElement()==null) //if the last element is null, the point can be inserted there
 			return points.size()-1; 
 		double lastdistance;

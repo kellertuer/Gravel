@@ -456,9 +456,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		{
 			case NURBSCreationMessage.INTERPOLATION:
 				if (getMouseHandling()!=INTERPOLATION_MOUSEHANDLING) //really change
-				{
 					setMouseHandling(INTERPOLATION_MOUSEHANDLING);
-				}
 				break;			
 			case NURBSCreationMessage.CIRCLE:
 			if (getMouseHandling()!=CIRCLE_MOUSEHANDLING)

@@ -170,7 +170,7 @@ public class NURBSCreationMessage {
 		switch (type)
 		{
 			case INTERPOLATION:
-				return ((points!=null)&&(points.size()>0)&&((status&(ADD_END|ADD_BETWEEN))>0)) //Both
+				return ((points!=null)&&(points.size()>=0)&&((status&(ADD_END|ADD_BETWEEN))>0)) //Both
 				&& ( (degree>=1) //Normal IP
 				   || ( (degree==0) && ((curve.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT))); //Sub replacement
 			case CIRCLE: //TODO degree

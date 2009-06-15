@@ -174,7 +174,11 @@ public class KnotModificationMouseHandler implements ShapeModificationMouseHandl
 			else if (remove)
 				temporaryShape.removeKnotNear(proj.getResultPoint(), dist);
 			if (add||remove) //We're active
-				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
+			{
+				HyperEdgeRef.setShape(temporaryShape);
+				resetShape();
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+			}
 		}
 	}
 	public Point getMouseOffSet() {

@@ -148,8 +148,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		c.gridy++;
 		buildInterpolationPanel();
 		cont.add(InterpolationFields,c);
-		InterpolationFields.setVisible(true);
-
+		setIPVisibility(true);
 		//
 		//Container for the fields of the second mode
 		//
@@ -295,7 +294,6 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 		DegreeFields.add(IPInfo,c);
 
 	}
-
 	private void buildInterpolationPanel()
 	{
 		InterpolationFields = new Container();
@@ -419,12 +417,43 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	private void setCreationFieldVisibility(boolean visible)
 	{
  		CircleFields.setVisible(visible);
-		InterpolationFields.setVisible(visible);
+		setIPVisibility(visible);
     	DegreeFields.setVisible(visible);
 		cBasicShape.setVisible(visible);
 		BasicShape.setVisible(visible);
 	}
 	
+	private void setIPVisibility(boolean visible)
+	{
+		InterpolationFields.setVisible(visible);
+		
+		if (visible)
+		{	//Handling Escape as Cancel
+			//Add ESC-Handling
+			InputMap iMap = Gui.getInstance().getParentWindow().getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+			iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ALT, KeyEvent.ALT_DOWN_MASK), "alternative");
+
+			ActionMap aMap = Gui.getInstance().getParentWindow().getRootPane().getActionMap();
+			aMap.put("alternative", new AbstractAction()
+				{
+					private static final long serialVersionUID = 1L;
+					public void actionPerformed(ActionEvent e)
+					{
+						System.err.println("pressed....");
+						rAddBetween.doClick();					
+					}
+				});
+		}
+		else //remove
+		{
+    		InputMap iMap = Gui.getInstance().getParentWindow().getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    		iMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_ALT, 0));
+
+    		ActionMap aMap = Gui.getInstance().getParentWindow().getRootPane().getActionMap();
+    		aMap.remove("alternative");
+		}
+	}
+
 	public void actionPerformed(ActionEvent e) {
 	        if ((e.getSource()==bCancel)||(e.getSource()==bOk))
 	        {
@@ -505,7 +534,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 	        		actionPerformed(new ActionEvent(cBasicShape,0,"Refresh"));
 	        	}
 	        }
-	        if ((e.getSource()==rAddBetween)||(e.getSource()==rAddEnd))
+	        else if ((e.getSource()==rAddBetween)||(e.getSource()==rAddEnd))
 	        {
 	       		NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
 				if (rAddBetween.isSelected())
@@ -514,7 +543,7 @@ public class HyperEdgeShapePanel implements CaretListener, ActionListener, Obser
 					nm.setStatus(NURBSCreationMessage.ADD_END);
 				HShapeGraphicRef.setShapeParameters(nm);
 	        }	
-	        if (e.getSource()==bCheckShape)
+	        else if (e.getSource()==bCheckShape)
 	        {
 	        	NURBSShapeValidator validator = new NURBSShapeValidator(HGraphRef, HEdgeRefIndex, null, HShapeGraphicRef); //Check actual Shape of the Edge
 	    		if (validator.isShapeValid())

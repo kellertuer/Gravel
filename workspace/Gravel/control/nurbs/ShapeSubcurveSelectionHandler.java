@@ -111,7 +111,7 @@ public class ShapeSubcurveSelectionHandler implements
 		// Only if a Block was started: End it... with notification
 		if (dragged()) {
 			DragOrigin = null;
-			HyperEdgeRef.setShape(temporaryShape);
+			HyperEdgeRef.setShape(getShape()); //Set shape to NURBSShapeFragment
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 		}
 		DragOrigin=null;
@@ -140,6 +140,7 @@ public class ShapeSubcurveSelectionHandler implements
 				((NURBSShapeFragment)temporaryShape).setStart(tempStart);
 				((NURBSShapeFragment)temporaryShape).setEnd(tempEnd);
 				((NURBSShapeFragment)temporaryShape).refreshDecoration();
+				HyperEdgeRef.setShape(getShape()); //Set shape to NURBSShapeFragment
 			}
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 		}
@@ -149,7 +150,6 @@ public class ShapeSubcurveSelectionHandler implements
 			toggleOnClick = true;
 		}
 	}
-
 	public void mousePressed(MouseEvent e) {
 		firstdrag = true;
 		boolean alt = ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK); // alt
@@ -186,7 +186,6 @@ public class ShapeSubcurveSelectionHandler implements
 				DragOrigin=null;
 		}
 	}
-
 	public void mouseDragged(MouseEvent e) {
 
 		if (((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)
@@ -232,7 +231,6 @@ public class ShapeSubcurveSelectionHandler implements
 		MouseOffSet = e.getPoint();
 		firstdrag = false;
 	}
-
 	public void mouseReleased(MouseEvent e) {
 		if (!firstdrag) // If in Drag - handle last moevemnt
 		{
@@ -242,7 +240,6 @@ public class ShapeSubcurveSelectionHandler implements
 		}
 		internalReset();
 	}
-
 	public void mouseMoved(MouseEvent e) {}
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
@@ -272,7 +269,9 @@ public class ShapeSubcurveSelectionHandler implements
 					tempEnd = proj.getResultParameter();
 				setStartNext ^= toggleOnClick; //Toggle if toggleonclick
 			}
-			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
+			HyperEdgeRef.setShape(getShape()); //Set shape to NURBSShapeFragment
+			resetShape();
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 		}
 	}
 	public Point getMouseOffSet() {

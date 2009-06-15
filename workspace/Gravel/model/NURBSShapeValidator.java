@@ -87,7 +87,7 @@ public class NURBSShapeValidator extends NURBSShape {
 		//
 		//Search for the Point that is definetly outside
 		CPOutside= new Point2D.Double(Double.MAX_VALUE,Double.MAX_VALUE);		
-		for (int i=0; i<controlPoints.size(); i++)
+		for (int i=0; i<maxCPIndex-degree; i++)
 		{
 			Point2D actual = controlPoints.get(i);
 			if (actual.getY()<CPOutside.getY())
@@ -114,7 +114,7 @@ public class NURBSShapeValidator extends NURBSShape {
 			Point2D actualP = Points.poll();
 			NURBSShapeProjection proj = new NURBSShapeProjection(this,actualP);
 			Point2D ProjP = proj.getResultPoint(); //This Point belong definetly to the same set as actualP but lies on the Curve
-			double radius= ProjP.distance(actualP)-(double)e.getWidth()/2d;
+			double radius= ProjP.distance(actualP)-(double)e.getWidth()/2d - 1d; //To get rid of overlappings by rounding errors, -1
 			if ((radius<maxSize) &&(radius > 0))
 			{	
 				pointInformation.get(actualP).radius = radius; //Change radius

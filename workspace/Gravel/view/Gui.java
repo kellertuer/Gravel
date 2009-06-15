@@ -402,6 +402,7 @@ public class Gui implements WindowListener
 		if (!gp.getBoolValue("graph.loadfileonstart")) 
 			gp.setStringValue("graph.lastfile","$NONE");
 		//evtl neue daten Speichern wenn nicht oben geladen worden ist
+			gp.setFloatValue("zoom",1f);
 			gp.writetoXML();
 		System.exit(0);
 	}
