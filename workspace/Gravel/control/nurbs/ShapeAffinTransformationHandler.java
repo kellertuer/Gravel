@@ -130,8 +130,12 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 		if (dragged())
 		{
 			DragOrigin = null;
+			//Set shape
+			HyperEdgeRef.setShape(temporaryShape);
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 		}
+		DragOrigin=null;
+		resetShape();
 	}
 	
 	private double getDegreefromDirection(Point2D dir)

@@ -107,12 +107,14 @@ public class KnotModificationMouseHandler implements ShapeModificationMouseHandl
 	private void internalReset()
 	{
 		//Only if a Block was started: End it...
-		if ((!Double.isNaN(DragStartProjection))&&(!firstdrag)) //We had an Drag an a Circle was created, draw it one final time
+		if ((!Double.isNaN(DragStartProjection))&&(!firstdrag)) //We had an Drag, but Reset ends that - though the shape is set a last time
 		{
 			DragStartProjection=Double.NaN;
-			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_END,GraphConstraints.HYPEREDGE));
+			HyperEdgeRef.setShape(temporaryShape);
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 		}
 		DragStartProjection=Double.NaN;
+		resetShape();
 	}
 	//One every Click a potental Drag is initialized but firstdrag = true signals, that no Drag-Movement happened yet
 	public void mousePressed(MouseEvent e) {

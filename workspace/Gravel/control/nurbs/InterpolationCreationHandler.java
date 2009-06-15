@@ -126,6 +126,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 		}
 		DragOriginIndex=-1;
+		resetShape();
 	}
 	private int containsPoint(Point2D p)
 	{

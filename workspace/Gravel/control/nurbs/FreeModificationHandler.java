@@ -83,9 +83,12 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 		if ((!Double.isNaN(DragStartProjection))&&(!firstdrag)) //We had an Drag an a Circle was created, draw it one final time
 		{
 			DragStartProjection=Double.NaN;
-			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_END,GraphConstraints.HYPEREDGE));			
+			//Set shape
+			HyperEdgeRef.setShape(temporaryShape);
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 		}
 		DragStartProjection=Double.NaN;
+		resetShape();
 	}
 	//One every Click a potental Drag is initialized but firstdrag = true signals, that no Drag-Movement happened yet
 	public void mousePressed(MouseEvent e) {

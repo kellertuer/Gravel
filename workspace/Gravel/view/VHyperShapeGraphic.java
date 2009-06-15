@@ -489,32 +489,13 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			GraphMessage m = (GraphMessage)arg;
  			if ((m.getModification()&GraphConstraints.HISTORY)>0)//We got an undo/redp
 			{
- 				if (secondModus!=null) //Simple, because we just reset the shape to that one from the graph - history updated that
- 				{
+ 				//Update startShape in the modi
+ 				if (secondModus!=null)
  					secondModus.resetShape();
- 				}
+ 				else if (firstModus!=null)
+ 					firstModus.resetShape();
  			}
- 			else if ((firstModus!=null)&&(!firstModus.dragged())) //First Modus and we have no drag
-			{
-				if (((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) //Drag just ended -> Set Circle as Shape
-				{
-					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(firstModus.getShape());
-					firstModus.resetShape();
-				}
-			}
- 			else if ((secondModus!=null)&&(!secondModus.dragged())) //Second Modus and we have no drag
-			{
-				if (((m.getModification()&GraphConstraints.BLOCK_END)==GraphConstraints.BLOCK_END)) //Drag just ended -> Set Circle as Shape
-				{
-					NURBSShape s = secondModus.getShape();
-					if ((s.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
-						((NURBSShapeFragment)s).refreshDecoration();
-
-					vG.modifyHyperEdges.get(highlightedHyperEdge).setShape(s);
-					vG.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE, highlightedHyperEdge, GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE, GraphConstraints.HYPEREDGE)); //HyperEdgeShape Updated
-					secondModus.resetShape();
-				}
-			}
+ 			//Redraw
  			repaint();
 		}
 	}

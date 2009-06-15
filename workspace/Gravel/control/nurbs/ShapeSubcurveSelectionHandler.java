@@ -111,9 +111,11 @@ public class ShapeSubcurveSelectionHandler implements
 		// Only if a Block was started: End it... with notification
 		if (dragged()) {
 			DragOrigin = null;
-			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,
-					GraphConstraints.BLOCK_END));
+			HyperEdgeRef.setShape(temporaryShape);
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 		}
+		DragOrigin=null;
+		resetShape();
 	}
 
 	public void setModificationState(int i) {

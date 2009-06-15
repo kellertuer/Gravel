@@ -135,6 +135,7 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
 			}
 		}
+		resetShape();
 		DragOrigin=null;
 	}
 	//One every Click a potental Drag is initialized but firstdrag = true signals, that no Drag-Movement happened yet
