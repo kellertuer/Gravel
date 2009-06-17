@@ -2,6 +2,7 @@ package io;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
 
 import javax.swing.JFileChooser;
 import javax.xml.parsers.DocumentBuilder;
@@ -10,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import model.VEdgeLinestyle;
 import model.VEdgeText;
+import model.VNode;
 
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -18,6 +20,8 @@ import view.Gui;
 import dialogs.JFileDialogs;
 
 public class GraphMLReader {
+
+	private static HashMap<String,String> keyTypes = new HashMap<String,String>();
 
 	public static void main(String[] args) {	 
 		JFileChooser fc = new JFileChooser("Öffnen einer Gravel-Datei");
@@ -100,7 +104,7 @@ public class GraphMLReader {
 			return; 
 		NamedNodeMap attrs = node.getAttributes();
 		int len = attrs.getLength();
-		String keyName="", keyType="";
+		String keyName="", keyType="",keyID="";
 		for (int i=0; i<len; i++)
 		{
 			Attr attr = (Attr)attrs.item(i);
@@ -108,10 +112,14 @@ public class GraphMLReader {
 				keyName = attr.getNodeValue();
 			if (attr.getNodeName().equals("attr.type"))
 				keyType = attr.getNodeValue();
+			if (attr.getNodeName().equals("id"))
+				keyID = attr.getNodeValue();
         }
 		System.err.print("\nParsing key "+keyName);
-		if (keyName.equals("")||(keyType.equals("")))
+		if (keyName.equals("")||(keyType.equals(""))||(keyID.equals("")))
 			return;
+		//To decide when reaching data element
+		keyTypes.put(keyID,keyType);
 		NodeList children = node.getChildNodes(); //If there is da default value...
 		Node defaultVal = null;
 		for (int i=0; i<children.getLength(); i++)
@@ -180,6 +188,21 @@ public class GraphMLReader {
 			GeneralPreferences.getInstance().setIntValue(pre+"_length",l.getLength());
 			GeneralPreferences.getInstance().setIntValue(pre+"_type",l.getType());
 		}
+		else if (keyType.equals("node.text.type")) //So this works due to pre for hperedge and edge text stuff
+		{
+			while ((n!=null)&&(!(n.getNodeName().equals("nodetext")))) //Find the graph
+				n = n.getNextSibling();
+			if (n==null)
+			{
+				System.err.println("no Nodetext found");
+				return;
+			}
+			VNode node = parseNodeText(n);
+			GeneralPreferences.getInstance().setIntValue(pre+"_distance", node.getNameDistance());
+			GeneralPreferences.getInstance().setIntValue(pre+"_rotation",node.getNameRotation());
+			GeneralPreferences.getInstance().setIntValue(pre+"_size",node.getNameSize());
+			GeneralPreferences.getInstance().setBoolValue(pre+"_visible",node.isNameVisible());
+		}
 		else
 			System.err.print("Still TODO Type:"+keyType);
 		
@@ -231,7 +254,7 @@ public class GraphMLReader {
             //Attributes length="5" distance="8" type="solid"
             if (attr.getNodeName().equals("length"))
             	try {l.setLength(Integer.parseInt(attr.getNodeValue()));} catch(Exception e){}
-            else if (attr.getNodeName().equals("distance")) //TODO Change model
+            else if (attr.getNodeName().equals("distance"))
               	try {l.setDistance(Integer.parseInt(attr.getNodeValue()));} catch(Exception e){}
             else if (attr.getName().equals("type"))
             {
@@ -246,7 +269,37 @@ public class GraphMLReader {
             }
 		}
         return l;
-	}	
+	}
+	/**
+	 * Parse a XML-Node with information about a Nodes Text and return that (within a VNode)
+	 */
+	static private VNode parseNodeText(Node nodetext)
+	{
+		VNode n = new VNode(0,0,0,0,
+				GeneralPreferences.getInstance().getIntValue("node.name_distance"),
+				GeneralPreferences.getInstance().getIntValue("node.name_rotation"),
+				GeneralPreferences.getInstance().getIntValue("node.name_size"),
+				GeneralPreferences.getInstance().getBoolValue("node.name_visible"));
+
+		if (!nodetext.getNodeName().equals("nodetext"))
+			return n;
+        NamedNodeMap attrs = nodetext.getAttributes();
+        int len = attrs.getLength();
+        for (int i=0; i<len; i++) //Look at all atributes
+        {
+            Attr attr = (Attr)attrs.item(i);
+            //Attributes distance="10" rotation="180.0" size="12" visible="true"
+            if (attr.getNodeName().equals("rotation"))
+            	try {n.setNameRotation(Integer.parseInt(attr.getNodeValue()));} catch(Exception e){}
+            else if (attr.getNodeName().equals("distance"))
+              	try {n.setNameDistance(Integer.parseInt(attr.getNodeValue()));} catch(Exception e){}
+            else if (attr.getNodeName().equals("size"))
+               	try {n.setNameSize(Integer.parseInt(attr.getNodeValue()));} catch(Exception e){}
+            else if (attr.getNodeName().equals("visible"))
+               	n.setNameVisible(Boolean.parseBoolean(attr.getNodeValue()));
+ 		}
+        return n;
+	}
 	
 	static void print(Node node)
 	  {
