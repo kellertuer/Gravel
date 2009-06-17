@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://gravel.darkmoonwolf.de/xmlns"  
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns 
+                                http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+<!-- Default Values and Keys -->
+	<key id="gt" for="graph" attr.name="type" attr.type="string">
+		<default>mathgraph</default>
+	</key>
+	<key id="gl" for="graph" attr.name="allowloops" attr.type="boolean">
+		<default>true</default>
+	</key>
+	<key id="gm" for="graph" attr.name="allowmultiple" attr.type="boolean">
+		<default>true</default>
+	</key>
+
+	<!-- Gravel key Definitions for any graph -->
+	<key id="edgevalue" for="edge" attr.name="value" attr.type="integer">
+		<default>1</default>
+	</key>
+	
+	<key id="edgename" for="edge" attr.name="name" attr.type="string" />
+		<default>e_{$ID}</default>
+	</key>
+	<key id="hyperedgevalue" for="hyperedge" attr.name="value" attr.type="integer">
+		<default>1</default>
+	</key>
+	<!-- there may be a hypergraph so hypergraph keys also -->
+	<key id="hyperedgename" for="hyperedge" attr.name="name" attr.type="string" />
+		<default>E_{$ID}</default>
+	</key>
+	<key id="nodename" for="node" attr.name="name" attr.type="string">
+		<default>v_{$ID}</default>
+	</key>
+	<key id="subgraph" for="graph" attr.name="subgraph" atttr.type="graph.subgraph.type"> <!-- Don't know if that will work! -->
+		<default>
+			<subgraph>
+				<name>Untergraph $ID</name>
+			</subgraph>
+		</default>
+	</key>
+	<key id="nodeform" for="node" attr.name="form" attr.type="node.form.type">
+		<default>
+			<form type="Circle" x="100" y="100" size="8"/>
+		</default>
+	</key>
+	<key id="nodetext" for="node" attr.name="text" attr.type="node.text.type">
+		<default>
+			<nodetext distance="10" rotation="180.0" size="12" visible="true"/>
+		</default>
+	</key>
+	<key id="edgearrow" for="edge" attr.name="arrow" attry.type="edge.arrow">
+		<default>
+			<arrow size="14" part=".8" position=".77" headalpha="20.0"/>
+		</default>
+	</key>
+	<key id="edgepoints" for="edge" attr.name="points" attr.type="edge.points.type"/> <!-- no default -->
+	<key id="edgewidth" for="edge" attr.name="width" attr.type="Integer"><default>1</default></key>
+	<key id="edgetype" for="edge" attr.name="edgetype" attr.type="string"><!-- Kantentyp (Orthogonal|QuadCurve|Segmented|StraightLine|) - noch verbessern als complextype?-->
+	<key id="edge_orthogonal_bool" for="edge" attr.name="orthogonaledge_verticalfirst" attr.type="boolean"> <!--Nur fuer Orthogonal pflicht-->
+			<default>true</default>
+	</key>
+	<key id="loopedge" for="edge" attr.name="loopparameters" attr.type="edge.loop.type">
+		<default><loopedge length="20" proportion="1" direction="270.0" clockwise="false" /></default>
+	</key>
+	<key id="edgetext" for="edge" attr.name="textparameters" attr.type="edge.text.type">
+		<default><edgetext distance="10" position="77.0" size="12" show="value" visible="true"/></default>
+	</key>	
+	<key id="edgeline" for="edge" attr.name="linestyleparameters" attr.type="edge.line.type">
+		<default><edgeline length="5" distance="8" type="dashed"/></default>
+	</key>	
+	<key id="hyperedgetext" for="hyperedge" attr.name="textparameters" attr.type="edge.text.type">
+		<default><hyperedgetext distance="10" position="77.0" size="12" show="value" visible="true"/></default>
+	</key>	
+	<key id="hyperedgeline" for="hyperedge" attr.name="linestyleparameters" attr.type="edge.text.type">
+		<default><hyperedgeline length="5" distance="8" type="solid"/></default>
+	</key>	
+	<key id="hyperedgeshape" for="hyperedge" attr.name="shapeparameters" attr.type="hyperedge.shape.type"/>
+	
+	
+	<!-- Though a Graph is usually Graph or Hypergraph, this example just demonstrates BOTH -->
+  <graph id="G">
+		<node id="1">
+			<data key="nodename">v_1</data>
+			<data key="nodetext">
+				<nodetext distance="13" rotation="90.0" size="9" visible="true"/>
+			</data>
+			<data key="nodeform">
+				<nodeform type="Circle" x="130" y="30" size="9"/>
+			</data>
+		</node>
+
+		<node id="2">
+			<data key="nodename">v_2</data>
+			<data key="nodetext">
+				<nodetext distance="13" rotation="90.0" size="9" visible="true"/>
+			</data>
+			<data key="nodeform">
+				<nodeform type="Circle" x="225" y="99" size="9"/>
+			</data>
+		</node>
+
+		<node id="3">
+			<data key="nodename">v_3</data>
+			<data key="nodetext">
+				<nodetext distance="13" rotation="306.0" size="9" visible="true"/>
+			</data>
+			<data key="nodeform">
+				<nodeform type="Circle" x="189" y="211" size="9"/>
+			</data>
+		</node>
+
+		<edge id="1" source="node1" target="node2">
+			<data key="edgename">e_{1}</data>
+		</edge>
+
+		<edge id="2" source="node2" target="node3">
+			<data key="edgename">e_{2}</data>
+		</edge>
+
+		<!-- Example of an hyperedge -->
+		<hyperedge>
+			<data id="hyperedgetext">
+				<hyperedgetext distance="10" position="77.0" size="12" show="value" visible="true"/>
+			</data>
+			<data id="hyperedgeline">
+				<hyperedgeline length="5" distance="8" type="dotted"/>
+			</data>
+			<data id="hyperedgeshape">
+				<hyperedgeshape>
+					<degree>3</degree>
+					<knot id="0" u="0.0"/> 
+					<knot id="1" u="0.12"/> 
+					<knot id="2" u="0.34"/> 
+					<knot id="3" u="0.45"/> 
+					<knot id="4" u="0.56"/> 
+					<knot id="5" u="0.89"/>
+					<knot id="6" u="1.0"/> 
+					<controlpoint id="0" x="200.0" y="100.0" w="1.0" /> 
+					[...sone more CP...]
+				</hyperedgeshape>
+			</data>
+
+			<endpoind node="node1"/>
+			<endpoind node="node2"/>
+			<endpoind node="node3"/>
+		</hyperedge>
+		
+		
+		<data id="subgraph">
+			<subgraph id="1">
+				<name>Untergraph #1</name>
+				<Color r="230" g="140" b="30"/>
+				<nodeid>1</nodeid>
+				<nodeid>2</nodeid>
+				<edgeid>1</edgeid>
+			</subgraph>
+		</data>
+  </graph>
+</graphml>

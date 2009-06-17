@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<xs:schema 
+   targetNamespace="http://graphml.graphdrawing.org/xmlns"
+   xmlns="http://graphml.graphdrawing.org/xmlns"  
+   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+   elementFormDefault="qualified"
+   attributeFormDefault="unqualified"
+>
+  <xs:annotation>
+    <xs:documentation 
+        source="http://gravel.darkmoonwolf.de/"
+        xml:lang="en">
+		This document extends the GraphML-Stuff by some complex data-Elements
+		Those are the complex data that is reuired for the image of the graph
+		e.g.
+		- edge and hyper edge shape specifications
+		- text specifications
+		- subgraph specifications
+		
+		GraphML is published under CC-BY from graphml.graphdrawing.org
+    </xs:documentation>
+  </xs:annotation>
+
+	<xs:redefine schemaLocation="http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+	  <xs:complexType name="data-extension.type">
+	    <xs:complexContent>
+	      <xs:extension base="data-extension.type">
+	        <xs:choice>
+	          <xs:element name="form" type="node.form.type"/>
+			  <xs:element name="nodetext" type="node.text.type"/>
+	          <xs:element name="arrow" type="edge.arrow.type"/>
+	          <xs:element name="points" type="edge.points.type"/>
+	          <xs:element name="edgetext" type="edge.text.type"/>
+	          <xs:element name="edgeline" type="edge.line.type"/>	
+	          <xs:element name="loopedge" type="edge.loop.type"/>
+	          <xs:element name="hyperedgetext" type="edge.text.type"/>
+	          <xs:element name="hyperedgeshape" type="hyperedge.shape.type"/>	          
+	          <xs:element name="hyperedgeline" type="edge.line.type"/>
+			  <xs:element name="subgraph" type="graph.subgraph.type">
+			  </xs:element>
+	        </xs:choice>
+	      </xs:extension>
+	    </xs:complexContent>
+	  </xs:complexType>
+	</xs:redefine>
+
+	<!-- Node complex data tyes -->
+	<!-- Node Form-->
+	<xs:complexType name="node.form.type">
+			<xs:attribute name="type" type="form.type.type" use="required"/>
+			<xs:attribute name="x" type="xs:integer" use="required"/>
+			<xs:attribute name="y" type="xs:integer" use="required"/>
+			<xs:attribute name="size" type="xs:nonNegativeInteger" use="required"/>
+	</xs:ComplexType>
+	<xs:simpleType name="node.form.type.type">
+	  <xs:restriction base="xs:string">
+	      <xs:enumeration value="Circle"/>
+	    </xs:restriction>
+	</xs:simpleType>
+	<!-- Node Text -->
+	<xs:complexType name="node.text.type">
+			<xs:attribute name="distance" type="xs:nonNegativeInteger" use="required"/>
+			<xs:attribute name="rotation" type="xs:double" use="required"/>
+			<xs:attribute name="size" type="xs:nonNegativeInetger" use="required"/>
+			<xs:attribute name="visible" type="xs:boolean" use="required"/>
+	</xs:ComplexType>
+	
+	<!--Edge Stuff -->
+	<!-- Edge Arrow -->
+	<xs:complexType name="edge.arrow.type">
+		<xs:attribute name="size" type="xs:float" use="required"/>
+		<xs:attribute name="part" type="xs:float" use="required"/>
+		<xs:attribute name="position" type="xs:float" use="required"/>
+		<xs:attribute name="headalpha" type="float"  use="required"/>
+	</xs:complexType>
+	<!-- Set of Points for some edges -->
+	<xs:complexType name="edge.points.type">
+		<xs:sequence>
+			<xs:element name="point" type="edge.point.type"  minOccurs="1" maxOccurs="unbound">
+		</xs:sequence>
+		<xs:unique name="idKey">
+			<xs:selector xpath="point"/>
+			<xs:field xpath="@id"
+		</xs:unique>
+	</xs:omplexType>
+	<xs:complexType name="edge.point.type">
+		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required">
+		<xs:attribute name="x" type="xs:integer" use="required">
+		<xs:attribute name="y" type="xs:integer" use="required">
+	</xs:complexType>
+	<!-- Loop Edge Details -->
+	<xs:complexType name="edge.loop.type">
+		<xs:attribute name="length" type="xs:nonNegativeInteger" use="required"/>
+		<xs:attribute name="proportion" type="xs:float" use="required"/>
+		<xs:attribute name="direction" type="xs:float" use="required"/>
+		<xs:attribute name="clockwise" type="xs:boolean" use="required"/>
+	</xs:complexType>
+	<!-- Edge Text and HyperEdgeText Details -->
+	<xs:complexType name="edge.text.type">
+		<xs:attribute name="position" type="xs:double" use="required"/>
+		<xs:attribute name="distance" type="xs:nonNegativeInteger" use="required"/>
+		<xs:attribute name="size" type="xs:nonNegativeInteger" use="required"/>
+		<xs:attribute name="show" type="edge.text.show.type" use="required"/>
+		<xs:attribute name="visible" type="xs:boolean" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="edge.text.show.type">
+		<xs:restriction base="xs:string">
+	      <xs:enumeration value="value"/>
+	      <xs:enumeration value="name"/>
+	    </xs:restriction>
+	</xs:simpleType>
+	<!-- Edge Line and Hyper Edge Line Specification -->
+	<xs:complexType name="edge.line.type">
+		<xs:attribute name="distance" type="xs:nonNegativeInteger" use="required"/>
+		<xs:attribute name="length" type="xs:nonNegativeInteger" use="required"/>
+		<xs:attribute name="type" type="edge.line.type.type" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="edge.line.type.type">
+		<xs:restriction base="xs:string">
+	      	<xs:enumeration value="solid"/>
+	      	<xs:enumeration value="dashed"/>
+	      	<xs:enumeration value="dotted"/>
+	      	<xs:enumeration value="dashdotted"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- HyperEdge Shape-->
+	<xs:complexType name="hyperedge.shape.type">
+		<xs:all>
+			<xs:element name="knot" type="shape.knot.type" minOccurs="1"/>
+			<xs:element name="controlpoint" type="shape.point.type" minOccurs="1"/>
+			<xs:element name="degree" type="xs:nonNegativeInteger" use="required">
+		</xs:all>
+	</xs:complexType>
+	<xs:complexType name="shape.point.type">
+		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required">
+		<xs:attribute name="x" type="xs:double" use="required"/>
+		<xs:attribute name="y" type="xs:double" use="required"/>
+		<xs:attribute name="w" type="xs:double" use="required"/> <!-- ControlPoint Weights-->
+	</xs:complexType>
+	<xs:complexType name="shape.knot.type">
+		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required">
+		<xs:attribute name="u" type="xs:double"/>
+	</xs:complexType>
+
+	<!-- Subgraph as a Data Field of the Graph -->
+	<xs:complexType name="graph.subgraph.type">
+		<xs:all>
+			<xs:element name="Color" type="color.type" maxOccurs="1"/>
+			<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="nodeid" type="xs:nonNegativeInteger"/>
+			<xs:element name="edgeid" type="xs:nonNegativeInteger"/>
+			<xs:element name="hyperedgeid" type="xs:nonNegativeInteger"/>
+		</xs:all>
+		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required">
+	</xs:complexType>
+	<xs:complexType name="color.type">
+		<xs:attribute name="r" type="xs:integer" use="required"/>
+		<xs:attribute name="g" type="xs:integer" use="required"/>
+		<xs:attribute name="b" type="xs:integer" use="required"/>
+	</xs:complexType>
+
+</xs:schema>
