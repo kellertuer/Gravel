@@ -526,10 +526,10 @@ import view.pieces.GridComponent;
 		
 		
 		VLoopEdge vle = cLoop.createEdge(1,1);
-		gp.setIntValue("edge.looplength",vle.getLength());
-		gp.setIntValue("edge.loopproportion",(new Double(vle.getProportion()*100.0d)).intValue());
-		gp.setIntValue("edge.loopdirection",vle.getDirection());
-		gp.setBoolValue("edge.loopclockwise",vle.isClockwise());
+		gp.setIntValue("edge.loop_length",vle.getLength());
+		gp.setIntValue("edge.loop_proportion",(new Double(vle.getProportion()*100.0d)).intValue());
+		gp.setIntValue("edge.loop_direction",vle.getDirection());
+		gp.setBoolValue("edge.loop_clockwise",vle.isClockwise());
 		
 		
 		gp.setBoolValue("grid.enabled", this.grid.isEnabled());

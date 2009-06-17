@@ -104,13 +104,13 @@ public class GravelMLWriter {
 		s.write("\t\t<default>true</default>"+nl+"\t</key>"+nl);
 		//Loop Stuff
 		s.write("\t<key id=\"elol\" for=\"edge\" attr.name=\"looplength\" attr.type=\"integer\"> <!-- Laenge der Hauptellipsenachse -->"+nl);
-		s.write("\t\t<default>"+gp.getIntValue("edge.looplength")+"</default>"+nl+"\t</key>"+nl);
+		s.write("\t\t<default>"+gp.getIntValue("edge.loop_length")+"</default>"+nl+"\t</key>"+nl);
 		s.write("\t<key id=\"elop\" for=\"edge\" attr.name=\"loopproportion\" attr.type=\"float\"> <!-- Anteil der Nebenachse an der Hauptachse -->"+nl);
-		s.write("\t\t<default>"+((float)gp.getIntValue("edge.loopproportion"))+"</default>"+nl+"\t</key>"+nl);
+		s.write("\t\t<default>"+((float)gp.getIntValue("edge.loop_proportion"))+"</default>"+nl+"\t</key>"+nl);
 		s.write("\t<key id=\"elod\" for=\"edge\" attr.name=\"loopdirection\" attr.type=\"integer\"> <!-- Rihtung der Schleife vom Knoten aus -->"+nl);
-		s.write("\t\t<default>"+gp.getIntValue("edge.loopdirection")+"</default>"+nl+"\t</key>"+nl);
+		s.write("\t\t<default>"+gp.getIntValue("edge.loop_direction")+"</default>"+nl+"\t</key>"+nl);
 		s.write("\t<key id=\"eloc\" for=\"edge\" attr.name=\"loopclockwise\" attr.type=\"boolean\"> <!-- true, falls im Uhrzeigersinn, sonst false (Auswirkung auf die Pfeilrichtung) -->"+nl);
-		s.write("\t\t<default>"+gp.getBoolValue("edge.loopclockwise")+"</default>"+nl+"\t</key>"+nl);
+		s.write("\t\t<default>"+gp.getBoolValue("edge.loop_clockwise")+"</default>"+nl+"\t</key>"+nl);
 				
 		//:Kantenbeschriftungsdaten
 		s.write("\t<key id=\"etv\" for=\"edge\" attr.name=\"text_visible\" attr.type=\"boolean\">    <!-- Sichtbarkeit der Kantenbeschriftung -->"+nl);
@@ -245,13 +245,13 @@ public class GravelMLWriter {
 	    	   {
 	    		   VLoopEdge vle = (VLoopEdge) actual;
 	    		   s.write("\t\t\t<data key=\"et\">Loop</data>"+nl);
-				   if (vle.getLength()!=gp.getIntValue("edge.looplength"))
+				   if (vle.getLength()!=gp.getIntValue("edge.loop_length"))
 					   s.write("\t\t\t<data key=\"elol\">"+vle.getLength()+"</data>"+nl);
-   				  if (vle.getProportion()!=((double) gp.getIntValue("edge.loopproportion") /100.0d))
+   				  if (vle.getProportion()!=((double) gp.getIntValue("edge.loop_proportion") /100.0d))
    					  s.write("\t\t\t<data key=\"elop\">"+(new Double(vle.getProportion())).floatValue()+"</data>"+nl);
-   				  if (vle.getDirection()!=gp.getIntValue("edge.loopdirection"))
+   				  if (vle.getDirection()!=gp.getIntValue("edge.loop_direction"))
    					  s.write("\t\t\t<data key=\"elod\">"+vle.getDirection()+"</data>"+nl);
-   				  if (vle.isClockwise()!=gp.getBoolValue("edge.loopclockwise"))
+   				  if (vle.isClockwise()!=gp.getBoolValue("edge.loop_clockwise"))
    					  s.write("\t\t\t<data key=\"eloc\">"+vle.isClockwise()+"</data>"+nl);	 
 	    	   }
 	    	   //Textoutput

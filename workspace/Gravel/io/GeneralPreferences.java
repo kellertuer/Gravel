@@ -337,10 +337,10 @@ public class GeneralPreferences extends Observable
 		if (IntValues.get("edge.line_length")==null) return false;
 		if (IntValues.get("edge.line_type")==null) return false;
 		
-		if (IntValues.get("edge.looplength")==null) return false;
-		if (IntValues.get("edge.loopdirection")==null) return false;
-		if (IntValues.get("edge.loopproportion")==null) return false;
-		if (BoolValues.get("edge.loopclockwise")==null) return false;
+		if (IntValues.get("edge.loop_length")==null) return false;
+		if (IntValues.get("edge.loop_direction")==null) return false;
+		if (IntValues.get("edge.loop_proportion")==null) return false;
+		if (BoolValues.get("edge.loop_clockwise")==null) return false;
 		
 		
 		if (StringValues.get("edge.name")==null) return false;
@@ -425,9 +425,9 @@ public class GeneralPreferences extends Observable
 		IntValues.put("edge.line_length",10);
 		IntValues.put("edge.line_type",1);
 		
-		IntValues.put("edge.looplength",33);
-		IntValues.put("edge.loopdirection",0);
-		IntValues.put("edge.loopproportion",100);
+		IntValues.put("edge.loop_length",33);
+		IntValues.put("edge.loop_direction",0);
+		IntValues.put("edge.loop_proportion",100);
 		
 		IntValues.put("grid.x",50);
 		IntValues.put("grid.y",50);
@@ -452,7 +452,7 @@ public class GeneralPreferences extends Observable
 		BoolValues.put("edge.orth_verticalfirst",false);
 		BoolValues.put("edge.text_visible",false);
 		BoolValues.put("edge.text_showvalue",false);
-		BoolValues.put("edge.loopclockwise",true);
+		BoolValues.put("edge.loop_clockwise",true);
 		BoolValues.put("graph.allowmultiple",false);
 		BoolValues.put("graph.allowloops",false);
 		BoolValues.put("graph.directed",true);

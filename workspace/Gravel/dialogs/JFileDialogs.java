@@ -52,7 +52,7 @@ public class JFileDialogs implements Observer
 	 * 
 	 * @author Ronny
 	 */
-	class SimpleFilter extends FileFilter
+	public static class SimpleFilter extends FileFilter
 	{
 		private String m_description = null;
 		private String m_extension = null;

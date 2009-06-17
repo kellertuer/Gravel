@@ -151,7 +151,7 @@ public class NodeDragEdgeCreationListener implements MouseListener, MouseMotionL
 					MEdge m = new MEdge(i,StartNode.getIndex(),EndNode.getIndex(),gp.getIntValue("edge.value"),gp.getEdgeName(i,StartNode.getIndex(),EndNode.getIndex()));
 					if ((StartNode.getIndex()==EndNode.getIndex())&&(vg.getMathGraph().isLoopAllowed()))
 					{
-						VLoopEdge t = new VLoopEdge(i,gp.getIntValue("edge.width"),gp.getIntValue("edge.looplength"),gp.getIntValue("edge.loopdirection"),(double)gp.getIntValue("edge.loopproportion")/100.0d,gp.getBoolValue("edge.loopclockwise"));
+						VLoopEdge t = new VLoopEdge(i,gp.getIntValue("edge.width"),gp.getIntValue("edge.loop_length"),gp.getIntValue("edge.loop_direction"),(double)gp.getIntValue("edge.loop_proportion")/100.0d,gp.getBoolValue("edge.loop_clockwise"));
 						if (vg.modifyEdges.getIndexWithSimilarEdgePath(t, m.StartIndex,m.EndIndex)==0) //No Similar Edge existsmedge.StartIndex,medge.EndIndex))
 							{
 								vg.modifyEdges.add(t, m,StartNode.getPosition(), EndNode.getPosition());							

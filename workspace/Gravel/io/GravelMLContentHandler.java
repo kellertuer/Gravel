@@ -239,13 +239,13 @@ public class GravelMLContentHandler implements ContentHandler
 				try {eline.setType(Integer.parseInt(CDATA));} catch(Exception e) {eline.setType(gp.getIntValue("edge.line_type"));}
 			
 			if (data_key.equals("elol")) //Edge Loop Length
-				try {elol = Integer.parseInt(CDATA);} catch(Exception e) {elol = gp.getIntValue("edge.looplength");}
+				try {elol = Integer.parseInt(CDATA);} catch(Exception e) {elol = gp.getIntValue("edge.loop_length");}
 			if (data_key.equals("elod")) //Edge Loop Direction
-				try {elod = Integer.parseInt(CDATA);} catch(Exception e) {elod = gp.getIntValue("edge.loopdirection");}
+				try {elod = Integer.parseInt(CDATA);} catch(Exception e) {elod = gp.getIntValue("edge.loop_direction");}
 			if (data_key.equals("elop")) //Edge Loop Proportion
-				try {elop = Double.parseDouble(CDATA);} catch(Exception e) {elop = ((double)gp.getIntValue("edge.loopproportion"))/100.0d;}
+				try {elop = Double.parseDouble(CDATA);} catch(Exception e) {elop = ((double)gp.getIntValue("edge.loop_proportion"))/100.0d;}
 			if (data_key.equals("eloc")) //Edge Loop Clockwise
-				try {eloc = Boolean.parseBoolean(CDATA);} catch(Exception e) {eloc = gp.getBoolValue("edge.loopclockwise");}
+				try {eloc = Boolean.parseBoolean(CDATA);} catch(Exception e) {eloc = gp.getBoolValue("edge.loop_clockwise");}
 				
 				
 				
@@ -432,7 +432,7 @@ public class GravelMLContentHandler implements ContentHandler
 			ende = NodeIdtoIndex.get(atts.getValue("target"));
 			//Reset all Values
 			ev=0;ew=0;es=0.0f;ep=0.0f;eapos=-1.0f;ea=0.0f;et="";id=0;ex=-1;ey=-1;eo=false;en="";
-			elol = 0; elop = 0.0d; elod = 0; eloc = gp.getBoolValue("edge.loopclockwise");
+			elol = 0; elop = 0.0d; elod = 0; eloc = gp.getBoolValue("edge.loop_clockwise");
 			etxt = new VEdgeText(); //Std Values
 			eline = new VEdgeLinestyle(); //Back to Std
 			edgepath=new Vector<Point>();
@@ -518,11 +518,11 @@ public class GravelMLContentHandler implements ContentHandler
 			else if (et.equals("Loop"))
 			{
 				if (elol==0)
-					elol = gp.getIntValue("edge.looplength");
+					elol = gp.getIntValue("edge.loop_length");
 				if (elod==0)
-					elod = gp.getIntValue("edge.loopdirection");
+					elod = gp.getIntValue("edge.loop_direction");
 				if (elop==0.0d)
-					elop = ((double)gp.getIntValue("edge.loopproportion"))/100.0d;
+					elop = ((double)gp.getIntValue("edge.loop_proportion"))/100.0d;
 				toAdd = new VLoopEdge(id,ew,elol,elod,elop,eloc);
 			}
 			else

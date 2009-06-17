@@ -194,13 +194,13 @@ public class CLoopParameters extends Container implements ActionListener{
 		else
 		{
 			GeneralPreferences gp = GeneralPreferences.getInstance();
-			iLength.setValue(gp.getIntValue("edge.looplength"));
-			iProportion.setValue(gp.getIntValue("edge.loopproportion"));
-			iDirection.setValue(gp.getIntValue("edge.loopdirection"));
+			iLength.setValue(gp.getIntValue("edge.loop_length"));
+			iProportion.setValue(gp.getIntValue("edge.loop_proportion"));
+			iDirection.setValue(gp.getIntValue("edge.loop_direction"));
 			if (directed)
 			{
-				rClockwise.setSelected(gp.getBoolValue("edge.loopclockwise"));
-				rCounterClockwise.setSelected(!gp.getBoolValue("edge.loopclockwise"));
+				rClockwise.setSelected(gp.getBoolValue("edge.loop_clockwise"));
+				rCounterClockwise.setSelected(!gp.getBoolValue("edge.loop_clockwise"));
 			}
 		}
 	}
