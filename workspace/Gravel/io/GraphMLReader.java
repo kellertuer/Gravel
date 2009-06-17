@@ -1,4 +1,6 @@
 package io;
+import java.awt.Color;
+import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -9,9 +11,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import model.MSubgraph;
 import model.VEdgeLinestyle;
 import model.VEdgeText;
+import model.VLoopEdge;
 import model.VNode;
+import model.VSubgraph;
 
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -203,6 +208,47 @@ public class GraphMLReader {
 			GeneralPreferences.getInstance().setIntValue(pre+"_size",node.getNameSize());
 			GeneralPreferences.getInstance().setBoolValue(pre+"_visible",node.isNameVisible());
 		}
+		else if (keyType.equals("edge.loop.type")) //So this works due to pre for hperedge and edge text stuff
+		{
+			while ((n!=null)&&(!(n.getNodeName().equals("loopedge")))) //Find the graph
+				n = n.getNextSibling();
+			if (n==null)
+			{
+				System.err.println("no Edgeloop for default found");
+				return;
+			}
+			VLoopEdge edge = parseLoopEdgeDetails(n);
+			GeneralPreferences.getInstance().setIntValue(pre+"_direction", edge.getDirection());
+			GeneralPreferences.getInstance().setBoolValue(pre+"_clockwise",edge.isClockwise());
+			GeneralPreferences.getInstance().setIntValue(pre+"_length",edge.getLength());
+			GeneralPreferences.getInstance().setIntValue(pre+"_proportion",Math.round(100f*(float)edge.getProportion()));
+		}
+		else if (keyType.equals("graph.subgraph.type")) //So this works due to pre for hperedge and edge text stuff
+		{
+			//Search subgraph
+			while ((n!=null)&&(!(n.getNodeName().equals("subgraph")))) //Find the subgraph
+				n = n.getNextSibling();
+			if (n==null)
+			{
+				System.err.println("no Edgeloop for default found");
+				return;
+			}
+			MSubgraph msub = parseMSubgraph(n);
+			
+			GeneralPreferences.getInstance().setStringValue(pre+".name", msub.getName());
+		}
+		else if (keyType.equals("node.form.type")) //So this works due to pre for hperedge and edge text stuff
+		{
+			while ((n!=null)&&(!(n.getNodeName().equals("form")))) //Find the form
+				n = n.getNextSibling();
+			if (n==null)
+			{
+				System.err.println("no node form found");
+				return;
+			}
+			VNode node = parseNodeForm(n);
+			GeneralPreferences.getInstance().setIntValue(pre+".size", node.getSize());
+		}
 		else
 			System.err.print("Still TODO Type:"+keyType);
 		
@@ -298,6 +344,147 @@ public class GraphMLReader {
             else if (attr.getNodeName().equals("visible"))
                	n.setNameVisible(Boolean.parseBoolean(attr.getNodeValue()));
  		}
+        return n;
+	}
+	/**
+	 * Parse the data of an Loopedg-Detail-Key/Data field
+	 * @param loopedge
+	 * @return
+	 */
+	static private VLoopEdge parseLoopEdgeDetails(Node loopedge)
+	{
+		VLoopEdge ve = new VLoopEdge(0,0,
+				GeneralPreferences.getInstance().getIntValue("edge.loop_length"),
+				GeneralPreferences.getInstance().getIntValue("edge.loop_direction"),
+				(double)GeneralPreferences.getInstance().getIntValue("edge.loop_proportion")/100d,
+				GeneralPreferences.getInstance().getBoolValue("edge.loop_clockwise"));
+		if (!loopedge.getNodeName().equals("loopedge"))
+			return ve;
+        NamedNodeMap attrs = loopedge.getAttributes();
+        int len = attrs.getLength();
+        for (int i=0; i<len; i++) //Look at all atributes
+        {
+            Attr attr = (Attr)attrs.item(i);
+    		//Attributes length="20" proportion="1" direction="270.0" clockwise="false"
+            if (attr.getNodeName().equals("length"))
+            	try {ve.setLength(Integer.parseInt(attr.getNodeValue()));} catch(Exception e){}
+            else if (attr.getNodeName().equals("proportion"))
+              	try {ve.setProportion((double)Integer.parseInt(attr.getNodeValue())/100d);} catch(Exception e){}
+            else if (attr.getNodeName().equals("direction"))
+               	try {ve.setDirection(Integer.parseInt(attr.getNodeValue()));} catch(Exception e){}
+            else if (attr.getNodeName().equals("clockwise"))
+            		ve.setClockwise(Boolean.parseBoolean(attr.getNodeValue()));
+ 		}
+        return ve;
+	}
+	/**
+	 * Find index and all nodes/edges that belong to a subgraph
+	 * and the name
+	 * @param subgraph
+	 * @return
+	 */
+	static MSubgraph parseMSubgraph(Node subgraph)
+	{
+		int index=-1;
+	   NamedNodeMap attrs = subgraph.getAttributes();
+       int len = attrs.getLength();
+       for (int i=0; i<len; i++) //Look at all atributes
+       {
+           Attr attr = (Attr)attrs.item(i);
+           if (attr.getNodeName().equals("id"))
+        	   try {index = Integer.parseInt(attr.getNodeValue());} catch(Exception e){}
+       }
+       //Check SubSetStuff for nodeid, edgeids and the name
+       MSubgraph s = new MSubgraph(index,"");
+       //Run through all childnodes
+       Node n = subgraph.getFirstChild();
+
+		while (n!=null)
+		{
+			if (n.getNodeType()==Node.ELEMENT_NODE)
+			{
+				if (n.getNodeName().equals("name"))
+					s.setName(n.getTextContent());
+				else if (n.getNodeName().equals("nodeid"))
+					try {s.addNode(Integer.parseInt(n.getTextContent()));}catch(Exception e){}
+				else if (n.getNodeName().equals("edgeid"))
+					try {s.addEdge(Integer.parseInt(n.getTextContent()));}catch(Exception e){}
+			}
+			n = n.getNextSibling();
+		}
+		return s;
+	}
+	/**
+	 * Find index and id of a subgraph
+	 * @param subgraph
+	 * @return
+	 */
+	static VSubgraph parseVSubgraph(Node subgraph)
+	{
+		int index=-1;
+	   NamedNodeMap attrs = subgraph.getAttributes();
+       int len = attrs.getLength();
+       for (int i=0; i<len; i++) //Look at all atributes
+       {
+    	   Attr attr = (Attr)attrs.item(i);
+           if (attr.getNodeName().equals("id"))
+        	   try {index = Integer.parseInt(attr.getNodeValue());} catch(Exception e){}
+       }
+       //Check SubSetStuff for nodeid, edgeids and the name
+       VSubgraph s = new VSubgraph(index,new Color(0,0,0));
+       if (index==-1)
+    	   return s;
+       //Run through all childnodes
+		Node n = subgraph.getFirstChild();
+		Color c = new Color(0,0,0);
+		while (n!=null)
+		{
+			if ((n.getNodeType()==Node.ELEMENT_NODE)||(n.getNodeName().equals("color")))
+			{
+				   attrs = subgraph.getAttributes();
+			       len = attrs.getLength();
+			       for (int i=0; i<len; i++) //Look at all atributes
+			       {
+			    	   Attr attr = (Attr)attrs.item(i);
+			           if (attr.getNodeName().equals("r"))
+			        	   try {c = new Color(Integer.parseInt(attr.getNodeValue()),c.getGreen(),c.getBlue());} catch(Exception e){}
+			           if (attr.getNodeName().equals("g"))
+			        	   try {c = new Color(c.getRed(),Integer.parseInt(attr.getNodeValue()),c.getBlue());} catch(Exception e){}
+			           if (attr.getNodeName().equals("r"))
+			        	   try {c = new Color(c.getRed(),c.getGreen(),Integer.parseInt(attr.getNodeValue()));} catch(Exception e){}
+			       }
+			}
+			n = n.getNextSibling();
+		}
+		s = new VSubgraph(index,c);
+		return s;		
+	}
+
+	static private VNode parseNodeForm(Node nodedata)
+	{
+		VNode n = new VNode(0,0,0,0,
+				GeneralPreferences.getInstance().getIntValue("node.name_distance"),
+				GeneralPreferences.getInstance().getIntValue("node.name_rotation"),
+				GeneralPreferences.getInstance().getIntValue("node.name_size"),
+				GeneralPreferences.getInstance().getBoolValue("node.name_visible"));
+
+		if (!nodedata.getNodeName().equals("form"))
+			return n;
+        NamedNodeMap attrs = nodedata.getAttributes();
+        int len = attrs.getLength();
+        int x=0,y=0;
+        for (int i=0; i<len; i++) //Look at all atributes
+        {
+            Attr attr = (Attr)attrs.item(i);
+            //Attributes x,y,size (ignore form)
+            if (attr.getNodeName().equals("x"))
+            	try {x = Integer.parseInt(attr.getNodeValue());} catch(Exception e){}
+            else if (attr.getNodeName().equals("y"))
+              	try {y = Integer.parseInt(attr.getNodeValue());} catch(Exception e){}
+            else if (attr.getNodeName().equals("size"))
+               	try {n.setSize(Integer.parseInt(attr.getNodeValue()));} catch(Exception e){}
+ 		}
+        n.setPosition(new Point(x,y));
         return n;
 	}
 	
