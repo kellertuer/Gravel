@@ -51,9 +51,9 @@ public class GravelMLWriter {
 		s.write("<!-- Gravel key Defintition : graph.type is 'math' or 'visual' -->"+nl);
 		s.write("\t<key id=\"gt\" for=\"graph\" attr.name=\"type\" attr.type=\"string\">"+nl);
 		s.write("\t\t<default>math</default>"+nl+"\t</key>"+nl+""+nl);
-		s.write("\t<key id=\"gt\" for=\"graph\" attr.name=\"allowloops\" attr.type=\"boolean\">"+nl);
+		s.write("\t<key id=\"gl\" for=\"graph\" attr.name=\"allowloops\" attr.type=\"boolean\">"+nl);
 		s.write("\t\t<default>"+vg.getMathGraph().isLoopAllowed()+"</default>"+nl+"\t</key>"+nl+""+nl);
-		s.write("\t<key id=\"gt\" for=\"graph\" attr.name=\"allowmultiple\" attr.type=\"boolean\">"+nl);
+		s.write("\t<key id=\"gm\" for=\"graph\" attr.name=\"allowmultiple\" attr.type=\"boolean\">"+nl);
 		s.write("\t\t<default>"+vg.getMathGraph().isMultipleAllowed()+"</default>"+nl+"\t</key>"+nl+""+nl);
 		
 		s.write("<!-- Gravel key Definitions for any graph -->"+nl);
