@@ -158,12 +158,21 @@ public class GeneralPreferences extends Observable
 	}
 	/**
 	 * Creates the Subgraph name, where $ID is replaced by the id
-	 * @param id id of a MSubgraph, we need a name for
+	 * @param id id of an id, we need a name for
 	 * @return
 	 */
 	public String getSubgraphName(int id)
 	{
 		return replace(this.getStringValue("subgraph.name"),"$ID",""+id);
+	}
+	/**
+	 * Creates the Hyperedge name, where $ID is replaced by the id
+	 * @param id id of a MHyperedge ID, we need a name for
+	 * @return
+	 */
+	public String getHyperedgeName(int id)
+	{
+		return replace(this.getStringValue("hyperedge.name"),"$ID",""+id);
 	}
 	/**
 	 * Create Edge name, where
@@ -344,6 +353,9 @@ public class GeneralPreferences extends Observable
 		
 		
 		if (StringValues.get("edge.name")==null) return false;
+	
+		if (IntValues.get("hyperedge.value")==null) return false;
+		if (StringValues.get("hyperedge.name")==null) return false;
 		
 		if (BoolValues.get("edge.orth_verticalfirst")==null) return false;
 		if (BoolValues.get("edge.text_visible")==null) return false;
@@ -429,6 +441,8 @@ public class GeneralPreferences extends Observable
 		IntValues.put("grid.y",50);
 		IntValues.put("history.Stacksize",50);
 
+		IntValues.put("hyperedge.value",1);		
+
 		IntValues.put("node.size", 9);
 		IntValues.put("node.name_distance",18);
 		IntValues.put("node.name_rotation",270);
@@ -464,6 +478,7 @@ public class GeneralPreferences extends Observable
 		BoolValues.put("vgraphic.directed",true);
 		
 		StringValues.put("edge.name", "e_{$ID}");
+		StringValues.put("hyperedge.name", "E_{$ID}");
 		StringValues.put("graph.lastfile","$NONE");
 		StringValues.put("graph.fileformat","visual");
 		StringValues.put("node.name", "v_{$ID}");

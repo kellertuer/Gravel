@@ -551,22 +551,24 @@ public class GraphMLReader {
 	}
 	/**
 	 * Parse the data of an Loopedge-Detail-Key/Data field
-	 * @param loopedge
+	 * @param loopedgeNode
 	 * @return
 	 */
-	static private VLoopEdge parseLoopEdgeDetails(Node loopedge)
+	static private VLoopEdge parseLoopEdgeDetails(Node loopedgeNode)
 	{
 		VLoopEdge ve = new VLoopEdge(0,0,
 				GeneralPreferences.getInstance().getIntValue("edge.loop_length"),
 				GeneralPreferences.getInstance().getIntValue("edge.loop_direction"),
 				(double)GeneralPreferences.getInstance().getIntValue("edge.loop_proportion")/100d,
 				GeneralPreferences.getInstance().getBoolValue("edge.loop_clockwise"));
-		if (!loopedge.getNodeName().equals("loopedge"))
+		if (loopedgeNode==null) //Not given return std
+			return n;
+		if (!loopedgeNode.getNodeName().equals("loopedge"))
 		{
-			errorMsg = "Error when parsing Details of a LoopEdge: No Details Found";
+			errorMsg = "Error when parsing Details of a LoopEdge: Wrong Type of Node";
 			return ve;
 		}
-	    NamedNodeMap attrs = loopedge.getAttributes();
+	    NamedNodeMap attrs = loopedgeNode.getAttributes();
 	    int len = attrs.getLength();
 	    for (int i=0; i<len; i++) //Look at all atributes
 	    {
@@ -629,7 +631,6 @@ public class GraphMLReader {
 				GeneralPreferences.getInstance().getIntValue("node.name_rotation"),
 				GeneralPreferences.getInstance().getIntValue("node.name_size"),
 				GeneralPreferences.getInstance().getBoolValue("node.name_visible"));
-	
 		if (!nodeFormNode.getNodeName().equals("form"))
 		{
 			errorMsg = "error when Parsing Node Form: No Node Form found";
