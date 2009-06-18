@@ -17,9 +17,9 @@
 	<group name="edge">
 		<value name="arrow_alpha" type="Integer">38</value>
 		<value name="arrow_part" type="Float">0.75</value>
-		<value name="arrow_pos" type="Float">0.0</value>
+		<value name="arrow_pos" type="Float">1.0</value>
 		<value name="arrow_size" type="Integer">10</value>
-		<value name="line_distance" type="Integer">15</value>
+		<value name="line_distance" type="Integer">10</value>
 		<value name="line_length" type="Integer">10</value>
 		<value name="line_type" type="Integer">1</value>
 		<value name="loop_clockwise" type="Boolean">true</value>
@@ -54,6 +54,10 @@
 	<group name="history">
 		<value name="Stacksize" type="Integer">50</value>
 		<value name="trackSelection" type="Boolean">false</value>
+	</group>
+	<group name="hyperedge">
+		<value name="name" type="String">E_{$ID}</value>
+		<value name="value" type="Integer">1</value>
 	</group>
 	<group name="node">
 		<value name="name" type="String">v_{$ID}</value>

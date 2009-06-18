@@ -50,7 +50,7 @@
 			<xs:attribute name="type" type="form.type.type" use="required"/>
 			<xs:attribute name="x" type="xs:integer" use="required"/>
 			<xs:attribute name="y" type="xs:integer" use="required"/>
-			<xs:attribute name="size" type="xs:nonNegativeInteger" use="required"/>
+			<xs:attribute name="size" type="xs:nonNegativeInteger"/>
 	</xs:ComplexType>
 	<xs:simpleType name="node.form.type.type">
 	  <xs:restriction base="xs:string">
@@ -59,10 +59,10 @@
 	</xs:simpleType>
 	<!-- Node Text -->
 	<xs:complexType name="node.text.type">
-			<xs:attribute name="distance" type="xs:nonNegativeInteger" use="required"/>
-			<xs:attribute name="rotation" type="xs:double" use="required"/>
-			<xs:attribute name="size" type="xs:nonNegativeInetger" use="required"/>
-			<xs:attribute name="visible" type="xs:boolean" use="required"/>
+			<xs:attribute name="distance" type="xs:nonNegativeInteger"/>
+			<xs:attribute name="rotation" type="xs:double"/>
+			<xs:attribute name="size" type="xs:nonNegativeInetger"/>
+			<xs:attribute name="visible" type="xs:boolean"/>
 	</xs:ComplexType>
 	
 	<!--Edge Stuff -->

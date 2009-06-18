@@ -252,6 +252,8 @@ public class GraphMLReader {
 					System.err.println("Warning: Unhandled Data-Field in Node #"+index+" for key "+dataType);
 			}
 		} //End for - handle all Data Fields
+		if (name.equals("")) //If it is still empty recreate Std Name
+			name = GeneralPreferences.getInstance().getNodeName(index);
 		if (loadedVGraph!=null) //VGraph
 		{
 			if (loadedVGraph.getType()==VGraphInterface.GRAPH)
@@ -562,7 +564,7 @@ public class GraphMLReader {
 				(double)GeneralPreferences.getInstance().getIntValue("edge.loop_proportion")/100d,
 				GeneralPreferences.getInstance().getBoolValue("edge.loop_clockwise"));
 		if (loopedgeNode==null) //Not given return std
-			return n;
+			return ve;
 		if (!loopedgeNode.getNodeName().equals("loopedge"))
 		{
 			errorMsg = "Error when parsing Details of a LoopEdge: Wrong Type of Node";
@@ -605,7 +607,7 @@ public class GraphMLReader {
         for (int i=0; i<len; i++) //Look at all atributes
         {
             Attr attr = (Attr)attrs.item(i);
-            //Attributes distance="10" rotation="180.0" size="12" visible="true"
+            //Attributes distance="10" rotation="180.0" size="12" visible="true" all optional
             if (attr.getNodeName().equals("rotation"))
             	try {n.setNameRotation(Math.round(Float.parseFloat(attr.getNodeValue())));} catch(Exception e){}
             else if (attr.getNodeName().equals("distance"))
@@ -648,12 +650,14 @@ public class GraphMLReader {
 	        else if (attr.getNodeName().equals("y"))
 	          	try {y = Integer.parseInt(attr.getNodeValue());} catch(Exception e){}
 	        else if (attr.getNodeName().equals("size"))
-	           	try {n.setSize(Integer.parseInt(attr.getNodeValue()));} catch(Exception e){}
+	           	try {n.setSize(Integer.parseInt(attr.getNodeValue()));} catch(Exception e){n.setSize(0);}
 		}
 	    if ((x>=0)&&(y>=0))
 	    	n.setPosition(new Point(x,y));
 	    else
 	    	errorMsg = "Error when parsing NodeForm, Point ("+x+","+y+") out of Range";
+	    if (n.getSize()==0) //Still 0
+	    	n.setSize(GeneralPreferences.getInstance().getIntValue("node.size"));
 	    return n;
 	}
 	/**

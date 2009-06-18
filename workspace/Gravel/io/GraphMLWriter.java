@@ -93,9 +93,9 @@ public class GraphMLWriter {
 	{
 		s.write(nl+nl+"<!-- Graphel key Definitions for a (hyper)graph with visual information -->"+nl+nl);
 
-		if (vg!=null)
+		if (vg!=null) //Edge Stuff
 		{
-			s.write("\t\t<!-- Arrow of an Edge -->"+nl);
+			s.write("\t\t<!-- Edge Details -->"+nl);
 			s.write("\t<key id=\"edgearrow\" for=\"edge\" attr.name=\"edge.arrow\" attr.type=\"edge.arrow.type\">"+nl+
 					"\t\t<default>"+nl+"\t\t\t<arrow"+
 					" size="+gp.getIntValue("edge.arrow_size")+
@@ -103,10 +103,9 @@ public class GraphMLWriter {
 					" position="+gp.getFloatValue("edge.arrow_pos")+
 					" headalpha="+gp.getIntValue("edge.arrow_alpha")+"/>"+nl+
 					"\t\t</default>"+nl+"</key"+nl);
-			s.write("\t\t<!-- Additional Points defining an edge (e.g. the bezier-curve) / no default -->"+nl);
 			s.write("<key id=\"edgepoints\" for=\"edge\" attr.name=\"edge.points\" attr.type=\"edge.points.type\"/>"+nl);
 			s.write("<key id=\"edgewidth\" for=\"edge\" attr.name=\"edge.width\" attr.type=\"integer\">"+nl+
-					"\t\t<default>"+gp.getIntValue("edge.width")+"</default>"+nl+"\t</key>");
+					"\t\t<default>"+gp.getIntValue("edge.width")+"</default>"+nl+"\t</key>"+nl);
 			s.write("\t<key id=\"edgetype\" for=\"edge\" attr.name=\"edge.type\" attr.type=\"string\"> <!-- Kantentyp (Orthogonal|QuadCurve|Segmented|StraightLine|)-->"+nl);
 			s.write("\t\t<default>StraightLine</default>"+nl+"\t</key>"); //StraightLine ist immer Std !
 			s.write("\t<key id=\"e_orthogonal\" for=\"edge\" attr.name=\"orthogonaledge_verticalfirst\" attr.type=\"boolean\"> <!--Nur fuer Orthogonal pflicht-->"+nl);
@@ -118,85 +117,68 @@ public class GraphMLWriter {
 					" proportion="+gp.getIntValue("edge.loop_proportion")+
 					" direction="+gp.getIntValue("edge.loop_direction")+
 					" clockwise="+gp.getBoolValue("edge.loop_clockwise")+
-					"/>"+nl+"\t\t</default>"+nl+"\t</key>");
+					"/>"+nl+"\t\t</default>"+nl+"\t</key>"+nl);
 			s.write("\t<key id=\"edgetext\" for=\"edge\" attr.name=\"edge.text\" attr.type=\"edge.text.type\">"+nl+
 					"\t\t<default>"+nl+
-					"\t\t\t<edgetext distance="+gp.getIntValue("edge.text_distance")+
-					" position="+gp.getIntValue("edge.text_position")+
-					" size="+gp.getIntValue("edge.text_size")+
+					"\t\t\t<edgetext distance=\""+gp.getIntValue("edge.text_distance")+"\""+
+					" position=\""+gp.getIntValue("edge.text_position")+"\""+
+					" size=\""+gp.getIntValue("edge.text_size")+"\""+
+					" show=");
+			if (gp.getBoolValue("edge.text_showvalue"))
+				s.write("\"value\"");
+			else
+				s.write("\"name\"");
+			s.write(" visible=\""+gp.getBoolValue("edge.text_visible")+"/>"+nl);
+			s.write("\t\t</default>"+nl+"\t</key>"+nl);
+			
+			s.write("\t<kley id=\"edgeline\" for\"edge\" attr.name=\"edge.line\" attr.type=\"edge.line.type\">"+nl+
+					"\t\t<default>"+nl+
+					"\t\t\t<edgeline length=\""+gp.getIntValue("edge.line_length")+"\""+
+					" distance=\""+gp.getIntValue("edge.line_distance")+"\""+
+					" type=\""+gp.getIntValue("edge.line_type")+"\"/>"+nl+
+					"\t\t</default>"+nl+"\t</key>"+nl);
+		}
+		else
+		{
+			s.write("\t\t<!-- Hyperedge Details -->");
+			s.write("\t<key id=\"hyperedgewidth\" for=\"edge\" attr.name=\"hyperedge.width\" attr.type=\"integer\">"+nl+
+					"\t\t<default>"+gp.getIntValue("hyperedge.width")+"</default>"+nl+"\t</key>");
+			s.write("\t<key id=\"hyperedgemargin\" for=\"hyperedge\" attr.name=\"hyperedge.margin\" attr.type=\"integer\">"+nl+
+					"\t\t<default>"+gp.getIntValue("hyperedge.margin")+"</default>"+nl+"\t</key>");
+			s.write("\t<key id=\"hyperedgetext\" for=\"hyperedge\" attr.name=\"hyperedge.text\" attr.type=\"edge.text.type\">"+nl+
+					"\t\t<default>"+nl+
+					"\t\t\t<hyperedgetext distance=\""+gp.getIntValue("edge.text_distance")+"\""+
+					" position=\""+gp.getIntValue("edge.text_position")+"\""+
+					" size=\""+gp.getIntValue("edge.text_size")+"\""+
 					" show=");
 			if (gp.getBoolValue("edge.text_showvalue"))
 				s.write("\"value\"");
 			else
 				s.write("\"name\"");
 			s.write(" visible="+gp.getBoolValue("edge.text_visible")+"/>"+nl);
-			s.write"\t\t</default>"+nl+"\t</key>");
-//	<key id="edgeline" for="edge" attr.name="edge.line" attr.type="edge.line.type">
-//		<default><edgeline length="5" distance="8" type="dashed"/></default>
-//	</key>	
+			s.write("\t\t</default>"+nl+"\t</key>");
+			s.write("\t<kley id=\"hyperedgeline\" for\"hyperedge\" attr.name=\"edge.line\" attr.type=\"edge.line.type\">"+nl+
+					"\t\t<default>"+nl+
+					"\t\t\t<edgeline length=\""+gp.getIntValue("edge.line_length")+"\""+
+					" distance=\""+gp.getIntValue("edge.line_distance")+"\""+
+					" type=\""+gp.getIntValue("edge.line_type")+"\"/>"+nl+
+					"\t\t</default>"+nl+"\t</key>");
+	
+			s.write("<key id=\"hyperedgeshape\" for=\"hyperedge\" attr.name=\"hyperedge.shape\" attr.type=\"hyperedge.shape.type\"/>"+nl+nl);
 		}
-		else
-		{
-		//	<key id="hyperedgewidth" for="edge" attr.name="hyperedge.width" attr.type="integer"><default>1</default></key>
-		//	<key id="hyperedgemargin" for="hyperedge" attr.name="hyperedge.margin" attr.type="integer">
-		//	<default>6</default>
-		//	</key>
-		//	<key id="hyperedgetext" for="hyperedge" attr.name="hyperedge.text" attr.type="edge.text.type">
-		//		<default><hyperedgetext distance="17" position="19.0" size="12" show="value" visible="true"/></default>
-		//	</key>	
-		//	<key id="hyperedgeline" for="hyperedge" attr.name="hyperedge.line" attr.type="edge.line.type">
-		//		<default><hyperedgeline length="5" distance="8" type="solid"/></default>
-		//	</key>	
-		//	<key id="hyperedgeshape" for="hyperedge" attr.name="hyperedge.shape" attr.type="hyperedge.shape.type"/>
-		}
-		
-//	<key id="nodeform" for="node" attr.name="node" attr.type="node.form.type">
-//		<default>
-//			<form type="Circle" x="100" y="100" size="8"/>
-//		</default>
-//	</key>
-//	<key id="nodetext" for="node" attr.name="node.text" attr.type="node.text.type">
-//		<default>
-//			<nodetext distance="10" rotation="180.0" size="12" visible="true"/>
-//		</default>
-//	</key>
-		
-		s.write("\t<key id=\"nx\" for=\"node\" attr.name=\"x\" attr.type=\"integer\" /> <!--X-Position des Knotens -->"+nl);
-		s.write("\t<key id=\"ny\" for=\"node\" attr.name=\"y\" attr.type=\"integer\" /> <!--Y-Position des Knotens -->"+nl);
-		s.write("\t<key id=\"ns\" for=\"node\" attr.name=\"size\" attr.type=\"integer\">    <!-- Größe des Knotens -->"+nl);
-		s.write("\t<default>"+gp.getIntValue("node.size")+"</default>"+nl+"\t</key>"+nl);
-		s.write("\t	<key id=\"nd\" for=\"node\" attr.name=\"name_distance\" attr.type=\"integer\">    <!-- Abstand des Namens vom Knotenpunkt -->"+nl);
-		s.write("\t\t<default>"+gp.getIntValue("node.name_distance")+"</default>"+nl+"\t</key>"+nl);
-		s.write("\t<key id=\"nr\" for=\"node\" attr.name=\"name_rotation\" attr.type=\"integer\">    <!-- Drehung des Namens -->"+nl);
-		s.write("\t\t<default>"+gp.getIntValue("node.name_rotation")+"</default>"+nl+"\t</key>"+nl);
-		s.write("\t<key id=\"nns\" for=\"node\" attr.name=\"name_size\" attr.type=\"integer\">    <!-- Textgröße des Namens -->"+nl);
-		s.write("\t<default>"+gp.getIntValue("node.name_size")+"</default>"+nl+"\t</key>"+nl);
-		s.write("\t<key id=\"nnv\" for=\"node\" attr.name=\"name_visible\" attr.type=\"boolean\">    <!-- Name anzeigen -->"+nl);
-		s.write("\t<default>"+gp.getBoolValue("node.name_visible")+"</default>"+nl+"\t</key>"+nl+nl);
-
-		s.write("\t<key id=\"ex\" for=\"edge\" attr.name=\"x\" attr.type=\"integer\" /> <!--weitere Kontrollpunkt (Segmented|QuadCurveEdge) -->"+nl);
-		s.write("\t<key id=\"ey\" for=\"edge\" attr.name=\"y\" attr.type=\"integer\" />");
-		s.write("\t\t<default>true</default>"+nl+"\t</key>"+nl);
-		//Loop Stuff
-				
-		//:Kantenbeschriftungsdaten
-		s.write("\t<key id=\"etv\" for=\"edge\" attr.name=\"text_visible\" attr.type=\"boolean\">    <!-- Sichtbarkeit der Kantenbeschriftung -->"+nl);
-		s.write("\t<default>"+gp.getBoolValue("edge.text_visible")+"</default>"+nl+"\t</key>"+nl);
-		s.write("\t<key id=\"etw\" for=\"edge\" attr.name=\"text_showvalue\" attr.type=\"boolean\">    <!-- Anzeige von Kantenwert oder Kantenname -->"+nl);
-		s.write("\t<default>"+gp.getBoolValue("edge.text_showvalue")+"</default>"+nl+"\t</key>"+nl);
-		s.write("\t<key id=\"etd\" for=\"edge\" attr.name=\"text_distance\" attr.type=\"integer\">    <!-- Abstand von der Kantenlinie zum Textnittelpunkt -->"+nl);
-		s.write("\t<default>"+gp.getIntValue("edge.text_distance")+"</default>"+nl+"\t</key>"+nl);
-		s.write("\t<key id=\"etp\" for=\"edge\" attr.name=\"text_position\" attr.type=\"integer\">    <!-- Position auf der Kante -->"+nl);
-		s.write("\t<default>"+gp.getIntValue("edge.text_position")+"</default>"+nl+"\t</key>"+nl);
-		s.write("\t<key id=\"ets\" for=\"edge\" attr.name=\"text_size\" attr.type=\"integer\">    <!-- Textgroesse -->"+nl);
-		s.write("\t<default>"+gp.getIntValue("edge.text_size")+"</default>"+nl+"\t</key>"+nl);
-		//Kantenlinienart
-		s.write("\t<key id=\"eld\" for=\"edge\" attr.name=\"line_distance\" attr.type=\"integer\">    <!-- Abstand dash-dash/dash-dot/dot-dot -->"+nl);
-		s.write("\t<default>"+gp.getIntValue("edge.line_distance")+"</default>"+nl+"\t</key>"+nl);
-		s.write("\t<key id=\"ell\" for=\"edge\" attr.name=\"line_length\" attr.type=\"integer\">    <!-- Laenge eines Strichs -->"+nl);
-		s.write("\t<default>"+gp.getIntValue("edge.line_length")+"</default>"+nl+"\t</key>"+nl);
-		s.write("\t<key id=\"elt\" for=\"edge\" attr.name=\"line_type\" attr.type=\"integer\">    <!-- Standard Linientyp. Empfohlen wird 1 (solid) -->"+nl);
-		s.write("\t<default>"+gp.getIntValue("edge.line_type")+"</default>"+nl+"\t</key>"+nl);
+		s.write("\t\t<!-- Node Values -->"+nl);
+		s.write("\t<key id=\"nodeform\" for=\"node\" attr.name=\"node\" attr.type=\"node.form.type\">+nl+" +
+				"\t\t<default>"+nl+
+				"\t\t\t<form type=\"Circle\" x=\"0\" y=\"0\" size=\""+gp.getIntValue("node.size")+"\"/>"+nl+
+				"\t\t</default>"+nl+"\t</key>"+nl);
+		s.write("\t<key id=\"nodetext\" for=\"node\" attr.name=\"node.text\" attr.type=\"node.text.type\">"+nl+
+				"\t\t<default>"+nl+
+				"\t\t\t<nodetext distance=\""+gp.getIntValue("node.name_distance")+"\""+
+				" rotation=\""+gp.getIntValue("node.name_rotation")+"\" "+
+				" size=\""+gp.getIntValue("node.name_size")+"\""+
+				" visible=\""+gp.getBoolValue("node.name_visible")+"\"/>"+nl+
+				"\t\t</default>"+nl+"\t</key>");
+		//Subgraph stuff is not needed here because the one subgraph element does it all
 	}
 	/**
 	 * Write additional Stuff needed for visual graphs in the footer
@@ -211,7 +193,7 @@ public class GraphMLWriter {
 	 */
 	private void writeFooter(OutputStreamWriter s) throws IOException
 	{
-		s.write(nl+"</graphml>"+nl);
+		s.write(nl+"</graphml>");
 	}
 	/**
 	 * Write each node to a visual file
@@ -220,29 +202,52 @@ public class GraphMLWriter {
 	 */
 	private void writeVisualNodes(OutputStreamWriter s) throws IOException
 	{
+		MNodeSet mnodes; VNodeSet vnodes;
+		if (vg!=null)
+		{
+			mnodes = vg.getMathGraph().modifyNodes;
+			vnodes = vg.modifyNodes;
+		}
+		else if (vhg!=null)
+		{
+			mnodes = vhg.getMathGraph().modifyNodes;
+			vnodes = vhg.modifyNodes;			
+		}
+		else
+			throw new IOException("No Input given");
 	    //Nodes
-	    Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
+	    Iterator<VNode> nodeiter = vnodes.getIterator();
 	    while (nodeiter.hasNext())
 	    {
 	    	VNode actual = nodeiter.next();
-	    	s.write(nl+"\t\t<node id=\"node"+actual.getIndex()+"\">"+nl);
+	    	s.write(nl+"\t\t<node id=\""+actual.getIndex()+"\">"+nl);
 	    	//if the name is not a standard name
-	    	if (!(vg.getMathGraph().modifyNodes.get(actual.getIndex()).name).equals(gp.getStringValue("node.name")+actual.getIndex()))
-	    		s.write("\t\t\t<data key=\"nn\">"+vg.getMathGraph().modifyNodes.get(actual.getIndex()).name+"</data>"+nl);
+	    	if (!mnodes.get(actual.getIndex()).name.equals(gp.getNodeName(actual.getIndex())))
+	    		s.write("\t\t\t<data key=\"nodename\">"+vg.getMathGraph().modifyNodes.get(actual.getIndex()).name+"</data>"+nl);
 	    	//Position
-	    	s.write("\t\t\t<data key=\"nx\">"+actual.getPosition().x+"</data>"+nl);
-	    	s.write("\t\t\t<data key=\"ny\">"+actual.getPosition().y+"</data>"+nl);
-	    	//Size if it is not std
+	    	s.write("\t\t\t<data key=\"nodeform\"><form type=\"Circle\" x=\""+actual.getPosition().x+"\""+
+	    			" y=\""+actual.getPosition().y+"");
 	    	if (actual.getSize()!=gp.getIntValue("node.size"))
-	    		s.write("\t\t\t<data key=\"ns\">"+actual.getSize()+"</data>"+nl);
-	    	if (actual.getNameDistance()!=gp.getIntValue("node.name_distance"))
-	    		s.write("\t\t\t<data key=\"nd\">"+actual.getNameDistance()+"</data>"+nl);
-	    	if (actual.getNameRotation()!=gp.getIntValue("node.name_rotation"))
-	    		s.write("\t\t\t<data key=\"nr\">"+actual.getNameRotation()+"</data>"+nl);
-	    	if (actual.getNameSize()!=gp.getIntValue("node.name_size"))
-	    		s.write("\t\t\t<data key=\"nns\">"+actual.getNameSize()+"</data>"+nl);
-	    	if (actual.isNameVisible()!=gp.getBoolValue("node.name_visible"))
-	    		s.write("\t\t\t<data key=\"nnv\">"+actual.isNameVisible()+"</data>"+nl);
+	    		s.write(" size=\""+actual.getSize()+"\"");
+	    	s.write("/></data>"+nl);
+
+	    	boolean noStdDist = (actual.getNameDistance()!=gp.getIntValue("node.name_distance")),
+	    			noStdRot = (actual.getNameRotation()!=gp.getIntValue("node.name_rotation")),
+	    			noStdSize = (actual.getNameSize()!=gp.getIntValue("node.name_size")),
+	    			noStdVis =  (actual.isNameVisible()!=gp.getBoolValue("node.name_visible"));
+	    	if (noStdDist||noStdRot||noStdSize) //Do we need a nodename element?
+	    	{
+	    		s.write("\t\t\t<data key=\"nodetext\"><nodetext");
+	    		if (noStdDist)
+	    			s.write(" distance=\""+actual.getNameDistance()+"\"");
+	    		if (noStdRot)
+	    			s.write(" rotation=\""+actual.getNameRotation()+"\"");
+	    		if (noStdSize)
+	    			s.write(" size=\""+actual.getNameSize()+"\"");
+	    		if (noStdVis)
+	      			s.write(" visible=\""+actual.isNameVisible()+"\"");
+	    		s.write("/></data>"+nl); 
+	    	}
 	    	s.write("\t\t</node>"+nl);
 	    }
 
