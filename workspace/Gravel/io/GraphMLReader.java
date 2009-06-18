@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import model.MSubgraph;
+import model.VEdgeArrow;
 import model.VEdgeLinestyle;
 import model.VEdgeText;
 import model.VLoopEdge;
@@ -193,7 +194,7 @@ public class GraphMLReader {
 			GeneralPreferences.getInstance().setIntValue(pre+"_length",l.getLength());
 			GeneralPreferences.getInstance().setIntValue(pre+"_type",l.getType());
 		}
-		else if (keyType.equals("node.text.type")) //So this works due to pre for hperedge and edge text stuff
+		else if (keyType.equals("node.text.type")) //Node Text Std Values
 		{
 			while ((n!=null)&&(!(n.getNodeName().equals("nodetext")))) //Find the graph
 				n = n.getNextSibling();
@@ -223,7 +224,7 @@ public class GraphMLReader {
 			GeneralPreferences.getInstance().setIntValue(pre+"_length",edge.getLength());
 			GeneralPreferences.getInstance().setIntValue(pre+"_proportion",Math.round(100f*(float)edge.getProportion()));
 		}
-		else if (keyType.equals("graph.subgraph.type")) //So this works due to pre for hperedge and edge text stuff
+		else if (keyType.equals("graph.subgraph.type")) //Subgraph-Std-Values
 		{
 			//Search subgraph
 			while ((n!=null)&&(!(n.getNodeName().equals("subgraph")))) //Find the subgraph
@@ -237,7 +238,7 @@ public class GraphMLReader {
 			
 			GeneralPreferences.getInstance().setStringValue(pre+".name", msub.getName());
 		}
-		else if (keyType.equals("node.form.type")) //So this works due to pre for hperedge and edge text stuff
+		else if (keyType.equals("node.form.type")) //Node Form (Up to now in the key a  circle-size)
 		{
 			while ((n!=null)&&(!(n.getNodeName().equals("form")))) //Find the form
 				n = n.getNextSibling();
@@ -248,6 +249,21 @@ public class GraphMLReader {
 			}
 			VNode node = parseNodeForm(n);
 			GeneralPreferences.getInstance().setIntValue(pre+".size", node.getSize());
+		}
+		else if (keyType.equals("edge.arrow.type"))
+		{
+			while ((n!=null)&&(!(n.getNodeName().equals("arrow")))) //Find the arrow element in the default-substuff
+				n = n.getNextSibling();
+			if (n==null)
+			{
+				System.err.println("no edge arrow information found");
+				return;
+			}
+			VEdgeArrow a = parseEdgeArrow(n);
+			GeneralPreferences.getInstance().setIntValue(pre+"_alpha", Math.round(a.getAngle()));
+			GeneralPreferences.getInstance().setFloatValue(pre+"_part", a.getPart());
+			GeneralPreferences.getInstance().setFloatValue(pre+"_alpha", a.getPos());
+			GeneralPreferences.getInstance().setIntValue(pre+"_size", Math.round(a.getSize()));
 		}
 		else
 			System.err.print("Still TODO Type:"+keyType);
@@ -272,7 +288,7 @@ public class GraphMLReader {
             if (attr.getNodeName().equals("distance"))
             	try {t.setDistance(Integer.parseInt(attr.getNodeValue()));} catch(Exception e){}
             else if (attr.getNodeName().equals("position")) //TODO Change model
-              	try {t.setPosition(Math.round((float)Double.parseDouble(attr.getNodeValue())));} catch(Exception e){}
+              	try {t.setPosition(Math.round((float)Float.parseFloat(attr.getNodeValue())));} catch(Exception e){}
             else if (attr.getName().equals("size"))
             	try {t.setSize(Integer.parseInt(attr.getNodeValue()));} catch(Exception e){}
             else if (attr.getName().equals("show"))
@@ -315,6 +331,38 @@ public class GraphMLReader {
             }
 		}
         return l;
+	}
+	/**
+	 * Parse an Arrow of an Edge <arrow>-Element with attributes
+	 * - size
+	 * - part
+	 * - position (along the edge)
+	 * - headalpha (angle in the tip of the arrow)
+	 * @param n
+	 * @return
+	 */
+	static private VEdgeArrow parseEdgeArrow(Node edgearrowNode)
+	{
+		VEdgeArrow a = new VEdgeArrow();
+
+		if (!edgearrowNode.getNodeName().equals("arrow"))
+			return a;
+        NamedNodeMap attrs = edgearrowNode.getAttributes();
+        int len = attrs.getLength();
+        for (int i=0; i<len; i++) //Look at all atributes
+        {
+            Attr attr = (Attr)attrs.item(i);
+            //	<arrow size="14" part=".8" position=".77" headalpha="20.0"/>
+            if (attr.getNodeName().equals("size"))
+            	try {a.setSize(Float.parseFloat(attr.getNodeValue()));} catch(Exception e){}
+            else if (attr.getNodeName().equals("part"))
+              	try {a.setPart(Float.parseFloat(attr.getNodeValue()));} catch(Exception e){}
+            else if (attr.getNodeName().equals("pos"))
+               	try {a.setPos(Float.parseFloat(attr.getNodeValue()));} catch(Exception e){}
+            else if (attr.getNodeName().equals("headalpha"))
+               	try {a.setAngle(Float.parseFloat(attr.getNodeValue()));} catch(Exception e){}
+ 		}
+        return a;
 	}
 	/**
 	 * Parse a XML-Node with information about a Nodes Text and return that (within a VNode)

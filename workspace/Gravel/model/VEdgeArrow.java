@@ -4,10 +4,10 @@ import io.GeneralPreferences;
 
 public class VEdgeArrow {
 
-	private float size = GeneralPreferences.getInstance().getIntValue("edge.arrsize");
-	private float part = (float)GeneralPreferences.getInstance().getIntValue("edge.arrpart")/100;
-	private float alpha = GeneralPreferences.getInstance().getIntValue("edge.arralpha");
-	private float pos = (float)GeneralPreferences.getInstance().getIntValue("edge.arrpos")/100;
+	private float size = GeneralPreferences.getInstance().getIntValue("edge.arrow_size");
+	private float part = GeneralPreferences.getInstance().getFloatValue("edge.arrow_part");
+	private float alpha = GeneralPreferences.getInstance().getIntValue("edge.arrow_alpha");
+	private float pos = GeneralPreferences.getInstance().getFloatValue("edge.arrow_pos");
 	
 	/**
 	 * Initialize the Arrow with the standard values from GeneralPreferences

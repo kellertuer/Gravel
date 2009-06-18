@@ -71,7 +71,7 @@
 		<xs:attribute name="size" type="xs:float" use="required"/>
 		<xs:attribute name="part" type="xs:float" use="required"/>
 		<xs:attribute name="position" type="xs:float" use="required"/>
-		<xs:attribute name="headalpha" type="float"  use="required"/>
+		<xs:attribute name="headalpha" type="xs:float"  use="required"/>
 	</xs:complexType>
 	<!-- Set of Points for some edges -->
 	<xs:complexType name="edge.points.type">
@@ -97,7 +97,7 @@
 	</xs:complexType>
 	<!-- Edge Text and HyperEdgeText Details -->
 	<xs:complexType name="edge.text.type">
-		<xs:attribute name="position" type="xs:double" use="required"/>
+		<xs:attribute name="position" type="xs:float" use="required"/>
 		<xs:attribute name="distance" type="xs:nonNegativeInteger" use="required"/>
 		<xs:attribute name="size" type="xs:nonNegativeInteger" use="required"/>
 		<xs:attribute name="show" type="edge.text.show.type" use="required"/>

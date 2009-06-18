@@ -15,11 +15,11 @@
 
 <gravel.preferences>
 	<group name="edge">
-		<value name="arralpha" type="Integer">38</value>
-		<value name="arrpart" type="Integer">75</value>
-		<value name="arrpos" type="Integer">100</value>
-		<value name="arrsize" type="Integer">10</value>
-		<value name="line_distance" type="Integer">10</value>
+		<value name="arrow_alpha" type="Integer">38</value>
+		<value name="arrow_part" type="Float">0.75</value>
+		<value name="arrow_pos" type="Float">0.0</value>
+		<value name="arrow_size" type="Integer">10</value>
+		<value name="line_distance" type="Integer">15</value>
 		<value name="line_length" type="Integer">10</value>
 		<value name="line_type" type="Integer">1</value>
 		<value name="loop_clockwise" type="Boolean">true</value>

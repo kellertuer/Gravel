@@ -325,9 +325,9 @@ public class GeneralPreferences extends Observable
 	 */
 	public boolean check()
 	{
-		if (IntValues.get("edge.arralpha")==null) return false;
-		if (IntValues.get("edge.arrpart")==null) return false;
-		if (IntValues.get("edge.arrsize")==null) return false;
+		if (IntValues.get("edge.arrow_alpha")==null) return false;
+		if (FloatValues.get("edge.arrow_part")==null) return false;
+		if (IntValues.get("edge.arrow_size")==null) return false;
 		if (IntValues.get("edge.value")==null) return false;
 		if (IntValues.get("edge.width")==null) return false;
 		if (IntValues.get("edge.text_position")==null) return false;
@@ -394,12 +394,8 @@ public class GeneralPreferences extends Observable
 		if (IntValues.get("window.x")==null) return false;
 		if (IntValues.get("window.y")==null) return false;
 		
-		//All clear despite new ones
-		if (IntValues.get("edge.arrpos")==null)
-		{ //Set to actual
-			IntValues.put("edge.arrpos",100);
-			this.writetoXML(); 
-		}
+		if (FloatValues.get("edge.arrow_pos")==null) return false;
+
 		return true; //Falls alle da sind, alles okay
 	}
 		
@@ -414,10 +410,10 @@ public class GeneralPreferences extends Observable
 
 		IntValues.put("edge.width",1);
 		IntValues.put("edge.value",1);		
-		IntValues.put("edge.arrsize",10);          // Size of the arrow segment
-		IntValues.put("edge.arrpart",75);          // Size of the arrow segments
-		IntValues.put("edge.arralpha",38);
-		IntValues.put("edge.arrpos",100);
+		IntValues.put("edge.arrow_size",10);          // Size of the arrow segment
+		FloatValues.put("edge.arrow_part",0.75f);          // Size of the arrow segments
+		IntValues.put("edge.arrow_alpha",38);
+		FloatValues.put("edge.arrow_pos",1f);
 		IntValues.put("edge.text_distance",7);
 		IntValues.put("edge.text_position",25);
 		IntValues.put("edge.text_size",12);

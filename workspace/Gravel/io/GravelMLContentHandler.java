@@ -95,10 +95,8 @@ public class GravelMLContentHandler implements ContentHandler
 			return;
 		if (Status==PARSE_NODES) //Just parsed all nodes an std keys
 		{
-			if (gp.getIntValue("edge.arrpos")==-1) //not found
-			{
-				gp.setIntValue("edge.arrpos",100);
-			}
+			if (Float.isNaN(gp.getFloatValue("edge.arrow_pos"))) //not found
+				gp.setFloatValue("edge.arrow_pos",1f); //Set again, because this value was new
 		}
 		if (Status==PARSE_EDGES)
 		{
@@ -528,10 +526,10 @@ public class GravelMLContentHandler implements ContentHandler
 			else
 			{isValid=false; System.err.println("Unknown VEdge Standard-Type error. Please Check the key 'et' name 'edgetype' "); return;}	
 			//Arrow INfos
-			if (es==0.0f) es = (new Integer(gp.getIntValue("edge.arrsize"))).floatValue();
-			if ((ep==0.0f)||(ep>1.0f)) ep = (new Integer(gp.getIntValue("edge.arrpart"))).floatValue()/100;
-			if (ea==0.0f) ea = (new Integer(gp.getIntValue("edge.arralpha"))).floatValue();
-			if ((eapos<0.0f)||(eapos>1.0f)) eapos = (new Integer(gp.getIntValue("edge.arrpos"))).floatValue()/100;
+			if (es==0.0f) es = (new Integer(gp.getIntValue("edge.arrow_size"))).floatValue();
+			if ((ep==0.0f)||(ep>1.0f)) ep = gp.getFloatValue("edge.arrow_part");
+			if (ea==0.0f) ea = (new Integer(gp.getIntValue("edge.arrow_alpha"))).floatValue();
+			if ((eapos<0.0f)||(eapos>1.0f)) eapos = gp.getFloatValue("edge.arrow_pos");
 			toAdd.setArrow(new VEdgeArrow(es,ep,ea,eapos));
 			//huh just text left, but that one is initiated with default values and on error theyre alle set to default so text must be okay
 			toAdd.setTextProperties(etxt);

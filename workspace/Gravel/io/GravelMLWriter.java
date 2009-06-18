@@ -89,13 +89,13 @@ public class GravelMLWriter {
 		s.write("\t<key id=\"ew\" for=\"edge\" attr.name=\"width\" attr.type=\"integer\"> <!-- Kantenbreite -->"+nl);
 		s.write("\t<default>"+gp.getIntValue("edge.width")+"</default>"+nl+"\t</key>"+nl);
 		s.write("\t<key id=\"es\" for=\"edge\" attr.name=\"arrsize\" attr.type=\"float\"> <!--Pfeilgröße -->"+nl);
-		s.write("\t\t<default>"+gp.getIntValue("edge.arrsize")+".0</default>"+nl+"\t</key>"+nl);
+		s.write("\t\t<default>"+gp.getIntValue("edge.arrow_size")+".0</default>"+nl+"\t</key>"+nl);
 		s.write("\t<key id=\"ep\" for=\"edge\" attr.name=\"arrpart\" attr.type=\"float\"> <!-- Anteil des Pfeils -->"+nl);
-		s.write("\t\t<default>"+((float)gp.getIntValue("edge.arrpart")/100)+"</default>"+nl+"\t</key>"+nl);
+		s.write("\t\t<default>"+(gp.getFloatValue("edge.arrow_part"))+"</default>"+nl+"\t</key>"+nl);
 		s.write("\t<key id=\"eapos\" for=\"edge\" attr.name=\"arrpos\" attr.type=\"float\"> <!-- Anteil des Pfeils -->"+nl);
-		s.write("\t\t<default>"+((float)gp.getIntValue("edge.arrpos")/100)+"</default>"+nl+"\t</key>"+nl);
+		s.write("\t\t<default>"+(gp.getFloatValue("edge.arrow_pos"))+"</default>"+nl+"\t</key>"+nl);
 		s.write("\t<key id=\"ea\" for=\"edge\" attr.name=\"arralpha\" attr.type=\"float\"> <!-- Winkel in der Pfeilspitze-->"+nl);
-		s.write("\t\t<default>"+gp.getIntValue("edge.arralpha")+".0</default>"+nl+"\t</key>"+nl);
+		s.write("\t\t<default>"+gp.getIntValue("edge.arrow_alpha")+".0</default>"+nl+"\t</key>"+nl);
 		s.write("\t<key id=\"et\" for=\"edge\" attr.name=\"edgetype\" attr.type=\"string\"> <!-- Kantentyp (Orthogonal|QuadCurve|Segmented|StraightLine|)-->"+nl);
 		s.write("\t\t<default>StraightLine</default>"+nl+"\t</key>"); //StraightLine ist immer Std !
 		s.write("\t<key id=\"ex\" for=\"edge\" attr.name=\"x\" attr.type=\"integer\" /> <!--weitere Kontrollpunkt (Segmented|QuadCurveEdge) -->"+nl);
@@ -206,13 +206,13 @@ public class GravelMLWriter {
 	    	   if (actual.getWidth()!=gp.getIntValue("edge.width")) //if width is not std
 	    		   s.write("\t\t\t<data key=\"ew\">"+actual.getWidth()+"</data>"+nl);
 	    	   s.write("\t\t\t<data key=\"en\">"+vg.getMathGraph().modifyEdges.get(actual.getIndex()).name+"</data>"+nl);
-	    	   if (actual.getArrow().getSize()!=((float)gp.getIntValue("edge.arrsize"))) //if arrpart is not std
+	    	   if (actual.getArrow().getSize()!=((float)gp.getIntValue("edge.arrow_size"))) //if arrow_part is not std
 	    		   s.write("\t\t\t<data key=\"es\">"+actual.getArrow().getSize()+"</data>"+nl);
-	    	   if (actual.getArrow().getPart()!=((float)gp.getIntValue("edge.arrpart")/100)) //if arrpart is not std
+	    	   if (actual.getArrow().getPart()!=gp.getFloatValue("edge.arrow_part")) //if arrow_part is not std
 	    		   s.write("\t\t\t<data key=\"ep\">"+actual.getArrow().getPart()+"</data>"+nl);
-	    	   if (actual.getArrow().getAngle()!=((float)gp.getIntValue("edge.arralpha"))) //if arrangle is not std
+	    	   if (actual.getArrow().getAngle()!=((float)gp.getIntValue("edge.arrow_alpha"))) //if arrow_angle is not std
 	    		   s.write("\t\t\t<data key=\"ea\">"+actual.getArrow().getAngle()+"</data>"+nl);
-	    	   if (actual.getArrow().getPos()!=((float)gp.getIntValue("edge.arrpos")/100)) //if arrangle is not std
+	    	   if (actual.getArrow().getPos()!=gp.getFloatValue("edge.arrow_pos")) //if arrow_pos is not std
 	    		   s.write("\t\t\t<data key=\"eapos\">"+actual.getArrow().getPos()+"</data>"+nl);
 	    	   
 	    	   if (actual.getEdgeType()==VEdge.ORTHOGONAL)

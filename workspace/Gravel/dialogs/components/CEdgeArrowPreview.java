@@ -100,10 +100,10 @@ public class CEdgeArrowPreview extends Container implements Observer{
 		else
 		{
 			GeneralPreferences gp = GeneralPreferences.getInstance();
-			ArrowEdge.getArrow().setAngle(gp.getIntValue("edge.arralpha"));
-			ArrowEdge.getArrow().setPart((float)gp.getIntValue("edge.arrpart")/100.0f);
-			ArrowEdge.getArrow().setSize(gp.getIntValue("edge.arrsize"));
-			ArrowEdge.getArrow().setPos(gp.getIntValue("edge.arrpos")/100.0f);
+			ArrowEdge.getArrow().setAngle(gp.getIntValue("edge.arrow_alpha"));
+			ArrowEdge.getArrow().setPart(gp.getFloatValue("edge.arrow_part"));
+			ArrowEdge.getArrow().setSize(gp.getIntValue("edge.arrow_size"));
+			ArrowEdge.getArrow().setPos(gp.getFloatValue("edge.arrow_pos"));
 			
 			ArrowEdge.getTextProperties().setDistance(gp.getIntValue("edge.text_distance"));
 			ArrowEdge.getTextProperties().setPosition(gp.getIntValue("edge.text_position"));
