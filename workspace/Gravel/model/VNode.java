@@ -118,6 +118,14 @@ public class VNode extends VItem {
 		{
 			return "(#"+getIndex()+") - Pos:"+Pos;
 		}
+		
+		public void cloneTextDetailsFrom(VNode second)
+		{
+			name_distance = second.getNameDistance();
+			name_rotation = second.getNameRotation();
+			name_size = second.getNameSize();
+			name_visible = second.isNameVisible();
+		}
 		/**
 		 * Get the Distance from the node position to the middle of the text that should be displayd
 		 * @return a distance in px
