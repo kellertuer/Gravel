@@ -259,7 +259,8 @@ public class GraphMLWriter {
 	 */
 	private void writeVisualEdges(OutputStreamWriter s) throws IOException
 	{
-	       //Nodes
+			if (vg==null)
+				throw new IOException("No Graph Given");
 	       Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 	       while (edgeiter.hasNext())
 	       {
@@ -268,86 +269,169 @@ public class GraphMLWriter {
 	    	   int start = me.StartIndex;
 	    	   int ende = me.EndIndex;
 	    	   int value = me.Value;
-	    	   s.write(nl+"\t\t<edge id=\"edge"+actual.getIndex()+"\" source=\"node"+start+"\" target=\"node"+ende+"\">"+nl);
+	    	   s.write(nl+"\t\t<edge id=\""+actual.getIndex()+"\" source=\""+start+"\" target=\""+ende+"\">"+nl);
+	    	   if (!gp.getEdgeName(me.index,start,ende).equals(me.name)) //If name is not std
+	    		   s.write("\t\t\t<data key=\"edgename\">"+me.name+"</data>"+nl);
 	    	   if (value!=gp.getIntValue("edge.value")) 	    	   //if the value is not std
-	    		   s.write("\t\t\t<data key=\"ev\">"+value+"</data>"+nl);
+	    		   s.write("\t\t\t<data key=\"edgevalue\">"+value+"</data>"+nl);
 	    	   if (actual.getWidth()!=gp.getIntValue("edge.width")) //if width is not std
-	    		   s.write("\t\t\t<data key=\"ew\">"+actual.getWidth()+"</data>"+nl);
-	    	   s.write("\t\t\t<data key=\"en\">"+vg.getMathGraph().modifyEdges.get(actual.getIndex()).name+"</data>"+nl);
-	    	   if (actual.getArrow().getSize()!=((float)gp.getIntValue("edge.arrow_size"))) //if arrow_part is not std
-	    		   s.write("\t\t\t<data key=\"es\">"+actual.getArrow().getSize()+"</data>"+nl);
-	    	   if (actual.getArrow().getPart()!=gp.getFloatValue("edge.arrow_part")) //if arrow_part is not std
-	    		   s.write("\t\t\t<data key=\"ep\">"+actual.getArrow().getPart()+"</data>"+nl);
-	    	   if (actual.getArrow().getAngle()!=((float)gp.getIntValue("edge.arrow_alpha"))) //if arrow_angle is not std
-	    		   s.write("\t\t\t<data key=\"ea\">"+actual.getArrow().getAngle()+"</data>"+nl);
-	    	   if (actual.getArrow().getPos()!=gp.getFloatValue("edge.arrow_pos")) //if arrow_pos is not std
-	    		   s.write("\t\t\t<data key=\"eapos\">"+actual.getArrow().getPos()+"</data>"+nl);
+	    		   s.write("\t\t\t<data key=\"edgewidth\">"+actual.getWidth()+"</data>"+nl);
 	    	   
 	    	   if (actual.getEdgeType()==VEdge.ORTHOGONAL)
 	    	   {
-	    		   s.write("\t\t\t<data key=\"et\">Orthogonal</data>"+nl);
+	    		   s.write("\t\t\t<data key=\"edgetype\">Orthogonal</data>"+nl);
 	    		   if (((VOrthogonalEdge)actual).getVerticalFirst()!=gp.getBoolValue("edge.orth_verticalfirst")) //non standard Orth Edge
-	    			   s.write("\t\t\t<data key=\"eo\">"+((VOrthogonalEdge)actual).getVerticalFirst()+"</data>"+nl);
+	    			   s.write("\t\t\t<data key=\"edge_orthogonal_bool\">"+((VOrthogonalEdge)actual).getVerticalFirst()+"</data>"+nl);
 	    	   }
 	    	   else if (actual.getEdgeType()==VEdge.QUADCURVE)
 	    	   {
-	    		   s.write("\t\t\t<data key=\"et\">QuadCurve</data>"+nl);
+	    		   s.write("\t\t\t<data key=\"edgetype\">QuadCurve</data>"+nl);
 	    		   Point p = ((VQuadCurveEdge)actual).getControlPoints().firstElement();
-	    		   s.write("\t\t\t<data key=\"ex\">"+p.x+"</data>"+nl);
-	    		   s.write("\t\t\t<data key=\"ey\">"+p.y+"</data>"+nl);		   
+	    		   s.write("\t\t\t<data key=\"edgepoints\">"+nl+
+	    				   "\t\t\t\t<point id=\"0\" x=\""+p.x+" y=\""+p.y+"\"/>"+nl+
+	    				   "\t\t\t</data>"+nl);		   
 	    	   }
 	    	   else if (actual.getEdgeType()==VEdge.SEGMENTED)
 	    	   {
-	    		   s.write("\t\t\t<data key=\"et\">Segmented</data>"+nl);
+	    		   s.write("\t\t\t<data key=\"edgetype\">Segmented</data>"+nl);
 	    		   Vector<Point> points = ((VSegmentedEdge)actual).getControlPoints();
+	    		   s.write("\t\t\t<data key=\"edgepoints\">"+nl);
 	    			for (int i=0; i<points.size(); i++)
 	    			{
 	    				if (points.get(i)!=null)
 	    				{
 	    				   Point p = points.get(i);
-    					   s.write("\t\t\t<data key=\"ex\">"+p.x+"</data>"+nl);
-    		    		   s.write("\t\t\t<data key=\"ey\">"+p.y+"</data>"+nl);	}
+	    				   s.write("\t\t\t\t<point id=\""+i+"\" x=\""+p.x+" y=\""+p.y+"\"/>"+nl);
+	    				}
 	    			}		   
+				   s.write("\t\t\t</data>"+nl);		   
 	    	   }
 	    	   else if (actual.getEdgeType()==VEdge.LOOP)
 	    	   {
 	    		   VLoopEdge vle = (VLoopEdge) actual;
-	    		   s.write("\t\t\t<data key=\"et\">Loop</data>"+nl);
-				   if (vle.getLength()!=gp.getIntValue("edge.loop_length"))
-					   s.write("\t\t\t<data key=\"elol\">"+vle.getLength()+"</data>"+nl);
-   				  if (vle.getProportion()!=((double) gp.getIntValue("edge.loop_proportion") /100.0d))
-   					  s.write("\t\t\t<data key=\"elop\">"+(new Double(vle.getProportion())).floatValue()+"</data>"+nl);
-   				  if (vle.getDirection()!=gp.getIntValue("edge.loop_direction"))
-   					  s.write("\t\t\t<data key=\"elod\">"+vle.getDirection()+"</data>"+nl);
-   				  if (vle.isClockwise()!=gp.getBoolValue("edge.loop_clockwise"))
-   					  s.write("\t\t\t<data key=\"eloc\">"+vle.isClockwise()+"</data>"+nl);	 
+	    		   s.write("\t\t\t<data key=\"edgetype\">Loop</data>"+nl);
+				   boolean noStdLen = vle.getLength()!=gp.getIntValue("edge.loop_length"),
+				   		   noStdProp = vle.getProportion()!=((double)gp.getIntValue("edge.loop_proportion") /100.0d),
+				   		   noStdDir = vle.getDirection()!=gp.getIntValue("edge.loop_direction"),
+				   		   noStdCW = vle.isClockwise()!=gp.getBoolValue("edge.loop_clockwise");
+				   if (noStdLen||noStdProp||noStdDir||noStdCW) //Do we need an loopedge-Element?
+				   {					   
+					   s.write("\t\t\t<data key=\"loopedge\">"+nl+
+							   "\t\t\t\t<loopedge");
+					   if (noStdLen)
+						   s.write(" length\""+vle.getLength()+"\"");
+					   if (noStdProp)
+						   s.write(" proportion=\""+((float)vle.getProportion())+"\"");
+					   if (noStdDir)
+						   s.write(" direction=\""+vle.getDirection()+"\"");
+					   if (noStdCW)
+						   s.write(" clockwise=\""+vle.isClockwise()+"\"");
+					   s.write("/>"+nl+"\t\t\t</data>"+nl);
+   				   }
 	    	   }
-	    	   //Textoutput
-	    	   VEdgeText t = actual.getTextProperties();
-	    	   //each value is only written if it different from the std value
-	    	   if (t.getDistance()!=gp.getIntValue("edge.text_distance"))
-	    		   s.write("\t\t\t<data key=\"etd\">"+t.getDistance()+"</data>"+nl);
-	    	   if (t.getPosition()!=gp.getIntValue("edge.text_position"))
-	    		   s.write("\t\t\t<data key=\"etp\">"+t.getPosition()+"</data>"+nl);
-	    	   if (t.getSize()!=gp.getIntValue("edge.text_size"))
-	    		   s.write("\t\t\t<data key=\"ets\">"+t.getSize()+"</data>"+nl);
-	    	   if (t.isVisible()!=gp.getBoolValue("edge.text_visible"))
-	    		   s.write("\t\t\t<data key=\"etv\">"+t.isVisible()+"</data>"+nl);
-	    	   if (t.isshowvalue()!=gp.getBoolValue("edge.text_showvalue"))
-	    		   s.write("\t\t\t<data key=\"etw\">"+t.isshowvalue()+"</data>"+nl);
-
-	    	   //Linestyleoutput
-	    	   VEdgeLinestyle l = actual.getLinestyle();
-	    	   //each value is only written if it different from the std value
-	    	   if (l.getDistance()!=gp.getIntValue("edge.line_distance"))
-	    		   s.write("\t\t\t<data key=\"eld\">"+l.getDistance()+"</data>"+nl);
-	    	   if (l.getLength()!=gp.getIntValue("edge.line_length"))
-	    		   s.write("\t\t\t<data key=\"ell\">"+l.getLength()+"</data>"+nl);
-	    	   if (l.getType()!=gp.getIntValue("edge.line_type"))
-	    		   s.write("\t\t\t<data key=\"elt\">"+l.getType()+"</data>"+nl);
-
+	    	   //The Straightline does not need a type, because Straightline is Std.
+	    	   
+	    	   writeArrow(s,actual.getArrow());
+	    	   writeText(s,actual.getTextProperties(),false);
+	    	   writeLinestyle(s,actual.getLinestyle(),false);
 	    	   s.write("\t\t</edge>"+nl);
  		}
+	}
+	
+	private void writeArrow(OutputStreamWriter s, VEdgeArrow arrow) throws IOException
+	{
+		if (arrow==null)
+			throw new IOException(" No Arrow for Output");
+ 	   boolean noStdASize = arrow.getSize()!=((float)gp.getIntValue("edge.arrow_size")),
+		   noStdAPart = arrow.getPart()!=gp.getFloatValue("edge.arrow_part"),
+		   noStdAAngle = arrow.getAngle()!=((float)gp.getIntValue("edge.arrow_alpha")),
+		   noStdAPos = arrow.getPos()!=gp.getFloatValue("edge.arrow_pos");
+ 	   if (noStdASize||noStdAPart||noStdAAngle||noStdAPos)
+ 	   { //<arrow size="14" part=".8" position=".77" headalpha="20.0"/>
+ 		   s.write("\t\t\t<data key=\"edgearrow\">"+nl+
+ 		   "\t\t\t\t<arrow");
+ 		   if (noStdASize)
+ 			   s.write(" size=\""+arrow.getSize()+"\"");
+ 		   if (noStdAPart)
+ 			   s.write(" part=\""+arrow.getPart()+"\"");
+ 		   if (noStdAPos)
+ 			   s.write(" position=\""+arrow.getPos()+"\"");
+ 		   if (noStdAAngle)
+ 			   s.write(" headalpha=\""+arrow.getAngle()+"\"");
+ 		   s.write("/>"+nl+"\t\t\t</data>");
+ 	   }
+	}
+	
+	private void writeText(OutputStreamWriter s, VEdgeText t, boolean hyper) throws IOException
+	{
+		boolean noStdDis = t.getDistance()!=gp.getIntValue("edge.text_distance"),
+		noStdPos = t.getPosition()!=gp.getIntValue("edge.text_position"),
+		noStdSize = t.getSize()!=gp.getIntValue("edge.text_size"),
+		noStdVis = t.isVisible()!=gp.getBoolValue("edge.text_visible"),
+		noStdShow = t.isshowvalue()!=gp.getBoolValue("edge.text_showvalue");
+
+		if (noStdDis||noStdPos||noStdSize||noStdVis||noStdShow) //We need an Textelement
+		{
+			s.write("\t\t\t<data key=\"");
+			if (hyper)
+				s.write("hyper");
+			s.write("edgetext\""+nl+
+					"\t\t\t\t<edgetext");
+			if (noStdDis)
+				s.write(" distance=\""+t.getDistance()+"\"");
+			if (noStdPos)
+				s.write(" position=\""+t.getPosition()+"\"");
+			if (noStdSize)
+				s.write(" size=\""+t.getSize()+"\"");
+			if (noStdVis)
+				s.write(" visible=\""+t.isVisible()+"\"");
+			if (noStdDis)
+			{
+				if (t.isshowvalue())
+					s.write(" show=\"value\"");
+				else
+					s.write(" show=\"name\"");
+			}
+			s.write("/>"+nl+"\t\t\t</data>"+nl);
+		}
+	}
+
+	private void writeLinestyle(OutputStreamWriter s, VEdgeLinestyle l, boolean hyper) throws IOException
+	{
+		boolean noStdDist = l.getDistance()!=gp.getIntValue("edge.line_distance"),
+		noStdLen = l.getLength()!=gp.getIntValue("edge.line_length"),
+		noStdType = l.getType()!=gp.getIntValue("edge.line_type");
+		
+		if (noStdDist||noStdLen||noStdType)
+		{
+			s.write("\t\t\t<data key=\"");
+			if (hyper)
+				s.write("hyper");
+			s.write("edgetext\""+nl+
+			"\t\t\t\t<edgetext");
+			if (noStdDist)
+				s.write(" distance=\""+l.getDistance()+"\"");
+			if (noStdLen)
+				s.write(" length=\""+l.getLength()+"\"");
+			if (noStdType)
+			{
+				s.write(" type=\"");
+				switch(l.getType())
+				{
+					case VEdgeLinestyle.DOTTED:
+						s.write("dotted");
+					case VEdgeLinestyle.DASHED:
+						s.write("doshed");
+					case VEdgeLinestyle.DOTDASHED:
+						s.write("dotdashed");
+					default:
+						s.write("solid");
+				}
+				s.write("\"");
+			}
+			//each value is only written if it different from the std value
+		    s.write("/>"+nl+"\t\t\t</data>"+nl);
+		}
 	}
 	/**
 	 * Write visual Subgraphs to File
