@@ -249,7 +249,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				Point p2 = new Point(Math.round((float)End.getX()),Math.round((float)End.getY()));
 				this.drawCP(g2, p2, selColor.darker());
 			}
-			//TODO Remove DEBUG
 			Point2D StartCurve = tempshape.CurveAt(tempshape.Knots.get(tempshape.getDegree()));
 			Point p2 = new Point(Math.round((float)StartCurve.getX()),Math.round((float)StartCurve.getY()));
 			this.drawCP(g2, p2, Color.GREEN);
@@ -345,7 +344,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			break;
 			case KNOT_MODIFICATION_MOUSEHANDLING:
 				if (listenerclasschanged)
-					secondModus = new KnotModificationMouseHandler(state&DETAIL_MASK, vG, highlightedHyperEdge); //TODO
+					secondModus = new KnotModificationMouseHandler(state&DETAIL_MASK, vG, highlightedHyperEdge);
 				else //Just update State
 					((KnotModificationMouseHandler)secondModus).setModificationState(state&(DETAIL_MASK));
 			break;

@@ -71,7 +71,7 @@ public abstract class VCommonGraphic extends Component implements Observer
 	protected Color selColor; //Color of selected Elements
 	protected int selWidth; //Width of selection border
 
-	protected float zoomfactor; //TODO: set private after DEBUG
+	protected float zoomfactor; //protected for all subelements
 	protected int gridx,gridy;
 	protected boolean gridenabled,gridorientated;
 	protected GeneralPreferences gp;

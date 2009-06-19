@@ -1,11 +1,7 @@
 package model;
 
 import java.awt.geom.Point2D;
-import java.util.Iterator;
 import java.util.Vector;
-
-import javax.print.attribute.SupportedValuesAttribute;
-
 /**
  * Class for handling any stuff that is ment to only affect a part of a nurbsshape
  * 
@@ -117,7 +113,7 @@ public class NURBSShapeFragment extends NURBSShape {
 				int count = -minNum + 2;
 				Refinement.clear();
 				for (int i=1; i<count; i++)
-				{ //TODO: Nonlinear refinement that produces more points at start/end then in the middle
+				{ //TODO: Find nonlinear refinement that produces more points at start/end then in the middle
 					double val = t1+ (t2-t1)*(double)i/(double)count;
 					if (!Knots.contains(val))
 						Refinement.add(val);

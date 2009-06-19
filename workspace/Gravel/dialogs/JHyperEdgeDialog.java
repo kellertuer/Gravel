@@ -1,5 +1,7 @@
 package dialogs;
 
+import io.GeneralPreferences;
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -51,6 +53,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 {
 	private static final long serialVersionUID = 1L;
 
+	private GeneralPreferences gp = GeneralPreferences.getInstance();
 	private MHyperEdge oldmhyperedge;
 	private VHyperEdge oldvhyperedge;
 	boolean isNewHyperedge;
@@ -86,8 +89,8 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 			return;
 		graphref = (VHyperGraph)Gui.getInstance().getVGraph();
 		int index = graphref.getMathGraph().modifyHyperEdges.getNextIndex();
-		oldmhyperedge = new MHyperEdge(index,1,"E "+index); //Value 1 TODO GeneralPreferences-Std-Values
-		oldvhyperedge = new VHyperEdge(index,1, 12); //Width 1 TODO GP STd Values also for Distance
+		oldmhyperedge = new MHyperEdge(index,gp.getIntValue("hyperedge.value"),gp.getHyperedgeName(index));
+		oldvhyperedge = new VHyperEdge(index,gp.getIntValue("hyperedge.width"),gp.getIntValue("hyperedge.margin")); //Width 1 TODO GP STd Values also for Distance
 		for (int i=0; i<=initNodes.length(); i++)
 		{
 			if (initNodes.get(i))
@@ -305,7 +308,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		c.gridy++; TextContent.add(cLine.getContent(),c);
 		
 		//Werte einfügen
-		iMargin.setValue(12); //TODO Std.-Value needed for Hyperedge Margin
+		iMargin.setValue(oldvhyperedge.getMinimumMargin());
 	}
 	/**
 	 * Help function to create the list of node names from the corresponding VGraph 

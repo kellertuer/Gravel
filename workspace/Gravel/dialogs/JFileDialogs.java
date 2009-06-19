@@ -8,7 +8,6 @@ import io.SVGWriter;
 import io.TeXWriter;
 import io.LaTeXPictureWriter;
 //import io.MyTikZPictureWriter;
-import io.GravelMLWriter;
 
 import java.awt.Component;
 
@@ -270,9 +269,6 @@ public class JFileDialogs implements Observer
 			iw = new GraphMLWriter(((VHyperGraphic)vGc).getGraph()); //Save the actual reference
 		else
 			return false;
-		//TODO Change to the next line if MLWriter done
-		//GravelMLWriter iw = new GravelMLWriter(vG);
-		
 		saveVisual = GeneralPreferences.getInstance().getStringValue("graph.fileformat").equals("visual");
 		if (saveVisual)
 		{

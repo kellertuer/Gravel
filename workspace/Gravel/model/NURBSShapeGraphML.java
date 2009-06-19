@@ -1,11 +1,5 @@
 package model;
 
-import java.awt.geom.Point2D;
-import java.util.Iterator;
-import java.util.Vector;
-
-import javax.print.attribute.SupportedValuesAttribute;
-
 import org.w3c.dom.Node;
 
 /**

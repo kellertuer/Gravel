@@ -10,9 +10,6 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
 
-import quicktime.std.image.Curve;
-
-
 import model.*;
 import model.Messages.*;
 import view.VCommonGraphic;

@@ -87,7 +87,7 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 				ParameterVectorReference.setShapeParameters(nm.clone());
 				this.setObservation(true);
 			}
-			else //TODO: react on changes of normal Graph and change to second modus if the actual status before was creational
+			else
 			{
 				if (UndoStack.size()<2) //there is no change to be fond of
 					return;

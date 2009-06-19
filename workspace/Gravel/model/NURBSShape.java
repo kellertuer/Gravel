@@ -252,7 +252,7 @@ public class NURBSShape {
 	 * Initialization of the internal homogeneous Vector
 	 * Should be called everytime either the b or w vector are completly exchanged
 	 */
-	public void refreshInternalValues() //TODO Set protected after DEBUG
+	protected void refreshInternalValues()
 	{
 		controlPointsHom = new Vector<Point3d>();
 		Iterator<Point2D> ib =  controlPoints.iterator();
@@ -450,7 +450,7 @@ public class NURBSShape {
 	 * @param u
 	 * @return
 	 */
-	public int findSpan(double u) //TODO Set protected again after debug
+	protected int findSpan(double u)
 	{
 		if ((u<Knots.firstElement())||(u>Knots.lastElement())) //Out of range for all types
 				return -1;
@@ -811,7 +811,7 @@ public class NURBSShape {
 	 * 
 	 * @param changeFront
 	 */
-	public void updateCircular(boolean changeFront)//TODO Set protected after debug
+	protected void updateCircular(boolean changeFront)
 	{
 		double offset = Knots.get(maxKnotIndex-degree)-Knots.get(degree);
 		//Update Circular Part front

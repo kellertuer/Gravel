@@ -65,7 +65,7 @@ public class HESFreeModComponent implements ActionListener {
 	public void setVisible(boolean visible)
 	{
  		FreeModFields.setVisible(visible);
- 		if (visible) //init always with CP-Movement TODO Button for that
+ 		if (visible) //init always with CP-Movement TODO Button for the CP-Movement-Mode to visualize it
  		{
        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);
        		//Deselect all Buttons

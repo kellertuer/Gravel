@@ -10,7 +10,6 @@ import java.awt.geom.Point2D;
 import java.util.Observable;
 
 import view.VCommonGraphic;
-import view.VHyperGraphic;
 
 import model.*;
 import model.Messages.*;
