@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -337,7 +338,12 @@ public class GraphMLWriter {
 	    	   s.write("\t\t</edge>"+nl);
  		}
 	}
-	
+	/**
+	 * Write an Arrow of an edge to the file
+	 * @param s OutputStream
+	 * @param arrow Arrow of the edge
+	 * @throws IOException
+	 */
 	private void writeArrow(OutputStreamWriter s, VEdgeArrow arrow) throws IOException
 	{
 		if (arrow==null)
@@ -361,7 +367,13 @@ public class GraphMLWriter {
  		   s.write("/>"+nl+"\t\t\t</data>");
  	   }
 	}
-	
+	/**
+	 * Write an (hyper)edge text to file
+	 * @param s
+	 * @param t
+	 * @param hyper true if it is for an hperedge else false
+	 * @throws IOException
+	 */
 	private void writeText(OutputStreamWriter s, VEdgeText t, boolean hyper) throws IOException
 	{
 		boolean noStdDis = t.getDistance()!=gp.getIntValue("edge.text_distance"),
@@ -395,7 +407,13 @@ public class GraphMLWriter {
 			s.write("/>"+nl+"\t\t\t</data>"+nl);
 		}
 	}
-
+	/**
+	 * Write an (hyper)edge line style to file
+	 * @param s
+	 * @param l
+	 * @param hyper true if it is for an hyperedge else false
+	 * @throws IOException
+	 */
 	private void writeLinestyle(OutputStreamWriter s, VEdgeLinestyle l, boolean hyper) throws IOException
 	{
 		boolean noStdDist = l.getDistance()!=gp.getIntValue("edge.line_distance"),
@@ -433,6 +451,48 @@ public class GraphMLWriter {
 		    s.write("/>"+nl+"\t\t\t</data>"+nl);
 		}
 	}
+
+	private void writeHyperEgde(OutputStreamWriter s) throws IOException
+	{
+		if (vhg==null)
+			throw new IOException("No hyergraph given");
+		Iterator<VHyperEdge> edgeiter = vhg.modifyHyperEdges.getIterator();
+		while (edgeiter.hasNext())
+		{
+			VHyperEdge actual = edgeiter.next();
+			MHyperEdge mhe = vhg.getMathGraph().modifyHyperEdges.get(actual.getIndex());
+			s.write(nl+"\t\t<hyperedge id=\""+actual.getIndex()+"\">"+nl);
+			BitSet endnodes = mhe.getEndNodes();
+			for (int i=0; i<endnodes.size(); i++)
+			{
+				if (endnodes.get(i))
+				{
+					s.write("\t\t\t<endpoint id=\""+i+"\"/>"+nl);
+				}
+			}
+    	   
+    	   if (!gp.getHyperedgeName(mhe.index).equals(mhe.name)) //If name is not std
+    		   s.write("\t\t\t<data key=\"hyperedgename\">"+mhe.name+"</data>"+nl);
+    	   if (mhe.Value!=gp.getIntValue("hyperedge.value")) 	    	   //if the value is not std
+    		   s.write("\t\t\t<data key=\"hyperedgevalue\">"+mhe.Value+"</data>"+nl);
+    	   if (actual.getWidth()!=gp.getIntValue("hyperedge.width")) //if width is not std
+    		   s.write("\t\t\t<data key=\"hyperedgewidth\">"+actual.getWidth()+"</data>"+nl);
+    	   if (actual.getMinimumMargin()!=gp.getIntValue("hyperedge,margin")) //if width is not std
+    		   s.write("\t\t\t<data key=\"hyperedgemargin\">"+actual.getMinimumMargin()+"</data>"+nl);
+
+    	   writeText(s,actual.getTextProperties(),true);
+    	   writeLinestyle(s,actual.getLinestyle(),true);
+    	   writeShape(s,actual.getShape());
+    	   s.write("\t\t</hyperedge>"+nl);
+		}
+	}
+	private void writeShape(OutputStreamWriter s, NURBSShape shape) throws IOException
+	{
+		String str = (new NURBSShapeGraphML(shape)).toGraphML("hyperedgeshape","hyperedgeshape",nl,"\t\t\t");
+		if (!str.equals(""))
+			s.write(str);
+	}
+	
 	/**
 	 * Write visual Subgraphs to File
 	 * @param s

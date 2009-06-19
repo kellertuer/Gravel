@@ -21,7 +21,6 @@ import javax.vecmath.Point3d;
  * Other Methods are
  * - Min and Max of the Bounding Box of the ControlPolygon
  * - Addition (Refinement of Knots)
- * - TODO Removal of knots (without tollerance - because there is undo, so everyone can try to remove any knot and look whether it fits)
  * - TODO ?get&set knots &weights?
  * 
  * 
@@ -37,6 +36,7 @@ public class NURBSShape {
 	public final static int VALIDATOR = 1;
 	public final static int FRAGMENT = 2;
 	public final static int PROJECTION = 4;
+	public static final int GRAPHML = 8;
 	
 	public Vector<Double> Knots;
 	public Vector<Point2D> controlPoints; //ControlPoints, TODO: Set protected after DEBUG

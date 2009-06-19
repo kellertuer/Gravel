@@ -127,20 +127,6 @@ public class VHyperEdge extends VItem {
 		//Clone the shape with decorators iff there are some (don't strip)
 		return new VHyperEdge(getIndex(), width, minMargin, shape.clone(), text.clone(), linestyle.clone());
 	}
-	/**
-	 * getDirectionatPointonEdge
-	 * returns the Direction the edge has at the point that is at the given part from the Start Point
-	 * So the direction is on the edge at edge.lengt * part
-	 * 
-	 * @param Start Coordinates of the Startpoint
-	 * @param End Coordinates of the Endpoint of the Edge
-	 * @param part distance in % of the endge length from the start to the point required on the edge
-	 * @return the Direction as a vector
-	 */
-	public Point2D.Double getDirectionatPointonEdge()
-	{
-		return null;
-	}
 	public boolean containsPoint(Point p, double variance)
 	{
 		if (shape==null)

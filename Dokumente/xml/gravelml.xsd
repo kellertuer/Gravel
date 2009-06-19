@@ -129,8 +129,8 @@
 		<xs:all>
 			<xs:element name="knot" type="shape.knot.type" minOccurs="1"/>
 			<xs:element name="controlpoint" type="shape.point.type" minOccurs="1"/>
-			<xs:element name="degree" type="xs:nonNegativeInteger" use="required">
 		</xs:all>
+		<xs:attribute name="degree" type="xs:nonNegativeInteger" use="required">
 	</xs:complexType>
 	<xs:complexType name="shape.point.type">
 		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required">
@@ -140,7 +140,7 @@
 	</xs:complexType>
 	<xs:complexType name="shape.knot.type">
 		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required">
-		<xs:attribute name="u" type="xs:double"/>
+		<xs:attribute name="u" type="xs:double" use="required"/>
 	</xs:complexType>
 
 	<!-- Subgraph as a Data Field of the Graph -->
