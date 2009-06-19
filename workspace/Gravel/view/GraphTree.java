@@ -114,6 +114,12 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		updateEdges();
 		updateSubgraphs();
 	}
+	
+	private void updateVisibility(int MenuParent)
+	{
+		if (HyperEdgeShape!=null)
+			HyperEdgeShape.setVisible(MenuParent==USEEDGES);
+	}
 	/**
 	 * Force an Update of the NodeList
 	 */
@@ -265,6 +271,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		{
 			return;
 		}
+		updateVisibility(ParentType);
 		Menu.show(e.getComponent(), e.getX(), e.getY());
 	//	JOptionPane.showMessageDialog(this,message, "Fehler", JOptionPane.INFORMATION_MESSAGE);	
     }
