@@ -46,11 +46,11 @@ public class GraphMLWriter {
 		s.write("<!-- 	===GraphML-Gravel-Format==="+nl+"\t");
 		s.write("\tThe GraphML is a XML-format from "+nl+"\t");
 		s.write("graphml.graphdrawing.org "+nl+"\t");
-		s.write("pusblished under CC-BY,"+nl+"\t");
+		s.write("pusblished under CC-BY -->"+nl+nl);
 				
 		s.write("<graphml xmlns=\"http://gravel.darkmoonwolf.de/xmlns\""+nl+  
-            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"+nl+
-            "xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns "+ 
+				"     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+nl+
+				"xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns "+nl+
             "                     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">"+nl);
 		s.write("\t <!-- Extensions of the Elements following the Key-Data-Paradigm of GraphML -->"+nl);
 		s.write("\t\t<!-- Type of Graph represented here (no default value) - Values are math|math hyper|visual|visual hyper -->"+nl);
@@ -60,30 +60,45 @@ public class GraphMLWriter {
 			s.write("\t\t<!-- Values for allowance of loops and multiple edges -->"+nl);
 			s.write("\t<key id=\"graphloops\" for=\"graph\" attr.name=\"allowloops\" attr.type=\"boolean\">"+nl+
 					"\t\t<default>"+gp.getBoolValue("graph.allowloops")+"</default>"+nl+"\t</key>"+nl);
-			s.write("<key id=\"graphmultipleedges\" for=\"graph\" attr.name=\"allowmultiple\" attr.type=\"boolean\">"+nl+
+			s.write("\t<key id=\"graphmultipleedges\" for=\"graph\" attr.name=\"allowmultiple\" attr.type=\"boolean\">"+nl+
 					"\t\t<default>"+gp.getBoolValue("graph.allowmultiple")+"</default>"+nl+"\t</key>"+nl+nl);			
 			s.write("\t\t<!-- Values for edges -->"+nl);
-			s.write("<key id=\"edgevalue\" for=\"edge\" attr.name=\"edge.value\" attr.type=\"integer\">"+nl+
+			s.write("\t<key id=\"edgevalue\" for=\"edge\" attr.name=\"edge.value\" attr.type=\"integer\">"+nl+
 					"\t\t<default>"+gp.getIntValue("edge.value")+"</default>"+nl+"\t</key>"+nl);
-			s.write("<key id=\"edgename\" for=\"edge\" attr.name=\"edge.name\" attr.type=\"string\">"+nl+
+			s.write("\t<key id=\"edgename\" for=\"edge\" attr.name=\"edge.name\" attr.type=\"string\">"+nl+
 					"\t\t<default>"+gp.getStringValue("edge.name")+"</default>"+nl+"\t</key>"+nl);
 		}
 		else if (vhg!=null)
 		{
 			s.write("\t\t<!-- Values for hyperedges -->"+nl);
 			s.write("\t<key id=\"hyperedgevalue\" for=\"hyperedge\" attr.name=\"hyperedge.value\" attr.type=\"integer\">"+nl
-					+"\t\t<default>"+gp.getIntValue("hyperedge.value")+"</default>"+nl+"\t</key>");
-			s.write("<key id=\"hyperedgename\" for=\"hyperedge\" attr.name=\"hyperedge.name\" attr.type=\"string\">"+nl+
+					+"\t\t<default>"+gp.getIntValue("hyperedge.value")+"</default>"+nl+"\t</key>"+nl);
+			s.write("\t<key id=\"hyperedgename\" for=\"hyperedge\" attr.name=\"hyperedge.name\" attr.type=\"string\">"+nl+
 					"\t\t<default>"+gp.getStringValue("hyperedge.name")+"</default>"+nl+"\t</key>"+nl);
 		}
 		s.write("\t\t<!-- Values for nodes -->"+nl);
-		s.write("<key id=\"nodename\" for=\"node\" attr.name=\"node.name\" attr.type=\"string\">"+nl+
+		s.write("\t<key id=\"nodename\" for=\"node\" attr.name=\"node.name\" attr.type=\"string\">"+nl+
 				"\t\t<default>"+gp.getStringValue("node.name")+"</default>"+nl+"\t</key>"+nl);
-		s.write("\t\t<!-- One Value for all subgraph stuff -->"+nl);
-		s.write("<key id=\"subgraph\" for=\"graph\" attr.name=\"subgraph\" atttr.type=\"graph.subgraph.type\">"+nl+
-				"\t\t<default>"+nl+
-				"\t\t\t<subgraph><name>"+gp.getStringValue("subgraph.name")+"</name></subgraph>"+nl+
-				"\t\t</default>"+nl+"\t</key>"+nl);
+
+		VSubgraphSet vsubset;
+		if (vg!=null)
+		{
+			vsubset = vg.modifySubgraphs;
+		}
+		else if (vhg!=null)
+		{
+			vsubset = vhg.modifySubgraphs;
+		}
+		else
+			throw new IOException("No suitable input graph found.");
+		Iterator<VSubgraph> ster = vsubset.getIterator();
+		if (ster.hasNext()) //At leastone existent -> Comment
+			s.write("\t\t<!-- One Value for each individual subgraph so that the data keys are unique -->"+nl);
+		while (ster.hasNext()) //ONe Key for each subgraph
+		{
+			VSubgraph actual = ster.next();
+			s.write("\t<key id=\"subgraph"+actual.getIndex()+"\" for=\"graph\" attr.name=\"subgraph"+actual.getIndex()+"\" atttr.type=\"graph.subgraph.type\"/>"+nl);
+		}
 	}
 	/**
 	 *  Write the additional values needed for visual graphs
@@ -99,25 +114,25 @@ public class GraphMLWriter {
 			s.write("\t\t<!-- Edge Details -->"+nl);
 			s.write("\t<key id=\"edgearrow\" for=\"edge\" attr.name=\"edge.arrow\" attr.type=\"edge.arrow.type\">"+nl+
 					"\t\t<default>"+nl+"\t\t\t<arrow"+
-					" size="+gp.getIntValue("edge.arrow_size")+
-					" part="+gp.getFloatValue("edge.arrow_part")+
-					" position="+gp.getFloatValue("edge.arrow_pos")+
-					" headalpha="+gp.getIntValue("edge.arrow_alpha")+"/>"+nl+
-					"\t\t</default>"+nl+"</key"+nl);
-			s.write("<key id=\"edgepoints\" for=\"edge\" attr.name=\"edge.points\" attr.type=\"edge.points.type\"/>"+nl);
-			s.write("<key id=\"edgewidth\" for=\"edge\" attr.name=\"edge.width\" attr.type=\"integer\">"+nl+
+					" size=\""+gp.getIntValue("edge.arrow_size")+"\""+
+					" part=\""+gp.getFloatValue("edge.arrow_part")+"\""+
+					" position=\""+gp.getFloatValue("edge.arrow_pos")+"\""+
+					" headalpha=\""+gp.getIntValue("edge.arrow_alpha")+"\"/>"+nl+
+					"\t\t</default>"+nl+"\t</key>"+nl);
+			s.write("\t<key id=\"edgepoints\" for=\"edge\" attr.name=\"edge.points\" attr.type=\"edge.points.type\"/>"+nl);
+			s.write("\t<key id=\"edgewidth\" for=\"edge\" attr.name=\"edge.width\" attr.type=\"integer\">"+nl+
 					"\t\t<default>"+gp.getIntValue("edge.width")+"</default>"+nl+"\t</key>"+nl);
 			s.write("\t<key id=\"edgetype\" for=\"edge\" attr.name=\"edge.type\" attr.type=\"string\"> <!-- Kantentyp (Orthogonal|QuadCurve|Segmented|StraightLine|)-->"+nl);
-			s.write("\t\t<default>StraightLine</default>"+nl+"\t</key>"); //StraightLine ist immer Std !
+			s.write("\t\t<default>StraightLine</default>"+nl+"\t</key>"+nl); //StraightLine ist immer Std !
 			s.write("\t<key id=\"e_orthogonal\" for=\"edge\" attr.name=\"orthogonaledge_verticalfirst\" attr.type=\"boolean\"> <!--Nur fuer Orthogonal pflicht-->"+nl);
 			s.write("\t\t<default>true</default>"+nl+"\t</key>"+nl);
 			
 			s.write("\t<key id=\"loopedge\" for=\"edge\" attr.name=\"edge.loop\" attr.type=\"edge.loop.type\">"+nl+
 					"\t\t<default>"+nl+
-					"\t\t\t<loopedge length="+gp.getIntValue("edge.loop_length")+
-					" proportion="+gp.getIntValue("edge.loop_proportion")+
-					" direction="+gp.getIntValue("edge.loop_direction")+
-					" clockwise="+gp.getBoolValue("edge.loop_clockwise")+
+					"\t\t\t<loopedge length=\""+gp.getIntValue("edge.loop_length")+"\""+
+					" proportion=\""+gp.getIntValue("edge.loop_proportion")+"\""+
+					" direction=\""+gp.getIntValue("edge.loop_direction")+"\""+
+					" clockwise=\""+gp.getBoolValue("edge.loop_clockwise")+"\""+
 					"/>"+nl+"\t\t</default>"+nl+"\t</key>"+nl);
 			s.write("\t<key id=\"edgetext\" for=\"edge\" attr.name=\"edge.text\" attr.type=\"edge.text.type\">"+nl+
 					"\t\t<default>"+nl+
@@ -129,10 +144,10 @@ public class GraphMLWriter {
 				s.write("\"value\"");
 			else
 				s.write("\"name\"");
-			s.write(" visible=\""+gp.getBoolValue("edge.text_visible")+"/>"+nl);
+			s.write(" visible=\""+gp.getBoolValue("edge.text_visible")+"\"/>"+nl);
 			s.write("\t\t</default>"+nl+"\t</key>"+nl);
 			
-			s.write("\t<kley id=\"edgeline\" for\"edge\" attr.name=\"edge.line\" attr.type=\"edge.line.type\">"+nl+
+			s.write("\t<key id=\"edgeline\" for=\"edge\" attr.name=\"edge.line\" attr.type=\"edge.line.type\">"+nl+
 					"\t\t<default>"+nl+
 					"\t\t\t<edgeline length=\""+gp.getIntValue("edge.line_length")+"\""+
 					" distance=\""+gp.getIntValue("edge.line_distance")+"\""+
@@ -141,11 +156,11 @@ public class GraphMLWriter {
 		}
 		else
 		{
-			s.write("\t\t<!-- Hyperedge Details -->");
-			s.write("\t<key id=\"hyperedgewidth\" for=\"edge\" attr.name=\"hyperedge.width\" attr.type=\"integer\">"+nl+
-					"\t\t<default>"+gp.getIntValue("hyperedge.width")+"</default>"+nl+"\t</key>");
+			s.write("\t\t<!-- Hyperedge Details -->"+nl);
+			s.write("\t<key id=\"hyperedgewidth\" for=\"hyperedge\" attr.name=\"hyperedge.width\" attr.type=\"integer\">"+nl+
+					"\t\t<default>"+gp.getIntValue("hyperedge.width")+"</default>"+nl+"\t</key>"+nl);
 			s.write("\t<key id=\"hyperedgemargin\" for=\"hyperedge\" attr.name=\"hyperedge.margin\" attr.type=\"integer\">"+nl+
-					"\t\t<default>"+gp.getIntValue("hyperedge.margin")+"</default>"+nl+"\t</key>");
+					"\t\t<default>"+gp.getIntValue("hyperedge.margin")+"</default>"+nl+"\t</key>"+nl);
 			s.write("\t<key id=\"hyperedgetext\" for=\"hyperedge\" attr.name=\"hyperedge.text\" attr.type=\"edge.text.type\">"+nl+
 					"\t\t<default>"+nl+
 					"\t\t\t<hyperedgetext distance=\""+gp.getIntValue("edge.text_distance")+"\""+
@@ -156,19 +171,19 @@ public class GraphMLWriter {
 				s.write("\"value\"");
 			else
 				s.write("\"name\"");
-			s.write(" visible="+gp.getBoolValue("edge.text_visible")+"/>"+nl);
-			s.write("\t\t</default>"+nl+"\t</key>");
-			s.write("\t<kley id=\"hyperedgeline\" for\"hyperedge\" attr.name=\"edge.line\" attr.type=\"edge.line.type\">"+nl+
+			s.write(" visible=\""+gp.getBoolValue("edge.text_visible")+"\"/>"+nl);
+			s.write("\t\t</default>"+nl+"\t</key>+nl");
+			s.write("\t<key id=\"hyperedgeline\" for\"hyperedge\" attr.name=\"edge.line\" attr.type=\"edge.line.type\">"+nl+
 					"\t\t<default>"+nl+
 					"\t\t\t<edgeline length=\""+gp.getIntValue("edge.line_length")+"\""+
 					" distance=\""+gp.getIntValue("edge.line_distance")+"\""+
 					" type=\""+gp.getIntValue("edge.line_type")+"\"/>"+nl+
-					"\t\t</default>"+nl+"\t</key>");
+					"\t\t</default>"+nl+"\t</key>"+nl);
 	
-			s.write("<key id=\"hyperedgeshape\" for=\"hyperedge\" attr.name=\"hyperedge.shape\" attr.type=\"hyperedge.shape.type\"/>"+nl+nl);
+			s.write("\t<key id=\"hyperedgeshape\" for=\"hyperedge\" attr.name=\"hyperedge.shape\" attr.type=\"hyperedge.shape.type\"/>"+nl+nl);
 		}
 		s.write("\t\t<!-- Node Values -->"+nl);
-		s.write("\t<key id=\"nodeform\" for=\"node\" attr.name=\"node\" attr.type=\"node.form.type\">+nl+" +
+		s.write("\t<key id=\"nodeform\" for=\"node\" attr.name=\"node\" attr.type=\"node.form.type\">"+nl+
 				"\t\t<default>"+nl+
 				"\t\t\t<form type=\"Circle\" x=\"0\" y=\"0\" size=\""+gp.getIntValue("node.size")+"\"/>"+nl+
 				"\t\t</default>"+nl+"\t</key>"+nl);
@@ -224,10 +239,10 @@ public class GraphMLWriter {
 	    	s.write(nl+"\t\t<node id=\""+actual.getIndex()+"\">"+nl);
 	    	//if the name is not a standard name
 	    	if (!mnodes.get(actual.getIndex()).name.equals(gp.getNodeName(actual.getIndex())))
-	    		s.write("\t\t\t<data key=\"nodename\">"+vg.getMathGraph().modifyNodes.get(actual.getIndex()).name+"</data>"+nl);
+	    		s.write("\t\t\t<data key=\"nodename\">"+mnodes.get(actual.getIndex()).name+"</data>"+nl);
 	    	//Position
 	    	s.write("\t\t\t<data key=\"nodeform\"><form type=\"Circle\" x=\""+actual.getPosition().x+"\""+
-	    			" y=\""+actual.getPosition().y+"");
+	    			" y=\""+actual.getPosition().y+"\"");
 	    	if (actual.getSize()!=gp.getIntValue("node.size"))
 	    		s.write(" size=\""+actual.getSize()+"\"");
 	    	s.write("/></data>"+nl);
@@ -364,7 +379,7 @@ public class GraphMLWriter {
  			   s.write(" position=\""+arrow.getPos()+"\"");
  		   if (noStdAAngle)
  			   s.write(" headalpha=\""+arrow.getAngle()+"\"");
- 		   s.write("/>"+nl+"\t\t\t</data>");
+ 		   s.write("/>"+nl+"\t\t\t</data>"+nl);
  	   }
 	}
 	/**
@@ -387,7 +402,7 @@ public class GraphMLWriter {
 			s.write("\t\t\t<data key=\"");
 			if (hyper)
 				s.write("hyper");
-			s.write("edgetext\""+nl+
+			s.write("edgetext\">"+nl+
 					"\t\t\t\t<edgetext");
 			if (noStdDis)
 				s.write(" distance=\""+t.getDistance()+"\"");
@@ -438,10 +453,13 @@ public class GraphMLWriter {
 				{
 					case VEdgeLinestyle.DOTTED:
 						s.write("dotted");
+						break;
 					case VEdgeLinestyle.DASHED:
 						s.write("doshed");
+						break;
 					case VEdgeLinestyle.DOTDASHED:
 						s.write("dotdashed");
+						break;
 					default:
 						s.write("solid");
 				}
@@ -451,8 +469,12 @@ public class GraphMLWriter {
 		    s.write("/>"+nl+"\t\t\t</data>"+nl);
 		}
 	}
-
-	private void writeHyperEgde(OutputStreamWriter s) throws IOException
+	/**
+	 * Write all HyperEdges of vhg into File
+	 * @param s
+	 * @throws IOException
+	 */
+	private void writeVisualHyperEdges(OutputStreamWriter s) throws IOException
 	{
 		if (vhg==null)
 			throw new IOException("No hyergraph given");
@@ -486,13 +508,18 @@ public class GraphMLWriter {
     	   s.write("\t\t</hyperedge>"+nl);
 		}
 	}
+	/**
+	 * Write one HyperEdgeShape into File
+	 * @param s
+	 * @param shape
+	 * @throws IOException
+	 */
 	private void writeShape(OutputStreamWriter s, NURBSShape shape) throws IOException
 	{
 		String str = (new NURBSShapeGraphML(shape)).toGraphML("hyperedgeshape","hyperedgeshape",nl,"\t\t\t");
 		if (!str.equals(""))
 			s.write(str);
 	}
-	
 	/**
 	 * Write visual Subgraphs to File
 	 * @param s
@@ -500,41 +527,67 @@ public class GraphMLWriter {
 	 */
 	private void writeVisualSubgraphs(OutputStreamWriter s) throws IOException
 	{
-	       //Subgraphs
-	       Iterator<VSubgraph> ster = vg.modifySubgraphs.getIterator();
-	       if (vg.getMathGraph().modifySubgraphs.cardinality()!=0)
-	    	   s.write("<!-- == remove these lines to get a valid GraphML-FILE	-->"+nl);
-	       while (ster.hasNext())
-	       {
-	    	   VSubgraph actual = ster.next();
-	    	   s.write(nl+"\t\t<subset id=\"subset"+actual.getIndex()+"\">"+nl);
-	    	   //if the name is not a standard name
-	    	   if (!vg.getMathGraph().modifySubgraphs.get(actual.getIndex()).getName().equals(gp.getSubgraphName(actual.getIndex())))
-	    		   s.write("\t\t\t<data key=\"sn\">"+vg.getMathGraph().modifySubgraphs.get(actual.getIndex()).getName()+"</data>"+nl);
-	    	   
-    		   s.write("\t\t\t<data key=\"sr\">"+actual.getColor().getRed()+"</data>"+nl);
-    		   s.write("\t\t\t<data key=\"sg\">"+actual.getColor().getGreen()+"</data>"+nl);
-    		   s.write("\t\t\t<data key=\"sb\">"+actual.getColor().getBlue()+"</data>"+nl+nl);
+		VSubgraphSet vsubset;
+		MSubgraphSet msubset;
+		if (vg!=null)
+		{
+			vsubset = vg.modifySubgraphs;
+			msubset = vg.getMathGraph().modifySubgraphs;
+		}
+		else if (vhg!=null)
+		{
+			vsubset = vhg.modifySubgraphs;
+			msubset = vhg.getMathGraph().modifySubgraphs;
+		}
+		else
+			throw new IOException("No suitable input graph found.");
+		Iterator<VSubgraph> ster = vsubset.getIterator();
+		while (ster.hasNext())
+		{
+			VSubgraph actual = ster.next();
+			s.write(nl+"\t\t<data id=\"subgraph"+actual.getIndex()+"\">"+nl+
+					"\t\t\t<subgraph id=\""+actual.getIndex()+"\">"+nl);
+			//if the name is not a standard name
+			if (msubset.get(actual.getIndex()).getName().equals(gp.getSubgraphName(actual.getIndex())))
+    		   s.write("\t\t\t\t<name>"+msubset.get(actual.getIndex()).getName()+"</name>"+nl);
+			s.write("\t\t\t\t<color r=\""+actual.getColor().getRed()+"\""+
+					" g=\""+actual.getColor().getGreen()+"\""+
+					" b=\""+actual.getColor().getBlue()+"\"/>"+nl);
 
-    		   Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
-    		   while (nodeiter.hasNext())
-    		   {
-    			   VNode n = nodeiter.next();
-    			   if (vg.getMathGraph().modifySubgraphs.get(actual.getIndex()).containsNode(n.getIndex()))
-    				   s.write("\t\t\t<snode node=\"node"+n.getIndex()+"\" />"+nl);
-    		   }
-
-    		   Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
-    		   while (edgeiter.hasNext())
-    		   {
-    			   VEdge e = edgeiter.next();
-    			   if (vg.getMathGraph().modifySubgraphs.get(actual.getIndex()).containsEdge(e.getIndex()))
-    				   s.write("\t\t\t<sedge edge=\"edge"+e.getIndex()+"\" />"+nl);
-    		   }
-    		   s.write("\t\t</subset>");
- 		}
-	       if (vg.getMathGraph().modifySubgraphs.cardinality()!=0)
-    	       s.write("<!-- == END remove these lines to get a valid GraphML-FILE	-->"+nl);
+		   Iterator<VNode> nodeiter;
+		   if (vg!=null)
+			   nodeiter = vg.modifyNodes.getIterator();
+		   else if (vhg!=null)
+			   nodeiter = vhg.modifyNodes.getIterator();
+		   else throw new IOException("no graph existent");
+		   while (nodeiter.hasNext())
+		   {
+			   VNode n = nodeiter.next();
+			   if (msubset.get(actual.getIndex()).containsNode(n.getIndex()))
+				   s.write("\t\t\t\t<nodeid>"+n.getIndex()+"</nodeid>"+nl);
+		   }
+		   if (vg!=null)
+		   {
+			   Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
+			   while (edgeiter.hasNext())
+			   {
+				   VEdge e = edgeiter.next();
+				   if (msubset.get(actual.getIndex()).containsEdge(e.getIndex()))
+					   s.write("\t\t\t\t<edgeid>"+e.getIndex()+"</edgeid>"+nl);
+			   }
+		   }
+		   else if (vhg!=null)
+		   {
+			   Iterator<VHyperEdge> edgeiter = vhg.modifyHyperEdges.getIterator();
+			   while (edgeiter.hasNext())
+			   {
+				   VHyperEdge e = edgeiter.next();
+				   if (msubset.get(actual.getIndex()).containsEdge(e.getIndex()))
+					   s.write("\t\t\t\t<hyperedgeid>"+e.getIndex()+"</hyperedgeid>"+nl);
+			   }
+		   }
+		   s.write("\t\t\t</subgraph>"+nl+"\t\t</data>"+nl);
+		} //End of running through all Subgraphs
 	}
 	/**
 	 * Complete Funktion to write an visual Graph to a File
@@ -558,16 +611,35 @@ public class GraphMLWriter {
 	        OutputStreamWriter out = new OutputStreamWriter(bout, "UTF8");
 	        writeHeader(out);
 	        writeVisualHeaderAddon(out);
-	       if (vg.getMathGraph().isDirected())
-	    	   out.write(nl+"\t<graph id=\"G\" edgedefault=\"directed\">"+nl);     
-	       else
-	    	   out.write(nl+"\t<graph id=\"G\" edgedefault=\"undirected\">"+nl);     	    	   
+	        if (vg!=null)
+	        {
+	        	if (vg.getMathGraph().isDirected())
+	        		out.write(nl+"\t<graph id=\"G\" edgedefault=\"directed\">"+nl);     
+	        	else
+	        		out.write(nl+"\t<graph id=\"G\" edgedefault=\"undirected\">"+nl);
+	        }
+	        else if (vhg!=null)
+	        {
+        		out.write(nl+"\t<graph id=\"HG\" edgedefault=\"undirected\">"+nl);     
+	        }
 	       //set type to visual
-	       out.write("\t\t<data key=\"gt\">visual</data>"+nl);
-	       out.write("\t\t<data key=\"gl\">"+vg.getMathGraph().isLoopAllowed()+"</data>"+nl);
+	       out.write("\t\t<data key=\"graphtype\">visual");
+	       if(vg!=null)
+	    	   out.write(" graph");
+	       else if (vhg!=null)
+	    	   out.write(" hypergraph");
+	       out.write("</data>"+nl);
+	       if (vg!=null)
+	       {
+	    	   out.write("\t\t<data key=\"graphloops\">"+vg.getMathGraph().isLoopAllowed()+"</data>"+nl);
+	    	   out.write("\t\t<data key=\"graphmultipleedges\">"+vg.getMathGraph().isMultipleAllowed()+"</data>"+nl);
+	       }
 	       //Nodes
 	       writeVisualNodes(out);
-	       writeVisualEdges(out);
+	       if (vg!=null)
+	    	   writeVisualEdges(out);
+	       else if (vhg!=null)
+	    	   writeVisualHyperEdges(out);
 	       writeVisualSubgraphs(out);
 	       out.write("\t</graph>");
 	       writeVisualFooterAddon(out);
@@ -581,8 +653,6 @@ public class GraphMLWriter {
 		}
 		return "";
 	}
-
-	
 	/**
 	 * Write Nodes, but only their mathematical values
 	 * @param s
@@ -590,18 +660,24 @@ public class GraphMLWriter {
 	 */
 	private void writeMathNodes(OutputStreamWriter s) throws IOException
 	{
+		MNodeSet mnodes;
+		if (vg!=null)
+			mnodes = vg.getMathGraph().modifyNodes;
+		else if (vhg!=null)
+			mnodes = vhg.getMathGraph().modifyNodes;
+		else
+			throw new IOException("No Input given");
 	    //Nodes
-	    Iterator<MNode> nodeiter = vg.getMathGraph().modifyNodes.getIterator();
+	    Iterator<MNode> nodeiter = mnodes.getIterator();
 	    while (nodeiter.hasNext())
 	    {
 	    	MNode actual = nodeiter.next();
-	    	s.write(nl+"\t\t<node id=\"node"+actual.index+"\"");
+	    	s.write(nl+"\t\t<node id=\""+actual.index+"\">"+nl);
 	    	//if the name is not a standard name
-	    	if (!(vg.getMathGraph().modifyNodes.get(actual.index).name).equals(gp.getStringValue("node.name")+actual.index))
-	    		s.write(">"+nl+"\t\t\t<data key=\"nn\">"+vg.getMathGraph().modifyNodes.get(actual.index).name+"</data>"+nl+"\t\t</node>");
-	    	else //no data one tag beginning and end
-	    	s.write(" />");
- 		}
+	    	if (!mnodes.get(actual.index).name.equals(gp.getNodeName(actual.index)))
+	    		s.write("\t\t\t<data key=\"nodename\">"+mnodes.get(actual.index).name+"</data>"+nl);
+	    	s.write("\t\t</node>"+nl);
+	    }
 	}
 	/**
 	 * Write Edges, but only their mathematical values
@@ -610,23 +686,54 @@ public class GraphMLWriter {
 	 */
 	private void writeMathEdges(OutputStreamWriter s) throws IOException
 	{
-	       //Edges
-	       Iterator<MEdge> edgeiter = vg.getMathGraph().modifyEdges.getIterator();
-	       s.write(nl);
-	       while (edgeiter.hasNext())
-	       {
-	    	   MEdge actual = edgeiter.next();
-	    	   int start = actual.StartIndex;
-	    	   int ende = actual.EndIndex;
-	    	   int value = actual.Value;
-	    	   
-	    	   s.write(nl+"\t\t<edge id=\"edge"+actual.index+"\" source=\"node"+start+"\" target=\"node"+ende+"\"");
-	    	   if (value!=gp.getIntValue("edge.value")) 	    	   //if the value is not std
-	    		   s.write(">"+nl+"\t\t\t<data key=\"ev\">"+value+"</data>"+nl+"\t\t</edge>");
-	    	   else //std value, no data keys here
-	    		   s.write(" />"); 		   
+		if (vg==null)
+			throw new IOException("No Graph found");
+	   //Edges
+	   Iterator<MEdge> edgeiter = vg.getMathGraph().modifyEdges.getIterator();
+	   s.write(nl);
+	   while (edgeiter.hasNext())
+	   {
+		   MEdge actual = edgeiter.next();
+		   int start = actual.StartIndex;
+		   int ende = actual.EndIndex;
+		   int value = actual.Value;
+    	   s.write(nl+"\t\t<edge id=\""+actual.index+"\" source=\""+start+"\" target=\""+ende+"\">"+nl);
+    	   if (!gp.getEdgeName(actual.index,start,ende).equals(actual.name)) //If name is not std
+    		   s.write("\t\t\t<data key=\"edgename\">"+actual.name+"</data>"+nl);
+    	   if (value!=gp.getIntValue("edge.value")) 	    	   //if the value is not std
+    		   s.write("\t\t\t<data key=\"edgevalue\">"+value+"</data>"+nl);
+    	   s.write("\t\t</edge>"+nl);
  		}
-
+	}
+	/**
+	 * Write the mathematical part of an hyperedge into
+	 * @param s an OutputStream
+	 * @throws IOException
+	 */
+	private void writeMathHyperEdges(OutputStreamWriter s) throws IOException
+	{
+		if (vhg==null)
+			throw new IOException("No hyergraph given");
+		Iterator<MHyperEdge> edgeiter = vhg.getMathGraph().modifyHyperEdges.getIterator();
+		while (edgeiter.hasNext())
+		{
+			MHyperEdge actual = edgeiter.next();
+			s.write(nl+"\t\t<hyperedge id=\""+actual.index+"\">"+nl);
+			BitSet endnodes = actual.getEndNodes();
+			for (int i=0; i<endnodes.size(); i++)
+			{
+				if (endnodes.get(i))
+				{
+					s.write("\t\t\t<endpoint id=\""+i+"\"/>"+nl);
+				}
+			}
+    	   
+    	   if (!gp.getHyperedgeName(actual.index).equals(actual.name)) //If name is not std
+    		   s.write("\t\t\t<data key=\"hyperedgename\">"+actual.name+"</data>"+nl);
+    	   if (actual.Value!=gp.getIntValue("hyperedge.value")) 	    	   //if the value is not std
+    		   s.write("\t\t\t<data key=\"hyperedgevalue\">"+actual.Value+"</data>"+nl);
+    	   s.write("\t\t</hyperedge>"+nl);
+		}
 	}
 	/**
 	 * Write mathematical Subgraphs to File
@@ -635,37 +742,56 @@ public class GraphMLWriter {
 	 */
 	private void writeMathSubgraphs(OutputStreamWriter s) throws IOException
 	{
-	       Iterator<MSubgraph> siter = vg.getMathGraph().modifySubgraphs.getIterator();
-	       s.write(nl);
-	       if (vg.getMathGraph().modifySubgraphs.cardinality()!=0)
-	    	   s.write(nl+"<!-- == remove these lines to get a valid GraphML-FILE	-->"+nl);
-	       while (siter.hasNext())
-	       {
-	    	   MSubgraph actual = siter.next();
-	    	   s.write("\t\t<subset id=\"subset"+actual.getIndex()+"\">"+nl);
-	    	   //if the name is not a standard name
-	    	   if (!actual.getName().equals(gp.getSubgraphName(actual.getIndex())))
-	    		   s.write("\t\t\t<data key=\"sn\">"+actual.getName()+"</data>");
-	    	   
-       		   Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
-    		   while (nodeiter.hasNext())
-    		   {
-    			   VNode n = nodeiter.next();
-    			   if (vg.getMathGraph().modifySubgraphs.get(actual.getIndex()).containsNode(n.getIndex()))
-    				   s.write("\t\t\t<snode node=\"node"+n.getIndex()+"\" />"+nl);
-    		   }
-
-    		   Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
-    		   while (edgeiter.hasNext())
-    		   {
-    			   VEdge e = edgeiter.next();
-    			   if (actual.containsEdge(e.getIndex()))
-    				   s.write("\t\t\t<sedge edge=\"edge"+e.getIndex()+"\" />"+nl);
-    		   }
-    		   s.write("\t\t</subset>"+nl);
- 		}
-	       if (vg.getMathGraph().modifySubgraphs.cardinality()!=0)
-    	       s.write("<!-- == END remove these lines to get a valid GraphML-FILE	-->"+nl);
+		MSubgraphSet msubset;
+		if (vg!=null)
+			msubset = vg.getMathGraph().modifySubgraphs;
+		else if (vhg!=null)
+			msubset = vhg.getMathGraph().modifySubgraphs;
+		else
+			throw new IOException("No suitable input graph found.");
+		Iterator<MSubgraph> ster = msubset.getIterator();
+		while (ster.hasNext())
+		{
+			MSubgraph actual = ster.next();
+			s.write(nl+"\t\t<data id=\"subgraph"+actual.getIndex()+"\">"+nl+
+					"\t\t\t<subgraph id=\""+actual.getIndex()+"\">"+nl);
+			//if the name is not a standard name
+			if (msubset.get(actual.getIndex()).getName().equals(gp.getSubgraphName(actual.getIndex())))
+    		   s.write("\t\t\t\t<name>"+msubset.get(actual.getIndex()).getName()+"</name>"+nl);
+		   Iterator<MNode> nodeiter;
+		   if (vg!=null)
+			   nodeiter = vg.getMathGraph().modifyNodes.getIterator();
+		   else if (vhg!=null)
+			   nodeiter = vhg.getMathGraph().modifyNodes.getIterator();
+		   else throw new IOException("no graph existent");
+		   while (nodeiter.hasNext())
+		   {
+			   MNode n = nodeiter.next();
+			   if (msubset.get(actual.getIndex()).containsNode(n.index))
+				   s.write("\t\t\t\t<nodeid>"+n.index+"</nodeid>"+nl);
+		   }
+		   if (vg!=null)
+		   {
+			   Iterator<MEdge> edgeiter = vg.getMathGraph().modifyEdges.getIterator();
+			   while (edgeiter.hasNext())
+			   {
+				   MEdge e = edgeiter.next();
+				   if (msubset.get(actual.getIndex()).containsEdge(e.index))
+					   s.write("\t\t\t\t<edgeid>"+e.index+"</edgeid>"+nl);
+			   }
+		   }
+		   else if (vhg!=null)
+		   {
+			   Iterator<MHyperEdge> edgeiter = vhg.getMathGraph().modifyHyperEdges.getIterator();
+			   while (edgeiter.hasNext())
+			   {
+				   MHyperEdge e = edgeiter.next();
+				   if (msubset.get(actual.getIndex()).containsEdge(e.index))
+					   s.write("\t\t\t\t<hyperedgeid>"+e.index+"</hyperedgeid>"+nl);
+			   }
+		   }
+		   s.write("\t\t\t</subgraph>"+nl+"\t\t</data>"+nl);
+		} //End of running through all Subgraphs
 	}
 	/**
 	 * Write complete math graph to file f
@@ -680,24 +806,45 @@ public class GraphMLWriter {
 			}
 			catch (Exception e)
 			{
-				System.err.println("DEBUG : Error on Creating File : "+e.getMessage());
+				return "DEBUG : Error on Writing File : "+e.getMessage();
 			}
-		
+		if ((vg==null)&&(vhg==null))
+			return "No graph or hypergraph given to write to file "+f.getAbsolutePath();
 		try {        
 	        OutputStream fout= new FileOutputStream(f);
 	        OutputStream bout= new BufferedOutputStream(fout);
 	        OutputStreamWriter out = new OutputStreamWriter(bout, "UTF8");
 	        writeHeader(out);
-	       if (vg.getMathGraph().isDirected())
-	    	   out.write(nl+"\t<graph id=\"G\" edgedefault=\"directed\">"+nl);     
-	       else
-	    	   out.write(nl+"\t<graph id=\"G\" edgedefault=\"undirected\">"+nl);     	    	   
+	        if (vg!=null)
+	        {
+	        	if (vg.getMathGraph().isDirected())
+	        		out.write(nl+"\t<graph id=\"G\" edgedefault=\"directed\">"+nl);     
+	        	else
+	        		out.write(nl+"\t<graph id=\"G\" edgedefault=\"undirected\">"+nl);
+	        }
+	        else if (vhg!=null)
+	        {
+	    		out.write(nl+"\t<graph id=\"HG\" edgedefault=\"undirected\">"+nl);     
+	        }
 	       //set type to math
-	       out.write("\t\t<data key=\"gt\">math</data>"+nl);
-	       out.write("\t\t<data key=\"gl\">"+vg.getMathGraph().isLoopAllowed()+"</data>"+nl);
+	       out.write("\t\t<data key=\"graphtype\">math");
+	       if(vg!=null)
+	    	   out.write(" graph");
+	       else if (vhg!=null)
+	    	   out.write(" hypergraph");
+	       out.write("</data>"+nl);
+	       if (vg!=null)
+	       {
+	    	   out.write("\t\t<data key=\"graphloops\">"+vg.getMathGraph().isLoopAllowed()+"</data>"+nl);
+	    	   out.write("\t\t<data key=\"graphmultipleedges\">"+vg.getMathGraph().isMultipleAllowed()+"</data>"+nl);
+	       }
+	       //Nodes
 	       //Nodes
 	       writeMathNodes(out);
-	       writeMathEdges(out);
+	       if (vg!=null)
+		       writeMathEdges(out);
+	       else if (vhg!=null)
+		       writeMathHyperEdges(out);
 	       writeMathSubgraphs(out);
 	       out.write(nl+"\t</graph>");
 	       writeFooter(out);

@@ -355,6 +355,7 @@ public class GeneralPreferences extends Observable
 		if (StringValues.get("edge.name")==null) return false;
 	
 		if (IntValues.get("hyperedge.value")==null) return false;
+		if (IntValues.get("hyperedge.width")==null) return false;
 		
 		if (IntValues.get("hyperedge.margin")==null) return false;
 		if (StringValues.get("hyperedge.name")==null) return false;
@@ -444,6 +445,7 @@ public class GeneralPreferences extends Observable
 		IntValues.put("history.Stacksize",50);
 
 		IntValues.put("hyperedge.value",1);		
+		IntValues.put("hyperedge.width",1);		
 		IntValues.put("hyperedge.margin",8);		
 
 		IntValues.put("node.size", 9);

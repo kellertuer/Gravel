@@ -76,7 +76,7 @@ public class NURBSShapeGraphML extends NURBSShape {
 			" x=\""+controlPoints.get(i).getX()+"\""+
 			" y=\""+controlPoints.get(i).getY()+"\""+
 			" w=\""+cpWeight.get(i).doubleValue()+"\"/>"+nl;
-		s += indentation+"</data>";
+		s += indentation+"</data>"+nl;
 		return s;
 	}
 }

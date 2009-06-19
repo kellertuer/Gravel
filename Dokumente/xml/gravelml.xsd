@@ -68,10 +68,10 @@
 	<!--Edge Stuff -->
 	<!-- Edge Arrow -->
 	<xs:complexType name="edge.arrow.type">
-		<xs:attribute name="size" type="xs:float" use="required"/>
-		<xs:attribute name="part" type="xs:float" use="required"/>
-		<xs:attribute name="position" type="xs:float" use="required"/>
-		<xs:attribute name="headalpha" type="xs:float"  use="required"/>
+		<xs:attribute name="size" type="xs:float"/>
+		<xs:attribute name="part" type="xs:float"/>
+		<xs:attribute name="position" type="xs:float"/>
+		<xs:attribute name="headalpha" type="xs:float"/>
 	</xs:complexType>
 	<!-- Set of Points for some edges -->
 	<xs:complexType name="edge.points.type">
@@ -126,18 +126,22 @@
 
 	<!-- HyperEdge Shape-->
 	<xs:complexType name="hyperedge.shape.type">
-		<xs:all>
-			<xs:element name="knot" type="shape.knot.type" minOccurs="1"/>
-			<xs:element name="controlpoint" type="shape.point.type" minOccurs="1"/>
-		</xs:all>
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="knot" type="shape.knot.type" minOccurs="1"/>
+				<xs:element name="controlpoint" type="shape.point.type" minOccurs="1"/>
+			</xs:choice>
+		</xs:sequence>
 		<xs:attribute name="degree" type="xs:nonNegativeInteger" use="required">
 	</xs:complexType>
+
 	<xs:complexType name="shape.point.type">
 		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required">
 		<xs:attribute name="x" type="xs:double" use="required"/>
 		<xs:attribute name="y" type="xs:double" use="required"/>
 		<xs:attribute name="w" type="xs:double" use="required"/> <!-- ControlPoint Weights-->
 	</xs:complexType>
+
 	<xs:complexType name="shape.knot.type">
 		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required">
 		<xs:attribute name="u" type="xs:double" use="required"/>
@@ -145,13 +149,15 @@
 
 	<!-- Subgraph as a Data Field of the Graph -->
 	<xs:complexType name="graph.subgraph.type">
-		<xs:all>
-			<xs:element name="Color" type="color.type" maxOccurs="1"/>
-			<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="nodeid" type="xs:nonNegativeInteger"/>
-			<xs:element name="edgeid" type="xs:nonNegativeInteger"/>
-			<xs:element name="hyperedgeid" type="xs:nonNegativeInteger"/>
-		</xs:all>
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="Color" type="color.type" maxOccurs="1"/>
+				<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1"/>
+				<xs:element name="nodeid" type="xs:nonNegativeInteger"/>
+				<xs:element name="edgeid" type="xs:nonNegativeInteger"/>
+				<xs:element name="hyperedgeid" type="xs:nonNegativeInteger"/>
+			<xs:choice>
+		</xs:sequence>
 		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required">
 	</xs:complexType>
 	<xs:complexType name="color.type">

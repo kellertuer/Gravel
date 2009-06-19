@@ -1,6 +1,7 @@
 package dialogs;
 
 import io.GeneralPreferences;
+import io.GraphMLWriter;
 import io.PNGWriter;
 import io.GravelMLReader;
 import io.SVGWriter;
@@ -262,7 +263,13 @@ public class JFileDialogs implements Observer
 		}
 		String filename = GeneralPreferences.getInstance().getStringValue("graph.lastfile");
 		File f = new File (filename);
-		GravelMLWriter iw = new GravelMLWriter(((VGraphic)vGc).getGraph()); //Save the actual reference
+		GraphMLWriter iw=null;
+		if (GraphType==VCommonGraphic.VGRAPHIC)
+			iw = new GraphMLWriter(((VGraphic)vGc).getGraph()); //Save the actual reference
+		else if (GraphType==VCommonGraphic.VHYPERGRAPHIC)
+			iw = new GraphMLWriter(((VHyperGraphic)vGc).getGraph()); //Save the actual reference
+		else
+			return false;
 		//TODO Change to the next line if MLWriter done
 		//GravelMLWriter iw = new GravelMLWriter(vG);
 		
@@ -301,7 +308,7 @@ public class JFileDialogs implements Observer
 		if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
 			fc.setCurrentDirectory(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getParentFile());
 		
-		FileFilter graphml = new SimpleFilter("xml","GravelML (.xml)");
+		FileFilter graphml = new SimpleFilter("xml","GraphML (.xml)");
 		fc.removeChoosableFileFilter(fc.getFileFilter());
 		fc.addChoosableFileFilter(graphml);
 		fc.setFileHidingEnabled(true); 
@@ -311,9 +318,13 @@ public class JFileDialogs implements Observer
 		if (returnVal == JFileChooser.APPROVE_OPTION)
 		{
 			File f = fc.getSelectedFile();
-			GravelMLWriter iw = new GravelMLWriter(((VGraphic)vGc).getGraph()); //Save the actual reference
-			//TODO Change to the next line if MLWriter HyperGraphCapable
-			//GravelMLWriter iw = new GravelMLWriter(vG);
+			GraphMLWriter iw=null;
+			if (GraphType==VCommonGraphic.VGRAPHIC)
+				iw = new GraphMLWriter(((VGraphic)vGc).getGraph()); //Save the actual reference
+			else if (GraphType==VCommonGraphic.VHYPERGRAPHIC)
+				iw = new GraphMLWriter(((VHyperGraphic)vGc).getGraph()); //Save the actual reference
+			else
+				return false;
 			
 			SaveAsDialog sad = new SaveAsDialog(Gui.getInstance().getParentWindow());
 			if (sad.IsAccepted())
@@ -323,18 +334,21 @@ public class JFileDialogs implements Observer
 				if (saveVisual)
 				{					
 					GeneralPreferences.getInstance().setStringValue("graph.fileformat","visual");
-					if (iw.saveVisualToFile(f).equals(""))
+					String error = iw.saveVisualToFile(f);
+					if (error.equals(""))
 					{
 						GeneralPreferences.getInstance().setStringValue("graph.lastfile",f.getAbsolutePath());
 						//Observe VGraph
 						if (GraphType==VCommonGraphic.VGRAPHIC)
 							((VGraphic)vGc).getGraph().addObserver(this);
-						else
+						else if (GraphType==VCommonGraphic.VHYPERGRAPHIC)
 							((VHyperGraphic)vGc).getGraph().addObserver(this);
 						Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName());
 		    			//Set actual State saved.
 		    			vGc.getGraphHistoryManager().setGraphSaved();
 					}
+					else
+						System.err.println("Error when writing "+error);
 				}
 				else
 				{
