@@ -172,8 +172,8 @@ public class GraphMLWriter {
 			else
 				s.write("\"name\"");
 			s.write(" visible=\""+gp.getBoolValue("edge.text_visible")+"\"/>"+nl);
-			s.write("\t\t</default>"+nl+"\t</key>+nl");
-			s.write("\t<key id=\"hyperedgeline\" for\"hyperedge\" attr.name=\"edge.line\" attr.type=\"edge.line.type\">"+nl+
+			s.write("\t\t</default>"+nl+"\t</key>"+nl);
+			s.write("\t<key id=\"hyperedgeline\" for=\"hyperedge\" attr.name=\"edge.line\" attr.type=\"edge.line.type\">"+nl+
 					"\t\t<default>"+nl+
 					"\t\t\t<edgeline length=\""+gp.getIntValue("edge.line_length")+"\""+
 					" distance=\""+gp.getIntValue("edge.line_distance")+"\""+
@@ -440,7 +440,7 @@ public class GraphMLWriter {
 			s.write("\t\t\t<data key=\"");
 			if (hyper)
 				s.write("hyper");
-			s.write("edgetext\""+nl+
+			s.write("edgetext\">"+nl+
 			"\t\t\t\t<edgetext");
 			if (noStdDist)
 				s.write(" distance=\""+l.getDistance()+"\"");
@@ -455,7 +455,7 @@ public class GraphMLWriter {
 						s.write("dotted");
 						break;
 					case VEdgeLinestyle.DASHED:
-						s.write("doshed");
+						s.write("dashed");
 						break;
 					case VEdgeLinestyle.DOTDASHED:
 						s.write("dotdashed");

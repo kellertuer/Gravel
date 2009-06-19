@@ -3,25 +3,10 @@ package model;
 import org.w3c.dom.Node;
 
 /**
- * Class for handling any stuff that is ment to only affect a part of a nurbsshape
- * 
- * For a given NURBSShape this Class uses the decorator pattern to
- * extend it by subcurve-claculation and modification, that is
- * 
- * A specification of u1,u2 for a NURBSCurve C: [a,b] onto the plane with
- * u1,u2 \in [a,b] and
- * u1<u2 is the Curve is not unclamped&closed (else the values are swapted)
- *
- * Then the subcurve C*: [u1,u2] is set internally as the part to be modified
- * any modification is calculated to affect only this interval and then applied to C
- * 
- * If C is unclamped and closed and u1>u2
- * the Intervall C* is living on is a bit complicated:
- * It is [u1,b) and [a,u2] concatenated by shifting [a,u2] by b-a
- * C* on [u1,u2+(b-a)]
- * 
+ * Class for handling any stuff that from GraphML and into GraphML
  * If the subcurve is nonexistent (e.g. u1=u2) also the internal curve is set to empty, not only the subcurve
- * @author ronny
+ * @author Ronny Bergmann
+ * @since 0.4
  *
  */
 public class NURBSShapeGraphML extends NURBSShape {
@@ -70,6 +55,7 @@ public class NURBSShapeGraphML extends NURBSShape {
 			" x=\""+controlPoints.get(i).getX()+"\""+
 			" y=\""+controlPoints.get(i).getY()+"\""+
 			" w=\""+cpWeight.get(i).doubleValue()+"\"/>"+nl;
+		s += indentation+"\t</"+elementName+">"+nl;
 		s += indentation+"</data>"+nl;
 		return s;
 	}
