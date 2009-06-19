@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema 
    targetNamespace="http://graphml.graphdrawing.org/xmlns"
    xmlns="http://graphml.graphdrawing.org/xmlns"  
@@ -21,33 +21,69 @@
     </xs:documentation>
   </xs:annotation>
 
+<!-- Extend the complex type of the data element -->
 	<xs:redefine schemaLocation="http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
-	  <xs:complexType name="data-extension.type">
+	  <xs:complexType name="data-extension.type" mixed="true">
 	    <xs:complexContent>
 	      <xs:extension base="data-extension.type">
-	        <xs:choice>
-	          <xs:element name="form" type="node.form.type"/>
-			  <xs:element name="nodetext" type="node.text.type"/>
-	          <xs:element name="arrow" type="edge.arrow.type"/>
-	          <xs:element name="points" type="edge.points.type"/>
-	          <xs:element name="edgetext" type="edge.text.type"/>
-	          <xs:element name="edgeline" type="edge.line.type"/>	
-	          <xs:element name="loopedge" type="edge.loop.type"/>
-	          <xs:element name="hyperedgetext" type="edge.text.type"/>
-	          <xs:element name="hyperedgeshape" type="hyperedge.shape.type"/>	          
-	          <xs:element name="hyperedgeline" type="edge.line.type"/>
-			  <xs:element name="subgraph" type="graph.subgraph.type">
-			  </xs:element>
-	        </xs:choice>
+			<xs:sequence>
+	        	<xs:choice minOccurs="0" maxOccurs="1">
+	          		<xs:element name="form" type="node.form.type"/>
+				  	<xs:element name="nodetext" type="node.text.type"/>
+			        <xs:element name="arrow" type="edge.arrow.type"/>
+			        <xs:element name="points" type="edge.points.type"/>
+		        	<xs:element name="edgetext" type="edge.text.type"/>
+		        	<xs:element name="edgeline" type="edge.line.type"/>	
+		          	<xs:element name="loopedge" type="edge.loop.type"/>
+		          	<xs:element name="hyperedgetext" type="edge.text.type"/>
+		          	<xs:element name="hyperedgeshape" type="hyperedge.shape.type"/>	          
+		          	<xs:element name="hyperedgeline" type="edge.line.type"/>
+				  	<xs:element name="subgraph" type="graph.subgraph.type"/>
+		    	</xs:choice>
+			</xs:sequence>
 	      </xs:extension>
 	    </xs:complexContent>
 	  </xs:complexType>
 	</xs:redefine>
 
+<!-- Extend key.extra.attrib to save our types in an attribute of each key -->
+	<xs:redefine schemaLocation="http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  		<xs:attributeGroup name="key.extra.attrib">
+    		<xs:attributeGroup ref="key.extra.attrib"/> <!--keep all old values -->
+    		<xs:attribute name="attr.complexType" type="key.extra.complexType.type" use="optional"/>
+  		</xs:attributeGroup>
+	</xs:redefine>
+<!-- Simple Data type for our own data Type -->
+
+	<xs:simpleType name="key.extra.complexType.type">
+		<xs:annotation>
+			<xs:documentation 
+				source="???" 
+				xml:lang="en">
+					Another attribute for the Key element to classify the complexTypes used by Gravel
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:NMTOKEN">  
+	    	<xs:enumeration value="node.form.type"/>
+			<xs:enumeration value="node.text.type"/>
+			<xs:enumeration value="edge.arrow.type"/>
+			<xs:enumeration value="edge.points.type"/>
+			<xs:enumeration value="edge.line.type"/>
+			<xs:enumeration value="edge.text.type"/>
+			<xs:enumeration value="edge.loop.type"/>
+			<xs:enumeration value="hyperedge.shape.type"/>
+			<xs:enumeration value="graph.subgraph.type"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+<!--													-->
+<!-- Complex Data types for the default extension		-->
+<!--													-->
+
 	<!-- Node complex data tyes -->
 	<!-- Node Form-->
 	<xs:complexType name="node.form.type">
-			<xs:attribute name="type" type="form.type.type" use="required"/>
+			<xs:attribute name="type" type="node.form.type.type" use="required"/>
 			<xs:attribute name="x" type="xs:integer" use="required"/>
 			<xs:attribute name="y" type="xs:integer" use="required"/>
 			<xs:attribute name="size" type="xs:nonNegativeInteger"/>
@@ -61,7 +97,7 @@
 	<xs:complexType name="node.text.type">
 			<xs:attribute name="distance" type="xs:nonNegativeInteger"/>
 			<xs:attribute name="rotation" type="xs:double"/>
-			<xs:attribute name="size" type="xs:nonNegativeInetger"/>
+			<xs:attribute name="size" type="xs:nonNegativeInteger"/>
 			<xs:attribute name="visible" type="xs:boolean"/>
 	</xs:complexType>
 	
@@ -146,9 +182,9 @@
 	<!-- Subgraph as a Data Field of the Graph -->
 	<xs:complexType name="graph.subgraph.type">
 		<xs:sequence>
-			<xs:choice>
-				<xs:element name="Color" type="color.type" maxOccurs="1"/>
-				<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="color" type="color.type" maxOccurs="1"/>
+				<xs:element name="name" type="xs:string" maxOccurs="1"/>
 				<xs:element name="nodeid" type="xs:nonNegativeInteger"/>
 				<xs:element name="edgeid" type="xs:nonNegativeInteger"/>
 				<xs:element name="hyperedgeid" type="xs:nonNegativeInteger"/>

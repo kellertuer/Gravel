@@ -48,7 +48,7 @@
 		<value name="allowloops" type="Boolean">true</value>
 		<value name="allowmultiple" type="Boolean">true</value>
 		<value name="directed" type="Boolean">false</value>
-		<value name="fileformat" type="String">math</value>
+		<value name="fileformat" type="String">visual</value>
 		<value name="lastfile" type="String">$NONE</value>
 		<value name="loadfileonstart" type="Boolean">false</value>
 	</group>
@@ -75,7 +75,7 @@
 		<value name="name_rotation" type="Integer">270</value>
 		<value name="name_size" type="Integer">12</value>
 		<value name="name_visible" type="Boolean">false</value>
-		<value name="size" type="Integer">9</value>
+		<value name="size" type="Integer">8</value>
 	</group>
 	<group name="pref">
 		<value name="saveonexit" type="Boolean">true</value>

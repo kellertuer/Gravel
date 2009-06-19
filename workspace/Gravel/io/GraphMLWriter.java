@@ -48,10 +48,10 @@ public class GraphMLWriter {
 		s.write("graphml.graphdrawing.org "+nl+"\t");
 		s.write("pusblished under CC-BY -->"+nl+nl);
 				
-		s.write("<graphml xmlns=\"http://gravel.darkmoonwolf.de/xmlns\""+nl+  
+		s.write("<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\""+nl+  
 				"     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+nl+
 				"xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns "+nl+
-            "                     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">"+nl);
+            "                    http://gravel.darkmoonwolf.de/xmlns/gravelml.xsd\">"+nl);
 		s.write("\t <!-- Extensions of the Elements following the Key-Data-Paradigm of GraphML -->"+nl);
 		s.write("\t\t<!-- Type of Graph represented here (no default value) - Values are math|math hyper|visual|visual hyper -->"+nl);
 		s.write("\t<key id=\"graphtype\" for=\"graph\" attr.name=\"type\" attr.type=\"string\" />"+nl+nl);
@@ -63,7 +63,7 @@ public class GraphMLWriter {
 			s.write("\t<key id=\"graphmultipleedges\" for=\"graph\" attr.name=\"allowmultiple\" attr.type=\"boolean\">"+nl+
 					"\t\t<default>"+gp.getBoolValue("graph.allowmultiple")+"</default>"+nl+"\t</key>"+nl+nl);			
 			s.write("\t\t<!-- Values for edges -->"+nl);
-			s.write("\t<key id=\"edgevalue\" for=\"edge\" attr.name=\"edge.value\" attr.type=\"integer\">"+nl+
+			s.write("\t<key id=\"edgevalue\" for=\"edge\" attr.name=\"edge.value\" attr.type=\"int\">"+nl+
 					"\t\t<default>"+gp.getIntValue("edge.value")+"</default>"+nl+"\t</key>"+nl);
 			s.write("\t<key id=\"edgename\" for=\"edge\" attr.name=\"edge.name\" attr.type=\"string\">"+nl+
 					"\t\t<default>"+gp.getStringValue("edge.name")+"</default>"+nl+"\t</key>"+nl);
@@ -71,7 +71,7 @@ public class GraphMLWriter {
 		else if (vhg!=null)
 		{
 			s.write("\t\t<!-- Values for hyperedges -->"+nl);
-			s.write("\t<key id=\"hyperedgevalue\" for=\"hyperedge\" attr.name=\"hyperedge.value\" attr.type=\"integer\">"+nl
+			s.write("\t<key id=\"hyperedgevalue\" for=\"hyperedge\" attr.name=\"hyperedge.value\" attr.type=\"int\">"+nl
 					+"\t\t<default>"+gp.getIntValue("hyperedge.value")+"</default>"+nl+"\t</key>"+nl);
 			s.write("\t<key id=\"hyperedgename\" for=\"hyperedge\" attr.name=\"hyperedge.name\" attr.type=\"string\">"+nl+
 					"\t\t<default>"+gp.getStringValue("hyperedge.name")+"</default>"+nl+"\t</key>"+nl);
@@ -97,7 +97,7 @@ public class GraphMLWriter {
 		while (ster.hasNext()) //ONe Key for each subgraph
 		{
 			VSubgraph actual = ster.next();
-			s.write("\t<key id=\"subgraph"+actual.getIndex()+"\" for=\"graph\" attr.name=\"subgraph"+actual.getIndex()+"\" atttr.type=\"graph.subgraph.type\"/>"+nl);
+			s.write("\t<key id=\"subgraph"+actual.getIndex()+"\" for=\"graph\" attr.name=\"subgraph"+actual.getIndex()+"\" attr.complexType=\"graph.subgraph.type\"/>"+nl);
 		}
 	}
 	/**
@@ -112,29 +112,29 @@ public class GraphMLWriter {
 		if (vg!=null) //Edge Stuff
 		{
 			s.write("\t\t<!-- Edge Details -->"+nl);
-			s.write("\t<key id=\"edgearrow\" for=\"edge\" attr.name=\"edge.arrow\" attr.type=\"edge.arrow.type\">"+nl+
+			s.write("\t<key id=\"edgearrow\" for=\"edge\" attr.name=\"edge.arrow\" attr.complexType=\"edge.arrow.type\">"+nl+
 					"\t\t<default>"+nl+"\t\t\t<arrow"+
 					" size=\""+gp.getIntValue("edge.arrow_size")+"\""+
 					" part=\""+gp.getFloatValue("edge.arrow_part")+"\""+
 					" position=\""+gp.getFloatValue("edge.arrow_pos")+"\""+
 					" headalpha=\""+gp.getIntValue("edge.arrow_alpha")+"\"/>"+nl+
 					"\t\t</default>"+nl+"\t</key>"+nl);
-			s.write("\t<key id=\"edgepoints\" for=\"edge\" attr.name=\"edge.points\" attr.type=\"edge.points.type\"/>"+nl);
-			s.write("\t<key id=\"edgewidth\" for=\"edge\" attr.name=\"edge.width\" attr.type=\"integer\">"+nl+
+			s.write("\t<key id=\"edgepoints\" for=\"edge\" attr.name=\"edge.points\" attr.complexType=\"edge.points.type\"/>"+nl);
+			s.write("\t<key id=\"edgewidth\" for=\"edge\" attr.name=\"edge.width\" attr.type=\"int\">"+nl+
 					"\t\t<default>"+gp.getIntValue("edge.width")+"</default>"+nl+"\t</key>"+nl);
 			s.write("\t<key id=\"edgetype\" for=\"edge\" attr.name=\"edge.type\" attr.type=\"string\"> <!-- Kantentyp (Orthogonal|QuadCurve|Segmented|StraightLine|)-->"+nl);
 			s.write("\t\t<default>StraightLine</default>"+nl+"\t</key>"+nl); //StraightLine ist immer Std !
 			s.write("\t<key id=\"e_orthogonal\" for=\"edge\" attr.name=\"orthogonaledge_verticalfirst\" attr.type=\"boolean\"> <!--Nur fuer Orthogonal pflicht-->"+nl);
 			s.write("\t\t<default>true</default>"+nl+"\t</key>"+nl);
 			
-			s.write("\t<key id=\"loopedge\" for=\"edge\" attr.name=\"edge.loop\" attr.type=\"edge.loop.type\">"+nl+
+			s.write("\t<key id=\"loopedge\" for=\"edge\" attr.name=\"edge.loop\" attr.complexType=\"edge.loop.type\">"+nl+
 					"\t\t<default>"+nl+
 					"\t\t\t<loopedge length=\""+gp.getIntValue("edge.loop_length")+"\""+
 					" proportion=\""+gp.getIntValue("edge.loop_proportion")+"\""+
 					" direction=\""+gp.getIntValue("edge.loop_direction")+"\""+
 					" clockwise=\""+gp.getBoolValue("edge.loop_clockwise")+"\""+
 					"/>"+nl+"\t\t</default>"+nl+"\t</key>"+nl);
-			s.write("\t<key id=\"edgetext\" for=\"edge\" attr.name=\"edge.text\" attr.type=\"edge.text.type\">"+nl+
+			s.write("\t<key id=\"edgetext\" for=\"edge\" attr.name=\"edge.text\" attr.complexType=\"edge.text.type\">"+nl+
 					"\t\t<default>"+nl+
 					"\t\t\t<edgetext distance=\""+gp.getIntValue("edge.text_distance")+"\""+
 					" position=\""+gp.getIntValue("edge.text_position")+"\""+
@@ -147,21 +147,36 @@ public class GraphMLWriter {
 			s.write(" visible=\""+gp.getBoolValue("edge.text_visible")+"\"/>"+nl);
 			s.write("\t\t</default>"+nl+"\t</key>"+nl);
 			
-			s.write("\t<key id=\"edgeline\" for=\"edge\" attr.name=\"edge.line\" attr.type=\"edge.line.type\">"+nl+
+			s.write("\t<key id=\"edgeline\" for=\"edge\" attr.name=\"edge.line\" attr.complexType=\"edge.line.type\">"+nl+
 					"\t\t<default>"+nl+
 					"\t\t\t<edgeline length=\""+gp.getIntValue("edge.line_length")+"\""+
 					" distance=\""+gp.getIntValue("edge.line_distance")+"\""+
-					" type=\""+gp.getIntValue("edge.line_type")+"\"/>"+nl+
+					" type=\"");
+			switch(gp.getIntValue("edge.line_type"))
+			{
+				case VEdgeLinestyle.DOTTED:
+					s.write("dotted");
+					break;
+				case VEdgeLinestyle.DASHED:
+					s.write("dashed");
+					break;
+				case VEdgeLinestyle.DOTDASHED:
+					s.write("dotdashed");
+					break;
+				default:
+					s.write("solid");
+			}
+			s.write("\"/>"+nl+
 					"\t\t</default>"+nl+"\t</key>"+nl);
 		}
 		else
 		{
 			s.write("\t\t<!-- Hyperedge Details -->"+nl);
-			s.write("\t<key id=\"hyperedgewidth\" for=\"hyperedge\" attr.name=\"hyperedge.width\" attr.type=\"integer\">"+nl+
+			s.write("\t<key id=\"hyperedgewidth\" for=\"hyperedge\" attr.name=\"hyperedge.width\" attr.type=\"int\">"+nl+
 					"\t\t<default>"+gp.getIntValue("hyperedge.width")+"</default>"+nl+"\t</key>"+nl);
-			s.write("\t<key id=\"hyperedgemargin\" for=\"hyperedge\" attr.name=\"hyperedge.margin\" attr.type=\"integer\">"+nl+
+			s.write("\t<key id=\"hyperedgemargin\" for=\"hyperedge\" attr.name=\"hyperedge.margin\" attr.type=\"int\">"+nl+
 					"\t\t<default>"+gp.getIntValue("hyperedge.margin")+"</default>"+nl+"\t</key>"+nl);
-			s.write("\t<key id=\"hyperedgetext\" for=\"hyperedge\" attr.name=\"hyperedge.text\" attr.type=\"edge.text.type\">"+nl+
+			s.write("\t<key id=\"hyperedgetext\" for=\"hyperedge\" attr.name=\"hyperedge.text\" attr.complexType=\"edge.text.type\">"+nl+
 					"\t\t<default>"+nl+
 					"\t\t\t<hyperedgetext distance=\""+gp.getIntValue("edge.text_distance")+"\""+
 					" position=\""+gp.getIntValue("edge.text_position")+"\""+
@@ -173,21 +188,21 @@ public class GraphMLWriter {
 				s.write("\"name\"");
 			s.write(" visible=\""+gp.getBoolValue("edge.text_visible")+"\"/>"+nl);
 			s.write("\t\t</default>"+nl+"\t</key>"+nl);
-			s.write("\t<key id=\"hyperedgeline\" for=\"hyperedge\" attr.name=\"edge.line\" attr.type=\"edge.line.type\">"+nl+
+			s.write("\t<key id=\"hyperedgeline\" for=\"hyperedge\" attr.name=\"edge.line\" attr.complexType=\"edge.line.type\">"+nl+
 					"\t\t<default>"+nl+
 					"\t\t\t<edgeline length=\""+gp.getIntValue("edge.line_length")+"\""+
 					" distance=\""+gp.getIntValue("edge.line_distance")+"\""+
 					" type=\""+gp.getIntValue("edge.line_type")+"\"/>"+nl+
 					"\t\t</default>"+nl+"\t</key>"+nl);
 	
-			s.write("\t<key id=\"hyperedgeshape\" for=\"hyperedge\" attr.name=\"hyperedge.shape\" attr.type=\"hyperedge.shape.type\"/>"+nl+nl);
+			s.write("\t<key id=\"hyperedgeshape\" for=\"hyperedge\" attr.name=\"hyperedge.shape\" attr.complexType=\"hyperedge.shape.type\"/>"+nl+nl);
 		}
 		s.write("\t\t<!-- Node Values -->"+nl);
-		s.write("\t<key id=\"nodeform\" for=\"node\" attr.name=\"node\" attr.type=\"node.form.type\">"+nl+
+		s.write("\t<key id=\"nodeform\" for=\"node\" attr.name=\"node\" attr.complexType=\"node.form.type\">"+nl+
 				"\t\t<default>"+nl+
 				"\t\t\t<form type=\"Circle\" x=\"0\" y=\"0\" size=\""+gp.getIntValue("node.size")+"\"/>"+nl+
 				"\t\t</default>"+nl+"\t</key>"+nl);
-		s.write("\t<key id=\"nodetext\" for=\"node\" attr.name=\"node.text\" attr.type=\"node.text.type\">"+nl+
+		s.write("\t<key id=\"nodetext\" for=\"node\" attr.name=\"node.text\" attr.complexType=\"node.text.type\">"+nl+
 				"\t\t<default>"+nl+
 				"\t\t\t<nodetext distance=\""+gp.getIntValue("node.name_distance")+"\""+
 				" rotation=\""+gp.getIntValue("node.name_rotation")+"\" "+
@@ -545,7 +560,7 @@ public class GraphMLWriter {
 		while (ster.hasNext())
 		{
 			VSubgraph actual = ster.next();
-			s.write(nl+"\t\t<data id=\"subgraph"+actual.getIndex()+"\">"+nl+
+			s.write(nl+"\t\t<data key=\"subgraph"+actual.getIndex()+"\">"+nl+
 					"\t\t\t<subgraph id=\""+actual.getIndex()+"\">"+nl);
 			//if the name is not a standard name
 			if (msubset.get(actual.getIndex()).getName().equals(gp.getSubgraphName(actual.getIndex())))
@@ -753,7 +768,7 @@ public class GraphMLWriter {
 		while (ster.hasNext())
 		{
 			MSubgraph actual = ster.next();
-			s.write(nl+"\t\t<data id=\"subgraph"+actual.getIndex()+"\">"+nl+
+			s.write(nl+"\t\t<data key=\"subgraph"+actual.getIndex()+"\">"+nl+
 					"\t\t\t<subgraph id=\""+actual.getIndex()+"\">"+nl);
 			//if the name is not a standard name
 			if (msubset.get(actual.getIndex()).getName().equals(gp.getSubgraphName(actual.getIndex())))
