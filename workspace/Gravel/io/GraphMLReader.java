@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -124,6 +125,8 @@ public class GraphMLReader {
 	 */
 	public static boolean ErrorOccured()
 	{
+		if (!errorMsg.equals(""))
+			System.err.println("DEBUG: "+errorMsg);
 		return !errorMsg.equals("");
 	}
 	/**
@@ -301,10 +304,7 @@ public class GraphMLReader {
 	private static void parseEdge(Node edgeNode)
 	{
 		if ((edgeNode.getNodeType()!=Node.ELEMENT_NODE)||(!edgeNode.getNodeName().equals("edge")))
-		{
-			errorMsg = "No Eode found when trying to parse an Edge.";
-			return; 
-		}
+		{ errorMsg = "No Eode found when trying to parse an Edge."; return; }
 		//Value temporary fields
 		int index = -1, start=-1, end=-1, width=gp.getIntValue("edge.width"), value = gp.getIntValue("edge.value");
 		String name;
@@ -450,7 +450,6 @@ public class GraphMLReader {
 		}
 		else
 		{errorMsg = "No suitable Graph for adding an Edge found"; return;}
-		
 	}
 	private static void parseHyperedges(Node GraphNode)
 	{
@@ -468,9 +467,133 @@ public class GraphMLReader {
 	}
 	private static void parseHyperedge(Node hyperedgeNode)
 	{
-		//TODO Single HyperEdge Parsing
+		if ((hyperedgeNode.getNodeType()!=Node.ELEMENT_NODE)||(!hyperedgeNode.getNodeName().equals("hyperedge")))
+		{ errorMsg = "No hyperedge found when trying to parse an hyperedge.";return; }
+		//Value temporary fields
+		int index = -1, width=gp.getIntValue("hyperedge.width"), value = gp.getIntValue("hyperedge.value"), margin = gp.getIntValue("hyperedge.margin");
+		BitSet endnodes = new BitSet();
+		String name;
+		VEdgeText text = new VEdgeText();
+		VEdgeLinestyle linestyle = new VEdgeLinestyle();
+		NURBSShape shape = new NURBSShape();
+		HashMap<String,String> hyperedgeAttrib = getAttributeHashMap(hyperedgeNode);
+		if (!hyperedgeAttrib.containsKey("id"))
+		{ errorMsg = "Edge incomplete, either ID, Start or Endnode are missing"; return; }
+		try	{ index = Integer.parseInt(hyperedgeAttrib.get("id"));}
+		catch(Exception e) { errorMsg = "Edge incomplete, either ID, Start or Endnode could not be parsed."; return; }
+		name = gp.getHyperedgeName(index);
+		NodeList nodeChildElements = hyperedgeNode.getChildNodes();
+		for (int i=0; i<nodeChildElements.getLength(); i++)
+		{ //Search all Data-Elements, take their key-ID and Content as Values
+			Node actual = nodeChildElements.item(i);
+			if (actual.getNodeType()==Node.ELEMENT_NODE)
+			{
+				if (actual.getNodeName().equals("endpoint"))
+				{
+					HashMap<String,String> endnodeAttrib = getAttributeHashMap(actual);
+					if (!endnodeAttrib.containsKey("node"))
+					{ errorMsg = "No key-Reference for Data Element found"; return;}
+					try
+					{
+						endnodes.set(Integer.parseInt(endnodeAttrib.get("node")));
+					}
+					catch(Exception e)
+					{ errorMsg = "Invalid Node Index Reference in Hyperedge endnote of hyperedge #"+index;}
+				}
+				else if (actual.getNodeName().equals("data"))
+				{ //For each Data element
+					HashMap<String,String> dataAttrib = getAttributeHashMap(actual);
+					if (!dataAttrib.containsKey("key"))
+					{ errorMsg = "No key-Reference for Data Element found"; return;}
+					String dataType= dataAttrib.get("key");
+					if (dataType.equals("hyperedgename")) //We have the name 
+						name = actual.getTextContent();
+					else if (dataType.equals("hyperedgevalue")) //Simple int
+					{
+						try {value = Integer.parseInt(actual.getTextContent());}
+						catch (Exception e){errorMsg = "Could not parse value for hyperedge #"+index+""; return;}
+					}
+					else if (dataType.equals("hyperedgewidth")) //Simple int
+					{
+						try {width = Integer.parseInt(actual.getTextContent());}
+						catch (Exception e){errorMsg = "Could not parse width for hyperedge #"+index+""; return;}
+					}
+					else if (dataType.equals("hyperedgemargin")) //Simple int
+					{
+						try {margin = Integer.parseInt(actual.getTextContent());}
+						catch (Exception e){errorMsg = "Could not parse margin for hyperedge #"+index+""; return;}
+					}
+					else if (dataType.equals("hyperedgetext"))
+					{
+						//get Child with edge text
+						Node edgetext = getFirstChildWithElementName("hyperedgetext",actual);
+						if (edgetext==null)
+						{ errorMsg = "No hyperedgetext-Specification inside hyperedgetext data field found for hyperedge #"+index; return;}
+						text = parseEdgeText(edgetext);
+					}
+					else if (dataType.equals("hyperedgeline"))
+					{
+						//get Child with edge text
+						Node edgeline = getFirstChildWithElementName("hyperedgeline",actual);
+						if (edgeline==null)
+						{ errorMsg = "No hyperedgeline-Specification inside hyperedgeline data field found for hyperedge #"+index; return;}
+						linestyle = parseEdgeLinestyle(edgeline);
+					}
+					else if (dataType.equals("hyperedgeshape"))
+					{
+						//get Child with edge text
+						Node hyperedgeshapeNode = getFirstChildWithElementName("hyperedgeshape",actual);
+						if (hyperedgeshapeNode==null)
+						{ errorMsg = "No shape-Specification inside hyperedgeshape data field found for hyperedge #"+index; return;}
+						NURBSShapeGraphML ShapeParser = new NURBSShapeGraphML(shape);
+						String error = ShapeParser.InitFromGraphML(hyperedgeshapeNode);
+						if (!error.equals(""))
+						{ errorMsg = error+" (hyperedge #"+index+")"; return;}	
+						shape = ShapeParser.stripDecorations();
+					}
+					else
+						System.err.println("Warning: Unhandled Data-Field in Edge #"+index+" with key "+dataType);
+				}	
+			} //End if NodeType==ELEMENT
+		} //End for - handle all Data Fields
+		//Build hyperedge
+		if (endnodes.length()==0)
+		{ errorMsg = "Empty hyperedges are not allowd, but the hyperedge #"+index+" is empty"; return;}				
+		if ((loadedVGraph!=null)&&(loadedVGraph.getType()==VGraphInterface.HYPERGRAPH))
+		{	
+			MHyperEdge mhe = new MHyperEdge(index,value,name);
+			for (int i=0; i<=endnodes.length(); i++)
+			{
+				if (endnodes.get(i))
+				{
+					if (((VHyperGraph)loadedVGraph).getMathGraph().modifyNodes.get(i)==null) //Node should be set but is nonexistent
+					{errorMsg = "The endnode with index "+i+" does not exist"; return;}
+					mhe.addNode(i);
+				}
+			}
+			VHyperEdge resultEdge = new VHyperEdge(index,width,margin);
+			resultEdge.setTextProperties(text);
+			resultEdge.setLinestyle(linestyle);
+			resultEdge.setShape(shape);
+			((VHyperGraph)loadedVGraph).modifyHyperEdges.add(resultEdge,mhe);
+		}
+		else if ((loadedMGraph!=null)&&(loadedMGraph.getType()==MGraphInterface.GRAPH))
+		{
+			MHyperEdge mhe = new MHyperEdge(index,value,name);
+			for (int i=0; i<=endnodes.length(); i++)
+			{
+				if (endnodes.get(i))
+				{
+					if (((VHyperGraph)loadedVGraph).getMathGraph().modifyNodes.get(i)==null) //Node should be set but is nonexistent
+					{errorMsg = "The endnode with index "+i+" does not exist"; return;}
+					mhe.addNode(i);
+				}
+			}
+			((MHyperGraph)loadedMGraph).modifyHyperEdges.add(mhe);
+		}
+		else
+		{errorMsg = "No suitable Graph for adding an Edge found"; return;}
 	}
-	
 	//
 	//All Subgraphs
 	//
@@ -518,11 +641,9 @@ public class GraphMLReader {
 			}
 		}
 	}
-	
 	//
 	//Std Values at the beginning of the document
 	//
-	
 	/**
 	 * Parse one single node that is a <key>-Element
 	 * @param node
@@ -688,7 +809,7 @@ public class GraphMLReader {
 		
 	}
 	//
-	// Single Elements of Node/Edge/HyperEdge/Graph
+	// Single Elements inside of Node/Edge/HyperEdge/Graph
 	//
 	/**
 	 * Parse a Node of the edge type with the attributes distance, position, show, size and visible

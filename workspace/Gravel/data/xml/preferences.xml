@@ -20,7 +20,7 @@
 		<value name="arrow_part" type="Float">0.75</value>
 		<value name="arrow_pos" type="Float">1.0</value>
 		<value name="arrow_size" type="Integer">10</value>
-		<value name="line_distance" type="Integer">15</value>
+		<value name="line_distance" type="Integer">10</value>
 		<value name="line_length" type="Integer">10</value>
 		<value name="line_type" type="Integer">1</value>
 		<value name="loop_clockwise" type="Boolean">true</value>
@@ -34,13 +34,12 @@
 		<value name="text_showvalue" type="Boolean">false</value>
 		<value name="text_size" type="Integer">12</value>
 		<value name="text_visible" type="Boolean">false</value>
-		<value name="type" type="String">StraightLine</value>
 		<value name="value" type="Integer">1</value>
 		<value name="width" type="Integer">1</value>
 	</group>
 	<group name="graph">
-		<value name="allowloops" type="Boolean">true</value>
-		<value name="allowmultiple" type="Boolean">true</value>
+		<value name="allowloops" type="Boolean">false</value>
+		<value name="allowmultiple" type="Boolean">false</value>
 		<value name="directed" type="Boolean">true</value>
 		<value name="fileformat" type="String">visual</value>
 		<value name="lastfile" type="String">$NONE</value>
@@ -69,16 +68,18 @@
 		<value name="name_rotation" type="Integer">270</value>
 		<value name="name_size" type="Integer">12</value>
 		<value name="name_visible" type="Boolean">false</value>
-		<value name="size" type="Integer">8</value>
-		<value name="text_distance" type="Integer">18</value>
-		<value name="text_rotation" type="Integer">270</value>
-		<value name="text_size" type="Integer">12</value>
-		<value name="text_visible" type="Boolean">false</value>
+		<value name="size" type="Integer">9</value>
 	</group>
-	<value name="orthogonaledge_verticalfirst" type="Boolean">true</value>
+	<group name="pref">
 		<value name="saveonexit" type="Boolean">true</value>
+	</group>
+	<group name="statistics">
 		<value name="y" type="Integer">200</value>
+	</group>
+	<group name="subgraph">
 		<value name="name" type="String">Untergraph #$ID</value>
+	</group>
+	<group name="vgraphic">
 		<value name="cpshow" type="Boolean">false</value>
 		<value name="cpsize" type="Integer">3</value>
 		<value name="directed" type="Boolean">true</value>
@@ -89,7 +90,10 @@
 		<value name="selwidth" type="Integer">6</value>
 		<value name="x" type="Integer">500</value>
 		<value name="y" type="Integer">500</value>
+	</group>
+	<group name="window">
 		<value name="x" type="Integer">600</value>
 		<value name="y" type="Integer">500</value>
+	</group>
 	<value name="zoom" type="Float">1.0</value>
 </gravel.preferences>

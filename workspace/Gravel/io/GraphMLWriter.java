@@ -188,13 +188,27 @@ public class GraphMLWriter {
 				s.write("\"name\"");
 			s.write(" visible=\""+gp.getBoolValue("edge.text_visible")+"\"/>"+nl);
 			s.write("\t\t</default>"+nl+"\t</key>"+nl);
-			s.write("\t<key id=\"hyperedgeline\" for=\"hyperedge\" attr.name=\"edge.line\" attr.complexType=\"edge.line.type\">"+nl+
+			s.write("\t<key id=\"hyperedgeline\" for=\"hyperedge\" attr.name=\"hyperedge.line\" attr.complexType=\"edge.line.type\">"+nl+
 					"\t\t<default>"+nl+
-					"\t\t\t<edgeline length=\""+gp.getIntValue("edge.line_length")+"\""+
+					"\t\t\t<hyperedgeline length=\""+gp.getIntValue("edge.line_length")+"\""+
 					" distance=\""+gp.getIntValue("edge.line_distance")+"\""+
-					" type=\""+gp.getIntValue("edge.line_type")+"\"/>"+nl+
-					"\t\t</default>"+nl+"\t</key>"+nl);
-	
+					" type=\"");
+			switch(gp.getIntValue("edge.line_type"))
+			{
+				case VEdgeLinestyle.DOTTED:
+					s.write("dotted");
+					break;
+				case VEdgeLinestyle.DASHED:
+					s.write("dashed");
+					break;
+				case VEdgeLinestyle.DOTDASHED:
+					s.write("dotdashed");
+					break;
+				default:
+					s.write("solid");
+			}
+			s.write("\"/>"+nl+
+				"\t\t</default>"+nl+"\t</key>"+nl);	
 			s.write("\t<key id=\"hyperedgeshape\" for=\"hyperedge\" attr.name=\"hyperedge.shape\" attr.complexType=\"hyperedge.shape.type\"/>"+nl+nl);
 		}
 		s.write("\t\t<!-- Node Values -->"+nl);
@@ -418,7 +432,10 @@ public class GraphMLWriter {
 			if (hyper)
 				s.write("hyper");
 			s.write("edgetext\">"+nl+
-					"\t\t\t\t<edgetext");
+					"\t\t\t\t<");
+			if (hyper)
+				s.write("hyper");
+			s.write("edgetext");
 			if (noStdDis)
 				s.write(" distance=\""+t.getDistance()+"\"");
 			if (noStdPos)
@@ -456,7 +473,10 @@ public class GraphMLWriter {
 			if (hyper)
 				s.write("hyper");
 			s.write("edgeline\">"+nl+
-			"\t\t\t\t<edgeline");
+			"\t\t\t\t<");
+			if (hyper)
+				s.write("hyper");
+			s.write("edgeline");
 			if (noStdDist)
 				s.write(" distance=\""+l.getDistance()+"\"");
 			if (noStdLen)
@@ -504,7 +524,7 @@ public class GraphMLWriter {
 			{
 				if (endnodes.get(i))
 				{
-					s.write("\t\t\t<endpoint id=\""+i+"\"/>"+nl);
+					s.write("\t\t\t<endpoint node=\""+i+"\"/>"+nl);
 				}
 			}
     	   
@@ -514,7 +534,7 @@ public class GraphMLWriter {
     		   s.write("\t\t\t<data key=\"hyperedgevalue\">"+mhe.Value+"</data>"+nl);
     	   if (actual.getWidth()!=gp.getIntValue("hyperedge.width")) //if width is not std
     		   s.write("\t\t\t<data key=\"hyperedgewidth\">"+actual.getWidth()+"</data>"+nl);
-    	   if (actual.getMinimumMargin()!=gp.getIntValue("hyperedge,margin")) //if width is not std
+    	   if (actual.getMinimumMargin()!=gp.getIntValue("hyperedge.margin")) //if width is not std
     		   s.write("\t\t\t<data key=\"hyperedgemargin\">"+actual.getMinimumMargin()+"</data>"+nl);
 
     	   writeText(s,actual.getTextProperties(),true);
@@ -739,7 +759,7 @@ public class GraphMLWriter {
 			{
 				if (endnodes.get(i))
 				{
-					s.write("\t\t\t<endpoint id=\""+i+"\"/>"+nl);
+					s.write("\t\t\t<endpoint node=\""+i+"\"/>"+nl);
 				}
 			}
     	   

@@ -10,7 +10,8 @@
     <xs:documentation 
         source="http://gravel.darkmoonwolf.de/"
         xml:lang="en">
-		This document extends the GraphML-Stuff by some complex data-Elements
+		This document extends the GraphML-Fileformat by element for complex visual elements,
+		that keep the values needed for saving an graph image
 		Those are the complex data that is reuired for the image of the graph
 		e.g.
 		- edge and hyper edge shape specifications
@@ -24,6 +25,13 @@
 <!-- Extend the complex type of the data element -->
 	<xs:redefine schemaLocation="http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 	  <xs:complexType name="data-extension.type" mixed="true">
+		  <xs:annotation>
+		    <xs:documentation 
+		        source="http://gravel.darkmoonwolf.de/"
+		        xml:lang="en">
+		      Complex type for the &lt;data> element as extension of the original GraphML-Data element
+		    </xs:documentation>
+		  </xs:annotation>
 	    <xs:complexContent>
 	      <xs:extension base="data-extension.type">
 			<xs:sequence>
@@ -51,20 +59,27 @@
 <!-- Extend key.extra.attrib to save our types in an attribute of each key -->
 	<xs:redefine schemaLocation="http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
   		<xs:attributeGroup name="key.extra.attrib">
-    		<xs:attributeGroup ref="key.extra.attrib"/> <!--keep all old values -->
+			<xs:annotation>
+				<xs:documentation 
+		        		source="http://gravel.darkmoonwolf.de/"
+		        		xml:lang="en">
+		      		One extra optional Attribute for the &lt;key> to store data about the complex type.
+		    	</xs:documentation>
+		  	</xs:annotation>
+   			<xs:attributeGroup ref="key.extra.attrib"/> <!--keep all old values -->
     		<xs:attribute name="attr.complexType" type="key.extra.complexType.type" use="optional"/>
   		</xs:attributeGroup>
 	</xs:redefine>
-<!-- Simple Data type for our own data Type -->
 
+<!-- Simple Data type for keeping information of complexType -->
 	<xs:simpleType name="key.extra.complexType.type">
 		<xs:annotation>
 			<xs:documentation 
-				source="???" 
-				xml:lang="en">
-					Another attribute for the Key element to classify the complexTypes used by Gravel
-			</xs:documentation>
-		</xs:annotation>
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+	      		Type for an extra Attribute for the &lt;key> element. It sores the type of an complex element
+	    	</xs:documentation>
+	  	</xs:annotation>
 		<xs:restriction base="xs:NMTOKEN">  
 	    	<xs:enumeration value="node.form.type"/>
 			<xs:enumeration value="node.text.type"/>
@@ -82,57 +97,143 @@
 <!-- Complex Data types for the default extension		-->
 <!--													-->
 
-	<!-- Node complex data tyes -->
+<!-- Node complex data tyes -->
 	<!-- Node Form-->
 	<xs:complexType name="node.form.type">
-			<xs:attribute name="type" type="node.form.type.type" use="required"/>
-			<xs:attribute name="x" type="xs:integer" use="required"/>
-			<xs:attribute name="y" type="xs:integer" use="required"/>
-			<xs:attribute name="size" type="xs:nonNegativeInteger"/>
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+	      		Complex Data Type, that stores Data of the visual nodeform. This is
+					- a point (required)
+					- a type of the form (only Circle available up to now, required value)
+					- for the form circle an additional size of the circle (diameter) - optional, because a standard value is used then (specified within key/default)
+	    	</xs:documentation>
+	  	</xs:annotation>
+		<xs:attribute name="type" type="node.form.type.type" use="required"/>
+		<xs:attribute name="x" type="xs:integer" use="required"/>
+		<xs:attribute name="y" type="xs:integer" use="required"/>
+		<xs:attribute name="size" type="xs:nonNegativeInteger"/>
 	</xs:complexType>
+
+	<!-- Node form Type -->
 	<xs:simpleType name="node.form.type.type">
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+	      		Form Type is a String, restricted to some forms. Up to know only a circle form is available
+	    	</xs:documentation>
+	  	</xs:annotation>
 	  <xs:restriction base="xs:string">
 	      <xs:enumeration value="Circle"/>
 	    </xs:restriction>
 	</xs:simpleType>
+
 	<!-- Node Text -->
 	<xs:complexType name="node.text.type">
-			<xs:attribute name="distance" type="xs:nonNegativeInteger"/>
-			<xs:attribute name="rotation" type="xs:double"/>
-			<xs:attribute name="size" type="xs:nonNegativeInteger"/>
-			<xs:attribute name="visible" type="xs:boolean"/>
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+	      		Node text Information. Displayed is alwas the name of a node
+					- in a Distance to the circle origin
+					- in direction specified by rotation
+					- with a special textsize
+					- and the visibility might be toggled to invisible
+				All values are optionally, because a standard value is specified
+				either in the programm itself or inside key/default
+	    	</xs:documentation>
+	  	</xs:annotation>
+		<xs:attribute name="distance" type="xs:nonNegativeInteger"/>
+		<xs:attribute name="rotation" type="xs:double"/>
+		<xs:attribute name="size" type="xs:nonNegativeInteger"/>
+		<xs:attribute name="visible" type="xs:boolean"/>
 	</xs:complexType>
 	
 	<!--Edge Stuff -->
 	<!-- Edge Arrow -->
 	<xs:complexType name="edge.arrow.type">
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+	      		Edge Arrow specification with the values
+				- Arrow size
+				- the part (in % of the size) of the arrow that is filled. 100% means the arrow has one baseline (isosecled triangle), 0% is an arrow only drawn by 2 lines (no triangle)
+				- position along the edge (where 0.0 is with baseline at the startnode and 1.0 is an arrow with its tip at the endnote)
+				- headalpha is the angle at the tip of the arrow
+	    	</xs:documentation>
+	  	</xs:annotation>
 		<xs:attribute name="size" type="xs:float"/>
 		<xs:attribute name="part" type="xs:float"/>
 		<xs:attribute name="position" type="xs:float"/>
 		<xs:attribute name="headalpha" type="xs:float"/>
 	</xs:complexType>
+	
 	<!-- Set of Points for some edges -->
 	<xs:complexType name="edge.point.type">
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+	      		One single point for an edge
+	    	</xs:documentation>
+	  	</xs:annotation>
 		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required"/>
 		<xs:attribute name="x" type="xs:integer" use="required"/>
 		<xs:attribute name="y" type="xs:integer" use="required"/>
 	</xs:complexType>
+	
 	<!-- Loop Edge Details -->
 	<xs:complexType name="edge.loop.type">
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+	      		Loop edges need the following values
+					- length as diamoeter in direction from the node (start/end)
+					- proportion of the secondary axis of the ellipse (1.0 means circle and the max value)
+					- direction ananlogous to and direction in degree
+					- the boolean for clockwise or anticlockwise drawing of the loop is interesting for the placement of arrows
+			</xs:documentation>
+	  	</xs:annotation>
 		<xs:attribute name="length" type="xs:nonNegativeInteger" use="required"/>
 		<xs:attribute name="proportion" type="xs:float" use="required"/>
 		<xs:attribute name="direction" type="xs:float" use="required"/>
 		<xs:attribute name="clockwise" type="xs:boolean" use="required"/>
 	</xs:complexType>
+
 	<!-- Edge Text and HyperEdgeText Details -->
 	<xs:complexType name="edge.text.type">
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+	      		Edge Text is placed along the edge
+				- a position 0&lt; x &lt;=.5 places it above the edge, .5&lt; x &lt;=1 below the edge with an
+				- distance orthogonal to the actual direction at position
+				- a text size
+				- a specification what value is show (edge value or edge name)
+				- and the specification whether the text is visible
+			</xs:documentation>
+	  	</xs:annotation>
 		<xs:attribute name="position" type="xs:float"/>
 		<xs:attribute name="distance" type="xs:nonNegativeInteger"/>
 		<xs:attribute name="size" type="xs:nonNegativeInteger"/>
 		<xs:attribute name="show" type="edge.text.show.type"/>
 		<xs:attribute name="visible" type="xs:boolean"/>
 	</xs:complexType>
+
+	<!-- Edge text show values -->
 	<xs:simpleType name="edge.text.show.type">
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+	      		Edge Text visible values
+	    	</xs:documentation>
+	  	</xs:annotation>
 		<xs:restriction base="xs:string">
 	      <xs:enumeration value="value"/>
 	      <xs:enumeration value="name"/>
@@ -140,11 +241,33 @@
 	</xs:simpleType>
 	<!-- Edge Line and Hyper Edge Line Specification -->
 	<xs:complexType name="edge.line.type">
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+	      		Edges are lines. These lines have different linestyle values
+				- length of a line segment (if linestyle is not solid)
+				- distnce between line elements (if not solid)
+				- type of linestyle
+	    	</xs:documentation>
+	  	</xs:annotation>
 		<xs:attribute name="distance" type="xs:nonNegativeInteger"/>
 		<xs:attribute name="length" type="xs:nonNegativeInteger"/>
-		<xs:attribute name="type" type="edge.line.type.type"/>
+		<xs:attribute name="type" type="edge.line.type.type" default="solid"/>
 	</xs:complexType>
+
 	<xs:simpleType name="edge.line.type.type">
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+	      		Edge line styles
+					- solid (default)
+					- dashed (each dash of length and a distance between two dashes)
+					- dotted (each dot with size of edge with, a distance between each dot)
+					- dotdashed (compibation of the both prior types, alternating dashes and dots)
+	    	</xs:documentation>
+	  	</xs:annotation>
 		<xs:restriction base="xs:string">
 	      	<xs:enumeration value="solid"/>
 	      	<xs:enumeration value="dashed"/>
@@ -155,29 +278,64 @@
 
 	<!-- HyperEdge Shape-->
 	<xs:complexType name="hyperedge.shape.type">
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+	      		Hyperedges are delimited by their shape. 
+				The Shape is a NURBS Curve, closed and unclamped. This NURBS needs a
+				degree, which is an attribute of this complexType and
+				- a set of knots, which are sorted and indexed by id
+				- a set of ControlPoints which must fit to number of knots and degree, 
+					though this is not checked via schme
+		    	</xs:documentation>
+	  	</xs:annotation>
 		<xs:sequence>
-			<xs:choice>
-				<xs:element name="knot" type="shape.knot.type" minOccurs="1"/>
-				<xs:element name="controlpoint" type="shape.point.type" minOccurs="1"/>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element name="knot" type="shape.knot.type"/>
+				<xs:element name="controlpoint" type="shape.point.type"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="degree" type="xs:nonNegativeInteger" use="required"/>
 	</xs:complexType>
 
+	<!-- NURBS Controlpoints -->
 	<xs:complexType name="shape.point.type">
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+			One Controlpoint of the nurbs is a point in 2D but homogeneous with a weight
+	    	</xs:documentation>
+	  	</xs:annotation>
 		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required"/>
 		<xs:attribute name="x" type="xs:double" use="required"/>
 		<xs:attribute name="y" type="xs:double" use="required"/>
 		<xs:attribute name="w" type="xs:double" use="required"/> <!-- ControlPoint Weights-->
 	</xs:complexType>
 
+	<!-- NURBS Knots -->
 	<xs:complexType name="shape.knot.type">
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+				NURBS Knots have an id wich is nonNegative and a value
+	    	</xs:documentation>
+	  	</xs:annotation>
 		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required"/>
 		<xs:attribute name="u" type="xs:double" use="required"/>
 	</xs:complexType>
 
 	<!-- Subgraph as a Data Field of the Graph -->
 	<xs:complexType name="graph.subgraph.type">
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+				Subgraphs are subsets of nodes and (hyper)edges of the graph. A Subgraph is additionally given a name and a color
+	    	</xs:documentation>
+	  	</xs:annotation>
 		<xs:sequence>
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="color" type="color.type" maxOccurs="1"/>
@@ -189,7 +347,16 @@
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required"/>
 	</xs:complexType>
+	
+	<!-- Subgraph Color-->
 	<xs:complexType name="color.type">
+		<xs:annotation>
+			<xs:documentation 
+	        		source="http://gravel.darkmoonwolf.de/"
+	        		xml:lang="en">
+				A simple Color is defined in RGB
+	    	</xs:documentation>
+	  	</xs:annotation>
 		<xs:attribute name="r" type="xs:integer" use="required"/>
 		<xs:attribute name="g" type="xs:integer" use="required"/>
 		<xs:attribute name="b" type="xs:integer" use="required"/>
