@@ -39,7 +39,7 @@ public class SaveAsDialog extends JDialog implements ActionListener
 	 */
 	public SaveAsDialog(Frame parent)
 	{
-		super(parent,"Einstellungen für GravelML");
+		super(parent,"Einstellungen für GraphML");
 		Container content = getContentPane();
 		GridBagConstraints c = new GridBagConstraints();
 		Container ContentPane = this.getContentPane();

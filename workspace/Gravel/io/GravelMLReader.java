@@ -34,7 +34,7 @@ public class GravelMLReader
 	 */
 	private class typeExtractor implements ContentHandler
 	{
-		private String graphtype = null, position="";;
+		private String graphtype = "", position="";
 		private Stack<String> path; //graphtype as the result and path for the actual path
 		private String data_key = ""; //For Data Key searching for gt
 		private String id="", fortype="", type=""; //For any key
@@ -121,13 +121,16 @@ public class GravelMLReader
 	File f = null;
 	String GraphType ="";
 	GravelMLContentHandler ggMLCH;
+	public GravelMLReader(File f)
+	{
+		this.f = f;
+	}
 	/**
 	 * 
 	 * @return eine Fehlermeldung als String, falls ein vorliegt, sonst "", dann sind alle Keys da und der typ stimmt
 	 */
-	public String checkGraph(File pFile)
+	public String checkFile()
 	{
-		f = pFile;
 		if (!f.exists())
 		{
 			error = true;
@@ -140,11 +143,7 @@ public class GravelMLReader
 		}
 		catch (SAXException e) 
 		{
-			try {
-				//System.err.println("bla");
-				//Std System-Parser holen
-				parser = XMLReaderFactory.createXMLReader();
-			}
+			try {parser = XMLReaderFactory.createXMLReader();}
 			catch (SAXException e2) 
 			{
 				error = true;

@@ -448,9 +448,10 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     		return ((VHyperGraphic)graphpart).getGraph().modifyNodes.hasSelection();
 	}
 	/**
-	 * Check, whether a Graph is saved, if not ask for Saving and handle the answer
+	 * Check whether to save the Garph before quitting or not
+	 * @return
 	 */
-	public void checkSaved() 
+	public boolean checkSavedBeforeQuit() 
 	{
 		if (!fileDialogs.isGraphSaved()) //Not Saved
 		{
@@ -464,23 +465,28 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 					cardinality = ((VHyperGraph)Gui.getInstance().getVGraph()).getMathGraph().modifyNodes.cardinality();
 				if (cardinality>0) //es gibt überhaupt was
 				{
-					int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Der aktuelle Graph wurde nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie den Graph noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_OPTION);
+					int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Der aktuelle Graph wurde nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie den Graph noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_CANCEL_OPTION);
 					if (n==JOptionPane.YES_OPTION)
-					{
-						fileDialogs.SaveAs();
-					}
+						return fileDialogs.SaveAs(); //If someone chose yes and aborted, we don't want to quit
+					else if (n==JOptionPane.NO_OPTION)
+						return true; //He does not want to save but just quit
+					else //Cancel
+						return false; //Do not wuit
 				}
 			}
 			else
 			{
 				String file = (new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName());
-				int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Die letzten "+main.CONST.html_Ae+"nderungen des Graphen<br><i>'"+file+"'</i><br>wurden noch nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie diese noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_OPTION);
+				int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Die letzten "+main.CONST.html_Ae+"nderungen des Graphen<br><i>'"+file+"'</i><br>wurden noch nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie diese noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_CANCEL_OPTION);
 	    		if (n==JOptionPane.YES_OPTION)
-	    		{
-	    			fileDialogs.Save();
-	    		}				
+	    			return fileDialogs.Save();
+				else if (n==JOptionPane.NO_OPTION)
+					return true; //He does not want to save but just quit
+				else //Cancel
+					return false; //Do not wuit
 			}
 		}
+		return false;
 	}
 	private int getIndexofSingeSelectedHyperEdge()
 	{

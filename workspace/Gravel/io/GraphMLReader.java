@@ -7,7 +7,6 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Vector;
 
-import javax.swing.JFileChooser;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,29 +17,22 @@ import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import view.Gui;
-import dialogs.JFileDialogs;
 
 public class GraphMLReader {
 
-	private static HashMap<String,String> keyTypes = new HashMap<String,String>();
-	private static VGraphInterface loadedVGraph=null;
-	private static MGraphInterface loadedMGraph=null;
-	private static String errorMsg="";
-	private static GeneralPreferences gp = GeneralPreferences.getInstance();
+	private HashMap<String,String> keyTypes = new HashMap<String,String>();
+	private VGraphInterface loadedVGraph=null;
+	private MGraphInterface loadedMGraph=null;
+	private String errorMsg="";
+	private GeneralPreferences gp = GeneralPreferences.getInstance();
 	
-	public static void main(String[] args) {	 
-		JFileChooser fc = new JFileChooser("Öffnen einer Gravel-Datei");
-		//Letzten Ordner verwenden
-		if (!gp.getStringValue("graph.lastfile").equals("$NONE"))
-			fc.setCurrentDirectory(new File(gp.getStringValue("graph.lastfile")).getParentFile());
-		fc.addChoosableFileFilter(new JFileDialogs.SimpleFilter("XML","GraphML"));
-		int returnVal = fc.showOpenDialog(Gui.getInstance().getParentWindow());
-		if (returnVal != JFileChooser.APPROVE_OPTION)
-		{
-			System.err.println("Aborted");
-			return;
-		}
-		File f = fc.getSelectedFile();
+	/**
+	 * Init the Reader to a File f, this also starts the parsing of the file
+	 * If an error Occurs, ErrorOccured() returns true and the message is available in getErrorMsg();
+	 * @param f
+	 */
+	public GraphMLReader(File f)
+	{	 
 		Document doc=null;
 		try {
 			DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -115,15 +107,24 @@ public class GraphMLReader {
 
 	parseSubgraphs(n);
 	//Set Subgraphs into Graph		
-	if (loadedVGraph!=null)
-		Gui.getInstance().setVGraph(loadedVGraph);
-		Gui.getInstance().show();
+	}
+	public VGraphInterface getVGraph()
+	{
+		if (!ErrorOccured())
+			return loadedVGraph;
+		return null;
+	}
+	public MGraphInterface getMGraph()
+	{
+		if (!ErrorOccured())
+			return loadedMGraph;
+		return null;
 	}
 	/**
 	 * Check for an Error
 	 * @return
 	 */
-	public static boolean ErrorOccured()
+	public boolean ErrorOccured()
 	{
 		if (!errorMsg.equals(""))
 			System.err.println("DEBUG: "+errorMsg);
@@ -133,7 +134,7 @@ public class GraphMLReader {
 	 * Return the last ErrorMsg, this value is empty (but never null) iff no Error occured
 	 * @return
 	 */
-	public static String getErrorMsg()
+	public String getErrorMsg()
 	{
 		return errorMsg;
 	}
@@ -141,7 +142,7 @@ public class GraphMLReader {
 	 * Get the Data from the Graph-<Data>-elements needed for initialization
 	 * @param GraphNode
 	 */
-	private static void readAttributesAndInitGraph(Node GraphNode)
+	private void readAttributesAndInitGraph(Node GraphNode)
 	{
 		boolean directed=gp.getBoolValue("graph.directed");
 		boolean allowloops=gp.getBoolValue("graph.allowloops");
@@ -194,7 +195,7 @@ public class GraphMLReader {
 	/**
 	 * Call for each direct Child of the Graph that is a Node the ParseNode-Function
 	 */
-	private static void parseNodes(Node GraphNode)
+	private void parseNodes(Node GraphNode)
 	{
 		NodeList GraphChildElements = GraphNode.getChildNodes();
 		for (int i=0; i<GraphChildElements.getLength(); i++)
@@ -212,7 +213,7 @@ public class GraphMLReader {
 	 * Parse one single (V/M)Node and (if everything is right) put it into the specific (V/M ./H)Graph
 	 * @param graphnodeNode parental Node which is a Node
 	 */
-	private static void parseNode(Node graphnodeNode)
+	private void parseNode(Node graphnodeNode)
 	{
 		if ((graphnodeNode.getNodeType()!=Node.ELEMENT_NODE)||(!graphnodeNode.getNodeName().equals("node")))
 		{
@@ -287,7 +288,7 @@ public class GraphMLReader {
 		}
 	}
 
-	private static void parseEdges(Node GraphNode)
+	private void parseEdges(Node GraphNode)
 	{
 		NodeList GraphChildElements = GraphNode.getChildNodes();
 		for (int i=0; i<GraphChildElements.getLength(); i++)
@@ -301,7 +302,7 @@ public class GraphMLReader {
 			}
 		}
 	}
-	private static void parseEdge(Node edgeNode)
+	private void parseEdge(Node edgeNode)
 	{
 		if ((edgeNode.getNodeType()!=Node.ELEMENT_NODE)||(!edgeNode.getNodeName().equals("edge")))
 		{ errorMsg = "No Eode found when trying to parse an Edge."; return; }
@@ -451,7 +452,7 @@ public class GraphMLReader {
 		else
 		{errorMsg = "No suitable Graph for adding an Edge found"; return;}
 	}
-	private static void parseHyperedges(Node GraphNode)
+	private void parseHyperedges(Node GraphNode)
 	{
 		NodeList GraphChildElements = GraphNode.getChildNodes();
 		for (int i=0; i<GraphChildElements.getLength(); i++)
@@ -465,7 +466,7 @@ public class GraphMLReader {
 			}
 		}
 	}
-	private static void parseHyperedge(Node hyperedgeNode)
+	private void parseHyperedge(Node hyperedgeNode)
 	{
 		if ((hyperedgeNode.getNodeType()!=Node.ELEMENT_NODE)||(!hyperedgeNode.getNodeName().equals("hyperedge")))
 		{ errorMsg = "No hyperedge found when trying to parse an hyperedge.";return; }
@@ -597,7 +598,7 @@ public class GraphMLReader {
 	//
 	//All Subgraphs
 	//
-	private static void parseSubgraphs(Node GraphNode)
+	private void parseSubgraphs(Node GraphNode)
 	{
 
 		NodeList GraphChildElements = GraphNode.getChildNodes();
@@ -648,7 +649,7 @@ public class GraphMLReader {
 	 * Parse one single node that is a <key>-Element
 	 * @param node
 	 */
-	static private void parseKeyIntoPreferences(Node node)
+	private void parseKeyIntoPreferences(Node node)
 	{
 		int type = node.getNodeType();
 		if ((type!=Node.ELEMENT_NODE)||(!node.getNodeName().equals("key")))
@@ -687,7 +688,7 @@ public class GraphMLReader {
 	 * @param keyType Type of the default value from the attr.type-field
 	 * @param defaultValue
 	 */
-	static private void parseDefaultIntoPref(String pre, String keyType, Node defaultValue)
+	private void parseDefaultIntoPref(String pre, String keyType, Node defaultValue)
 	{
 		if ((!defaultValue.getNodeName().equals("default"))||(pre.equals("graph.type")))
 			return; //We need an default-NOde and we don't want to have an graphtype-default
@@ -816,7 +817,7 @@ public class GraphMLReader {
 	 * @param edgeTextNode a Node of type edgetext or hyperedgetext
 	 * @return
 	 */
-	static private VEdgeText parseEdgeText(Node edgeTextNode)
+	private VEdgeText parseEdgeText(Node edgeTextNode)
 	{
 		VEdgeText t = new VEdgeText(); //With Std Values;
 		if ((!edgeTextNode.getNodeName().equals("edgetext"))&&(!edgeTextNode.getNodeName().equals("hyperedgetext")))
@@ -847,7 +848,7 @@ public class GraphMLReader {
 	 * @param edgeLineNode
 	 * @return
 	 */
-	static private VEdgeLinestyle parseEdgeLinestyle(Node edgeLineNode)
+	private VEdgeLinestyle parseEdgeLinestyle(Node edgeLineNode)
 	{
 		VEdgeLinestyle l = new VEdgeLinestyle(); //With Std Values;
 		if ((!edgeLineNode.getNodeName().equals("edgeline"))&&(!edgeLineNode.getNodeName().equals("hyperedgeline")))
@@ -888,7 +889,7 @@ public class GraphMLReader {
 	 * @param n
 	 * @return
 	 */
-	static private VEdgeArrow parseEdgeArrow(Node edgearrowNode)
+	private VEdgeArrow parseEdgeArrow(Node edgearrowNode)
 	{
 		VEdgeArrow a = new VEdgeArrow();
 
@@ -919,7 +920,7 @@ public class GraphMLReader {
 	 * @param loopedgeNode
 	 * @return
 	 */
-	static private VLoopEdge parseLoopEdgeDetails(Node loopedgeNode)
+	private VLoopEdge parseLoopEdgeDetails(Node loopedgeNode)
 	{
 		VLoopEdge ve = new VLoopEdge(0,0,
 				gp.getIntValue("edge.loop_length"),
@@ -956,7 +957,7 @@ public class GraphMLReader {
 	 * @param edgepointsNode Data node with the point-Elements as childs
 	 * @return
 	 */
-	static private Vector<Point> parseEdgePoints(Node edgepointsNode)
+	private Vector<Point> parseEdgePoints(Node edgepointsNode)
 	{
 		Vector<Point> result = new Vector<Point>();
 		NodeList nodeChildElements = edgepointsNode.getChildNodes();
@@ -986,7 +987,7 @@ public class GraphMLReader {
 	/**
 	 * Parse a XML-Node with information about a Nodes Text and return that (within a VNode)
 	 */
-	static private VNode parseNodeText(Node nodeTextNode)
+	private VNode parseNodeText(Node nodeTextNode)
 	{
 		VNode n = new VNode(0,0,0,0,
 				gp.getIntValue("node.name_distance"),
@@ -1022,7 +1023,7 @@ public class GraphMLReader {
 	 * @param nodeFormNode
 	 * @return
 	 */
-	private static VNode parseNodeForm(Node nodeFormNode)
+	private VNode parseNodeForm(Node nodeFormNode)
 	{
 		VNode n = new VNode(0,0,0,0,
 				gp.getIntValue("node.name_distance"),
@@ -1062,7 +1063,7 @@ public class GraphMLReader {
 	 * @param subgraphNode
 	 * @return
 	 */
-	static MSubgraph parseMSubgraph(Node subgraphNode)
+	private MSubgraph parseMSubgraph(Node subgraphNode)
 	{
 		int index=-1;
 	   NamedNodeMap attrs = subgraphNode.getAttributes();
@@ -1100,7 +1101,7 @@ public class GraphMLReader {
 	 * @param subgraphNode
 	 * @return
 	 */
-	static VSubgraph parseVSubgraph(Node subgraphNode)
+	private VSubgraph parseVSubgraph(Node subgraphNode)
 	{
 		int index=-1;
 	   
@@ -1145,7 +1146,7 @@ public class GraphMLReader {
 	 * @param parent of this parent Node
 	 * @return
 	 */
-	private static Node getFirstChildWithElementName(String elementName, Node parent)
+	private Node getFirstChildWithElementName(String elementName, Node parent)
 	{
 		NodeList children = parent.getChildNodes(); //If there is da default value...
 		for (int i=0; i<children.getLength(); i++)
@@ -1160,7 +1161,7 @@ public class GraphMLReader {
 	 * @param parent Node to get Attributes from
 	 * @return the HashMap of Attributes, which might be empty, if there are no attributes
 	 */
-	private static HashMap<String,String> getAttributeHashMap(Node parent)
+	private HashMap<String,String> getAttributeHashMap(Node parent)
 	{
 		HashMap<String,String> attributes = new HashMap<String,String>();
 		NamedNodeMap Nodeattrs = parent.getAttributes();
@@ -1177,7 +1178,7 @@ public class GraphMLReader {
 	 * @param parent of this node
 	 * @return the value of the first attribute with that name, if existent, else null
 	 */
-	private static String getFirstAttributeValue(String attributename, Node parent)
+	private String getFirstAttributeValue(String attributename, Node parent)
 	{
 		   NamedNodeMap attrs = parent.getAttributes();
 	       for (int i=0; i<attrs.getLength(); i++) //Look at all atributes

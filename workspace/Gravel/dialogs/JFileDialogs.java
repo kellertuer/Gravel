@@ -1,6 +1,7 @@
 package dialogs;
 
 import io.GeneralPreferences;
+import io.GraphMLReader;
 import io.GraphMLWriter;
 import io.PNGWriter;
 import io.GravelMLReader;
@@ -19,6 +20,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import main.CONST;
+import model.MGraphInterface;
 import model.VGraph;
 import model.VGraphInterface;
 import model.VHyperGraph;
@@ -67,7 +70,7 @@ public class JFileDialogs implements Observer
 		}
 		public String getStdFileExtension()
 		{
-			return m_extension;
+			return m_extension.toLowerCase();
 		}
 		public boolean accept(File f) 
 	    {
@@ -75,7 +78,7 @@ public class JFileDialogs implements Observer
 				return false;
 			if (f.isDirectory())
 				return true;
-			return f.getName().toLowerCase().endsWith(m_extension);
+			return f.getName().toLowerCase().endsWith(getStdFileExtension());
 	    }
 	}
 	
@@ -86,11 +89,8 @@ public class JFileDialogs implements Observer
 	 */
 	class JOverwriteCheckFileChooser extends JFileChooser
 	{
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
-		String command;
+		String command="";
 		public JOverwriteCheckFileChooser(String s)
 		{
 			super(s);
@@ -100,14 +100,8 @@ public class JFileDialogs implements Observer
 		command = "save";
 		return super.showSaveDialog(parent);
 		}
-		public int showOpenDialog(Component parent)
-		{
-		command = "open";
-		return super.showOpenDialog(parent);
-		}
 		public void approveSelection()
 		{
-			
 			int selection = -1;
 			File fold = getSelectedFile();
 			String s = ((SimpleFilter)getFileFilter()).getStdFileExtension();
@@ -201,27 +195,48 @@ public class JFileDialogs implements Observer
 		//Letzten Ordner verwenden
 		if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
 			fc.setCurrentDirectory(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getParentFile());
-		fc.addChoosableFileFilter(new SimpleFilter("XML","GravelML"));
+		SimpleFilter GraphMLFilter = new SimpleFilter("XML","GraphML (.xml)"),
+		GravelMLFilter = new SimpleFilter("XML","GravelML (.xml, laden alter Graphen bis v. 0.3)");		
+		fc.removeChoosableFileFilter(fc.getFileFilter()); //Remove display all
+		fc.addChoosableFileFilter(GraphMLFilter);
+		fc.addChoosableFileFilter(GravelMLFilter);
+		fc.setFileFilter(GraphMLFilter);
 		int returnVal = fc.showOpenDialog(Gui.getInstance().getParentWindow());
 		if (returnVal == JFileChooser.APPROVE_OPTION)
 		   {
+				VGraphInterface loadedVGraph=null;
+				MGraphInterface loadedMGraph=null;
 				File f = fc.getSelectedFile();
-	    		GravelMLReader R = new GravelMLReader();
-	    		String error="";
-	    		error = R.checkGraph(f); //Check File
-	    		if (error.equals("")) //if okay - load
-	    		{
-	    			error = R.readGraph(); // Graph einlesen, Fehler merken
-	    		}
+				String error = "";
+				if (fc.getFileFilter()==GravelMLFilter)
+				{
+					GravelMLReader R = new GravelMLReader(f);
+		    		error = R.checkFile();
+					if (error.equals("")) //if okay - load
+		    			error = R.readGraph(); // Graph einlesen, Fehler merken
+					loadedVGraph = R.getVGraph();
+					loadedMGraph = R.getMGraph();
+				}
+				else if (fc.getFileFilter()==GraphMLFilter)
+				{
+					GraphMLReader R = new GraphMLReader(f);
+					if (R.ErrorOccured())
+		    			error = R.getErrorMsg();
+					else
+					{
+						loadedVGraph = R.getVGraph();
+						loadedMGraph = R.getMGraph();						
+					}
+				}
 	    		//bei einem der beiden ist ein Fehler aufgetreten
 	    		if (!error.equals("")) //es liegt ein fehler vor
 	    		{
 	    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><p>Der Graph konnte nicht geladen werden<br>Fehler :<br>"+error+"</p></html>","Fehler beim Laden",JOptionPane.ERROR_MESSAGE);				
 	    			return false;
 	    		} //kein Fehler und ein VGraph
-	    		else if (R.getVGraph()!=null)
+	    		else if (loadedVGraph!=null)
 	    		{
-	    			Gui.getInstance().setVGraph(R.getVGraph());
+	    			Gui.getInstance().setVGraph(loadedVGraph);
 	    			GeneralPreferences.getInstance().setStringValue("graph.lastfile",f.getAbsolutePath());
 					Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+"");
 					if (GraphType==VCommonGraphic.VGRAPHIC)
@@ -232,7 +247,7 @@ public class JFileDialogs implements Observer
 	    			vGc.getGraphHistoryManager().setGraphSaved();
 	    			return true;
 	    		}
-	    		else
+	    		else if (loadedMGraph!=null)
 	    		{
 	    			System.err.println("DEBUG : MGraph geladen, TODO Wizard hier einbauen.");
 					JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><p>Die Datei <br><i>"+f.getName()+"</i><br>enth"+main.CONST.html_ae+"lt einen mathematischen Graphen. Diese können bisher nicht weiter verarbeitet werden.</p></html>","Hinweis",JOptionPane.INFORMATION_MESSAGE);				
@@ -243,7 +258,8 @@ public class JFileDialogs implements Observer
 	    			//actualgraphsaved = true; //because only the math part was loaded
 					return true;
 	    		}
-	    		
+	    		else
+	    			return false;
 	       }
 		return false; //Chosen Cancel
 	}
@@ -299,15 +315,14 @@ public class JFileDialogs implements Observer
 	 */
 	public boolean SaveAs()
 	{
-		JFileChooser fc = new JOverwriteCheckFileChooser("Speichern unter");
+		JOverwriteCheckFileChooser fc = new JOverwriteCheckFileChooser("Speichern unter");
 		//Last used Directory
 		if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
 			fc.setCurrentDirectory(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getParentFile());
 		
-		FileFilter graphml = new SimpleFilter("xml","GraphML (.xml)");
-		fc.removeChoosableFileFilter(fc.getFileFilter());
+		SimpleFilter graphml = new SimpleFilter("XML","GraphML (.xml)");
+		fc.removeChoosableFileFilter(fc.getFileFilter()); //Remove display all
 		fc.addChoosableFileFilter(graphml);
-		fc.setFileHidingEnabled(true); 
 		saveVisual = GeneralPreferences.getInstance().getStringValue("graph.fileformat").equals("visual");
 		fc.setFileFilter(graphml);	
 		int returnVal = fc.showSaveDialog(Gui.getInstance().getParentWindow());
@@ -377,22 +392,26 @@ public class JFileDialogs implements Observer
 	public boolean Export()
 	{
 		JFileChooser fc = new JOverwriteCheckFileChooser("Exportieren");
+		if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
+			fc.setCurrentDirectory(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getParentFile());
 		//Wenn man schon nen File hat das Directory davon verwenden
-		FileFilter png = new SimpleFilter("PNG","Portable Network Graphics");
-		FileFilter tex = new SimpleFilter("TEX","LaTeX-Picture-Grafik");
-		FileFilter svg = new SimpleFilter("SVG","Scalable Vector Graphics");
+		SimpleFilter png = new SimpleFilter("png","Portable Network Graphics (.png)");
+		SimpleFilter tex = new SimpleFilter("TEX","LaTeX-Picture-Grafik (.tex)");
+		SimpleFilter svg = new SimpleFilter("SVG","Scalable Vector Graphics (.svg)");
+		fc.removeChoosableFileFilter(fc.getFileFilter()); //Remove display all
 		fc.addChoosableFileFilter(png);
 		fc.addChoosableFileFilter(tex);
 		fc.addChoosableFileFilter(svg);
-		if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
-			fc.setCurrentDirectory(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getParentFile());
+		fc.setFileFilter(png);
 
 		int returnVal = fc.showSaveDialog(Gui.getInstance().getParentWindow());
 		   if (returnVal == JFileChooser.APPROVE_OPTION)
 		   {
 			    File f = fc.getSelectedFile();
-	    		if (png.accept(f))
+	    		if (fc.getFileFilter()==png)
 	    		{
+	    			if (!CheckExtension(f,png))
+	    				return false;
 	    			ExportPNGDialog esvgd = new ExportPNGDialog(Gui.getInstance().getParentWindow(),
 	    					(vG.getMaxPoint(vGc.getGraphics()).x-vG.getMinPoint(vGc.getGraphics()).x),
 	    					(vG.getMaxPoint(vGc.getGraphics()).y-vG.getMinPoint(vGc.getGraphics()).y));
@@ -403,8 +422,10 @@ public class JFileDialogs implements Observer
 	    				return true;
 	    			}
 	    		}
-	    		else if (svg.accept(f))
+	    		else if (fc.getFileFilter()==svg)
 	    		{
+	    			if (!CheckExtension(f,svg))
+	    				return false;
 	    			ExportSVGDialog esvgd = new ExportSVGDialog(Gui.getInstance().getParentWindow(),
 	    					(vG.getMaxPoint(vGc.getGraphics()).x-vG.getMinPoint(vGc.getGraphics()).x),
 	    					(vG.getMaxPoint(vGc.getGraphics()).y-vG.getMinPoint(vGc.getGraphics()).y));
@@ -415,8 +436,10 @@ public class JFileDialogs implements Observer
 	    				return true;
 	    			}
 	    		}
-	    		else if (tex.accept(f))
+	    		else if (fc.getFileFilter()==tex)
 	    		{
+	    			if (!CheckExtension(f,tex))
+	    				return false;
 	    			ExportTeXDialog etexd = new ExportTeXDialog(Gui.getInstance().getParentWindow(),
 	    					(vG.getMaxPoint(vGc.getGraphics()).x-vG.getMinPoint(vGc.getGraphics()).x),
 	    					(vG.getMaxPoint(vGc.getGraphics()).y-vG.getMinPoint(vGc.getGraphics()).y));
@@ -449,6 +472,18 @@ public class JFileDialogs implements Observer
 	    		}
 	       }	   
 		   return false;
+	}
+	private boolean CheckExtension(File f, FileFilter ff)
+	{
+		if (ff.accept(f))
+			return true;
+		int sel = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(),
+				"<html>Die Datei<br><br><i>"+f.getAbsolutePath()+"</i><br><br>hat eine Falsche Endung (."+
+				getExtension(f)+") zum Export in <br><i>"+ff.getDescription()+"</i><br> M"+CONST.html_oe+
+				"chten Sie trotzdem exportieren?","Unbekannte Dateiendung für den Export", JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+	if (sel == JOptionPane.NO_OPTION)
+		return false;
+	return true;
 	}
 	/**
 	 * Get the actual status of the graph

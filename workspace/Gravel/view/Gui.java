@@ -2,6 +2,7 @@ package view;
 
 import history.CommonGraphHistoryManager;
 import io.GeneralPreferences;
+import io.GraphMLReader;
 import io.GravelMLReader;
 
 import java.awt.*;
@@ -80,41 +81,36 @@ public class Gui implements WindowListener
 		}
 		if (gp.getBoolValue("graph.loadfileonstart")&&(!gp.getStringValue("graph.lastfile").equals("$NONE")))
 		{
-			GravelMLReader R = new GravelMLReader();
+			GraphMLReader R = new GraphMLReader(new File(gp.getStringValue("graph.lastfile")));
 			String error="";
-			try {
-				error = R.checkGraph(new File(gp.getStringValue("graph.lastfile")));
-			}
-			catch(Exception e){}
-			if (error.equals("")) //letzten laden
-			{
-				error = R.readGraph(); // Graph einlesen, Fehler merken
-			}
-			//bei einem der beiden ist ein Fehler aufgetreten
-			if (!error.equals("")) //es liegt ein fehler vor
+			if (R.ErrorOccured()) //An error occured and because we only save in new format, don't try gravelML
 			{
 				JOptionPane.showMessageDialog(frame, "<html><p>Der Graph konnte nicht geladen werden<br>Fehler :<br>"+error+"</p></html>","Initialisierungsfehler",JOptionPane.ERROR_MESSAGE);				
 				MainGraph = new VGraph(gp.getBoolValue("graph.directed"),gp.getBoolValue("graph.allowloops"),gp.getBoolValue("graph.allowmultiple"));
-			} //kein Fehler und ein VGraph
-			else if (R.getVGraph()!=null)
-			{
-				MainGraph=R.getVGraph(); //weiter so
-				gp.setStringValue("graph.fileformat","visual");
-				frame.setTitle(Gui.WindowName+" - "+(new File(gp.getStringValue("graph.lastfile")).getName())+"");
 			}
-			else
+			else //No Error in new FileFormat
 			{
-				System.err.println(" DEBUG MGraph geladen, TODO Wizard hier einbauen.");
-				//TODO: Wizard 
-				JOptionPane.showMessageDialog(frame, "<html><p>Der letzte gespeicherte Graph ist ein mathematischer Graph. Diese können zwar geladen, danach jedoch nicht weiter verarbeitet werden.<br>Gravel startet mit einem neuen Graphen.</p></html>","Hinweis",JOptionPane.INFORMATION_MESSAGE);				
-				MainGraph = new VGraph(gp.getBoolValue("graph.directed"),gp.getBoolValue("graph.allowloops"),gp.getBoolValue("graph.allowmultiple"));
+				if (R.getVGraph()!=null)
+				{
+					MainGraph=R.getVGraph(); //weiter so
+					gp.setStringValue("graph.fileformat","visual");
+					frame.setTitle(Gui.WindowName+" - "+(new File(gp.getStringValue("graph.lastfile")).getName())+"");
+				}
+				else
+				{
+					//TODO: Wizard 
+					JOptionPane.showMessageDialog(frame, "<html><p>Der letzte gespeicherte Graph ist ein mathematischer Graph. Diese können zwar geladen, danach jedoch nicht weiter verarbeitet werden.<br>Gravel startet mit einem neuen Graphen.</p></html>","Hinweis",JOptionPane.INFORMATION_MESSAGE);				
+					MainGraph = new VGraph(gp.getBoolValue("graph.directed"),gp.getBoolValue("graph.allowloops"),gp.getBoolValue("graph.allowmultiple"));
+				}
 			}
 		}
-		else //don't load a Graph on start
+		else
+		{
+			//don't load a Graph on start
 		//	MainGraph = new VGraph(gp.getBoolValue("graph.directed"),gp.getBoolValue("graph.allowloops"),gp.getBoolValue("graph.allowmultiple"));			
 		//For Debug Start with a HyperGraph	
 			MainGraph = new VHyperGraph();
-        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		}
         frame.addWindowListener(this);        
         BorderLayout test = new BorderLayout();
         frame.setLayout(test);
@@ -305,9 +301,12 @@ public class Gui implements WindowListener
     public void doQuit()
     {
     		//Check File Saved
-    		MenuBar.checkSaved();    		
-			frame.setVisible(false);
-			frame.dispose();
+    		boolean quit = MenuBar.checkSavedBeforeQuit();
+    		if (quit)
+    		{
+    			frame.setVisible(false);
+				frame.dispose();
+    		}
     }
     //External getting referrence of the Graph for manipulating ist
     /**
