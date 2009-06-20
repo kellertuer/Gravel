@@ -449,14 +449,14 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 	}
 	/**
 	 * Check whether to save the Garph before quitting or not
-	 * @return
+	 * @return true if we can uit or the user wishes to, else false
 	 */
 	public boolean checkSavedBeforeQuit() 
 	{
 		if (!fileDialogs.isGraphSaved()) //Not Saved
 		{
 			//Fragen
-			if (GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
+			if (GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE")) //Last file known, check for changes
 			{
 				int cardinality = 0;
 				if (Gui.getInstance().getVGraph().getType()==VGraphInterface.GRAPH)
@@ -474,7 +474,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 						return false; //Do not wuit
 				}
 			}
-			else
+			else //No last file known
 			{
 				String file = (new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getName());
 				int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Die letzten "+main.CONST.html_Ae+"nderungen des Graphen<br><i>'"+file+"'</i><br>wurden noch nicht gespeichert.<br>M"+main.CONST.html_oe+"chten Sie diese noch speichern ?</html>","Gravel beenden",JOptionPane.YES_NO_CANCEL_OPTION);
@@ -486,7 +486,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 					return false; //Do not wuit
 			}
 		}
-		return false;
+		return true;
 	}
 	private int getIndexofSingeSelectedHyperEdge()
 	{
