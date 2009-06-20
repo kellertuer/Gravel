@@ -58,9 +58,9 @@ public class GraphMLWriter {
 		if (vg!=null)
 		{
 			s.write("\t\t<!-- Values for allowance of loops and multiple edges -->"+nl);
-			s.write("\t<key id=\"graphloops\" for=\"graph\" attr.name=\"allowloops\" attr.type=\"boolean\">"+nl+
+			s.write("\t<key id=\"graphloops\" for=\"graph\" attr.name=\"graph.allowloops\" attr.type=\"boolean\">"+nl+
 					"\t\t<default>"+gp.getBoolValue("graph.allowloops")+"</default>"+nl+"\t</key>"+nl);
-			s.write("\t<key id=\"graphmultipleedges\" for=\"graph\" attr.name=\"allowmultiple\" attr.type=\"boolean\">"+nl+
+			s.write("\t<key id=\"graphmultipleedges\" for=\"graph\" attr.name=\"graph.allowmultiple\" attr.type=\"boolean\">"+nl+
 					"\t\t<default>"+gp.getBoolValue("graph.allowmultiple")+"</default>"+nl+"\t</key>"+nl+nl);			
 			s.write("\t\t<!-- Values for edges -->"+nl);
 			s.write("\t<key id=\"edgevalue\" for=\"edge\" attr.name=\"edge.value\" attr.type=\"int\">"+nl+
@@ -124,7 +124,7 @@ public class GraphMLWriter {
 					"\t\t<default>"+gp.getIntValue("edge.width")+"</default>"+nl+"\t</key>"+nl);
 			s.write("\t<key id=\"edgetype\" for=\"edge\" attr.name=\"edge.type\" attr.type=\"string\"> <!-- Kantentyp (Orthogonal|QuadCurve|Segmented|StraightLine|)-->"+nl);
 			s.write("\t\t<default>StraightLine</default>"+nl+"\t</key>"+nl); //StraightLine ist immer Std !
-			s.write("\t<key id=\"e_orthogonal\" for=\"edge\" attr.name=\"orthogonaledge_verticalfirst\" attr.type=\"boolean\"> <!--Nur fuer Orthogonal pflicht-->"+nl);
+			s.write("\t<key id=\"edgeorthogonal\" for=\"edge\" attr.name=\"orthogonaledge_verticalfirst\" attr.type=\"boolean\"> <!--Nur fuer Orthogonal pflicht-->"+nl);
 			s.write("\t\t<default>true</default>"+nl+"\t</key>"+nl);
 			
 			s.write("\t<key id=\"loopedge\" for=\"edge\" attr.name=\"edge.loop\" attr.complexType=\"edge.loop.type\">"+nl+
@@ -312,14 +312,14 @@ public class GraphMLWriter {
 	    	   {
 	    		   s.write("\t\t\t<data key=\"edgetype\">Orthogonal</data>"+nl);
 	    		   if (((VOrthogonalEdge)actual).getVerticalFirst()!=gp.getBoolValue("edge.orth_verticalfirst")) //non standard Orth Edge
-	    			   s.write("\t\t\t<data key=\"edge_orthogonal_bool\">"+((VOrthogonalEdge)actual).getVerticalFirst()+"</data>"+nl);
+	    			   s.write("\t\t\t<data key=\"edgeorthogonal\">"+((VOrthogonalEdge)actual).getVerticalFirst()+"</data>"+nl);
 	    	   }
 	    	   else if (actual.getEdgeType()==VEdge.QUADCURVE)
 	    	   {
 	    		   s.write("\t\t\t<data key=\"edgetype\">QuadCurve</data>"+nl);
 	    		   Point p = ((VQuadCurveEdge)actual).getControlPoints().firstElement();
 	    		   s.write("\t\t\t<data key=\"edgepoints\">"+nl+
-	    				   "\t\t\t\t<point id=\"0\" x=\""+p.x+" y=\""+p.y+"\"/>"+nl+
+	    				   "\t\t\t\t<point id=\"0\" x=\""+p.x+"\" y=\""+p.y+"\"/>"+nl+
 	    				   "\t\t\t</data>"+nl);		   
 	    	   }
 	    	   else if (actual.getEdgeType()==VEdge.SEGMENTED)
@@ -332,7 +332,7 @@ public class GraphMLWriter {
 	    				if (points.get(i)!=null)
 	    				{
 	    				   Point p = points.get(i);
-	    				   s.write("\t\t\t\t<point id=\""+i+"\" x=\""+p.x+" y=\""+p.y+"\"/>"+nl);
+	    				   s.write("\t\t\t\t<point id=\""+i+"\" x=\""+p.x+"\" y=\""+p.y+"\"/>"+nl);
 	    				}
 	    			}		   
 				   s.write("\t\t\t</data>"+nl);		   
@@ -455,8 +455,8 @@ public class GraphMLWriter {
 			s.write("\t\t\t<data key=\"");
 			if (hyper)
 				s.write("hyper");
-			s.write("edgetext\">"+nl+
-			"\t\t\t\t<edgetext");
+			s.write("edgeline\">"+nl+
+			"\t\t\t\t<edgeline");
 			if (noStdDist)
 				s.write(" distance=\""+l.getDistance()+"\"");
 			if (noStdLen)

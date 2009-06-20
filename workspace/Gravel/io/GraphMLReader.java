@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Vector;
 
 import javax.swing.JFileChooser;
 import javax.xml.parsers.DocumentBuilder;
@@ -24,12 +25,13 @@ public class GraphMLReader {
 	private static VGraphInterface loadedVGraph=null;
 	private static MGraphInterface loadedMGraph=null;
 	private static String errorMsg="";
+	private static GeneralPreferences gp = GeneralPreferences.getInstance();
 	
 	public static void main(String[] args) {	 
 		JFileChooser fc = new JFileChooser("Öffnen einer Gravel-Datei");
 		//Letzten Ordner verwenden
-		if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
-			fc.setCurrentDirectory(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getParentFile());
+		if (!gp.getStringValue("graph.lastfile").equals("$NONE"))
+			fc.setCurrentDirectory(new File(gp.getStringValue("graph.lastfile")).getParentFile());
 		fc.addChoosableFileFilter(new JFileDialogs.SimpleFilter("XML","GraphML"));
 		int returnVal = fc.showOpenDialog(Gui.getInstance().getParentWindow());
 		if (returnVal != JFileChooser.APPROVE_OPTION)
@@ -86,10 +88,35 @@ public class GraphMLReader {
 			return;
 		//Parse all Node-Elements, that are direct children of n
 		parseNodes(n);
+		if (ErrorOccured())
+			return;
 		//Check for Edges (or Hyperedges if it's a hypergraph
-		
-		//Set Subgraphs into Graph		
-		
+		if (loadedVGraph!=null)
+		{
+			if (loadedVGraph.getType()==VGraphInterface.GRAPH)
+				parseEdges(n); //Parse all edges that are direct children of graph-Element
+			else if (loadedVGraph.getType()==VGraphInterface.HYPERGRAPH)
+				parseHyperedges(n); //analogogous parse all Hyperedges
+			if (ErrorOccured())
+				return;
+		}
+		else if (loadedMGraph!=null)
+		{
+			if (loadedMGraph.getType()==MGraphInterface.GRAPH)
+				parseEdges(n); //Parse all edges that are direct children of graph-Element
+			else if (loadedMGraph.getType()==VGraphInterface.HYPERGRAPH)
+				parseHyperedges(n); //analogogous parse all Hyperedges
+			if (ErrorOccured())
+				return;
+		}
+		else 
+			errorMsg = "Unknown graph type";
+
+	parseSubgraphs(n);
+	//Set Subgraphs into Graph		
+	if (loadedVGraph!=null)
+		Gui.getInstance().setVGraph(loadedVGraph);
+		Gui.getInstance().show();
 	}
 	/**
 	 * Check for an Error
@@ -113,19 +140,13 @@ public class GraphMLReader {
 	 */
 	private static void readAttributesAndInitGraph(Node GraphNode)
 	{
-		boolean directed=GeneralPreferences.getInstance().getBoolValue("graph.directed");
-		boolean allowloops=GeneralPreferences.getInstance().getBoolValue("graph.allowloops");
-		boolean allowmultiple=GeneralPreferences.getInstance().getBoolValue("graph.allowmultiple");
-		NamedNodeMap GraphAttrs = GraphNode.getAttributes();
-		for (int j=0; j<GraphAttrs.getLength(); j++)
-		{
-			Attr attr = (Attr)GraphAttrs.item(j);
-			if (attr.getNodeName().equals("edgedefault"))
-			{
-				System.err.println("Found Data for Direction: "+attr.getValue());
-				directed = attr.getValue().equals("directed");
-			}
-        }
+		boolean directed=gp.getBoolValue("graph.directed");
+		boolean allowloops=gp.getBoolValue("graph.allowloops");
+		boolean allowmultiple=gp.getBoolValue("graph.allowmultiple");
+		HashMap<String,String> graphAttrib = getAttributeHashMap(GraphNode);
+		if (!graphAttrib.containsKey("edgedefault"))
+		{ errorMsg = "no edgedefault-value found, though its mandatory."; return;}
+		directed = graphAttrib.get("edgedefault").equals("directed");
 		NodeList GraphChildElements = GraphNode.getChildNodes();
 		HashMap<String,String> keyValues = new HashMap<String,String>();
 		for (int i=0; i<GraphChildElements.getLength(); i++)
@@ -133,13 +154,10 @@ public class GraphMLReader {
 			Node actual = GraphChildElements.item(i);
 			if (actual.getNodeName().equals("data")&&(actual.getNodeType()==Node.ELEMENT_NODE))
 			{
-				NamedNodeMap attrs = actual.getAttributes();
-				for (int j=0; j<attrs.getLength(); j++)
-				{
-					Attr attr = (Attr)attrs.item(j);
-					if (attr.getNodeName().equals("key"))
-						keyValues.put(attr.getValue(),actual.getTextContent());
-		        }
+				HashMap<String,String> dataAttrib = getAttributeHashMap(actual);
+				if (!dataAttrib.containsKey("key"))
+				{ errorMsg = "No key-Reference for Data Element found"; return;}
+				keyValues.put(dataAttrib.get("key"),actual.getTextContent());
 			}
 		}
 		if (keyValues.containsKey("graphloops"))
@@ -198,32 +216,24 @@ public class GraphMLReader {
 			errorMsg = "No Node found when parsing Node.";
 			return; 
 		}
-		int index = -1;
-		NamedNodeMap attrs = graphnodeNode.getAttributes();
-		VNode resultNode = null; String name="";
-		for (int j=0; j<attrs.getLength(); j++) //Find the index
-		{
-			Attr attr = (Attr)attrs.item(j);
-			if (attr.getNodeName().equals("id"))
-			try {index = Integer.parseInt(attr.getValue());} catch(Exception e){index=-1;}
-		}
-		if (index==-1)
-		{	errorMsg = "Error When Parsing Node ID";return;}
-		resultNode = new VNode(index,0,0,0,0,0,0,false);
+		int index;
+		HashMap<String,String> nodeAttributes = getAttributeHashMap(graphnodeNode);
+		if (!nodeAttributes.containsKey("id"))
+		{ errorMsg = "Error When Parsing Node ID";return;}
+		try {index = Integer.parseInt(nodeAttributes.get("id"));} 
+		catch(Exception e){ errorMsg = "Error When Parsing Node ID";return; }
+		String name= gp.getNodeName(index);
+		VNode resultNode = new VNode(index,0,0,0,0,0,0,false);
 		NodeList nodeChildElements = graphnodeNode.getChildNodes();
 		for (int i=0; i<nodeChildElements.getLength(); i++)
 		{ //Search all Data-Elements, take their key-ID and Content as Values
 			Node actual = nodeChildElements.item(i);
 			if (actual.getNodeName().equals("data")&&(actual.getNodeType()==Node.ELEMENT_NODE))
 			{ //For each Data element
-				NamedNodeMap Nodeattrs = actual.getAttributes();
-				String dataType="";
-				for (int j=0; j<Nodeattrs.getLength(); j++)
-				{
-					Attr attr = (Attr)Nodeattrs.item(j);
-					if (attr.getNodeName().equals("key"))
-						dataType = attr.getNodeValue();
-		        }
+				HashMap<String,String> dataAttrib = getAttributeHashMap(actual);
+				if (!dataAttrib.containsKey("key"))
+				{ errorMsg = "No key-Reference for Data Element found"; return;}
+				String dataType= dataAttrib.get("key");
 				if (dataType.equals("nodename")) //We have an Index and 
 					name = actual.getTextContent();
 				else if (dataType.equals("nodetext"))
@@ -237,7 +247,7 @@ public class GraphMLReader {
 					VNode FormInfo = resultNode.clone();
 					if ((info==null)&&(loadedVGraph!=null)) //We need that for a VGraph
 					{
-						errorMsg = "No Form existent for the node #"+index;
+						errorMsg = "Incorrect form information for the node #"+index;
 						return;
 					}
 					else if (loadedVGraph!=null)
@@ -252,10 +262,10 @@ public class GraphMLReader {
 					System.err.println("Warning: Unhandled Data-Field in Node #"+index+" for key "+dataType);
 			}
 		} //End for - handle all Data Fields
-		if (name.equals("")) //If it is still empty recreate Std Name
-			name = GeneralPreferences.getInstance().getNodeName(index);
 		if (loadedVGraph!=null) //VGraph
 		{
+			if ((resultNode.getPosition().x==0)||(resultNode.getPosition().y==0)||(resultNode.getSize()==0))
+			{errorMsg = "No Form given for node "+resultNode.getIndex(); return;}
 			if (loadedVGraph.getType()==VGraphInterface.GRAPH)
 				((VGraph)loadedVGraph).modifyNodes.add(resultNode,new MNode(index,name));
 			else if (loadedVGraph.getType()==VGraphInterface.HYPERGRAPH)
@@ -263,7 +273,7 @@ public class GraphMLReader {
 			else
 				errorMsg = "Unknown visual GraphType when parsing Nodes";
 		}
-		else if (loadedMGraph!=null) //VGraph
+		else if (loadedMGraph!=null) //MGraph - add MNode
 		{
 			if (loadedMGraph.getType()==MGraphInterface.GRAPH)
 				((MGraph)loadedMGraph).modifyNodes.add(new MNode(index,name));
@@ -273,10 +283,241 @@ public class GraphMLReader {
 				errorMsg = "Unknown visual GraphType when parsing Nodes";
 		}
 	}
+
+	private static void parseEdges(Node GraphNode)
+	{
+		NodeList GraphChildElements = GraphNode.getChildNodes();
+		for (int i=0; i<GraphChildElements.getLength(); i++)
+		{ //Search all Data-Elements, take their key-ID and Content as Values
+			Node actual = GraphChildElements.item(i);
+			if (actual.getNodeName().equals("edge")&&(actual.getNodeType()==Node.ELEMENT_NODE))
+			{
+				parseEdge(actual);
+				if (ErrorOccured())
+					return;
+			}
+		}
+	}
+	private static void parseEdge(Node edgeNode)
+	{
+		if ((edgeNode.getNodeType()!=Node.ELEMENT_NODE)||(!edgeNode.getNodeName().equals("edge")))
+		{
+			errorMsg = "No Eode found when trying to parse an Edge.";
+			return; 
+		}
+		//Value temporary fields
+		int index = -1, start=-1, end=-1, width=gp.getIntValue("edge.width"), value = gp.getIntValue("edge.value");
+		String name;
+		VEdgeText text = new VEdgeText();
+		VEdgeLinestyle linestyle = new VEdgeLinestyle();
+		VEdgeArrow arrow = new VEdgeArrow(); 
+		Vector<Point> Points = new Vector<Point>();
+		boolean orth_verticalfirst = gp.getBoolValue("edge.orth_verticalfirst");
+		int type = VEdge.STRAIGHTLINE;
+		VLoopEdge StdLoopEdgeValues = parseLoopEdgeDetails(null);
+		//Loop Values, std
+		HashMap<String,String> edgeAttrib = getAttributeHashMap(edgeNode);
+		if ((!edgeAttrib.containsKey("id"))||(!edgeAttrib.containsKey("source"))||(!edgeAttrib.containsKey("target")))
+		{ errorMsg = "Edge incomplete, either ID, Start or Endnode are missing"; return; }
+		try
+		{
+			index = Integer.parseInt(edgeAttrib.get("id"));
+			start = Integer.parseInt(edgeAttrib.get("source"));
+			end = Integer.parseInt(edgeAttrib.get("target"));
+		}
+		catch(Exception e)
+		{ errorMsg = "Edge incomplete, either ID, Start or Endnode could not be parsed."; return; }
+		name = gp.getEdgeName(index,start,end);
+		NodeList nodeChildElements = edgeNode.getChildNodes();
+		for (int i=0; i<nodeChildElements.getLength(); i++)
+		{ //Search all Data-Elements, take their key-ID and Content as Values
+			Node actual = nodeChildElements.item(i);
+			if (actual.getNodeName().equals("data")&&(actual.getNodeType()==Node.ELEMENT_NODE))
+			{ //For each Data element
+				HashMap<String,String> dataAttrib = getAttributeHashMap(actual);
+				if (!dataAttrib.containsKey("key"))
+				{ errorMsg = "No key-Reference for Data Element found"; return;}
+				String dataType= dataAttrib.get("key");
+				if (dataType.equals("edgename")) //We have the name 
+					name = actual.getTextContent();
+				else if (dataType.equals("edgevalue")) //Simple int
+				{
+					try {value = Integer.parseInt(actual.getTextContent());}
+					catch (Exception e){errorMsg = "Could not Parse value for edge #"+index+""; return;}
+				}
+				else if (dataType.equals("edgewidth")) //Simple int
+				{
+					try {width = Integer.parseInt(actual.getTextContent());}
+					catch (Exception e){errorMsg = "Could not Parse width for edge #"+index+""; return;}
+				}
+				else if (dataType.equals("edgeorthogonal")) //Simple int
+				{
+					try {orth_verticalfirst = Boolean.parseBoolean(actual.getTextContent());}
+					catch (Exception e){errorMsg = "Could not Parse orthogonal information for edge #"+index+""; return;}
+				}
+				else if (dataType.equals("edgetype")) //Simple string
+				{
+					String sType = actual.getTextContent();
+					if (sType.equals("Orthogonal"))
+						type = VEdge.ORTHOGONAL;
+					else if (sType.equals("QuadCurve"))
+						type = VEdge.QUADCURVE;
+					else if (sType.equals("Segmented"))
+						type = VEdge.SEGMENTED;
+					else if (sType.equals("Loop"))
+						type = VEdge.LOOP;
+					//If it is none of that, don't throw an error, because (a) Strightline always works (b) edgetype is a String
+				}
+				else if (dataType.equals("edgetext"))
+				{
+					//get Child with edge text
+					Node edgetext = getFirstChildWithElementName("edgetext",actual);
+					if (edgetext==null)
+					{ errorMsg = "No edgetext-Specification inside edgetext data field found for edge #"+index; return;}
+					text = parseEdgeText(edgetext);
+				}
+				else if (dataType.equals("edgeline"))
+				{
+					//get Child with edge text
+					Node edgeline = getFirstChildWithElementName("edgeline",actual);
+					if (edgeline==null)
+					{ errorMsg = "No edgeline-Specification inside edgeline data field found for edge #"+index; return;}
+					linestyle = parseEdgeLinestyle(edgeline);
+				}
+				else if (dataType.equals("edgearrow"))
+				{
+					//get Child with edge text
+					Node edgearrow = getFirstChildWithElementName("arrow",actual);
+					if (edgearrow==null)
+					{ errorMsg = "No arrow-Specification inside edgearrow data field found for edge #"+index; return;}
+					linestyle = parseEdgeLinestyle(edgearrow);
+				}
+				else if (dataType.equals("edgepoints"))
+				{
+					Points = parseEdgePoints(actual);
+					if (ErrorOccured())
+						return;
+				}
+				else
+					System.err.println("Warning: Unhandled Data-Field in Edge #"+index+" with key "+dataType);
+			}
+		} //End for - handle all Data Fields
+		//Build Edge
+		if ((loadedVGraph!=null)&&(loadedVGraph.getType()==VGraphInterface.GRAPH))
+		{	
+			MEdge me = new MEdge(index,start,end,value,name);
+			VEdge resultEdge=null;
+			switch (type)
+			{
+				case VEdge.LOOP:
+					resultEdge = new VLoopEdge(index, width,
+							StdLoopEdgeValues.getLength(),StdLoopEdgeValues.getDirection(),
+							StdLoopEdgeValues.getProportion(),StdLoopEdgeValues.isClockwise());				
+				break;
+				case VEdge.ORTHOGONAL:
+					resultEdge = new VOrthogonalEdge(index,width,orth_verticalfirst);
+				break;
+				case VEdge.QUADCURVE:
+					if (Points.size()==0)
+					{errorMsg = "No Bezier control poin exists for quadcurve";}
+					resultEdge = new VQuadCurveEdge(index,width,Points.firstElement());
+				break;				
+				case VEdge.SEGMENTED:
+					if (Points.size()==0)
+					{errorMsg = "No suitable controlpoints for the segmented edge";}
+					resultEdge = new VSegmentedEdge(index,width,Points);
+				break;
+				case VEdge.STRAIGHTLINE:
+				default:
+					resultEdge = new VStraightLineEdge(index, width);
+			}
+			if (resultEdge==null)
+			{errorMsg = "No suitable edge could be created"; return;}
+			resultEdge.setArrow(arrow);
+			resultEdge.setTextProperties(text);
+			resultEdge.setLinestyle(linestyle);
+			VGraph castedGraph = ((VGraph)loadedVGraph);
+			if ((castedGraph.modifyNodes.get(start)==null)||(castedGraph.modifyNodes.get(end)==null))
+			{errorMsg = "Start or Endnode does not exist"; return;}
+			Point s = castedGraph.modifyNodes.get(start).getPosition();
+			Point e = castedGraph.modifyNodes.get(end).getPosition();
+			((VGraph)loadedVGraph).modifyEdges.add(resultEdge,me, s, e);
+		}
+		else if ((loadedMGraph!=null)&&(loadedMGraph.getType()==MGraphInterface.GRAPH))
+		{
+			MEdge me = new MEdge(index,start,end,value,name);
+			((MGraph)loadedMGraph).modifyEdges.add(me);
+		}
+		else
+		{errorMsg = "No suitable Graph for adding an Edge found"; return;}
+		
+	}
+	private static void parseHyperedges(Node GraphNode)
+	{
+		NodeList GraphChildElements = GraphNode.getChildNodes();
+		for (int i=0; i<GraphChildElements.getLength(); i++)
+		{ //Search all Data-Elements, take their key-ID and Content as Values
+			Node actual = GraphChildElements.item(i);
+			if (actual.getNodeName().equals("hyperedge")&&(actual.getNodeType()==Node.ELEMENT_NODE))
+			{
+				parseHyperedge(actual);
+				if (ErrorOccured())
+					return;
+			}
+		}
+	}
+	private static void parseHyperedge(Node hyperedgeNode)
+	{
+		//TODO Single HyperEdge Parsing
+	}
+	
 	//
 	//All Subgraphs
 	//
-	
+	private static void parseSubgraphs(Node GraphNode)
+	{
+
+		NodeList GraphChildElements = GraphNode.getChildNodes();
+		for (int i=0; i<GraphChildElements.getLength(); i++)
+		{ //Search all Data-Elements, take their key-ID and Content as Values
+			Node actual = GraphChildElements.item(i);
+			if (actual.getNodeName().equals("data")&&(actual.getNodeType()==Node.ELEMENT_NODE))
+			{
+				HashMap<String,String> dataAttrib = getAttributeHashMap(actual);
+				if (!dataAttrib.containsKey("key"))
+				{errorMsg="key-Attribute for data-Element missing"; return;}
+				if (dataAttrib.get("key").startsWith("subgraph"))
+				{
+					//Search for subgraph subentry
+					Node sub = getFirstChildWithElementName("subgraph",actual);
+					if (sub==null)
+					{errorMsg="No subgraph-Element found, though the data-key-reference indicated one"; return;}
+					MSubgraph msub = parseMSubgraph(sub);
+					VSubgraph vsub = parseVSubgraph(sub);
+					if (ErrorOccured())
+						return;
+					if (loadedVGraph!=null) //VGraph
+					{
+						if (loadedVGraph.getType()==VGraphInterface.GRAPH)
+							((VGraph)loadedVGraph).modifySubgraphs.add(vsub,msub);
+						else if (loadedVGraph.getType()==VGraphInterface.HYPERGRAPH)
+							((VHyperGraph)loadedVGraph).modifySubgraphs.add(vsub,msub);
+						else
+							errorMsg = "Unknown visual GraphType when parsing Nodes";
+					}
+					else if (loadedMGraph!=null) //MGraph
+					{
+						if (loadedMGraph.getType()==MGraphInterface.GRAPH)
+							((MGraph)loadedMGraph).modifySubgraphs.add(msub);
+						else if (loadedMGraph.getType()==MGraphInterface.HYPERGRAPH)
+							((MHyperGraph)loadedVGraph).modifySubgraphs.add(msub);
+						else
+							errorMsg = "Unknown visual GraphType when parsing Nodes";
+					}
+				}
+			}
+		}
+	}
 	
 	//
 	//Std Values at the beginning of the document
@@ -299,14 +540,16 @@ public class GraphMLReader {
 			Attr attr = (Attr)attrs.item(i);
 			if (attr.getNodeName().equals("attr.name"))
 				keyName = attr.getNodeValue();
-			if (attr.getNodeName().equals("attr.type"))
+			if (attr.getNodeName().equals("attr.type")||attr.getNodeName().equals("attr.complexType"))
 				keyType = attr.getNodeValue();
 			if (attr.getNodeName().equals("id"))
 				keyID = attr.getNodeValue();
         }
 //		System.err.print("\nParsing key "+keyName);
-		if (keyName.equals("")||(keyType.equals(""))||(keyID.equals("")))
+		if (keyName.equals("")||(keyType.equals(""))||(keyID.equals(""))) //We need them always all 3
+		{
 			return;
+		}
 		//To decide when reaching data element
 		keyTypes.put(keyID,keyType);
 		Node defaultVal = getFirstChildWithElementName("default",node);
@@ -326,21 +569,21 @@ public class GraphMLReader {
 	static private void parseDefaultIntoPref(String pre, String keyType, Node defaultValue)
 	{
 		if ((!defaultValue.getNodeName().equals("default"))||(pre.equals("graph.type")))
-			return;
+			return; //We need an default-NOde and we don't want to have an graphtype-default
 		String s = defaultValue.getTextContent();
 
 		if (keyType.equals("string"))
-			GeneralPreferences.getInstance().setStringValue(pre,s);
-		else if (keyType.equals("integer"))
+			gp.setStringValue(pre,s);
+		else if (keyType.equals("int"))
 		{
-			try{GeneralPreferences.getInstance().setIntValue(pre,Integer.parseInt(s));}
+			try{gp.setIntValue(pre,Integer.parseInt(s));}
 			catch (Exception e){}
 		}
 		else if (keyType.equals("boolean"))
-			GeneralPreferences.getInstance().setBoolValue(pre,Boolean.parseBoolean(s));
+			gp.setBoolValue(pre,Boolean.parseBoolean(s));
 		else if (keyType.equals("float"))
 		{
-			try{GeneralPreferences.getInstance().setFloatValue(pre,Float.parseFloat(s));}
+			try{gp.setFloatValue(pre,Float.parseFloat(s));}
 			catch (Exception e){}
 		}
 		else if (keyType.equals("edge.text.type")) //So this works due to pre for hperedge and edge text stuff
@@ -354,11 +597,11 @@ public class GraphMLReader {
 				return;
 			}
 			VEdgeText t = parseEdgeText(n);
-			GeneralPreferences.getInstance().setIntValue(pre+"_distance", t.getDistance());
-			GeneralPreferences.getInstance().setIntValue(pre+"_position",t.getPosition());
-			GeneralPreferences.getInstance().setBoolValue(pre+"_showvalue",t.isshowvalue());
-			GeneralPreferences.getInstance().setIntValue(pre+"_size",t.getSize());
-			GeneralPreferences.getInstance().setBoolValue(pre+"_visible",t.isVisible());
+			gp.setIntValue(pre+"_distance", t.getDistance());
+			gp.setIntValue(pre+"_position",t.getPosition());
+			gp.setBoolValue(pre+"_showvalue",t.isshowvalue());
+			gp.setIntValue(pre+"_size",t.getSize());
+			gp.setBoolValue(pre+"_visible",t.isVisible());
 		}
 		else if (keyType.equals("edge.line.type")) //So this works due to pre for hperedge and edge text stuff
 		{
@@ -371,9 +614,9 @@ public class GraphMLReader {
 				return;
 			}
 			VEdgeLinestyle l = parseEdgeLinestyle(n);
-			GeneralPreferences.getInstance().setIntValue(pre+"_distance", l.getDistance());
-			GeneralPreferences.getInstance().setIntValue(pre+"_length",l.getLength());
-			GeneralPreferences.getInstance().setIntValue(pre+"_type",l.getType());
+			gp.setIntValue(pre+"_distance", l.getDistance());
+			gp.setIntValue(pre+"_length",l.getLength());
+			gp.setIntValue(pre+"_type",l.getType());
 		}
 		else if (keyType.equals("node.text.type")) //Node Text Std Values
 		{
@@ -384,10 +627,10 @@ public class GraphMLReader {
 				return;
 			}
 			VNode node = parseNodeText(n);
-			GeneralPreferences.getInstance().setIntValue(pre+"_distance", node.getNameDistance());
-			GeneralPreferences.getInstance().setIntValue(pre+"_rotation",node.getNameRotation());
-			GeneralPreferences.getInstance().setIntValue(pre+"_size",node.getNameSize());
-			GeneralPreferences.getInstance().setBoolValue(pre+"_visible",node.isNameVisible());
+			gp.setIntValue(pre+"_distance", node.getNameDistance());
+			gp.setIntValue(pre+"_rotation",node.getNameRotation());
+			gp.setIntValue(pre+"_size",node.getNameSize());
+			gp.setBoolValue(pre+"_visible",node.isNameVisible());
 		}
 		else if (keyType.equals("edge.loop.type")) //So this works due to pre for hperedge and edge text stuff
 		{
@@ -398,10 +641,10 @@ public class GraphMLReader {
 				return;
 			}
 			VLoopEdge edge = parseLoopEdgeDetails(n);
-			GeneralPreferences.getInstance().setIntValue(pre+"_direction", edge.getDirection());
-			GeneralPreferences.getInstance().setBoolValue(pre+"_clockwise",edge.isClockwise());
-			GeneralPreferences.getInstance().setIntValue(pre+"_length",edge.getLength());
-			GeneralPreferences.getInstance().setIntValue(pre+"_proportion",Math.round(100f*(float)edge.getProportion()));
+			gp.setIntValue(pre+"_direction", edge.getDirection());
+			gp.setBoolValue(pre+"_clockwise",edge.isClockwise());
+			gp.setIntValue(pre+"_length",edge.getLength());
+			gp.setIntValue(pre+"_proportion",Math.round(100f*(float)edge.getProportion()));
 		}
 		else if (keyType.equals("graph.subgraph.type")) //Subgraph-Std-Values
 		{
@@ -413,7 +656,7 @@ public class GraphMLReader {
 				return;
 			}
 			MSubgraph msub = parseMSubgraph(n);			
-			GeneralPreferences.getInstance().setStringValue(pre+".name", msub.getName());
+			gp.setStringValue(pre+".name", msub.getName());
 		}
 		else if (keyType.equals("node.form.type")) //Node Form (Up to now in the key a  circle-size)
 		{
@@ -424,7 +667,7 @@ public class GraphMLReader {
 				return;
 			}
 			VNode node = parseNodeForm(n);
-			GeneralPreferences.getInstance().setIntValue(pre+".size", node.getSize());
+			gp.setIntValue(pre+".size", node.getSize());
 		}
 		else if (keyType.equals("edge.arrow.type"))
 		{
@@ -435,10 +678,10 @@ public class GraphMLReader {
 				return;
 			}
 			VEdgeArrow a = parseEdgeArrow(n);
-			GeneralPreferences.getInstance().setIntValue(pre+"_alpha", Math.round(a.getAngle()));
-			GeneralPreferences.getInstance().setFloatValue(pre+"_part", a.getPart());
-			GeneralPreferences.getInstance().setFloatValue(pre+"_alpha", a.getPos());
-			GeneralPreferences.getInstance().setIntValue(pre+"_size", Math.round(a.getSize()));
+			gp.setIntValue(pre+"_alpha", Math.round(a.getAngle()));
+			gp.setFloatValue(pre+"_part", a.getPart());
+			gp.setFloatValue(pre+"_alpha", a.getPos());
+			gp.setIntValue(pre+"_size", Math.round(a.getSize()));
 		}
 		else
 			System.err.print("Still TODO Type:"+keyType);
@@ -447,7 +690,6 @@ public class GraphMLReader {
 	//
 	// Single Elements of Node/Edge/HyperEdge/Graph
 	//
-	
 	/**
 	 * Parse a Node of the edge type with the attributes distance, position, show, size and visible
 	 * @param edgeTextNode a Node of type edgetext or hyperedgetext
@@ -559,10 +801,10 @@ public class GraphMLReader {
 	static private VLoopEdge parseLoopEdgeDetails(Node loopedgeNode)
 	{
 		VLoopEdge ve = new VLoopEdge(0,0,
-				GeneralPreferences.getInstance().getIntValue("edge.loop_length"),
-				GeneralPreferences.getInstance().getIntValue("edge.loop_direction"),
-				(double)GeneralPreferences.getInstance().getIntValue("edge.loop_proportion")/100d,
-				GeneralPreferences.getInstance().getBoolValue("edge.loop_clockwise"));
+				gp.getIntValue("edge.loop_length"),
+				gp.getIntValue("edge.loop_direction"),
+				(double)gp.getIntValue("edge.loop_proportion")/100d,
+				gp.getBoolValue("edge.loop_clockwise"));
 		if (loopedgeNode==null) //Not given return std
 			return ve;
 		if (!loopedgeNode.getNodeName().equals("loopedge"))
@@ -588,15 +830,48 @@ public class GraphMLReader {
 	    return ve;
 	}
 	/**
+	 * Parse the data field edge.points and return a Vector of these points if they are all correct
+	 * else an empty Vector is returned and the errorMsg is set
+	 * @param edgepointsNode Data node with the point-Elements as childs
+	 * @return
+	 */
+	static private Vector<Point> parseEdgePoints(Node edgepointsNode)
+	{
+		Vector<Point> result = new Vector<Point>();
+		NodeList nodeChildElements = edgepointsNode.getChildNodes();
+		for (int i=0; i<nodeChildElements.getLength(); i++)
+		{ //Search all Data-Elements, take their key-ID and Content as Values
+			Node actual = nodeChildElements.item(i);
+			if (actual.getNodeName().equals("point")&&(actual.getNodeType()==Node.ELEMENT_NODE))
+			{ //For each Data element
+				HashMap<String,String> dataAttrib = getAttributeHashMap(actual);
+				if ((!dataAttrib.containsKey("id"))||(!dataAttrib.containsKey("y"))||(!dataAttrib.containsKey("x")))
+				{ errorMsg = "Edge Point Entry incomplete"; return new Vector<Point>();}
+				try
+				{
+					int id = Integer.parseInt(dataAttrib.get("id"));
+					int x = Integer.parseInt(dataAttrib.get("x"));
+					int y = Integer.parseInt(dataAttrib.get("y"));
+					if (result.size()<=id)
+						result.setSize(id+1);
+					result.set(id,new Point(x,y));
+				}
+				catch (Exception e)
+				{errorMsg = "Edge Point Parsing failed"; return new Vector<Point>();}
+			}
+		} //End for - handle all Data Fields
+		return result;
+	}
+	/**
 	 * Parse a XML-Node with information about a Nodes Text and return that (within a VNode)
 	 */
 	static private VNode parseNodeText(Node nodeTextNode)
 	{
 		VNode n = new VNode(0,0,0,0,
-				GeneralPreferences.getInstance().getIntValue("node.name_distance"),
-				GeneralPreferences.getInstance().getIntValue("node.name_rotation"),
-				GeneralPreferences.getInstance().getIntValue("node.name_size"),
-				GeneralPreferences.getInstance().getBoolValue("node.name_visible"));
+				gp.getIntValue("node.name_distance"),
+				gp.getIntValue("node.name_rotation"),
+				gp.getIntValue("node.name_size"),
+				gp.getBoolValue("node.name_visible"));
 
 		if ((n==null)||(!nodeTextNode.getNodeName().equals("nodetext")))
 		{ //Return Std Values that already exist
@@ -629,10 +904,10 @@ public class GraphMLReader {
 	private static VNode parseNodeForm(Node nodeFormNode)
 	{
 		VNode n = new VNode(0,0,0,0,
-				GeneralPreferences.getInstance().getIntValue("node.name_distance"),
-				GeneralPreferences.getInstance().getIntValue("node.name_rotation"),
-				GeneralPreferences.getInstance().getIntValue("node.name_size"),
-				GeneralPreferences.getInstance().getBoolValue("node.name_visible"));
+				gp.getIntValue("node.name_distance"),
+				gp.getIntValue("node.name_rotation"),
+				gp.getIntValue("node.name_size"),
+				gp.getBoolValue("node.name_visible"));
 		if (!nodeFormNode.getNodeName().equals("form"))
 		{
 			errorMsg = "error when Parsing Node Form: No Node Form found";
@@ -657,7 +932,7 @@ public class GraphMLReader {
 	    else
 	    	errorMsg = "Error when parsing NodeForm, Point ("+x+","+y+") out of Range";
 	    if (n.getSize()==0) //Still 0
-	    	n.setSize(GeneralPreferences.getInstance().getIntValue("node.size"));
+	    	n.setSize(gp.getIntValue("node.size"));
 	    return n;
 	}
 	/**
@@ -692,6 +967,8 @@ public class GraphMLReader {
 					try {s.addNode(Integer.parseInt(n.getTextContent()));}catch(Exception e){}
 				else if (n.getNodeName().equals("edgeid"))
 					try {s.addEdge(Integer.parseInt(n.getTextContent()));}catch(Exception e){}
+				else if (n.getNodeName().equals("hyperedgeid"))
+					try {s.addEdge(Integer.parseInt(n.getTextContent()));}catch(Exception e){}
 			}
 			n = n.getNextSibling();
 		}
@@ -720,32 +997,25 @@ public class GraphMLReader {
 		Color c = new Color(0,0,0);
 		while (n!=null)
 		{
-			if ((n.getNodeType()==Node.ELEMENT_NODE)||(n.getNodeName().equals("color")))
-			{
-				NamedNodeMap attrs = subgraphNode.getAttributes();
-			    for (int i=0; i<attrs.getLength(); i++) //Look at all atributes
-			    {
-			    	Attr attr = (Attr)attrs.item(i);
-			        if (attr.getNodeName().equals("r"))
-			           try {c = new Color(Integer.parseInt(attr.getNodeValue()),c.getGreen(),c.getBlue());} catch(Exception e){}
-			        if (attr.getNodeName().equals("g"))
-			           try {c = new Color(c.getRed(),Integer.parseInt(attr.getNodeValue()),c.getBlue());} catch(Exception e){}
-			        if (attr.getNodeName().equals("r"))
-			           try {c = new Color(c.getRed(),c.getGreen(),Integer.parseInt(attr.getNodeValue()));} catch(Exception e){}
-			    }
+			if ((n.getNodeType()==Node.ELEMENT_NODE)&&(n.getNodeName().equals("color"))) {
+				HashMap<String,String> colAttributes = getAttributeHashMap(n);
+				if ((!colAttributes.containsKey("r"))||(!colAttributes.containsKey("g"))||(!colAttributes.containsKey("b")))
+				{ errorMsg = "Error when Parsing Subgraph #"+index+": Color Attributes Missing";return s;}
+				try {c = new Color(Integer.parseInt(colAttributes.get("r")),
+						Integer.parseInt(colAttributes.get("g")),
+						Integer.parseInt(colAttributes.get("b")));}
+		        catch(Exception e){errorMsg="Error when parsing Color of Subgraph #"+s.getIndex()+": One Value of RGB is no Integer"; return s;}
+		        break;
 			}
 			n = n.getNextSibling();
 		}
 		if ((c.getRed()==0)&&(c.getGreen()==0)&&(c.getBlue()==0))
-		{
-		   	   errorMsg = "Error when Parsing Subgraph #"+index+": No Color found";
-		   	   return s;
-		}
+		{ errorMsg = "Error when Parsing Subgraph #"+index+": No Color found";return s;}
 		s = new VSubgraph(index,c);
 		return s;		
 	}
 	//
-	//Helper Functions
+	//Help Functions
 	//
 	/**
 	 * Search in the Child of parent for an Element-Node with the Name elementName
@@ -763,6 +1033,22 @@ public class GraphMLReader {
 				return children.item(i);
 		}
 		return null;
+	}
+	/**
+	 * Return all Attributes of an Element as HashMap key=value
+	 * @param parent Node to get Attributes from
+	 * @return the HashMap of Attributes, which might be empty, if there are no attributes
+	 */
+	private static HashMap<String,String> getAttributeHashMap(Node parent)
+	{
+		HashMap<String,String> attributes = new HashMap<String,String>();
+		NamedNodeMap Nodeattrs = parent.getAttributes();
+		for (int j=0; j<Nodeattrs.getLength(); j++)
+		{
+			Attr attr = (Attr)Nodeattrs.item(j);
+			attributes.put(attr.getNodeName(),attr.getNodeValue());
+        }
+		return attributes;
 	}
 	/**
 	 * Return the Value of the first occurence of an attribute with specific name

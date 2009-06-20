@@ -679,10 +679,9 @@ public class GeneralPreferences extends Observable
 	        out.close();
 	      }
 	      catch (Exception e) {
-	        System.err.println("Writing : "+e+" "+e.getLocalizedMessage());        
+	        System.err.println("Writing : "+e+" "+e.getLocalizedMessage());
 	      }
 	}
-	
 	/**
 	 * simple substring replacement
 	 * @param in input

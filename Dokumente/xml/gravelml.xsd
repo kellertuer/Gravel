@@ -31,7 +31,9 @@
 	          		<xs:element name="form" type="node.form.type"/>
 				  	<xs:element name="nodetext" type="node.text.type"/>
 			        <xs:element name="arrow" type="edge.arrow.type"/>
-			        <xs:element name="points" type="edge.points.type"/>
+			        <xs:sequence>
+						<xs:element name="point" type="edge.point.type" minOccurs="1" maxOccurs="unbounded"/>
+					</xs:sequence>
 		        	<xs:element name="edgetext" type="edge.text.type"/>
 		        	<xs:element name="edgeline" type="edge.line.type"/>	
 		          	<xs:element name="loopedge" type="edge.loop.type"/>
@@ -110,11 +112,6 @@
 		<xs:attribute name="headalpha" type="xs:float"/>
 	</xs:complexType>
 	<!-- Set of Points for some edges -->
-	<xs:complexType name="edge.points.type">
-		<xs:sequence>
-			<xs:element name="point" type="edge.point.type"  minOccurs="1" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
 	<xs:complexType name="edge.point.type">
 		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required"/>
 		<xs:attribute name="x" type="xs:integer" use="required"/>
@@ -129,11 +126,11 @@
 	</xs:complexType>
 	<!-- Edge Text and HyperEdgeText Details -->
 	<xs:complexType name="edge.text.type">
-		<xs:attribute name="position" type="xs:float" use="required"/>
-		<xs:attribute name="distance" type="xs:nonNegativeInteger" use="required"/>
-		<xs:attribute name="size" type="xs:nonNegativeInteger" use="required"/>
-		<xs:attribute name="show" type="edge.text.show.type" use="required"/>
-		<xs:attribute name="visible" type="xs:boolean" use="required"/>
+		<xs:attribute name="position" type="xs:float"/>
+		<xs:attribute name="distance" type="xs:nonNegativeInteger"/>
+		<xs:attribute name="size" type="xs:nonNegativeInteger"/>
+		<xs:attribute name="show" type="edge.text.show.type"/>
+		<xs:attribute name="visible" type="xs:boolean"/>
 	</xs:complexType>
 	<xs:simpleType name="edge.text.show.type">
 		<xs:restriction base="xs:string">
@@ -143,16 +140,16 @@
 	</xs:simpleType>
 	<!-- Edge Line and Hyper Edge Line Specification -->
 	<xs:complexType name="edge.line.type">
-		<xs:attribute name="distance" type="xs:nonNegativeInteger" use="required"/>
-		<xs:attribute name="length" type="xs:nonNegativeInteger" use="required"/>
-		<xs:attribute name="type" type="edge.line.type.type" use="required"/>
+		<xs:attribute name="distance" type="xs:nonNegativeInteger"/>
+		<xs:attribute name="length" type="xs:nonNegativeInteger"/>
+		<xs:attribute name="type" type="edge.line.type.type"/>
 	</xs:complexType>
 	<xs:simpleType name="edge.line.type.type">
 		<xs:restriction base="xs:string">
 	      	<xs:enumeration value="solid"/>
 	      	<xs:enumeration value="dashed"/>
 	      	<xs:enumeration value="dotted"/>
-	      	<xs:enumeration value="dashdotted"/>
+	      	<xs:enumeration value="dotdashed"/>
 		</xs:restriction>
 	</xs:simpleType>
 
