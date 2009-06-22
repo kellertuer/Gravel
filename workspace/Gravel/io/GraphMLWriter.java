@@ -17,6 +17,8 @@ import java.util.Vector;
  * This Class provides a simple Writer for Graphs to a GravelML-XML-File
  * based on and extending GraphML, though backward compatible to the std-GraphML-Stuff
  * 
+ * === Not in use since 0.4 because this old format is chaotic ===
+ * 
  * @author Ronny Bergmann
  * @since 0.2
  */

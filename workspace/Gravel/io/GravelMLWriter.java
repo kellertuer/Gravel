@@ -16,6 +16,7 @@ import java.util.Vector;
  * This Class provides a simple Writer for Graphs to a GravelML-XML-File
  * 
  * @author Ronny Bergmann
+ * @deprecated use GraphML-writer instead, because the new Format is nicer to read and depends upon an XMLSchema
  * @since 0.2
  */
 public class GravelMLWriter {

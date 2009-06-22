@@ -73,7 +73,7 @@ public class CommonGraphHistoryManager implements Observer
 		stacksize=GeneralPreferences.getInstance().getIntValue("history.Stacksize");
 		trackSelection=GeneralPreferences.getInstance().getBoolValue("history.trackSelection");
 		SavedUndoStackSize = 0;
-	}	
+	}
 	/**
 	 * Create an Action based on the message, that came from the Graph,
 	 * return that Action and update LastGraph

@@ -25,6 +25,8 @@ import model.MGraphInterface;
 import model.VGraph;
 import model.VGraphInterface;
 import model.VHyperGraph;
+import model.Messages.GraphConstraints;
+import model.Messages.GraphMessage;
 
 import view.Gui;
 import view.VCommonGraphic;
@@ -42,7 +44,7 @@ import view.VHyperGraphic;
  * 	- PNG
  * 	- LaTeX	Picture Export
  * 	- SVG	Export als Vektorgrafik
-
+ * 
  * Ideas for further Exports: GraphML, .dot, TikZ,...?
  * Ideas for Imports: GraphML, .dot, GML,...?
  * 
@@ -231,7 +233,8 @@ public class JFileDialogs implements Observer
 	    		//bei einem der beiden ist ein Fehler aufgetreten
 	    		if (!error.equals("")) //es liegt ein fehler vor
 	    		{
-	    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><p>Der Graph konnte nicht geladen werden<br>Fehler :<br>"+error+"</p></html>","Fehler beim Laden",JOptionPane.ERROR_MESSAGE);				
+	    			String HTMLError = error.replace("\n", "<br/>");
+	    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><p>Der Graph konnte nicht geladen werden<br>Fehler :<br>"+HTMLError+"</p></html>","Fehler beim Laden",JOptionPane.ERROR_MESSAGE);				
 	    			return false;
 	    		} //kein Fehler und ein VGraph
 	    		else if (loadedVGraph!=null)
@@ -240,9 +243,15 @@ public class JFileDialogs implements Observer
 	    			GeneralPreferences.getInstance().setStringValue("graph.lastfile",f.getAbsolutePath());
 					Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+"");
 					if (GraphType==VCommonGraphic.VGRAPHIC)
+					{
 						((VGraphic)vGc).getGraph().addObserver(this);
+						((VGraphic)vGc).getGraph().pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.REPLACEMENT));
+					}
 					else
+					{
 						((VHyperGraphic)vGc).getGraph().addObserver(this);
+						((VHyperGraphic)vGc).getGraph().pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.REPLACEMENT));
+					}
 	    			//Set actual State saved.
 	    			vGc.getGraphHistoryManager().setGraphSaved();
 	    			return true;

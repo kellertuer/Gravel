@@ -471,7 +471,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 					else if (n==JOptionPane.NO_OPTION)
 						return true; //He does not want to save but just quit
 					else //Cancel
-						return false; //Do not wuit
+						return false; //Do not quit
 				}
 			}
 			else //No last file known
@@ -483,7 +483,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 				else if (n==JOptionPane.NO_OPTION)
 					return true; //He does not want to save but just quit
 				else //Cancel
-					return false; //Do not wuit
+					return false; //Do not quit
 			}
 		}
 		return true;

@@ -52,8 +52,6 @@ public class VHyperGraphic extends VCommonGraphic
 		vG = Graph;
 		vG.addObserver(this); //Die Graphikumgebung als Observer der Datenstruktur eintragen
 		vGh = new CommonGraphHistoryManager(vG);
-		vG.modifyNodes.add(new VNode(1,207,196,8,19,270,12,true), new MNode(1,"v_1"));
-		vG.modifyNodes.add(new VNode(2,65,231,8,19,270,12,true), new MNode(2,"v_2"));		
 	}
 	public void paint(Graphics g) 
 	{

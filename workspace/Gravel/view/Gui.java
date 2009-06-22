@@ -3,7 +3,6 @@ package view;
 import history.CommonGraphHistoryManager;
 import io.GeneralPreferences;
 import io.GraphMLReader;
-import io.GravelMLReader;
 
 import java.awt.*;
 import java.awt.event.*;

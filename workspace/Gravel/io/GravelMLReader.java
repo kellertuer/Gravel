@@ -22,6 +22,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * Liest einen Graphen im GraphML-Gravel-Format ein. Benötigt dafür 2 Durchläufe:
  *  - Einen, um den Typ festzustellen und die Keys auf Korrektheit zu prüfen
  *  - Einen, um den Graphen einzulesen
+ *  
+ *  === Only in use for backward compatibility ===
  * 
  * @author Ronny Bergmann
  * @since 0.2
