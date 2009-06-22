@@ -48,13 +48,13 @@ public class NURBSShapeValidator extends NURBSShape {
 		{
 			set = s; radius = r; nodeIndex=ni;
 		}
-		public PointInfo(int s, double r)
+		public PointInfo(int s, double r, Point2D pr)
 		{
 			this(s,r,-1);
 		}
 	}
+	private final double TOL = 0.001d, MINRAD = .5d;
 	float zoom = GeneralPreferences.getInstance().getFloatValue("zoom");
-
 	private Point2D CPOutside;
 	//Points we have to work on 
 	private Queue<Point2D> Points = new LinkedList<Point2D>();
@@ -103,7 +103,7 @@ public class NURBSShapeValidator extends NURBSShape {
 		Graphics2D g2 = (Graphics2D) g.getGraphics();
 		//(Graphics2D)(new VHyperGraphic(new Dimension(0,0),vG)).getGraphics();
 		int maxSize = Math.max( Math.round((float)(vG.getMaxPoint(g2).getX()-vG.getMinPoint(g2).getX())),
-								Math.round((float)(vG.getMaxPoint(g2).getY()-vG.getMinPoint(g2).getY())) );
+								Math.round((float)(vG.getMaxPoint(g2).getY()-vG.getMinPoint(g2).getY())) ) / 2;
 		//Check each Intervall, whether we are done
 		int checkInterval = Points.size();
 		
@@ -114,11 +114,14 @@ public class NURBSShapeValidator extends NURBSShape {
 			Point2D actualP = Points.poll();
 			NURBSShapeProjection proj = new NURBSShapeProjection(this,actualP);
 			Point2D ProjP = proj.getResultPoint(); //This Point belong definetly to the same set as actualP but lies on the Curve
-			double radius= ProjP.distance(actualP)-(double)e.getWidth()/2d - 1d; //To get rid of overlappings by rounding errors, -1
-			if ((radius<maxSize) &&(radius > 0))
+			double radius= ProjP.distance(actualP); //To get rid of overlappings by rounding errors, -1
+			i++;
+			if ((radius<maxSize) &&(radius > MINRAD))
 			{	
 				pointInformation.get(actualP).radius = radius; //Change radius
 				g2.setColor(Color.gray);
+				if (pointInformation.get(actualP).set==pointInformation.get(CPOutside).set)
+					g2.setColor(Color.GREEN);
 				g2.drawOval(Math.round((float)(actualP.getX()-radius)*zoom),
 					Math.round((float)(actualP.getY()-radius)*zoom),
 					Math.round((float)(2*radius)*zoom), Math.round((float)(2*radius)*zoom));
@@ -136,11 +139,11 @@ public class NURBSShapeValidator extends NURBSShape {
 					//If the radius is given and distance of the actualPoint to this is smaller that the sum of both radii - both are in the same set
 					if (actEntry.getKey()!=actualP)
 					{
-						if ((!Double.isNaN(actEntry.getValue().radius)) && ( (actEntry.getKey().distance(actualP)+radius <actEntry.getValue().radius)) )
+						if ((!Double.isNaN(actEntry.getValue().radius)) && ( ( (actEntry.getKey().distance(actualP)+radius) < actEntry.getValue().radius)) )
 						{
 							circlehandled = true; //The circle around actualP was completely handled by actEntry.getKey()
 						}
-						if ((!Double.isNaN(actEntry.getValue().radius)) &&(actEntry.getKey().distance(actualP)<(actEntry.getValue().radius+radius)) )
+						if ((!Double.isNaN(actEntry.getValue().radius)) &&(actEntry.getKey().distance(actualP)<(actEntry.getValue().radius+radius - TOL)) )
 						{ //Both circles overlap -> union sets
 							int a = actEntry.getValue().set;
 							int b = pointInformation.get(actualP).set;
@@ -158,7 +161,6 @@ public class NURBSShapeValidator extends NURBSShape {
 					Points.offer(newP);
 					pointInformation.put(newP,newPInfo);
 				}
-				i++;
 				if ((i%checkInterval)==0)
 				{
 					System.err.print(i+"   -  ");
@@ -431,6 +433,9 @@ public class NURBSShapeValidator extends NURBSShape {
 		
 		if (!twosets) //We'Re not ready yet
 		{
+			if (invalidNodeIndices.size()>0)
+				return false; //We have wrong nodes
+			else
 			invalidNodeIndices.clear(); return false;
 		}
 		return result;
