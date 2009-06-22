@@ -94,7 +94,12 @@ public class VHyperGraphic extends VCommonGraphic
 		IP.add(new Point2D.Double(80,350));
 		int degree = 4;
 		NURBSCreationMessage nm = new NURBSCreationMessage(degree, NURBSCreationMessage.ADD_END, IP);
-		NURBSShape c = NURBSShapeFactory.CreateShape(nm);		
+		NURBSShape c = NURBSShapeFactory.CreateShape(nm);
+		NURBSShape drawSel = c.stripDecorations().clone(); //really only nurbs
+		drawSel.scale(zoomfactor);
+		g2.setColor(selColor);
+		g2.setStroke(new BasicStroke(1f*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+		g2.draw(drawSel.getCurve(5d/(double)zoomfactor)); //draw only a preview				
 	}
 	private void paintSubCurveIP(Graphics2D g2)
 	{

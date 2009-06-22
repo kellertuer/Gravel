@@ -618,16 +618,20 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
      		else if (item == mEdModifySelection)
     		{
      			if (isGraph)
-     				new JSelectionModifyDialog(false, true, true, "Auswahl bearbeiten", ((VGraphic)graphpart).getGraph());
-     			//else TODO: Enable SelectionModifyDialog if its ready for Hypergraphs
-     			//	new JSelectionModifyDialog(false, true, true, "Auswahl bearbeiten", ((VHyperGraphic)graphpart).getGraph());
-    		}
+     				new JSelectionModifyDialog(false, true, "Auswahl bearbeiten", ((VGraphic)graphpart).getGraph());
+     			else //Hypergraph
+     				new JSelectionModifyDialog(false, true, "Auswahl bearbeiten", ((VHyperGraphic)graphpart).getGraph());
+     			mEdUndo.setEnabled(GraphHistory.CanUndo());
+     			mEdRedo.setEnabled(GraphHistory.CanRedo());
+       		}
      		else if (item == mEdArrangeSelection)
     		{
      			if (isGraph)
-     				new JSelectionModifyDialog(true, false, false, "selektierte Knoten anordnen",  ((VGraphic)graphpart).getGraph());
-     			//else TODO: Enable SelectionModifyDialog for Node Arrangements in HyperGraphs if ready
-     			//	new JSelectionModifyDialog(true,false,false, "selektioerte Knoten anordnen", ((VHyperGraphic)graphpart).getGraph());
+     				new JSelectionModifyDialog(true, false, "selektierte Knoten anordnen", ((VGraphic)graphpart).getGraph());
+     			else //Hypergraph
+     				new JSelectionModifyDialog(true, false, "selektierte Knoten anordnen", ((VHyperGraphic)graphpart).getGraph());
+     			mEdUndo.setEnabled(GraphHistory.CanUndo());
+     			mEdRedo.setEnabled(GraphHistory.CanRedo());
     		}
 			if(!isGraph)
 				return;

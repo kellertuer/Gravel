@@ -126,7 +126,7 @@ public class GraphMLWriter {
 					"\t\t<default>"+gp.getIntValue("edge.width")+"</default>"+nl+"\t</key>"+nl);
 			s.write("\t<key id=\"edgetype\" for=\"edge\" attr.name=\"edge.type\" attr.type=\"string\"> <!-- Kantentyp (Orthogonal|QuadCurve|Segmented|StraightLine|)-->"+nl);
 			s.write("\t\t<default>StraightLine</default>"+nl+"\t</key>"+nl); //StraightLine ist immer Std !
-			s.write("\t<key id=\"edgeorthogonal\" for=\"edge\" attr.name=\"orthogonaledge_verticalfirst\" attr.type=\"boolean\"> <!--Nur fuer Orthogonal pflicht-->"+nl);
+			s.write("\t<key id=\"edgeorthogonal\" for=\"edge\" attr.name=\"edge.orth_verticalfirst\" attr.type=\"boolean\"> <!--Nur fuer Orthogonal pflicht-->"+nl);
 			s.write("\t\t<default>true</default>"+nl+"\t</key>"+nl);
 			
 			s.write("\t<key id=\"loopedge\" for=\"edge\" attr.name=\"edge.loop\" attr.complexType=\"edge.loop.type\">"+nl+
