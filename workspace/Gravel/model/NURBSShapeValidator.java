@@ -42,18 +42,29 @@ public class NURBSShapeValidator extends NURBSShape {
 	{ //Additional Info for a Point
 		int set;
 		double radius;
+		Point2D projectionPoint=null;
 		//if this point belongs to a node, this is its index, else its null
 		int nodeIndex=-1;
-		public PointInfo(int s, double r, int ni)
+		public PointInfo(int s, double r,Point2D projP, int ni)
 		{
-			set = s; radius = r; nodeIndex=ni;
+			if (s==-1)
+				System.err.println("Hm?");
+			set = s; radius = r; nodeIndex=ni; projectionPoint = projP;
 		}
 		public PointInfo(int s, double r, Point2D pr)
 		{
-			this(s,r,-1);
+			this(s,r,pr,-1);
+		}
+		public String toString()
+		{
+			if (nodeIndex==-1)
+				return "PointInfo: is in Set "+set+" and distance "+radius+" to Curve (C(u) = "+projectionPoint;
+			else
+				return "PointInfo: Node #"+nodeIndex+" is in Set "+set+" and distance "+radius+" to Curve (C(u) = "+projectionPoint;
+						
 		}
 	}
-	private final double TOL = 0.001d, MINRAD = .5d;
+	private final double TOL = 0.01d, MINRAD = 3d;
 	float zoom = GeneralPreferences.getInstance().getFloatValue("zoom");
 	private Point2D CPOutside;
 	//Points we have to work on 
@@ -64,6 +75,7 @@ public class NURBSShapeValidator extends NURBSShape {
 	
 	private Vector<Integer> invalidNodeIndices  = new Vector<Integer>();
 	private boolean ResultValidation;
+	private int SingleInSet=-1, SingleOutSet=-1;
 	
 	private NURBSShape origCurve;
 	public NURBSShapeValidator(VHyperGraph vG, int HyperEdgeIndex, NURBSShape Curve, VCommonGraphic g)
@@ -93,7 +105,6 @@ public class NURBSShapeValidator extends NURBSShape {
 			if (actual.getY()<CPOutside.getY())
 				CPOutside = (Point2D)actual.clone();	
 		}
-		System.err.println(CPOutside);
 		initPointSets(vG);
 		
 		//Number of Projections made, 
@@ -102,35 +113,31 @@ public class NURBSShapeValidator extends NURBSShape {
 		//We need something to mearue font-size so...
 		Graphics2D g2 = (Graphics2D) g.getGraphics();
 		//(Graphics2D)(new VHyperGraphic(new Dimension(0,0),vG)).getGraphics();
-		int maxSize = Math.max( Math.round((float)(vG.getMaxPoint(g2).getX()-vG.getMinPoint(g2).getX())),
-								Math.round((float)(vG.getMaxPoint(g2).getY()-vG.getMinPoint(g2).getY())) ) / 2;
+		Point MaxPoint = vG.getMaxPoint(g2);
+		Point MinPoint = vG.getMinPoint(g2);
+		int maxSize = Math.max(MaxPoint.x-MinPoint.x, MaxPoint.y-MinPoint.y);
 		//Check each Intervall, whether we are done
-		int checkInterval = Points.size();
-		
+		int checkIntervall = Points.size();
 		boolean running=true;
 		
 		while (!Points.isEmpty()&&running) 
 		{
 			Point2D actualP = Points.poll();
-			NURBSShapeProjection proj = new NURBSShapeProjection(this,actualP);
-			Point2D ProjP = proj.getResultPoint(); //This Point belong definetly to the same set as actualP but lies on the Curve
-			double radius= ProjP.distance(actualP); //To get rid of overlappings by rounding errors, -1
-			i++;
-			if ((radius<maxSize) &&(radius > MINRAD))
+			PointInfo actualInfo = pointInformation.get(actualP);
+			if ((Double.isNaN(actualInfo.radius))||(actualInfo.projectionPoint==null))
+			{
+				NURBSShapeProjection proj = new NURBSShapeProjection(this,actualP);
+				actualInfo.radius = proj.getResultPoint().distance(actualP);
+				actualInfo.projectionPoint = proj.getResultPoint();
+			}
+			if ((actualInfo.radius < maxSize)&&(actualInfo.radius > MINRAD))
 			{	
-				pointInformation.get(actualP).radius = radius; //Change radius
+				i++;
 				g2.setColor(Color.gray);
-				if (pointInformation.get(actualP).set==pointInformation.get(CPOutside).set)
-					g2.setColor(Color.GREEN);
-				g2.drawOval(Math.round((float)(actualP.getX()-radius)*zoom),
-					Math.round((float)(actualP.getY()-radius)*zoom),
-					Math.round((float)(2*radius)*zoom), Math.round((float)(2*radius)*zoom));
+				g2.drawOval(Math.round((float)(actualP.getX()-actualInfo.radius)*zoom),
+					Math.round((float)(actualP.getY()-actualInfo.radius)*zoom),
+					Math.round((float)(2*actualInfo.radius)*zoom), Math.round((float)(2*actualInfo.radius)*zoom));
 				//Calculate Distance and direction from Point to its projection
-				Point2D ProjDir = new Point2D.Double(ProjP.getX()-actualP.getX(),ProjP.getY()-actualP.getY());
-				double length = ProjDir.distance(0d,0d);
-				//get radius in opposite direction 
-				ProjDir = new Point2D.Double(radius/length*ProjDir.getX(),radius/length*ProjDir.getY());
-				//Check whether other Old Points interfere with this one	
 				boolean circlehandled = false; //Indicator whether the new circle is completely inside another
 				Iterator<Entry<Point2D,PointInfo>> RadiusIterator = pointInformation.entrySet().iterator();
 				while (RadiusIterator.hasNext()) //Iterate all old Points
@@ -139,29 +146,53 @@ public class NURBSShapeValidator extends NURBSShape {
 					//If the radius is given and distance of the actualPoint to this is smaller that the sum of both radii - both are in the same set
 					if (actEntry.getKey()!=actualP)
 					{
-						if ((!Double.isNaN(actEntry.getValue().radius)) && ( ( (actEntry.getKey().distance(actualP)+radius) < actEntry.getValue().radius)) )
+						if ((!Double.isNaN(actEntry.getValue().radius)) && ( ( (actEntry.getKey().distance(actualP)+actualInfo.radius) < actEntry.getValue().radius)) )
 						{
 							circlehandled = true; //The circle around actualP was completely handled by actEntry.getKey()
 						}
-						if ((!Double.isNaN(actEntry.getValue().radius)) &&(actEntry.getKey().distance(actualP)<(actEntry.getValue().radius+radius - TOL)) )
+						if ((!Double.isNaN(actEntry.getValue().radius)) &&(actEntry.getKey().distance(actualP)<(actEntry.getValue().radius+actualInfo.radius - TOL)) )
 						{ //Both circles overlap -> union sets
 							int a = actEntry.getValue().set;
-							int b = pointInformation.get(actualP).set;
+							int b = actualInfo.set;
+							if (((a==8)&&(b==1))||((a==1)&&(b==8)))
+							{
+								g2.setColor(Color.RED);
+								g2.drawOval(Math.round((float)(actualP.getX()-actualInfo.radius)*zoom),
+									Math.round((float)(actualP.getY()-actualInfo.radius)*zoom),
+									Math.round((float)(2*actualInfo.radius)*zoom), Math.round((float)(2*actualInfo.radius)*zoom));
+								g2.drawOval(Math.round((float)(actEntry.getKey().getX()-actEntry.getValue().radius)*zoom),
+										Math.round((float)(actEntry.getKey().getY()-actEntry.getValue().radius)*zoom),
+										Math.round((float)(2*actEntry.getValue().radius)*zoom), Math.round((float)(2*actEntry.getValue().radius)*zoom));
+								System.err.println(actualP+" and "+actEntry.getKey());
+							}
 							if (a!=b) //not in the same set yet -> Union of both sets in the minimum (sameset)
+							{
 								UnionSets(a,b);
+							}
 						}
 					}
 				}
-				//Calculate a new Point for the set (TODO: the other two new points in 90 and 270 Degree or another better Choice?)
-				Point2D newP = new Point2D.Double(actualP.getX()-ProjDir.getX(),actualP.getY()-ProjDir.getY());
-				g.drawCP(g2,new Point(Math.round((float)newP.getX()),Math.round((float)newP.getY())),Color.BLUE); //Draw as handled
-				PointInfo newPInfo = new PointInfo(pointInformation.get(actualP).set, Double.NaN, -1);
-				if (!pointInformation.containsKey(newP)&&(!circlehandled))
+				Vector<Point2D> Succ = findSuccessors(actualP);
+				if ((Succ==null)||(Succ.size()==0))
 				{
-					Points.offer(newP);
-					pointInformation.put(newP,newPInfo);
+					System.err.println("Hm?");
 				}
-				if ((i%checkInterval)==0)
+				else if (!circlehandled) 	//At least One Successor at 180°
+				{
+					for (int j=0; j<Succ.size(); j++)
+					{
+						if (!pointInformation.containsKey(Succ.get(j))) //Just set the set
+						{
+							PointInfo newPInfo = new PointInfo(actualInfo.set, Double.NaN,null,-1);
+							pointInformation.put(Succ.get(j),newPInfo);
+							Points.offer(Succ.get(j));
+						}
+						else //Just offer, because its q
+							Points.offer(Succ.get(j));
+						g.drawCP(g2, new Point(Math.round((float)Succ.get(j).getX()),Math.round((float)Succ.get(j).getY())),Color.ORANGE);
+					}
+				}
+				if ((i%checkIntervall)==0)
 				{
 					System.err.print(i+"   -  ");
 					boolean valid = CheckSet(vG, HyperEdgeIndex);
@@ -172,7 +203,7 @@ public class NURBSShapeValidator extends NURBSShape {
 						Point2D pos = getPointOfNode(id);
 						System.err.print(id+"in"+pointInformation.get(pos).set+"  ");
 					}
-					System.err.println("- All nodes in #"+pointInformation.get(CPOutside).set+" are outside");
+					System.err.println("- All nodes in #"+pointInformation.get(CPOutside).set+" are outside ("+Points.size()+" nodes left)");
 					//If either ResultValid=true Wrong.size()==0 we're ready because the shape is valid
 					//If ResultValid=false and Wrong.size()>0 we're ready because the shape is invalid
 					running = ! (  (valid&&(invalidNodeIndices.size()==0)) || (!valid&&(invalidNodeIndices.size()>0)) );
@@ -205,19 +236,16 @@ public class NURBSShapeValidator extends NURBSShape {
 				ResultValidation = false;
 		}
 	}
-	
 	@Override
 	public NURBSShape stripDecorations()
 	{
 		return origCurve.stripDecorations();
 	}
-	
 	@Override
 	public int getDecorationTypes()
 	{
 		return origCurve.getDecorationTypes()|NURBSShape.VALIDATOR;
 	}
-
 	private Point2D getPointOfNode(int i)
 	{
 		//Iterate over Points and get its nodeindex
@@ -230,7 +258,6 @@ public class NURBSShapeValidator extends NURBSShape {
 		}
 		return null;
 	}
-	
 	/**
 	 * Returns whether the input was valid, if it was not valid, no Check was done
 	 * @return
@@ -239,7 +266,6 @@ public class NURBSShapeValidator extends NURBSShape {
 	{
 		return !(!ResultValidation&&(invalidNodeIndices.size()==0));
 	}
-	
 	/**
 	 * Main result of the Algorithm
 	 * (if it was persormed @see isInputValid())
@@ -250,7 +276,6 @@ public class NURBSShapeValidator extends NURBSShape {
 	{
 		return ResultValidation;
 	}
-	
 	/**
 	 * Get the indices that are wrong.
 	 * This set includes all Node-indices, that are
@@ -290,7 +315,6 @@ public class NURBSShapeValidator extends NURBSShape {
 			}
 		}
 	}
-	
 	private void initPointSets(VHyperGraph vG)
 	{
 		Points = new LinkedList<Point2D>();
@@ -302,7 +326,7 @@ public class NURBSShapeValidator extends NURBSShape {
 			Point2D p2 = new Point2D.Double(p.getX(),p.getY());
 			Points.offer(p2);
 			//Set is the node index, radius is not given yet, Nodeindex is the nodeindex
-			PointInfo p2Info = new PointInfo(n.getIndex(), Double.NaN, n.getIndex());
+			PointInfo p2Info = new PointInfo(n.getIndex(), Double.NaN, null,n.getIndex());
 			pointInformation.put(p2, p2Info);
 		}
 		int base = vG.getMathGraph().modifyNodes.getNextIndex();
@@ -310,10 +334,9 @@ public class NURBSShapeValidator extends NURBSShape {
 		{
 			Points.offer(controlPoints.get(i));
 			//Set is the a free index greater that biggest node index, Radius and INdex are not yet resp never given
-			PointInfo cpInfo = new PointInfo(base+i, Double.NaN, -1);
+			PointInfo cpInfo = new PointInfo(base+i, Double.NaN,null, -2); //-2 inidcates original CP
 			pointInformation.put(controlPoints.get(i),cpInfo);
 		}
-
 	}
 	/**
 	 * Find a successor for the point p depending upon its precessor pre
@@ -325,51 +348,48 @@ public class NURBSShapeValidator extends NURBSShape {
 	 * @param z Debug-Zoom
 	 * @return
 	 */
-	public static Point2D findSuccessor(Point2D p, Point2D pre, NURBSShape c,Graphics2D Debug,float z)
+	private Vector<Point2D> findSuccessors(Point2D p)
 	{
-		NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
-		Point2D hatp = proj.getResultPoint(); //This Point belong definetly to the same set as actualP but lies on the Curve
-		double hatt = proj.getResultParameter();
-		double radius= hatp.distance(p)-1d; //1 linewidth
-//		System.err.print("Circle Radius: "+radius);
+		if (!pointInformation.containsKey(p))
+			return null;
+		NURBSShapeProjection projP = new NURBSShapeProjection(this,p);
+		Point2D p_c = projP.getResultPoint(); //This Point belong definetly to the same set as actualP but lies on the Curve
+		double r_p = p_c.distance(p); //1 linewidth
 
-		Debug.setColor(Color.gray);
-		Debug.drawOval(Math.round((float)(p.getX()-radius)*z),
-			Math.round((float)(p.getY()-radius)*z),
-			Math.round((float)(2*radius)*z), Math.round((float)(2*radius)*z));
+		Point2D ProjDir = new Point2D.Double(p_c.getX()-p.getX(),p_c.getY()-p.getY());
+		//Calculate a new Point for the set (TODO: the other two new points in 90 and 270 Degree or another better Choice?)
+		Point2D q = new Point2D.Double(p.getX()-ProjDir.getX(),p.getY()-ProjDir.getY());
 		//Calculate Distance and direction from Point to its projection
-		Point2D ProjDir = new Point2D.Double(hatp.getX()-p.getX(),hatp.getY()-p.getY());
-		//and shorten this by 
-		ProjDir = new Point2D.Double(radius/hatp.distance(p)*ProjDir.getX(),radius/hatp.distance(p)*ProjDir.getY());
-		Debug.drawLine(Math.round((float)p.getX()*z), Math.round((float)p.getY()*z),
-				Math.round((float)(p.getX()+ProjDir.getX())*z),
-				Math.round((float)(p.getY()+ProjDir.getY())*z));
-		
-		Point2D deriv1 = c.DerivateCurveAt(1,hatt);
-		Point2D deriv2 = c.DerivateCurveAt(2,hatt);
-		double l = deriv1.getX()*deriv1.getX() + deriv1.getY()*deriv1.getY();
-		double curvature = (deriv1.getX()*deriv2.getY() - deriv2.getX()*deriv1.getY())/ Math.sqrt(l*l*l);
-		curvature = curvature*c.WeightAt(hatt);
-		curvature = Math.abs(curvature);
-
-		double varphi = Math.atan(curvature)+(Math.PI/2);
-		System.err.println("curv:"+curvature);
-		if (curvature > 1d/1000d)
-			varphi = Math.PI;
-		else
-			varphi = Math.PI/2d;
-		double newx = ProjDir.getX()* Math.cos(varphi) +  ProjDir.getY()*Math.sin(varphi);
-		double newy = -ProjDir.getX()*Math.sin(varphi) + ProjDir.getY()*Math.cos(varphi);
-		Point2D newp = new Point2D.Double(newx,newy);
-		Debug.setColor(Color.orange);
-		Debug.drawLine(Math.round((float)p.getX()*z), Math.round((float)p.getY()*z),
-				Math.round((float)(p.getX()+newp.getX())*z),
-				Math.round((float)(p.getY()+newp.getY())*z));
-		newp = new Point2D.Double(p.getX()+newp.getX(),p.getY()+newp.getY()); 
-		Debug.drawLine(Math.round((float)(newp.getX()-4)*z),Math.round((float)newp.getY()*z),Math.round((float)(newp.getX()+4)*z),Math.round((float)newp.getY()*z));
-		Debug.drawLine(Math.round((float)newp.getX()*z),Math.round((float)(newp.getY()-4)*z),Math.round((float)newp.getX()*z),Math.round((float)(newp.getY()+4)*z));
-
-		return newp;
+		NURBSShapeProjection projQ = new NURBSShapeProjection(this,q);
+		Point2D q_c = projQ.getResultPoint(); //This Point belong definetly to the same set as actualP but lies on the Curve
+		double r_q = q_c.distance(q); //1 linewidth
+		//The two real new Points
+		double alpha = Math.PI/2d + r_q/(2*r_p)*(Math.PI/2d);
+		double degTOL = Math.PI/36; //5 Degree Tolerance
+		if (alpha>(Math.PI-degTOL))
+			alpha = Math.PI;
+		else if (alpha<(Math.PI/2d + degTOL))
+			alpha = Math.PI/2d;
+		Vector<Point2D> result = new Vector<Point2D>();
+		if (alpha==Math.PI) //Result is only Q
+		{ 	//We only put Q into the result, but that also means we
+			//put the Projection point info into pointinformation so that we don't have to compute them again
+			result.add(q);
+			if (!pointInformation.containsKey(q))
+				pointInformation.put(q, new PointInfo(pointInformation.get(p).set,r_q,q_c,-1));
+			else
+				return new Vector<Point2D>(); //We handled that point already, no Successor
+		}
+		else 
+		{
+			Point2D q1 = new Point2D.Double(p.getX()+Math.cos(alpha)*ProjDir.getX() + Math.sin(alpha)*ProjDir.getY(),
+					p.getY() - Math.sin(alpha)*ProjDir.getX() + Math.cos(alpha)*ProjDir.getY());
+			Point2D q2 = new Point2D.Double(p.getX()+Math.cos(alpha)*ProjDir.getX() - Math.sin(alpha)*ProjDir.getY(),
+					p.getY() + Math.sin(alpha)*ProjDir.getX() + Math.cos(alpha)*ProjDir.getY());
+			result.add(q1);
+			result.add(q2);
+		}
+		return result;
 	}
 	/**
 	 * Check the actual sets of NodePositions whether they are legal or not and
@@ -389,7 +409,7 @@ public class NURBSShapeValidator extends NURBSShape {
 		//All Hyperedge nodes must be in a set (inSet) and all other in exactely one other set (outset)
 		int inSet=-1, outSet = pointInformation.get(CPOutside).set;
 		Iterator<MNode> nit = vG.getMathGraph().modifyNodes.getIterator();
-		while (nit.hasNext()||(inSet==-1)) //Find Set of any node inside Hyper Edge - if we're ready - this should be the only one inside
+		while ((nit.hasNext())&&(inSet==-1)) //Find Set of any node inside Hyper Edge - if we're ready - this should be the only one inside
 		{
 			int nodeid = nit.next().index;
 			if (vG.getMathGraph().modifyHyperEdges.get(HEIndex).containsNode(nodeid))
