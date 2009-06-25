@@ -1,6 +1,7 @@
 package control;
 
 import java.awt.Point;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -11,6 +12,8 @@ import view.VHyperGraphic;
 import model.VGraph;
 import model.VHyperGraph;
 import model.VNode;
+import model.Messages.GraphConstraints;
+import model.Messages.GraphMessage;
 import dialogs.JNodeDialog;
 
 /**
@@ -40,13 +43,25 @@ public class CommonNodeClickListener implements MouseListener {
 
 	public void mouseClicked(MouseEvent e) {
 		Point p = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //rausrechnen
-		if ((e.getClickCount()==2)&&(e.getModifiers() == MouseEvent.BUTTON1_MASK))
-		{ //Double Click on Node
-			VNode r=null;
+		//Double Click on Node
+		VNode r=null;
+		if (vg!=null)
+			r = vg.modifyNodes.getFirstinRangeOf(p);
+		else if (vhg!=null)
+			r = vhg.modifyNodes.getFirstinRangeOf(p);
+		boolean alt = ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK); // alt ?
+		if (alt) //if alt+click -> toggle visibility of the text
+		{
+			if (r!=null) //Doubleclick really on Node
+				r.setNameVisible(r.isNameVisible()^true);
+			GraphMessage msg = new GraphMessage(GraphConstraints.NODE, r.getIndex(),GraphConstraints.UPDATE, GraphConstraints.NODE);
 			if (vg!=null)
-				r = vg.modifyNodes.getFirstinRangeOf(p);
+				vg.pushNotify(msg);
 			else if (vhg!=null)
-				r = vhg.modifyNodes.getFirstinRangeOf(p);
+				vhg.pushNotify(msg);
+		}
+		else if ((e.getClickCount()==2)&&(e.getModifiers() == MouseEvent.BUTTON1_MASK)) //Double click without alt
+		{
 			if (r!=null) //Doubleclick really on Node
 			{
 				if (vg!=null)
