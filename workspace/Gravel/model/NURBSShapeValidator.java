@@ -42,13 +42,15 @@ public class NURBSShapeValidator extends NURBSShape {
 	{ //Additional Info for a Point
 		int set;
 		double radius;
-		Point2D projectionPoint=null;
+		Point2D projectionPoint=null, previousPoint=null;
 		//if this point belongs to a node, this is its index, else its null
 		int nodeIndex=-1;
+		public PointInfo(int s, double r,Point2D projP, Point2D pre, int ni)
+		{
+			set = s; radius = r; nodeIndex=ni; projectionPoint = projP; previousPoint = pre;
+		}
 		public PointInfo(int s, double r,Point2D projP, int ni)
 		{
-			if (s==-1)
-				System.err.println("Hm?");
 			set = s; radius = r; nodeIndex=ni; projectionPoint = projP;
 		}
 		public PointInfo(int s, double r, Point2D pr)
@@ -153,36 +155,21 @@ public class NURBSShapeValidator extends NURBSShape {
 						{ //Both circles overlap -> union sets
 							int a = actEntry.getValue().set;
 							int b = actualInfo.set;
-							if (((a==8)&&(b==1))||((a==1)&&(b==8)))
-							{
-								g2.setColor(Color.RED);
-								g2.drawOval(Math.round((float)(actualP.getX()-actualInfo.radius)*zoom),
-									Math.round((float)(actualP.getY()-actualInfo.radius)*zoom),
-									Math.round((float)(2*actualInfo.radius)*zoom), Math.round((float)(2*actualInfo.radius)*zoom));
-								g2.drawOval(Math.round((float)(actEntry.getKey().getX()-actEntry.getValue().radius)*zoom),
-										Math.round((float)(actEntry.getKey().getY()-actEntry.getValue().radius)*zoom),
-										Math.round((float)(2*actEntry.getValue().radius)*zoom), Math.round((float)(2*actEntry.getValue().radius)*zoom));
-								System.err.println(actualP+" and "+actEntry.getKey());
-							}
 							if (a!=b) //not in the same set yet -> Union of both sets in the minimum (sameset)
-							{
 								UnionSets(a,b);
-							}
 						}
 					}
 				}
 				Vector<Point2D> Succ = findSuccessors(actualP);
 				if ((Succ==null)||(Succ.size()==0))
-				{
-					System.err.println("Hm?");
-				}
+				{}
 				else if (!circlehandled) 	//At least One Successor at 180°
 				{
 					for (int j=0; j<Succ.size(); j++)
 					{
 						if (!pointInformation.containsKey(Succ.get(j))) //Just set the set
 						{
-							PointInfo newPInfo = new PointInfo(actualInfo.set, Double.NaN,null,-1);
+							PointInfo newPInfo = new PointInfo(actualInfo.set, Double.NaN,null,actualP,-1);
 							pointInformation.put(Succ.get(j),newPInfo);
 							Points.offer(Succ.get(j));
 						}
@@ -235,28 +222,6 @@ public class NURBSShapeValidator extends NURBSShape {
 				ResultValidation = false;
 		}
 	}
-	@Override
-	public NURBSShape stripDecorations()
-	{
-		return origCurve.stripDecorations();
-	}
-	@Override
-	public int getDecorationTypes()
-	{
-		return origCurve.getDecorationTypes()|NURBSShape.VALIDATOR;
-	}
-	private Point2D getPointOfNode(int i)
-	{
-		//Iterate over Points and get its nodeindex
-		Iterator<Entry<Point2D, PointInfo>> it = pointInformation.entrySet().iterator();
-		while (it.hasNext())
-		{
-			Entry<Point2D, PointInfo> actualEntry = it.next();
-			if (actualEntry.getValue().nodeIndex==i)
-				return actualEntry.getKey();
-		}
-		return null;
-	}
 	/**
 	 * Returns whether the input was valid, if it was not valid, no Check was done
 	 * @return
@@ -287,6 +252,28 @@ public class NURBSShapeValidator extends NURBSShape {
 	public Vector<Integer> getInvalidNodeIndices()
 	{
 		return invalidNodeIndices;
+	}
+	@Override
+	public NURBSShape stripDecorations()
+	{
+		return origCurve.stripDecorations();
+	}
+	@Override
+	public int getDecorationTypes()
+	{
+		return origCurve.getDecorationTypes()|NURBSShape.VALIDATOR;
+	}
+	private Point2D getPointOfNode(int i)
+	{
+		//Iterate over Points and get its nodeindex
+		Iterator<Entry<Point2D, PointInfo>> it = pointInformation.entrySet().iterator();
+		while (it.hasNext())
+		{
+			Entry<Point2D, PointInfo> actualEntry = it.next();
+			if (actualEntry.getValue().nodeIndex==i)
+				return actualEntry.getKey();
+		}
+		return null;
 	}
 	/**
 	 * 
@@ -374,8 +361,8 @@ public class NURBSShapeValidator extends NURBSShape {
 		{ 	//We only put Q into the result, but that also means we
 			//put the Projection point info into pointinformation so that we don't have to compute them again
 			result.add(q);
-			if (!pointInformation.containsKey(q))
-				pointInformation.put(q, new PointInfo(pointInformation.get(p).set,r_q,q_c,-1));
+			if (!pointInformation.containsKey(q)) //q is in the same set as p with radius r_q, ProjP q_c Predecessor p and is no point for a node
+				pointInformation.put(q, new PointInfo(pointInformation.get(p).set,r_q,q_c,p,-1));
 			else
 				return new Vector<Point2D>(); //We handled that point already, no Successor
 		}
@@ -385,8 +372,21 @@ public class NURBSShapeValidator extends NURBSShape {
 					p.getY() - Math.sin(alpha)*ProjDir.getX() + Math.cos(alpha)*ProjDir.getY());
 			Point2D q2 = new Point2D.Double(p.getX()+Math.cos(alpha)*ProjDir.getX() - Math.sin(alpha)*ProjDir.getY(),
 					p.getY() + Math.sin(alpha)*ProjDir.getX() + Math.cos(alpha)*ProjDir.getY());
-			result.add(q1);
-			result.add(q2);
+			if (pointInformation.get(p).previousPoint!=null) //We have a Predecessor, use the direction, that's more equal to the direction to pre
+			{
+				//We take that qi with the greater angle, that is more
+				double c1 = pointInformation.get(p).previousPoint.distance(q1);
+				double c2 = pointInformation.get(p).previousPoint.distance(q2);
+				if (c1>=c2)
+					result.add(q1);
+				else
+					result.add(q2);
+			}
+			else //No predecessor - use both 
+			{
+				result.add(q1);
+				result.add(q2);
+			}
 		}
 		return result;
 	}
