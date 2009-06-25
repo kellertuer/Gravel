@@ -27,17 +27,19 @@ public class OCMClickMouseHandler implements ClickMouseHandler {
 	private VHyperGraph vhg = null;
 	private VCommonGraphic vgc;
 	private GeneralPreferences gp;
-	
+
 	CommonNodeClickListener NodeMouseActions;
+	CommonEdgeClickListener EdgeMouseActions;
 	SelectionClickListener SelectionMouseActions;
 	ContextMenuClickListener PopupClickActions;
 
-		
 	public OCMClickMouseHandler(VGraphic g)
 	{
 		NodeMouseActions = new CommonNodeClickListener(g);
+		EdgeMouseActions = new CommonEdgeClickListener(g);
 		SelectionMouseActions = new SelectionClickListener(g);;
 		PopupClickActions = new ContextMenuClickListener(g);
+
 		vgc = g;
 		vg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
@@ -46,6 +48,7 @@ public class OCMClickMouseHandler implements ClickMouseHandler {
 	public OCMClickMouseHandler(VHyperGraphic g)
 	{
 		NodeMouseActions = new CommonNodeClickListener(g);
+		EdgeMouseActions = new CommonEdgeClickListener(g);
 		SelectionMouseActions = new SelectionClickListener(g);;
 		PopupClickActions = new ContextMenuClickListener(g);
 		vgc = g;
@@ -59,6 +62,7 @@ public class OCMClickMouseHandler implements ClickMouseHandler {
 	public void mouseClicked(MouseEvent e) 
 	{
 		NodeMouseActions.mouseClicked(e);
+		EdgeMouseActions.mouseClicked(e);
 		SelectionMouseActions.mouseClicked(e);
 		PopupClickActions.mouseClicked(e);
 		Point pointInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100)));

@@ -20,6 +20,7 @@ import view.*;
 public class StandardClickMouseHandler implements ClickMouseHandler {
 	
 	CommonNodeClickListener NodeMouseActions;
+	CommonEdgeClickListener EdgeMouseActions;
 	SelectionClickListener SelectionMouseActions;
 	ContextMenuClickListener PopupClickActions;
 
@@ -30,6 +31,7 @@ public class StandardClickMouseHandler implements ClickMouseHandler {
 	public StandardClickMouseHandler(VGraphic g)
 	{
 		NodeMouseActions = new CommonNodeClickListener(g);
+		EdgeMouseActions = new CommonEdgeClickListener(g);
 		SelectionMouseActions = new SelectionClickListener(g);;
 		PopupClickActions = new ContextMenuClickListener(g);
 	}
@@ -37,6 +39,7 @@ public class StandardClickMouseHandler implements ClickMouseHandler {
 	public StandardClickMouseHandler(VHyperGraphic g)
 	{
 		NodeMouseActions = new CommonNodeClickListener(g);
+		EdgeMouseActions = new CommonEdgeClickListener(g);
 		SelectionMouseActions = new SelectionClickListener(g);;
 		PopupClickActions = new ContextMenuClickListener(g);
 	}
@@ -44,6 +47,7 @@ public class StandardClickMouseHandler implements ClickMouseHandler {
 	public void mouseClicked(MouseEvent e)
 	{
 		NodeMouseActions.mouseClicked(e);
+		EdgeMouseActions.mouseClicked(e);
 		SelectionMouseActions.mouseClicked(e);
 		PopupClickActions.mouseClicked(e);
 	}

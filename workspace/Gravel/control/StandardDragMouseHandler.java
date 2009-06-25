@@ -57,6 +57,7 @@ public class StandardDragMouseHandler implements DragMouseHandler
 		sNodeDragActions = new StandardNodeDragListener(g);
 		cSelectionDragActions= new SelectionDragListener(g);
 		cNodeDragActions = new CommonNodeDragListener(g);
+		cEdgeDragActions = new CommonEdgeDragListener(g);
 	}
 
 	/**
@@ -78,7 +79,7 @@ public class StandardDragMouseHandler implements DragMouseHandler
 		if (vg!=null)
 			return (sNodeDragActions.dragged()||sEdgeDragActions.dragged()||cEdgeDragActions.dragged()||cNodeDragActions.dragged()||cSelectionDragActions.dragged());
 		else if (vhg!=null)
-			return ((sNodeDragActions.dragged())||cNodeDragActions.dragged()||cSelectionDragActions.dragged());
+			return ((sNodeDragActions.dragged())||cNodeDragActions.dragged()||cEdgeDragActions.dragged()||cSelectionDragActions.dragged());
 		else
 			return false;
 	}
@@ -103,32 +104,26 @@ public class StandardDragMouseHandler implements DragMouseHandler
 		cSelectionDragActions.mouseDragged(e);
 		cNodeDragActions.mouseDragged(e);
 		sNodeDragActions.mouseDragged(e);
+		cEdgeDragActions.mouseDragged(e);
 		if (vg!=null)
-		{
-			cEdgeDragActions.mouseDragged(e);
 			sEdgeDragActions.mouseDragged(e);
-		}
 		MouseOffSet = e.getPoint();
 	}
 	public void mousePressed(MouseEvent e) {
 		cSelectionDragActions.mousePressed(e);
 		cNodeDragActions.mousePressed(e);
 		sNodeDragActions.mousePressed(e);		
+		cEdgeDragActions.mousePressed(e);
 		if (vg!=null)
-		{
-			cEdgeDragActions.mousePressed(e);
 			sEdgeDragActions.mousePressed(e);			
-		}
 	}
 	public void mouseReleased(MouseEvent e) {
 		cSelectionDragActions.mouseReleased(e);
 		cNodeDragActions.mouseReleased(e);
 		sNodeDragActions.mouseReleased(e);
+		cEdgeDragActions.mouseReleased(e);
 		if (vg!=null)
-		{
-			cEdgeDragActions.mouseReleased(e);
 			sEdgeDragActions.mouseReleased(e);
-		}
 		MouseOffSet = new Point(0,0);
 	}
 	public Rectangle getSelectionRectangle() {

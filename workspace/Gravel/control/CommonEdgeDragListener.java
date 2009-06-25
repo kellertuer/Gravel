@@ -26,8 +26,8 @@ public class CommonEdgeDragListener
 			MouseListener,
 			MouseMotionListener {
 
-	VEdge movingEdge;
-	VGraph vg;
+	VEdge movingEdge; VHyperEdge movingHyperEdge;
+	VGraph vg=null; VHyperGraph vhg=null;
 	VCommonGraphic vgc;
 	GeneralPreferences gp;
 	Point MouseOffSet;
@@ -37,6 +37,13 @@ public class CommonEdgeDragListener
 	{
 		vgc = g;
 		vg = g.getGraph();
+		gp = GeneralPreferences.getInstance();
+		MouseOffSet = new Point(0,0);
+	}
+	public CommonEdgeDragListener(VHyperGraphic g)
+	{
+		vgc = g;
+		vhg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
 		MouseOffSet = new Point(0,0);
 	}
@@ -54,6 +61,7 @@ public class CommonEdgeDragListener
 				vg.pushNotify(new GraphMessage(GraphConstraints.EDGE|GraphConstraints.NODE,GraphConstraints.BLOCK_END));
 		}
 		movingEdge=null;
+		movingHyperEdge=null;
 		altwaspressed=false;
 		shiftwaspressed=false;
 		multiplemoving = false;
@@ -61,7 +69,7 @@ public class CommonEdgeDragListener
 	}
 	public boolean dragged()
 	{
-		return (movingEdge!=null)||(multiplemoving);
+		return (movingHyperEdge!=null)||(movingEdge!=null)||(multiplemoving);
 	}
 	/**
 	 * Help method for moving selected nodes - if they touch the border of the area (e.g. some values are below 0 after a movement) the whole graph is moved the opposite direction
@@ -71,10 +79,39 @@ public class CommonEdgeDragListener
 	 */
 	private void moveSelEdges(int x,int y)
 	{
+		if (vg==null)
+			return;
 		Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 		while (edgeiter.hasNext()) // drawNodes
 		{
 			VEdge temp = edgeiter.next();
+			if (((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)&&(temp.getTextProperties().isVisible()))
+			{
+				int pos = (temp.getTextProperties().getPosition()+x)%100;
+				if (pos < 0)
+					pos +=100;
+				int distance = (temp.getTextProperties().getDistance()+y);
+				if (distance<0)
+					distance = 0;
+				temp.getTextProperties().setPosition(pos);
+				temp.getTextProperties().setDistance(distance);
+			}
+		}
+	}
+	/**
+	 * Help method for moving selected nodes - if they touch the border of the area (e.g. some values are below 0 after a movement) the whole graph is moved the opposite direction
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	private void moveSelHyperEdges(int x,int y)
+	{
+		if (vhg==null)
+			return;
+		Iterator<VHyperEdge> edgeiter = vhg.modifyHyperEdges.getIterator();
+		while (edgeiter.hasNext()) // drawNodes
+		{
+			VHyperEdge temp = edgeiter.next();
 			if (((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)&&(temp.getTextProperties().isVisible()))
 			{
 				int pos = (temp.getTextProperties().getPosition()+x)%100;
@@ -95,7 +132,11 @@ public class CommonEdgeDragListener
 		MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed
 		Point pointInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //Rausrechnen des zooms
 
-		VEdge edgeInRange = vg.getEdgeinRangeOf(pointInGraph,2.0*((float)vgc.getZoom()/100));
+		VEdge edgeInRange=null; VHyperEdge hyperedgeInRange=null;
+		if (vg!=null)
+			edgeInRange = vg.getEdgeinRangeOf(pointInGraph,2.0*((float)vgc.getZoom()/100));
+		else if (vhg!=null)
+			hyperedgeInRange = vhg.getEdgeinRangeOf(pointInGraph,2.0*((float)vgc.getZoom()/100));
 		
 		boolean alt = ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK); // alt ?
 		boolean shift = ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK); //shift ?
@@ -103,6 +144,7 @@ public class CommonEdgeDragListener
 		if ((alt)&&(!shift))
 		{ //Alt and not shift
 			movingEdge = edgeInRange; //kein Shift == moving Node merken, sonst werden alle selected Bewegt
+			movingHyperEdge = hyperedgeInRange; //kein Shift == moving Node merken, sonst werden alle selected Bewegt
 			altwaspressed = true;
 		}
 		else if ((alt)&&(shift))
@@ -112,6 +154,8 @@ public class CommonEdgeDragListener
 			altwaspressed = true;
 			//Node in Range must be selected
 			if ((edgeInRange!=null)&&((edgeInRange.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED))
+				multiplemoving = true;
+			else if ((hyperedgeInRange!=null)&&((hyperedgeInRange.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED))
 				multiplemoving = true;
 		}
 	}
@@ -151,11 +195,22 @@ public class CommonEdgeDragListener
 			}
 			else if (((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK)&&(multiplemoving))
 			{
-				moveSelEdges(horizontalMovInGraph,verticalMovInGraph);
-				if (firstdrag) //Begin drag with a Block Start Notification
-					vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
-				else		
-					vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.UPDATE));				
+				if (vg!=null)
+				{
+					moveSelEdges(horizontalMovInGraph,verticalMovInGraph);
+					if (firstdrag) //Begin drag with a Block Start Notification
+						vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
+					else
+						vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.UPDATE));
+				}
+				else if (vhg!=null)
+				{
+					moveSelHyperEdges(horizontalMovInGraph,verticalMovInGraph);
+					if (firstdrag) //Begin drag with a Block Start Notification
+						vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
+					else
+						vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.UPDATE));
+				}
 			}
 		} //End handling ALT
 		MouseOffSet = e.getPoint();

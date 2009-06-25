@@ -54,6 +54,7 @@ public class OCMDragMouseHandler implements DragMouseHandler
 		MouseOffSet = new Point(0,0);
 		cSelectionDragActions= new SelectionDragListener(g);
 		cNodeDragActions = new CommonNodeDragListener(g);
+		cEdgeDragActions = new CommonEdgeDragListener(g);
 	}
 
 	/**
@@ -74,39 +75,33 @@ public class OCMDragMouseHandler implements DragMouseHandler
 		if (vg!=null)
 			return (GraphNodeDragActions.dragged()||cEdgeDragActions.dragged()||cNodeDragActions.dragged()||cSelectionDragActions.dragged());
 		else if (vhg!=null)
-			return (cNodeDragActions.dragged()||cSelectionDragActions.dragged());
+			return (cNodeDragActions.dragged()||cSelectionDragActions.dragged()||cEdgeDragActions.dragged());
 		else
 			return false;
 	}
 	public void mouseDragged(MouseEvent e) {
 		cSelectionDragActions.mouseDragged(e);
 		cNodeDragActions.mouseDragged(e);
+		cEdgeDragActions.mouseDragged(e);
 		if (vg!=null)
-		{
-			cEdgeDragActions.mouseDragged(e);
 			GraphNodeDragActions.mouseDragged(e);
-		}
 	}
 
 	public void mousePressed(MouseEvent e) {
 		cSelectionDragActions.mousePressed(e);
 		cNodeDragActions.mousePressed(e);
+		cEdgeDragActions.mousePressed(e);
 		if (vg!=null)
-		{
-			cEdgeDragActions.mousePressed(e);
 			GraphNodeDragActions.mousePressed(e);
-		}
 		MouseOffSet = e.getPoint();
 	}
 
 	public void mouseReleased(MouseEvent e) {
 		cSelectionDragActions.mouseReleased(e);
 		cNodeDragActions.mouseReleased(e);
+		cEdgeDragActions.mouseReleased(e);
 		if (vg!=null)
-		{
-			cEdgeDragActions.mouseReleased(e);
 			GraphNodeDragActions.mouseReleased(e);
-		}
 		MouseOffSet = new Point(0,0);
 	}
 
