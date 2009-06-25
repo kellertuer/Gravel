@@ -346,7 +346,7 @@ public class VHyperGraphic extends VCommonGraphic
 				g2.draw(temp.getLinestyle().modifyPath(p,temp.getWidth(),zoomfactor));
 				if (temp.getTextProperties().isVisible()) //Visible
 				{
-					Point m = temp.getTextCenter(this);
+					Point m = temp.getTextCenter();
 					//get the text wich should be displayd
 				    String text = "";
 				    if (temp.getTextProperties().isshowvalue())

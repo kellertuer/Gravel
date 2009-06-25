@@ -203,7 +203,7 @@ public class VHyperEdge extends VItem {
 	 * 
 	 * @return
 	 */
-	public Point getTextCenter(VCommonGraphic Debug)
+	public Point getTextCenter()
 	{
 		float pos; boolean top; double part;
 		if (getTextProperties().getPosition() > .5f)
@@ -218,16 +218,11 @@ public class VHyperEdge extends VItem {
 			top = true;
 			part = ((double)pos)*2.0d;
 		}
-
 		Point2D p = shape.CurveRelativeAt(part);
-		Debug.drawCP(Debug.getGraphics(), new Point(Math.round((float)p.getX()),Math.round((float)p.getY())), Color.GREEN);
 		Point2D dir = shape.DerivateCurveRelativeAt(1,part);
 		double l = dir.distance(0.0d,0.0d);
-		System.err.print(dir);
 		//and norm dir
 		dir = new Point2D.Double(dir.getX()/l, dir.getY()/l);
-		Debug.getGraphics().setColor(Color.orange);
-		Debug.getGraphics().drawLine(Math.round((float)p.getX()), Math.round((float)p.getY()), Math.round((float)p.getX()+30f*(float)dir.getX()), Math.round((float)p.getY()+30f*(float)dir.getY()));
 		//And now from the point on the edge the distance
 		Point m = new Point(0,0); //middle of the text
 		if (top) //Countter Clockwise rotation of dir
@@ -240,7 +235,6 @@ public class VHyperEdge extends VItem {
 			m.x = (new Long(Math.round(p.getX() - ((double)getTextProperties().getDistance())*dir.getY())).intValue());
 			m.y = (new Long(Math.round(p.getY() + ((double)getTextProperties().getDistance())*dir.getX())).intValue());
 		}
-		Debug.drawCP(Debug.getGraphics(), m, Color.GREEN.darker());
 		return m;
 	}
 	public int getType()
