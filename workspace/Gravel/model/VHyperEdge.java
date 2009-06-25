@@ -1,8 +1,12 @@
 package model;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.Comparator;
+
+import view.VCommonGraphic;
 
 /**
  * This class represents the visual information of an edge.
@@ -193,9 +197,51 @@ public class VHyperEdge extends VItem {
 	public NURBSShape getShape() {
 		return shape;
 	}
-	public Point getTextCenter()
+	/**
+	 * return center Point of Text Display, so that anybody can either use that or calculate any edge of the 
+	 * Text-Panel to display it correctly
+	 * 
+	 * @return
+	 */
+	public Point getTextCenter(VCommonGraphic Debug)
 	{
-		return null;
+		float pos; boolean top; double part;
+		if (getTextProperties().getPosition() > .5f)
+		{ //below edge
+			pos = getTextProperties().getPosition() - .5f;
+			top = false;
+			part = 1-((double)pos)*2.0d; //from the end - so 1- at the part
+		}
+		else
+		{
+			pos = getTextProperties().getPosition();
+			top = true;
+			part = ((double)pos)*2.0d;
+		}
+
+		Point2D p = shape.CurveRelativeAt(part);
+		Debug.drawCP(Debug.getGraphics(), new Point(Math.round((float)p.getX()),Math.round((float)p.getY())), Color.GREEN);
+		Point2D dir = shape.DerivateCurveRelativeAt(1,part);
+		double l = dir.distance(0.0d,0.0d);
+		System.err.print(dir);
+		//and norm dir
+		dir = new Point2D.Double(dir.getX()/l, dir.getY()/l);
+		Debug.getGraphics().setColor(Color.orange);
+		Debug.getGraphics().drawLine(Math.round((float)p.getX()), Math.round((float)p.getY()), Math.round((float)p.getX()+30f*(float)dir.getX()), Math.round((float)p.getY()+30f*(float)dir.getY()));
+		//And now from the point on the edge the distance
+		Point m = new Point(0,0); //middle of the text
+		if (top) //Countter Clockwise rotation of dir
+		{
+			m.x = (new Long(Math.round(p.getX() + ((double)getTextProperties().getDistance())*dir.getY())).intValue());
+			m.y = (new Long(Math.round(p.getY() - ((double)getTextProperties().getDistance())*dir.getX())).intValue());
+		}
+		else //invert both direction elements
+		{
+			m.x = (new Long(Math.round(p.getX() - ((double)getTextProperties().getDistance())*dir.getY())).intValue());
+			m.y = (new Long(Math.round(p.getY() + ((double)getTextProperties().getDistance())*dir.getX())).intValue());
+		}
+		Debug.drawCP(Debug.getGraphics(), m, Color.GREEN.darker());
+		return m;
 	}
 	public int getType()
 	{

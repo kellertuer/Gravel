@@ -328,6 +328,7 @@ public class VHyperGraphic extends VCommonGraphic
 		while (ei.hasNext()) // drawEdges
 		{
 			VHyperEdge temp = ei.next();
+			MHyperEdge tempm = vG.getMathGraph().modifyHyperEdges.get(temp.getIndex());
 			if (!temp.getShape().isEmpty())
 			{
 				NURBSShape s = temp.getShape().stripDecorations().clone();
@@ -343,6 +344,30 @@ public class VHyperGraphic extends VCommonGraphic
 				g2.setColor(temp.getColor());
 				g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 				g2.draw(temp.getLinestyle().modifyPath(p,temp.getWidth(),zoomfactor));
+				if (temp.getTextProperties().isVisible()) //Visible
+				{
+					Point m = temp.getTextCenter(this);
+					//get the text wich should be displayd
+				    String text = "";
+				    if (temp.getTextProperties().isshowvalue())
+						text = ""+tempm.Value;
+				    else
+				    	text = tempm.name;
+				    //Show it
+					Font f = new Font("Arial",Font.PLAIN, Math.round(temp.getTextProperties().getSize()*zoomfactor));
+					g2.setFont(f);
+					g2.setColor(Color.black);
+					FontMetrics metrics = g2.getFontMetrics(f);
+				    int hgt = metrics.getAscent()-metrics.getLeading()-metrics.getDescent();
+				    if (text==null)
+				    	text = "";
+				    int adv = metrics.stringWidth(text);
+				    m.x = Math.round(m.x*zoomfactor);
+					m.y = Math.round(m.y*zoomfactor);
+					//adjust the point form the middle to the bottom left corner
+					m.x -= Math.round(adv/2); m.y += Math.round(hgt/2); //For Drawing, move to Top Left
+					g2.drawString(text,m.x,m.y);
+				}
 			}
 		}
 	}

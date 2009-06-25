@@ -476,6 +476,39 @@ public class NURBSShape {
 		return mid;
 	}
 	/**
+	 * Evaluate Curve at a given point relative on the Knot-vector,
+	 * that is 0 ist the startpoint, 1 is the endpoint
+	 * 
+	 * @param u
+	 * @return
+	 */
+	public Point2D CurveRelativeAt(double u)
+	{
+		if (u>1)
+			u -= Math.floor(u);
+		double a = Knots.get(degree);
+		double b = Knots.get(maxKnotIndex-degree);
+		double rel = a + (b-a)*u;
+		return CurveAt(rel);
+	}
+	/**
+	 * Evaluate Curve Derivatives a given point relative on the Knot-vector,
+	 * that is 0 ist the startpoint, 1 is the endpoint
+	 * 
+	 * @param u relative position
+	 * @param deriv, derivth derivate of the curve
+	 * @return
+	 */
+	public Point2D DerivateCurveRelativeAt(int deriv,double u)
+	{
+		if (u>1)
+			u -= Math.floor(u);
+		double a = Knots.get(degree);
+		double b = Knots.get(maxKnotIndex-degree);
+		double rel = a + (b-a)*u;
+		return DerivateCurveAt(deriv,rel);
+	}
+	/**
 	 * Evaluate the Curve at given point u \in [t_0,t_m]
 	 * @param u
 	 * @return

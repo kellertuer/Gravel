@@ -208,9 +208,9 @@ public class CommonEdgeDragListener
 				movingHyperEdge.getTextProperties().setPosition(pos);
 				movingHyperEdge.getTextProperties().setDistance(distance);
 				if (firstdrag) //Begin drag with a Block-Notification
-					vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
+					vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
 				else		
-					vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE));
+					vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE));
 			}
 			else if (((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK)&&(multiplemoving))
 			{
