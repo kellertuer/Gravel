@@ -562,7 +562,7 @@ import view.pieces.GridComponent;
 		gp.setIntValue("vgraphic.cpsize", this.iControlPointSize.getValue());
 		
 		gp.setBoolValue("edge.text_visible", chEdge.getTextProperties().isVisible());
-		gp.setIntValue("edge.text_position",chEdge.getTextProperties().getPosition());
+		gp.setFloatValue("edge.text_position",chEdge.getTextProperties().getPosition());
 		gp.setIntValue("edge.text_distance",chEdge.getTextProperties().getDistance());
 		gp.setIntValue("edge.text_size",chEdge.getTextProperties().getSize());
 		gp.setBoolValue("edge.text_showvalue",chEdge.getTextProperties().isshowvalue());

@@ -368,6 +368,40 @@ public abstract class VEdge extends VItem {
 	{
 		text = newtext;
 	}
+	public Point getTextCenter(Point startNodePos, Point endNodePos)
+	{
+		float pos; boolean top; double part;
+		if (getTextProperties().getPosition() > .5f)
+		{ //below edge
+			pos = getTextProperties().getPosition() - .5f;
+			top = false;
+			part = 1-((double)pos)*2.0d; //from the end - so 1- at the part
+		}
+		else
+		{
+			pos = getTextProperties().getPosition();
+			top = true;
+			part = ((double)pos)*2.0d;
+		}
+		Point p = getPointonEdge(startNodePos,endNodePos, part);
+		Point2D.Double dir = getDirectionatPointonEdge(startNodePos,endNodePos, part);
+		double l = dir.distance(0.0d,0.0d);
+		//and norm dir
+		dir.x = dir.x/l; dir.y = dir.y/l;
+		//And now from the point on the edge the distance
+		Point m = new Point(0,0); //middle of the text
+		if (top) //Countter Clockwise rotation of dir
+		{
+			m.x = p.x + (new Long(Math.round(((double)getTextProperties().getDistance())*dir.y)).intValue());
+			m.y = p.y - (new Long(Math.round(((double)getTextProperties().getDistance())*dir.x)).intValue());
+		}
+		else //invert both direction elements
+		{
+			m.x = p.x - (new Long(Math.round(((double)getTextProperties().getDistance())*dir.y)).intValue());
+			m.y = p.y + (new Long(Math.round(((double)getTextProperties().getDistance())*dir.x)).intValue());
+		}
+		return m;
+	}
 	public VEdgeLinestyle getLinestyle() {
 		return linestyle;
 	}

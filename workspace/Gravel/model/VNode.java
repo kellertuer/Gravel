@@ -126,6 +126,12 @@ public class VNode extends VItem {
 			name_size = second.getNameSize();
 			name_visible = second.isNameVisible();
 		}
+		public Point getTextCenter()
+		{
+			int x = getPosition().x + Math.round((float)name_distance*(float)Math.cos(Math.toRadians((double)name_rotation)));
+			int y = getPosition().y - Math.round((float)name_distance*(float)Math.sin(Math.toRadians((double)name_rotation)));
+			return new Point(x,y);
+		}
 		/**
 		 * Get the Distance from the node position to the middle of the text that should be displayd
 		 * @return a distance in px

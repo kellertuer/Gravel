@@ -9,7 +9,6 @@ public class VEdgeText {
 
 	
 	//text size of the edge name
-	private int size;
 	//visibility of the text
 	//if true, show the edge value, if false show the edge name
 	private boolean showvalue;
@@ -17,7 +16,8 @@ public class VEdgeText {
 
 	//distance from the edge and position on the edge
 	//Position <50 means above, >50 means below the edge
-	private int distance, position;
+	private int distance, size;
+	float position;
 
 	/**
 	 * Std Values
@@ -26,7 +26,7 @@ public class VEdgeText {
 	public VEdgeText()
 	{
 		distance = GeneralPreferences.getInstance().getIntValue("edge.text_distance");
-		position = GeneralPreferences.getInstance().getIntValue("edge.text_position");
+		position = GeneralPreferences.getInstance().getFloatValue("edge.text_position");
 		size = GeneralPreferences.getInstance().getIntValue("edge.text_size");
 		visible = GeneralPreferences.getInstance().getBoolValue("edge.text_visible");
 		showvalue = GeneralPreferences.getInstance().getBoolValue("edge.text_showvalue");	
@@ -35,7 +35,7 @@ public class VEdgeText {
 	 * given Values
 	 *
 	 */
-	public VEdgeText(int td, int tp, int ts, boolean tv, boolean tw)
+	public VEdgeText(int td, float tp, int ts, boolean tv, boolean tw)
 	{
 		distance = td;
 		position = tp;
@@ -70,21 +70,23 @@ public class VEdgeText {
 	 * 
 	 * @return position of the text
 	 */
-	public int getPosition() {
+	public float getPosition() {
 		return position;
 	}
 	/**
 	 * Sets the position along the edge the text middle is shown.
-	 * teh value is between 0 and 100 and
-	 * 	0 to 50 means it is shown CCW 90° to the edge direction, so if the edge is from left to right,
+	 * the value is in percent.
+	 * On An Edge it has the following interpretation:
+	 * 0-50% means 0 to 50 means it is shown CCW 90° to the edge direction, so if the edge is from left to right,
 	 * 	the text is above the edge
-	 * 
-	 * 	51 to 100 means the text is placed CW 90° to the edge direction, so again if the edge is from left to right, 
+	 * 51 - 100% means the text is placed CW 90° to the edge direction, so again if the edge is from left to right, 
 	 * 	the edge text is placed below the edge line itself
 	 * 
+	 * On An HyperEdge it's analogue, just that 0-50% is rotatet CCW and therefore „outside“ (if shape is defined Clockwise)
+	 * and for 51-100% „inside“
 	 * @return position of the text
 	 */
-	public void setPosition(int position) {
+	public void setPosition(float position) {
 		this.position = position;
 	}
 	/**

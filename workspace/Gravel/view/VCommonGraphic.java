@@ -137,16 +137,14 @@ public abstract class VCommonGraphic extends Component implements Observer
 				Font f = new Font("Arial",Font.PLAIN, Math.round(temp.getNameSize()*zoomfactor));
 				g2.setFont(f);
 				//mittelpunkt des Textes
-				int x = temp.getPosition().x + Math.round((float)temp.getNameDistance()*(float)Math.cos(Math.toRadians((double)temp.getNameRotation())));
-				int y = temp.getPosition().y - Math.round((float)temp.getNameDistance()*(float)Math.sin(Math.toRadians((double)temp.getNameRotation())));
+				Point m = temp.getTextCenter();
 				
 			    FontMetrics metrics = g2.getFontMetrics(f);
 			    int hgt = metrics.getAscent()-metrics.getLeading()-metrics.getDescent();
 			    int adv = metrics.stringWidth(mnodes.get(temp.getIndex()).name);
-			    x = Math.round(x*zoomfactor);
-			    y = Math.round(y*zoomfactor);
-			    x -= Math.round(adv/2); y += Math.round(hgt/2);
-				g2.drawString(mnodes.get(temp.getIndex()).name, x,y);
+			    m.x = Math.round(m.x*zoomfactor); m.y = Math.round(m.y*zoomfactor); //Zoom
+			    m.x -= Math.round(adv/2); m.y += Math.round(hgt/2); //Move to top left
+				g2.drawString(mnodes.get(temp.getIndex()).name, m.x,m.y);
 				
 			}
 		}

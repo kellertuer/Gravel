@@ -102,36 +102,7 @@ public class VGraphic extends VCommonGraphic
 			//And finally draw the text if visible
 			if (temp.getTextProperties().isVisible()) //Visible
 			{
-				int pos; boolean top; double part;
-				if (temp.getTextProperties().getPosition() > 50)
-				{ //below edge
-					pos = temp.getTextProperties().getPosition() - 50;
-					top = false;
-					part = 1-((double)pos)*2.0d/100.0d; //from the end - so 1- at the part
-				}
-				else
-				{
-					pos = temp.getTextProperties().getPosition();
-					top = true;
-					part = ((double)pos)*2.0d/100.0d;
-				}
-				Point p = temp.getPointonEdge(p1,p2, part);
-				Point2D.Double dir = temp.getDirectionatPointonEdge(p1,p2, part);
-				double l = dir.distance(0.0d,0.0d);
-				//and norm dir
-				dir.x = dir.x/l; dir.y = dir.y/l;
-				//And now from the point on the edge the distance
-				Point m = new Point(0,0); //middle of the text
-				if (top) //Countter Clockwise rotation of dir
-				{
-					m.x = p.x + (new Long(Math.round(((double)temp.getTextProperties().getDistance())*dir.y)).intValue());
-					m.y = p.y - (new Long(Math.round(((double)temp.getTextProperties().getDistance())*dir.x)).intValue());				
-				}
-				else //invert both direction elements
-				{
-					m.x = p.x - (new Long(Math.round(((double)temp.getTextProperties().getDistance())*dir.y)).intValue());
-					m.y = p.y + (new Long(Math.round(((double)temp.getTextProperties().getDistance())*dir.x)).intValue());				
-				}
+				Point m = temp.getTextCenter(p1,p2);
 				//get the text wich should be displayd
 			    String text = "";
 			    if (temp.getTextProperties().isshowvalue())
@@ -150,7 +121,7 @@ public class VGraphic extends VCommonGraphic
 			    m.x = Math.round(m.x*zoomfactor);
 				m.y = Math.round(m.y*zoomfactor);
 				//adjust the point form the middle to the bottom left corner
-				m.x -= Math.round(adv/2); m.y += Math.round(hgt/2);
+				m.x -= Math.round(adv/2); m.y += Math.round(hgt/2); //For Drawing, move to Top Left
 				g2.drawString(text,m.x,m.y);
 			}
 		}

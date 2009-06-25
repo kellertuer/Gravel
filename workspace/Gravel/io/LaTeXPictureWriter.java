@@ -214,38 +214,8 @@ public class LaTeXPictureWriter implements TeXWriter {
 		    	if (actual.getTextProperties().isVisible()) //draw name
 				{	
 		    		VEdgeText t = actual.getTextProperties();
-					//mittelpunkt des Textes herausfinden
-		    		int pos; boolean top; double part;
-					if (t.getPosition() > 50)
-					{ //below edge
-						pos = t.getPosition() - 50;
-						top = false;
-						part = 1-((double)pos)*2.0d/100.0d; //from the end - so 1- at the part
-					}
-					else
-					{
-						pos = t.getPosition();
-						top = true;
-						part = ((double)pos)*2.0d/100.0d;
-					}
-					Point p = actual.getPointonEdge(nodes.get(start).getPosition(),nodes.get(ende).getPosition(), part);
-					Point2D.Double dir = actual.getDirectionatPointonEdge(nodes.get(start).getPosition(),nodes.get(ende).getPosition(), part);
-					double l = dir.distance(0.0d,0.0d);
-					//and norm dir
-					dir.x = dir.x/l; dir.y = dir.y/l;
-					//And now from the point on the edge the distance
-					Point m = new Point(0,0); //middle of the text
-					if (top) //Countter Clockwise rotation of dir
-					{
-						m.x = p.x + (new Long(Math.round(((double)t.getDistance())*dir.y)).intValue());
-						m.y = p.y - (new Long(Math.round(((double)t.getDistance())*dir.x)).intValue());				
-					}
-					else //invert both direction elements
-					{
-						m.x = p.x - (new Long(Math.round(((double)t.getDistance())*dir.y)).intValue());
-						m.y = p.y + (new Long(Math.round(((double)t.getDistance())*dir.x)).intValue());				
-					}
-					//get the text wich should be displayd
+		    		Point m = actual.getTextCenter(nodes.get(start).getPosition(),nodes.get(ende).getPosition());
+		    		//get the text wich should be displayd
 				    String text = "";
 				    if (t.isshowvalue())
 						text = ""+me.Value;

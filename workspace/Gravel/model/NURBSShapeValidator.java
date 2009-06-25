@@ -75,7 +75,6 @@ public class NURBSShapeValidator extends NURBSShape {
 	
 	private Vector<Integer> invalidNodeIndices  = new Vector<Integer>();
 	private boolean ResultValidation;
-	private int SingleInSet=-1, SingleOutSet=-1;
 	
 	private NURBSShape origCurve;
 	public NURBSShapeValidator(VHyperGraph vG, int HyperEdgeIndex, NURBSShape Curve, VCommonGraphic g)

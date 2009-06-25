@@ -339,7 +339,7 @@ public class GeneralPreferences extends Observable
 		if (IntValues.get("edge.arrow_size")==null) return false;
 		if (IntValues.get("edge.value")==null) return false;
 		if (IntValues.get("edge.width")==null) return false;
-		if (IntValues.get("edge.text_position")==null) return false;
+		if (FloatValues.get("edge.text_position")==null) return false;
 		if (IntValues.get("edge.text_distance")==null) return false;
 		if (IntValues.get("edge.text_size")==null) return false;
 		if (IntValues.get("edge.line_distance")==null) return false;
@@ -430,7 +430,7 @@ public class GeneralPreferences extends Observable
 		IntValues.put("edge.arrow_alpha",38);
 		FloatValues.put("edge.arrow_pos",1f);
 		IntValues.put("edge.text_distance",7);
-		IntValues.put("edge.text_position",25);
+		FloatValues.put("edge.text_position",.25f);
 		IntValues.put("edge.text_size",12);
 		IntValues.put("edge.line_distance",10);
 		IntValues.put("edge.line_length",10);

@@ -53,12 +53,13 @@ public class CommonNodeClickListener implements MouseListener {
 		if (alt) //if alt+click -> toggle visibility of the text
 		{
 			if (r!=null) //Doubleclick really on Node
-				r.setNameVisible(r.isNameVisible()^true);
-			GraphMessage msg = new GraphMessage(GraphConstraints.NODE, r.getIndex(),GraphConstraints.UPDATE, GraphConstraints.NODE);
-			if (vg!=null)
-				vg.pushNotify(msg);
-			else if (vhg!=null)
-				vhg.pushNotify(msg);
+			{	r.setNameVisible(r.isNameVisible()^true);
+				GraphMessage msg = new GraphMessage(GraphConstraints.NODE, r.getIndex(),GraphConstraints.UPDATE, GraphConstraints.NODE);
+				if (vg!=null)
+					vg.pushNotify(msg);
+				else if (vhg!=null)
+					vhg.pushNotify(msg);
+			}
 		}
 		else if ((e.getClickCount()==2)&&(e.getModifiers() == MouseEvent.BUTTON1_MASK)) //Double click without alt
 		{

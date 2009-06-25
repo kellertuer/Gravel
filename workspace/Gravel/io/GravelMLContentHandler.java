@@ -222,7 +222,7 @@ public class GravelMLContentHandler implements ContentHandler
 			if (data_key.equals("etd")) //Edge Text Distance
 				try {etxt.setDistance(Integer.parseInt(CDATA));} catch(Exception e) {etxt.setDistance(gp.getIntValue("edge.text_distance"));}
 			if (data_key.equals("etp")) //Edge Text Position
-				try {etxt.setPosition(Integer.parseInt(CDATA));} catch(Exception e) {etxt.setPosition(gp.getIntValue("edge.text_position"));}
+				try {etxt.setPosition((float)Integer.parseInt(CDATA)/100f);} catch(Exception e) {etxt.setPosition(gp.getFloatValue("edge.text_position"));}
 			if (data_key.equals("ets")) //Edge Text Size
 				try {etxt.setSize(Integer.parseInt(CDATA));} catch(Exception e) {etxt.setSize(gp.getIntValue("edge.text_size"));}
 			if (data_key.equals("etv")) //Edge Text visible

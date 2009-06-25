@@ -840,7 +840,7 @@ public class GraphMLReader {
 			}
 			VEdgeText t = parseEdgeText(n);
 			gp.setIntValue(pre + "_distance", t.getDistance());
-			gp.setIntValue(pre + "_position", t.getPosition());
+			gp.setFloatValue(pre + "_position", t.getPosition());
 			gp.setBoolValue(pre + "_showvalue", t.isshowvalue());
 			gp.setIntValue(pre + "_size", t.getSize());
 			gp.setBoolValue(pre + "_visible", t.isVisible());
@@ -956,8 +956,8 @@ public class GraphMLReader {
 				}
 			else if (attr.getNodeName().equals("position")) // TODO Change model
 				try {
-					t.setPosition(Math.round(Float.parseFloat(attr
-							.getNodeValue())));
+					t.setPosition(Float.parseFloat(attr
+							.getNodeValue()));
 				} catch (Exception e) {
 				}
 			else if (attr.getName().equals("size"))

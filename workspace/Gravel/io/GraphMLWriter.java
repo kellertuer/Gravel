@@ -139,7 +139,7 @@ public class GraphMLWriter {
 			s.write("\t<key id=\"edgetext\" for=\"edge\" attr.name=\"edge.text\" attr.complexType=\"edge.text.type\">"+nl+
 					"\t\t<default>"+nl+
 					"\t\t\t<edgetext distance=\""+gp.getIntValue("edge.text_distance")+"\""+
-					" position=\""+gp.getIntValue("edge.text_position")+"\""+
+					" position=\""+gp.getFloatValue("edge.text_position")+"\""+
 					" size=\""+gp.getIntValue("edge.text_size")+"\""+
 					" show=");
 			if (gp.getBoolValue("edge.text_showvalue"))
@@ -181,7 +181,7 @@ public class GraphMLWriter {
 			s.write("\t<key id=\"hyperedgetext\" for=\"hyperedge\" attr.name=\"hyperedge.text\" attr.complexType=\"edge.text.type\">"+nl+
 					"\t\t<default>"+nl+
 					"\t\t\t<hyperedgetext distance=\""+gp.getIntValue("edge.text_distance")+"\""+
-					" position=\""+gp.getIntValue("edge.text_position")+"\""+
+					" position=\""+gp.getFloatValue("edge.text_position")+"\""+
 					" size=\""+gp.getIntValue("edge.text_size")+"\""+
 					" show=");
 			if (gp.getBoolValue("edge.text_showvalue"))
@@ -423,7 +423,7 @@ public class GraphMLWriter {
 	private void writeText(OutputStreamWriter s, VEdgeText t, boolean hyper) throws IOException
 	{
 		boolean noStdDis = t.getDistance()!=gp.getIntValue("edge.text_distance"),
-		noStdPos = t.getPosition()!=gp.getIntValue("edge.text_position"),
+		noStdPos = t.getPosition()!=gp.getFloatValue("edge.text_position"),
 		noStdSize = t.getSize()!=gp.getIntValue("edge.text_size"),
 		noStdVis = t.isVisible()!=gp.getBoolValue("edge.text_visible"),
 		noStdShow = t.isshowvalue()!=gp.getBoolValue("edge.text_showvalue");

@@ -87,9 +87,10 @@ public class CommonEdgeDragListener
 			VEdge temp = edgeiter.next();
 			if (((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)&&(temp.getTextProperties().isVisible()))
 			{
-				int pos = (temp.getTextProperties().getPosition()+x)%100;
+				float pos = (temp.getTextProperties().getPosition()+(float)x/100f);
+				pos -= Math.floor(pos); //Back to percent
 				if (pos < 0)
-					pos +=100;
+					pos +=1f;
 				int distance = (temp.getTextProperties().getDistance()+y);
 				if (distance<0)
 					distance = 0;
@@ -114,9 +115,10 @@ public class CommonEdgeDragListener
 			VHyperEdge temp = edgeiter.next();
 			if (((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)&&(temp.getTextProperties().isVisible()))
 			{
-				int pos = (temp.getTextProperties().getPosition()+x)%100;
+				float pos = (temp.getTextProperties().getPosition()+(float)x/100f);
+				pos -= Math.floor(pos);
 				if (pos < 0)
-					pos +=100;
+					pos +=1f;
 				int distance = (temp.getTextProperties().getDistance()+y);
 				if (distance<0)
 					distance = 0;
@@ -180,7 +182,8 @@ public class CommonEdgeDragListener
 		{
 			if ((movingEdge!=null)&&(movingEdge.getTextProperties().isVisible()))
 			{ //Single Edge
-				int pos = (movingEdge.getTextProperties().getPosition()+horizontalMovInGraph)%100;
+				float pos = movingEdge.getTextProperties().getPosition() + (float)horizontalMovInGraph/100f;
+				pos -= Math.floor(pos);
 				if (pos < 0)
 					pos +=100;
 				int distance = (movingEdge.getTextProperties().getDistance()+verticalMovInGraph);
@@ -192,6 +195,22 @@ public class CommonEdgeDragListener
 					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
 				else		
 					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.UPDATE));
+			}
+			else if ((movingHyperEdge!=null)&&(movingHyperEdge.getTextProperties().isVisible()))
+			{ //Single Edge
+				float pos = movingHyperEdge.getTextProperties().getPosition() + (float)horizontalMovInGraph/100f;
+				pos -= Math.floor(pos);
+				if (pos < 0)
+					pos +=100;
+				int distance = (movingHyperEdge.getTextProperties().getDistance()+verticalMovInGraph);
+				if (distance<0)
+					distance = 0;
+				movingHyperEdge.getTextProperties().setPosition(pos);
+				movingHyperEdge.getTextProperties().setDistance(distance);
+				if (firstdrag) //Begin drag with a Block-Notification
+					vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
+				else		
+					vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE));
 			}
 			else if (((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK)&&(multiplemoving))
 			{

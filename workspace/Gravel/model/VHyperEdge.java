@@ -193,7 +193,10 @@ public class VHyperEdge extends VItem {
 	public NURBSShape getShape() {
 		return shape;
 	}
-	
+	public Point getTextCenter()
+	{
+		return null;
+	}
 	public int getType()
 	{
 		return VItem.HYPEREDGE;

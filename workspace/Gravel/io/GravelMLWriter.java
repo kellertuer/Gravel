@@ -121,7 +121,7 @@ public class GravelMLWriter {
 		s.write("\t<key id=\"etd\" for=\"edge\" attr.name=\"text_distance\" attr.type=\"integer\">    <!-- Abstand von der Kantenlinie zum Textnittelpunkt -->"+nl);
 		s.write("\t<default>"+gp.getIntValue("edge.text_distance")+"</default>"+nl+"\t</key>"+nl);
 		s.write("\t<key id=\"etp\" for=\"edge\" attr.name=\"text_position\" attr.type=\"integer\">    <!-- Position auf der Kante -->"+nl);
-		s.write("\t<default>"+gp.getIntValue("edge.text_position")+"</default>"+nl+"\t</key>"+nl);
+		s.write("\t<default>"+gp.getFloatValue("edge.text_position")+"</default>"+nl+"\t</key>"+nl);
 		s.write("\t<key id=\"ets\" for=\"edge\" attr.name=\"text_size\" attr.type=\"integer\">    <!-- Textgroesse -->"+nl);
 		s.write("\t<default>"+gp.getIntValue("edge.text_size")+"</default>"+nl+"\t</key>"+nl);
 		//Kantenlinienart
@@ -260,7 +260,7 @@ public class GravelMLWriter {
 	    	   //each value is only written if it different from the std value
 	    	   if (t.getDistance()!=gp.getIntValue("edge.text_distance"))
 	    		   s.write("\t\t\t<data key=\"etd\">"+t.getDistance()+"</data>"+nl);
-	    	   if (t.getPosition()!=gp.getIntValue("edge.text_position"))
+	    	   if (t.getPosition()!=gp.getFloatValue("edge.text_position"))
 	    		   s.write("\t\t\t<data key=\"etp\">"+t.getPosition()+"</data>"+nl);
 	    	   if (t.getSize()!=gp.getIntValue("edge.text_size"))
 	    		   s.write("\t\t\t<data key=\"ets\">"+t.getSize()+"</data>"+nl);

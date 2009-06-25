@@ -89,7 +89,7 @@ public class CEdgeArrowPreview extends Container implements Observer{
 			
 			ArrowEdge.getTextProperties().setDistance(e.getTextProperties().getDistance());
 			ArrowEdge.getTextProperties().setPosition(e.getTextProperties().getPosition());
-			ArrowEdge.getTextProperties().setSize(e.getTextProperties().getPosition());
+			ArrowEdge.getTextProperties().setSize(e.getTextProperties().getSize());
 			ArrowEdge.getTextProperties().setshowvalue(e.getTextProperties().isshowvalue());
 			ArrowEdge.getTextProperties().setVisible(e.getTextProperties().isVisible());
 
@@ -106,7 +106,7 @@ public class CEdgeArrowPreview extends Container implements Observer{
 			ArrowEdge.getArrow().setPos(gp.getFloatValue("edge.arrow_pos"));
 			
 			ArrowEdge.getTextProperties().setDistance(gp.getIntValue("edge.text_distance"));
-			ArrowEdge.getTextProperties().setPosition(gp.getIntValue("edge.text_position"));
+			ArrowEdge.getTextProperties().setPosition(gp.getFloatValue("edge.text_position"));
 			ArrowEdge.getTextProperties().setSize(gp.getIntValue("edge.text_size"));
 			ArrowEdge.getTextProperties().setshowvalue(gp.getBoolValue("edge.text_showvalue"));
 			ArrowEdge.getTextProperties().setVisible(gp.getBoolValue("edge.text_visible"));
@@ -148,7 +148,7 @@ public class CEdgeArrowPreview extends Container implements Observer{
 				if (v.firstElement()==CEdgeTextParameters.CEDGETEXTPARAMETERS)
 				{
 					VEdgeText m = new VEdgeText(v.get(CEdgeTextParameters.TEXTDISTANCE),
-												v.get(CEdgeTextParameters.TEXTPOSITION),
+												(float)v.get(CEdgeTextParameters.TEXTPOSITION)/100f,
 												v.get(CEdgeTextParameters.TEXTSIZE),
 												v.get(CEdgeTextParameters.BTEXTVISIBLE)==1,
 												v.get(CEdgeTextParameters.BSHOWTEXTVALUE)==1);

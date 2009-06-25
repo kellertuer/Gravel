@@ -189,7 +189,7 @@ public class CEdgeTextParameters extends Observable implements ActionListener, C
 			else
 				values.set(BSHOWTEXTVALUE,0);
 			
-			values.set(TEXTPOSITION, e.getPosition());
+			values.set(TEXTPOSITION, Math.round(e.getPosition()*100f));
 			values.set(TEXTDISTANCE, e.getDistance());
 			values.set(TEXTSIZE, e.getSize());
 			
@@ -206,7 +206,7 @@ public class CEdgeTextParameters extends Observable implements ActionListener, C
 			else
 				values.set(BSHOWTEXTVALUE,0);
 			
-			values.set(TEXTPOSITION, gp.getIntValue("edge.text_position"));
+			values.set(TEXTPOSITION, Math.round(gp.getFloatValue("edge.text_position")*100f));
 			values.set(TEXTDISTANCE, gp.getIntValue("edge.text_distance"));
 			values.set(TEXTSIZE, gp.getIntValue("edge.text_size"));
 			
@@ -363,7 +363,7 @@ public class CEdgeTextParameters extends Observable implements ActionListener, C
 			if (bChTextChoice.isSelected())
 				t.setshowvalue(rShowValue.isSelected());
 			if (bChTextPosition.isSelected())
-				t.setPosition(iTextPosition.getValue());
+				t.setPosition((float)iTextPosition.getValue()/100f);
 			if (bChTextDistance.isSelected())
 				t.setDistance(iTextDistance.getValue());
 			if (bChTextSize.isSelected())
@@ -372,7 +372,7 @@ public class CEdgeTextParameters extends Observable implements ActionListener, C
 		}
 		else
 		{
-			VEdgeText newtext = new VEdgeText(iTextDistance.getValue(),iTextPosition.getValue(), iTextSize.getValue(), bShowText.isSelected(), rShowValue.isSelected());
+			VEdgeText newtext = new VEdgeText(iTextDistance.getValue(),(float)iTextPosition.getValue()/100f, iTextSize.getValue(), bShowText.isSelected(), rShowValue.isSelected());
 			e.setTextProperties(newtext);
 		}
 		return e;
@@ -395,7 +395,7 @@ public class CEdgeTextParameters extends Observable implements ActionListener, C
 			if (bChTextChoice.isSelected())
 				t.setshowvalue(rShowValue.isSelected());
 			if (bChTextPosition.isSelected())
-				t.setPosition(iTextPosition.getValue());
+				t.setPosition((float)iTextPosition.getValue()/100f);
 			if (bChTextDistance.isSelected())
 				t.setDistance(iTextDistance.getValue());
 			if (bChTextSize.isSelected())
@@ -404,7 +404,7 @@ public class CEdgeTextParameters extends Observable implements ActionListener, C
 		}
 		else
 		{
-			VEdgeText newtext = new VEdgeText(iTextDistance.getValue(),iTextPosition.getValue(), iTextSize.getValue(), bShowText.isSelected(), rShowValue.isSelected());
+			VEdgeText newtext = new VEdgeText(iTextDistance.getValue(),(float)iTextPosition.getValue()/100f, iTextSize.getValue(), bShowText.isSelected(), rShowValue.isSelected());
 			e.setTextProperties(newtext);
 		}
 		return e;
