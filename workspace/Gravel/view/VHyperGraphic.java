@@ -72,7 +72,7 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-//		paintPIDEBUG(g2);
+		paintPIDEBUG(g2);
 //		paintSubCurveIP(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
@@ -261,36 +261,15 @@ public class VHyperGraphic extends VCommonGraphic
 	}
 	private void paintPIDEBUG(Graphics2D g2)
 	{
-		Vector<Double> knots = new Vector<Double>();
-		for (int i=0; i<=18; i++)
-			knots.add(((double)i-3d)/6d);
-		
-		Vector<Point2D> points = new Vector<Point2D>();
-		Vector<Double> weights = new Vector<Double>();
-		points.add(new Point2D.Double(60d,65d)); weights.add(1d);
-		points.add(new Point2D.Double(80d,105d)); weights.add(1d);
-		points.add(new Point2D.Double(100d,235d)); weights.add(1d);
-		points.add(new Point2D.Double(190d,335d)); weights.add(1d);
-		points.add(new Point2D.Double(200d,335d)); weights.add(1d);
-		points.add(new Point2D.Double(330d,135d)); weights.add(1d);
-		points.add(new Point2D.Double(430d,235d)); weights.add(1d);
-		points.add(new Point2D.Double(530d,135d)); weights.add(1d);
-		points.add(new Point2D.Double(530d,160d)); weights.add(1d);
-		points.add(new Point2D.Double(580d,125d)); weights.add(1d);
-		points.add(new Point2D.Double(430d,110d)); weights.add(1d);
-		points.add(new Point2D.Double(230d,155d));weights.add(1d);
-		for (int i=0; i<3; i++)
-		{
-			points.add((Point2D)points.get(i).clone());
-			weights.add(weights.get(i).doubleValue());
-		}
 		g2.setColor(Color.black);
-		NURBSShape c = new  NURBSShape(knots,points,weights);
-		c.removeKnotNear(c.CurveAt(.5d), 22);
+		if (vG.modifyHyperEdges.get(1)==null)
+			return;
+		
+		NURBSShape c = vG.modifyHyperEdges.get(1).getShape();
 		g2.setStroke(new BasicStroke(2,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		NURBSShape cs = c.clone();
-		cs.scale(zoomfactor);
-		g2.draw(cs.getCurve(5d/(double)zoomfactor));
+		//cs.scale(zoomfactor);
+		//g2.draw(cs.getCurve(5d/(double)zoomfactor));
 		for (int i=0; i<c.controlPoints.size(); i++)
 		{
 			drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())),Color.cyan.darker());
@@ -307,8 +286,13 @@ public class VHyperGraphic extends VCommonGraphic
 	    for (int j=0; j<projectionpoints.size(); j++)
 		{
 			Point p = projectionpoints.get(j);
-			NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
+			NURBSShapeProjection proj;
+			if (j==0)
+				proj = new NURBSShapeProjection(c,p,this,zoomfactor);
+			else
+				proj = new NURBSShapeProjection(c,p);
 			double dist = p.distance(proj.getResultPoint());
+			System.err.println("Node #"+(j+1)+" Projected onto Parameter "+proj.getResultParameter()+" in ["+c.Knots.get(c.degree)+""+c.Knots.get(c.maxKnotIndex-c.degree)+"]");
 			Color cross = Color.magenta;
 			if (dist<=2.0)
 				cross = Color.green.darker().darker();

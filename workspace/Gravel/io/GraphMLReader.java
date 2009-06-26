@@ -299,7 +299,7 @@ public class GraphMLReader {
 			if (loadedMGraph.getType() == MGraphInterface.GRAPH)
 				((MGraph) loadedMGraph).modifyNodes.add(new MNode(index, name));
 			else if (loadedMGraph.getType() == MGraphInterface.HYPERGRAPH)
-				((MHyperGraph) loadedVGraph).modifyNodes.add(new MNode(index,
+				((MHyperGraph) loadedMGraph).modifyNodes.add(new MNode(index,
 						name));
 			else
 				errorMsg = "Unknown visual GraphType when parsing Nodes";

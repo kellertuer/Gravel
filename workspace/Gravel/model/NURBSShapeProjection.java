@@ -1,11 +1,16 @@
 package model;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Vector;
 
 import javax.vecmath.Point3d;
+
+import view.VCommonGraphic;
 
 /**
  * This Class is used for the projection and point inversion on NURBS Curves
@@ -36,6 +41,10 @@ public class NURBSShapeProjection extends NURBSShape
 	 */
 	public NURBSShapeProjection(NURBSShape Curve, Point2D p)
 	{
+		this(Curve,p,null,0f);
+	}
+	public NURBSShapeProjection(NURBSShape Curve, Point2D p,VCommonGraphic debug, float z)
+	{
 		origCurve = Curve;
 		NURBSShape clone = Curve.clone(); //We clone with decorations - if anybody wants to project really only on curve - strip before init
 		//If it is unclamped - clamp it!
@@ -50,7 +59,9 @@ public class NURBSShapeProjection extends NURBSShape
 		{
 			Vector<NURBSShape> partsf = DecomposeCurve(this);
 			for (int i=0; i<partsf.size(); i++)
+			{
 				Parts.offer(partsf.get(i));
+			}
 		}
 		else
 			Parts.offer(clone()); //We are nondecorative so clone is okay
@@ -69,7 +80,6 @@ public class NURBSShapeProjection extends NURBSShape
 			double partAlpha = Math.min(p.distanceSq(actualPart.controlPoints.firstElement()), p.distanceSq(actualPart.controlPoints.lastElement()));
 			if (partAlpha<alpha)
 				alpha = partAlpha;
-//			System.err.print(alpha+" on ["+actualPart.Knots.firstElement()+","+actualPart.Knots.lastElement()+"].");
 
 			//Check whether all are outside compute min
 			double min = Double.MAX_VALUE;
@@ -185,6 +195,7 @@ public class NURBSShapeProjection extends NURBSShape
 			double nominator = firstDeriv.x*diff.x + firstDeriv.y*diff.y;
 			double denominator = secondDeriv.x*diff.x + secondDeriv.y*diff.y + firstDeriv.distanceSq(0d,0d);
 			double unext = u - nominator/denominator;
+			System.err.println(iterations+" has diff "+diff+"("+(diff.distance(0,0))+" and u="+u+" and undext = "+unext);
 			if (unext > c.Knots.lastElement()) //Out of Range
 				unext = c.Knots.lastElement();
 			if (unext < c.Knots.firstElement()) //Out of Range

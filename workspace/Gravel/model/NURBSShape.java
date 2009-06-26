@@ -46,7 +46,7 @@ public class NURBSShape {
 	//TODO: Set Protected after finishing debug
 	public int maxKnotIndex, //The Knots are numbered 0,1,...,maxKnotIndex
 				maxCPIndex; //The ControlPoints are numbered 0,1,...,maxCPIndex
-	protected int	degree; //Order of the piecewise polynomials - depends on the maxIndices Above: degree = maxKnotIndex-maxCPindex-1
+	public int	degree; //Order of the piecewise polynomials - depends on the maxIndices Above: degree = maxKnotIndex-maxCPindex-1
 	/**
 	 * Create an empty NURBSShape,
 	 * which has no controlpoints, weights nor knots
@@ -547,9 +547,9 @@ public class NURBSShape {
 	{
 		if (derivate==0)
 			return CurveAt(u);
-		Vector<Point3d> DerivatesBSpline = DerivateValues(derivate, u);
+		Vector<Point3d> DerivatesBSpline = DerivatesHom(derivate, u);
 		Vector<Point2D> DerivatesNURBS = new Vector<Point2D>();
-		DerivatesNURBS.setSize(derivate);
+		DerivatesNURBS.setSize(derivate+1);
 		for (int k=0; k<=derivate; k++)
 		{ //Calculate kth Derivate
 			Point2D.Double thisdeg //v = aders(k)
@@ -566,7 +566,7 @@ public class NURBSShape {
 				thisdeg.x = thisdeg.x/DerivatesBSpline.get(0).z;
 				thisdeg.y = thisdeg.y/DerivatesBSpline.get(0).z;
 			}
-			DerivatesNURBS.add(k, new Point2D.Double(thisdeg.x,thisdeg.y));
+			DerivatesNURBS.set(k, new Point2D.Double(thisdeg.x,thisdeg.y));
 		}
 		return DerivatesNURBS.elementAt(derivate);
 	}
@@ -579,7 +579,7 @@ public class NURBSShape {
 	 * @param u
 	 * @return
 	 */
-	private Vector<Point3d> DerivateValues(int derivate, double u)
+	public Vector<Point3d> DerivatesHom(int derivate, double u)
 	{
 		int du = Math.min(degree, derivate);
 		Vector<Point3d> CK = new Vector<Point3d>();
@@ -693,7 +693,7 @@ public class NURBSShape {
 	 * 
 	 * This method works for 2d homogeneous or 3d Stuff.
 	 *
-	 * @param u Point u \in [0,1], which result we want
+	 * @param u Point u \in [a,b], whose point we want
 	 * @return a 3d-Value of the Point in the Curve or null if u is out of range
 	 */
 	private Point3d deBoer3D(double u)
