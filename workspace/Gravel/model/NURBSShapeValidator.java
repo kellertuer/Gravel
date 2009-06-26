@@ -372,7 +372,9 @@ public class NURBSShapeValidator extends NURBSShape {
 					p.getY() - Math.sin(alpha)*ProjDir.getX() + Math.cos(alpha)*ProjDir.getY());
 			Point2D q2 = new Point2D.Double(p.getX()+Math.cos(alpha)*ProjDir.getX() - Math.sin(alpha)*ProjDir.getY(),
 					p.getY() + Math.sin(alpha)*ProjDir.getX() + Math.cos(alpha)*ProjDir.getY());
-			if (pointInformation.get(p).previousPoint!=null) //We have a Predecessor, use the direction, that's more equal to the direction to pre
+			if ((pointInformation.get(p).previousPoint!=null)&&(alpha>(Math.PI/2d)))
+					//We have a Predecessor, try to continue direction
+					//If we don't just split - then use both
 			{
 				//We take that qi with the greater angle, that is more
 				double c1 = pointInformation.get(p).previousPoint.distance(q1);

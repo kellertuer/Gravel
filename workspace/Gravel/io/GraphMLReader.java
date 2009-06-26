@@ -238,7 +238,8 @@ public class GraphMLReader {
 			return;
 		}
 		String name = gp.getNodeName(index);
-		VNode resultNode = new VNode(index, 0, 0, 0, 0, 0, 0, false);
+		//Init with Std Values
+		VNode resultNode = new VNode(index, 0, 0, gp.getIntValue("node.size"), gp.getIntValue("node.name_distance"),gp.getIntValue("node.name_rotation"), gp.getIntValue("node.name_size"), gp.getBoolValue("node.name_visible"));
 		NodeList nodeChildElements = graphnodeNode.getChildNodes();
 		for (int i = 0; i < nodeChildElements.getLength(); i++)
 		{

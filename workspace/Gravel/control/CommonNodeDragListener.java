@@ -179,8 +179,8 @@ public class CommonNodeDragListener
 				if (rotation < 0)
 					rotation +=360;
 				int distance = (movingNode.getNameDistance()+verticalMovInGraph);
-				if (distance<0)
-					distance = 0;
+				if (distance<=0)
+					distance = 1;
 				movingNode.setNameDistance(distance); //Y Richtung setzt Distance
 				movingNode.setNameRotation(rotation); //X Setzt Rotation
 				if (firstdrag) //Begin drag with a Block-Notification
