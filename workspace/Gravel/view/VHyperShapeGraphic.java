@@ -78,19 +78,49 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		while (ei.hasNext()) // drawEdges
 		{
 			VHyperEdge temp = ei.next();
-			if (!temp.getShape().isEmpty())
-			{
-				if (temp.getIndex()==highlightedHyperEdge)
-				{
-					g2.setColor(temp.getColor());
-				}
-				else
-					g2.setColor(this.selColor.brighter());
-				g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			MHyperEdge tempm = vG.getMathGraph().modifyHyperEdges.get(temp.getIndex());
+			paintHyperEdge(g,temp,tempm,temp.getIndex()==highlightedHyperEdge);
+		}
+	}
+	private void paintHyperEdge(Graphics g, VHyperEdge temp, MHyperEdge tempm, boolean active)
+	{
+		Graphics2D g2 = (Graphics2D) g;
+		if (!temp.getShape().isEmpty())
+		{
+			if (active)
+				g2.setColor(temp.getColor());
+			else
+				g2.setColor(this.selColor.brighter());
+			g2.setStroke(new BasicStroke(temp.getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 
-				NURBSShape s = temp.getShape().stripDecorations().clone(); //really only nurbs
-				s.scale(zoomfactor);
-				g2.draw(temp.getLinestyle().modifyPath(s.getCurve(5d/(double)zoomfactor),temp.getWidth(),zoomfactor));
+			NURBSShape s = temp.getShape().stripDecorations().clone(); //really only nurbs
+			s.scale(zoomfactor);
+			g2.draw(temp.getLinestyle().modifyPath(s.getCurve(5d/(double)zoomfactor),temp.getWidth(),zoomfactor));
+			if (temp.getTextProperties().isVisible()) //Visible
+			{
+				Point m = temp.getTextCenter();
+				//get the text wich should be displayd
+			    String text = "";
+			    if (temp.getTextProperties().isshowvalue())
+					text = ""+tempm.Value;
+			    else
+			    	text = tempm.name;
+			    //Show it
+				Font f = new Font("Arial",Font.PLAIN, Math.round(temp.getTextProperties().getSize()*zoomfactor));
+				g2.setFont(f);
+				if (active)
+					g2.setColor(Color.black);
+				//else stay inactive color
+				FontMetrics metrics = g2.getFontMetrics(f);
+			    int hgt = metrics.getAscent()-metrics.getLeading()-metrics.getDescent();
+			    if (text==null)
+			    	text = "";
+			    int adv = metrics.stringWidth(text);
+			    m.x = Math.round(m.x*zoomfactor);
+				m.y = Math.round(m.y*zoomfactor);
+				//adjust the point form the middle to the bottom left corner
+				m.x -= Math.round(adv/2); m.y += Math.round(hgt/2); //For Drawing, move to Top Left
+				g2.drawString(text,m.x,m.y);
 			}
 		}
 	}

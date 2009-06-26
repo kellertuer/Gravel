@@ -40,7 +40,7 @@ public class NURBSShape {
 	
 	public Vector<Double> Knots;
 	public Vector<Point2D> controlPoints; //ControlPoints, TODO: Set protected after DEBUG
-	protected Vector<Double> cpWeight;
+	public Vector<Double> cpWeight;
 	protected Vector<Point3d> controlPointsHom; //b in homogeneous coordinates multiplied by weight
 	protected int NURBSType; //May be clamped or unclamped	
 	//TODO: Set Protected after finishing debug

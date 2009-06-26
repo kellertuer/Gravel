@@ -72,7 +72,7 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-//		paintDEBUG(g2);
+//		paintPIDEBUG(g2);
 //		paintSubCurveIP(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
@@ -261,27 +261,32 @@ public class VHyperGraphic extends VCommonGraphic
 	}
 	private void paintPIDEBUG(Graphics2D g2)
 	{
-		Vector<Point2D> IP = new Vector<Point2D>();
-		IP.add(new Point2D.Double(60,200));
-		IP.add(new Point2D.Double(50,130));
-		IP.add(new Point2D.Double(150,60));
-		IP.add(new Point2D.Double(270,80));
-		IP.add(new Point2D.Double(270,120));
-		IP.add(new Point2D.Double(220,130));
-		IP.add(new Point2D.Double(200,200));
-		IP.add(new Point2D.Double(200,230));
-		IP.add(new Point2D.Double(270,230));
-		IP.add(new Point2D.Double(400,200));
-		IP.add(new Point2D.Double(400,300));
-		IP.add(new Point2D.Double(230,290));
-		IP.add(new Point2D.Double(200,280));
-		IP.add(new Point2D.Double(175,290));
-		IP.add(new Point2D.Double(185,320));
-		IP.add(new Point2D.Double(80,350));
-		int degree = 6;
-		NURBSCreationMessage nm = new NURBSCreationMessage(degree, NURBSCreationMessage.ADD_END, IP);
-		NURBSShape c = NURBSShapeFactory.CreateShape(nm);
-
+		Vector<Double> knots = new Vector<Double>();
+		for (int i=0; i<=18; i++)
+			knots.add(((double)i-3d)/6d);
+		
+		Vector<Point2D> points = new Vector<Point2D>();
+		Vector<Double> weights = new Vector<Double>();
+		points.add(new Point2D.Double(60d,65d)); weights.add(1d);
+		points.add(new Point2D.Double(80d,105d)); weights.add(1d);
+		points.add(new Point2D.Double(100d,235d)); weights.add(1d);
+		points.add(new Point2D.Double(190d,335d)); weights.add(1d);
+		points.add(new Point2D.Double(200d,335d)); weights.add(1d);
+		points.add(new Point2D.Double(330d,135d)); weights.add(1d);
+		points.add(new Point2D.Double(430d,235d)); weights.add(1d);
+		points.add(new Point2D.Double(530d,135d)); weights.add(1d);
+		points.add(new Point2D.Double(530d,160d)); weights.add(1d);
+		points.add(new Point2D.Double(580d,125d)); weights.add(1d);
+		points.add(new Point2D.Double(430d,110d)); weights.add(1d);
+		points.add(new Point2D.Double(230d,155d));weights.add(1d);
+		for (int i=0; i<3; i++)
+		{
+			points.add((Point2D)points.get(i).clone());
+			weights.add(weights.get(i).doubleValue());
+		}
+		g2.setColor(Color.black);
+		NURBSShape c = new  NURBSShape(knots,points,weights);
+		c.removeKnotNear(c.CurveAt(.5d), 22);
 		g2.setStroke(new BasicStroke(2,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		NURBSShape cs = c.clone();
 		cs.scale(zoomfactor);
