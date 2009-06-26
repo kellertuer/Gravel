@@ -124,11 +124,10 @@ public class StandardEdgeDragListener implements MouseListener, MouseMotionListe
 		{
 			if (!((e.getPoint().x==-1)||(e.getPoint().y==-1)))//kein Reset von außerhalb wegen modusumschaltung
 				mouseDragged(e); //Das gleiche wie als wenn man bewegt, nur ist danach kein Knoten mehr bewegter Knoten
+			vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_END)); //Kanten aktualisiert
 		}
-		if (!((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))
-		{	movingControlPointEdge=null;
-			movingControlPointIndex = -1;
-		}
+		movingControlPointEdge=null;
+		movingControlPointIndex = -1;
 		firstdrag = true;
 	}
 

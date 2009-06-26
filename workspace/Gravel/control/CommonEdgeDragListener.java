@@ -56,9 +56,16 @@ public class CommonEdgeDragListener
 		if (!firstdrag)//We had a Drag: End Block
 		{	
 			if (movingEdge!=null) //Single Node Handled
-				vg.pushNotify(new GraphMessage(GraphConstraints.NODE,GraphConstraints.BLOCK_END));
+				vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_END));
+			else if (movingHyperEdge!=null)
+				vhg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_END));
 			else if (multiplemoving) //Multiple (really!) Handled
-				vg.pushNotify(new GraphMessage(GraphConstraints.EDGE|GraphConstraints.NODE,GraphConstraints.BLOCK_END));
+			{
+				if (vg!=null)
+					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_END));
+				else if (vhg!=null)
+					vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
+			}
 		}
 		movingEdge=null;
 		movingHyperEdge=null;
@@ -192,9 +199,9 @@ public class CommonEdgeDragListener
 				movingEdge.getTextProperties().setPosition(pos);
 				movingEdge.getTextProperties().setDistance(distance);
 				if (firstdrag) //Begin drag with a Block-Notification
-					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
+					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,movingEdge.getIndex(),GraphConstraints.BLOCK_START|GraphConstraints.UPDATE,GraphConstraints.EDGE));
 				else		
-					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.UPDATE));
+					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,movingEdge.getIndex(),GraphConstraints.UPDATE, GraphConstraints.EDGE));
 			}
 			else if ((movingHyperEdge!=null)&&(movingHyperEdge.getTextProperties().isVisible()))
 			{ //Single Edge
@@ -208,9 +215,9 @@ public class CommonEdgeDragListener
 				movingHyperEdge.getTextProperties().setPosition(pos);
 				movingHyperEdge.getTextProperties().setDistance(distance);
 				if (firstdrag) //Begin drag with a Block-Notification
-					vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
+					vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,movingHyperEdge.getIndex(),GraphConstraints.BLOCK_START|GraphConstraints.UPDATE, GraphConstraints.HYPEREDGE));
 				else		
-					vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE));
+					vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,movingHyperEdge.getIndex(),GraphConstraints.UPDATE, GraphConstraints.HYPEREDGE));
 			}
 			else if (((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK)&&(multiplemoving))
 			{
@@ -218,17 +225,17 @@ public class CommonEdgeDragListener
 				{
 					moveSelEdges(horizontalMovInGraph,verticalMovInGraph);
 					if (firstdrag) //Begin drag with a Block Start Notification
-						vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
+						vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.EDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
 					else
-						vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.UPDATE));
+						vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.EDGE,GraphConstraints.UPDATE));
 				}
 				else if (vhg!=null)
 				{
 					moveSelHyperEdges(horizontalMovInGraph,verticalMovInGraph);
 					if (firstdrag) //Begin drag with a Block Start Notification
-						vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
+						vhg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE));
 					else
-						vg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.NODE|GraphConstraints.EDGE,GraphConstraints.UPDATE));
+						vhg.pushNotify(new GraphMessage(GraphConstraints.SELECTION|GraphConstraints.HYPEREDGE,GraphConstraints.UPDATE));
 				}
 			}
 		} //End handling ALT

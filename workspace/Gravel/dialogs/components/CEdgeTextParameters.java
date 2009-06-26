@@ -188,8 +188,11 @@ public class CEdgeTextParameters extends Observable implements ActionListener, C
 				values.set(BSHOWTEXTVALUE, 1);
 			else
 				values.set(BSHOWTEXTVALUE,0);
+			if (e.getPosition()!=-1f)
+				values.set(TEXTPOSITION, Math.round(e.getPosition()*100f));
+			else
+				values.set(TEXTPOSITION,-1);
 			
-			values.set(TEXTPOSITION, Math.round(e.getPosition()*100f));
 			values.set(TEXTDISTANCE, e.getDistance());
 			values.set(TEXTSIZE, e.getSize());
 			

@@ -439,7 +439,7 @@ public class GraphMLReader {
 								+ index;
 						return;
 					}
-					linestyle = parseEdgeLinestyle(edgearrow);
+					arrow = parseEdgeArrow(edgearrow);
 				} else if (dataType.equals("edgepoints")) {
 					Points = parseEdgePoints(actual);
 					if (ErrorOccured())
@@ -1046,7 +1046,7 @@ public class GraphMLReader {
 					a.setPart(Float.parseFloat(attr.getNodeValue()));
 				} catch (Exception e) {
 				}
-			else if (attr.getNodeName().equals("pos"))
+			else if (attr.getNodeName().equals("position"))
 				try {
 					a.setPos(Float.parseFloat(attr.getNodeValue()));
 				} catch (Exception e) {

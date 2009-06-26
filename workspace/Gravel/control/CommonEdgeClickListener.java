@@ -45,9 +45,17 @@ public class CommonEdgeClickListener implements MouseListener {
 		Point pointInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //Rausrechnen des zooms
 		VEdge edgeInRange=null; VHyperEdge hyperedgeInRange=null;
 		if (vg!=null)
+		{	
+			if (vg.modifyNodes.getFirstinRangeOf(pointInGraph)!=null)
+				return;
 			edgeInRange = vg.getEdgeinRangeOf(pointInGraph,2.0*((float)vgc.getZoom()/100));
+		}
 		else if (vhg!=null)
+		{
+			if (vhg.modifyNodes.getFirstinRangeOf(pointInGraph)!=null)
+				return;
 			hyperedgeInRange = vhg.getEdgeinRangeOf(pointInGraph,2.0*((float)vgc.getZoom()/100));
+		}
 		
 		boolean alt = ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK); // alt ?
 		if (alt&&(edgeInRange!=null)) //if alt+click -> toggle visibility

@@ -108,7 +108,7 @@ public class CommonGraphHistoryManager implements Observer
 		{
 			try { 
 				if (InformationalGraph.getType()==VGraphInterface.GRAPH)	//TODO: Optimize temp.clone();
-					act = new GraphAction(((VGraph)InformationalGraph).modifyNodes.get(m.getElementID()),action,((VGraph)InformationalGraph).clone()); 
+					act = new GraphAction(((VGraph)InformationalGraph).modifyNodes.get(m.getElementID()).clone(),action,((VGraph)InformationalGraph).clone()); 
 				else if (InformationalGraph.getType()==VGraphInterface.HYPERGRAPH)	//TODO: Optimize temp.clone();
 					act = new HyperGraphAction(((VHyperGraph)InformationalGraph).modifyNodes.get(m.getElementID()),action,((VHyperGraph)InformationalGraph).clone()); 
 				else
@@ -125,7 +125,7 @@ public class CommonGraphHistoryManager implements Observer
 				if (InformationalGraph.getType()!=VGraphInterface.GRAPH)
 					act = null;
 				//TODO: Optimize Environment Graph
-				act = new GraphAction(((VGraph)InformationalGraph).modifyEdges.get(m.getElementID()),action,((VGraph)InformationalGraph).clone());
+				act = new GraphAction(((VGraph)InformationalGraph).modifyEdges.get(m.getElementID()).clone(),action,((VGraph)InformationalGraph).clone());
 			}
 			catch (GraphActionException e2)
 			{
