@@ -127,7 +127,9 @@ public class NURBSShapeFactory {
 		controlPoints.add(new Point2D.Double(p.x-radius, p.y+radius)); //P4, bottom left
 		controlPoints.add(new Point2D.Double(p.x+radius, p.y+radius)); //P5, bottom right
 		controlPoints.add(new Point2D.Double(p.x+radius, p.y)); //P6 again P0
-		return new NURBSShape(knots,controlPoints,weights);
+		NURBSShape c = new NURBSShape(knots,controlPoints,weights);
+		c = unclamp(c);
+		return c;
 	}
 
 	/**
