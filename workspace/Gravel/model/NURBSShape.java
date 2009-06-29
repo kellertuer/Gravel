@@ -799,6 +799,98 @@ public class NURBSShape {
 		}
 		return (nomin/denomin);
 	}
+	//
+	// 29.06. New Approach to Derivatives
+	//
+	/**
+	 * Calculate all Nonvanishing BasisFunctions at u
+	 * This is a Variation of Alg 2.2 from the NURBS-Book
+	 */
+	private Vector<Vector<Double>> AllBasisFunctions(double u)
+	{
+		Vector<Vector<Double>> N = new Vector<Vector<Double>>();
+		N.setSize(degree+1);
+		for (int i=0; i<=degree; i++)
+		{
+			N.set(i, new Vector<Double>());
+			N.get(i).setSize(degree+1);
+		}				
+		int i = findSpan(u);
+		for (int deg=0; deg<=degree; deg++) //All Degrees less then degree
+		{ //Inside this 
+			Vector<Double> left = new Vector<Double>(); left.setSize(deg+1);
+			Vector<Double> right = new Vector<Double>(); right.setSize(deg+1);
+			N.get(0).set(deg,1.0);
+			for (int j=1; j<=deg; j++) //All Basis Values of degree 
+			{
+				left.set(j,u-Knots.get(i+1-j));
+				right.set(j,Knots.get(i+j)-u);
+				double saved = 0d;
+				for (int r=0; r<j; r++)
+				{
+					double temp = N.get(r).get(deg)/(right.get(r+1)+left.get(j-r));
+					N.get(r).set(deg, saved+right.get(r+1)*temp);
+					saved = left.get(j-r)*temp;
+				}
+				N.get(j).set(deg,saved);
+			}
+		}
+		return N;
+	}
+	/**
+	 * Compute ControlPoints of the Derivatives up to deriv
+	 * Based on Alg 3.3 with 
+	 * @param derivative
+	 */
+	private Vector<Vector<Point3d>> CurveDerivativeControlPointsHom(int d, int r1, int r2)
+	{ //n==maxCPIndex, d<=degree, p==degree, U==Knots, P==ControlPointsHom
+		//
+		Vector<Vector<Point3d>> PK = new Vector<Vector<Point3d>>();
+		if (d>degree)
+			return PK;
+		PK.setSize(d+1);
+		int r = r2-r1;
+		PK.set(0,new Vector<Point3d>());PK.get(0).setSize(r+1);
+		for (int i=0; i<=r; i++)
+			PK.get(0).set(i, (Point3d) controlPointsHom.get(r1+i).clone());
+		for (int k=1; k<=d; k++) //through all derivatives
+		{
+			PK.set(k,new Vector<Point3d>()); PK.get(k).setSize(r-k+1);
+			int tmp = degree-k+1;
+			for (int i=0; i<=r-k; i++)
+			{ //Code from p. 99
+				double denom = Knots.get(r1+i+degree+1)-Knots.get(r1+i+k);
+				double newx = tmp*(PK.get(k-1).get(i+1).x - PK.get(k-1).get(i).x)/denom;
+				double newy = tmp*(PK.get(k-1).get(i+1).y - PK.get(k-1).get(i).y)/denom;
+				double newz = tmp*(PK.get(k-1).get(i+1).z - PK.get(k-1).get(i).z)/denom;
+				PK.get(k).set(i, new Point3d(newx,newy,newz));
+			}
+		}	
+		return PK;
+	}
+	public Vector<Point3d> getDerivatesHomAt(int d, double u)
+	{//n==maxCPIndex, p==degree, U==Knots, P==controlPointsHom
+		Vector<Point3d> CK = new Vector<Point3d>();
+		CK.setSize(d+1);
+		int du = Math.min(d,degree);
+		for (int k=degree+1; k<=degree; k++)
+			CK.set(k, new Point3d(0d,0d,0d));
+		int span = findSpan(u);
+		Vector<Vector<Double>> N = AllBasisFunctions(u);
+		Vector<Vector<Point3d>> PK = CurveDerivativeControlPointsHom(du,span-degree,span);
+		for (int k=0; k<=du; k++)
+		{
+			CK.set(k,new Point3d(0d,0d,0d));
+			for (int j=0; j<=degree-k; j++)
+			{
+				double newx = CK.get(k).x + N.get(j).get(degree-k)*PK.get(k).get(j).x;
+				double newy = CK.get(k).y + N.get(j).get(degree-k)*PK.get(k).get(j).y;
+				double newz = CK.get(k).z + N.get(j).get(degree-k)*PK.get(k).get(j).z;
+				CK.set(k, new Point3d(newx,newy,newz));
+			}
+		}
+		return CK;
+	}
 	/**
 	 * Get the ControlPoint of the NURBSShape that is the nearest ofthe Point m
 	 * @param m
