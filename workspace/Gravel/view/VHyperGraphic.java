@@ -72,8 +72,8 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(Drag.getSelectionRectangle());
 		}
-		paintPIDEBUG(g2);
-//		paintSubCurveIP(g2);
+//		paintDerivDEBUG(g2);
+//		paintPIDEBUG(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
@@ -205,7 +205,8 @@ public class VHyperGraphic extends VCommonGraphic
 		}
 		g2.setColor(Color.black);
 		NURBSShape c = new  NURBSShape(knots,points,weights);
-//		c = NURBSShapeFactory.CreateShape(new NURBSCreationMessage(2, new Point2D.Double(200d,200d),150));
+		if (vG.modifyHyperEdges.get(1)!=null)
+			c = vG.modifyHyperEdges.get(1).getShape();
 		g2.setStroke(new BasicStroke(2,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		NURBSShape cs = c.clone();
 		cs.scale(zoomfactor);
@@ -219,61 +220,73 @@ public class VHyperGraphic extends VCommonGraphic
 						Math.round((float)c.controlPoints.get(i-1).getX()*zoomfactor),Math.round((float)c.controlPoints.get(i-1).getY()*zoomfactor));
 			}
 		}
-		if (vG.modifyNodes.get(1)==null)
+		int Num=5;
+		for (int i=0; i<Num; i++)
 		{
-			for (int i=0; i<1000; i++)
-			{
-				DerivateHelper(c, c.Knots.get(c.getDegree()) + (c.Knots.get(c.getDegree())+c.Knots.get(c.maxKnotIndex-c.getDegree()))*((double) i)/1000d, g2);
-			}
-		}
-		else
-		{
-			Iterator<VNode> iter = vG.modifyNodes.getIterator();
-			while (iter.hasNext())
-			{
-				VNode actual = iter.next();
-				Point2D p = new Point2D.Double(actual.getPosition().x,actual.getPosition().y);
-				NURBSShapeProjection proj = new NURBSShapeProjection(c,p);
-				DerivateHelper(c,proj.getResultParameter(), g2);
-			}
+			double pos = c.Knots.get(c.getDegree()) + (c.Knots.get(c.maxKnotIndex-c.getDegree())-c.Knots.get(c.getDegree()))*((double) i)/((double)Num);
+			if (i==0)
+				pos += 0.000001d;
+			DerivateHelper(c, pos, g2);
 		}
 	}
 	private void DerivateHelper(NURBSShape c, double pos, Graphics2D g2)
 	{
-		Point2D p = c.CurveAt(pos);
+		System.err.print("Eval at "+pos+" (w:"+c.WeightAt(pos)+")");
+		Vector<Point2D> derivs = c.DerivateCurveValuesAt(2,pos);
+		Point2D p = derivs.get(0);
 //		drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),Color.LIGHT_GRAY);
-		Point2D deriv1 = c.DerivateCurveAt(1,pos);
-		g2.setColor(Color.orange.brighter());
-		Point2D deriv2 = c.DerivateCurveAt(2,pos);
-
-		double l = deriv1.getX()*deriv1.getX() + deriv1.getY()*deriv1.getY();
-		double curvature = (deriv1.getX()*deriv2.getY() - deriv2.getX()*deriv1.getY())/ Math.sqrt(l*l*l);
-		curvature = curvature*c.WeightAt(pos);
-		curvature = Math.abs(curvature)*1000;
-		System.err.println(curvature);
+		Point2D deriv1 = derivs.get(1);
+		Point2D deriv2 = derivs.get(2);
+		System.err.println("Deriv1 is "+deriv1+" and Deriv2 is "+deriv2);
+		
+		double l = deriv1.distance(0d,0d)/100d;
 		Point2D normps = new Point2D.Double(deriv1.getX()/deriv1.distance(0d,0d),deriv1.getY()/deriv1.distance(0d,0d));
+		double l2 = deriv2.distance(0d,0d)/100d;
+		Point2D normps2 = new Point2D.Double(deriv2.getX()/deriv2.distance(0d,0d),deriv2.getY()/deriv2.distance(0d,0d));
 
 		//Now orthogonal to the first derivate the seconds derivates length
+		g2.setColor(Color.orange.brighter());
 		g2.drawLine(Math.round((float)p.getX()*zoomfactor), Math.round((float)p.getY()*zoomfactor),
-				Math.round((float)(p.getX()-normps.getY()*curvature)*zoomfactor),
-				Math.round((float)(p.getY()+normps.getX()*curvature)*zoomfactor));
+				Math.round((float)(p.getX()+normps.getX()*20*l)*zoomfactor),
+				Math.round((float)(p.getY()+normps.getY()*20*l)*zoomfactor));
+		g2.setColor(Color.red.darker().brighter());
+		g2.drawLine(Math.round((float)p.getX()*zoomfactor), Math.round((float)p.getY()*zoomfactor),
+				Math.round((float)(p.getX()+normps2.getX()*20*l2)*zoomfactor),
+				Math.round((float)(p.getY()+normps2.getY()*20*l2)*zoomfactor));
 
 	}
 	private void paintPIDEBUG(Graphics2D g2)
 	{
-		g2.setColor(Color.black);
-		if (vG.modifyHyperEdges.get(1)==null)
-			return;
-		
-		NURBSShape c = vG.modifyHyperEdges.get(1).getShape();
+		Vector<Point2D> IP = new Vector<Point2D>();
+		IP.add(new Point2D.Double(60,200));
+		IP.add(new Point2D.Double(50,130));
+		IP.add(new Point2D.Double(150,60));
+		IP.add(new Point2D.Double(270,80));
+		IP.add(new Point2D.Double(270,120));
+		IP.add(new Point2D.Double(220,130));
+		IP.add(new Point2D.Double(200,200));
+		IP.add(new Point2D.Double(200,230));
+		IP.add(new Point2D.Double(270,230));
+		IP.add(new Point2D.Double(400,200));
+		IP.add(new Point2D.Double(400,300));
+		IP.add(new Point2D.Double(230,290));
+		IP.add(new Point2D.Double(200,280));
+		IP.add(new Point2D.Double(175,290));
+		IP.add(new Point2D.Double(185,320));
+		IP.add(new Point2D.Double(80,350));
+		int degree = 6;
+		NURBSCreationMessage nm = new NURBSCreationMessage(degree, NURBSCreationMessage.ADD_END, IP);
+		NURBSShape c = NURBSShapeFactory.CreateShape(nm);
 		g2.setStroke(new BasicStroke(2,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		NURBSShape cs = c.clone();
-		//cs.scale(zoomfactor);
-		//g2.draw(cs.getCurve(5d/(double)zoomfactor));
+		cs.scale(zoomfactor);
+		g2.draw(cs.getCurve(5d/(double)zoomfactor));
 		for (int i=0; i<c.controlPoints.size(); i++)
 		{
 			drawCP(g2,new Point(Math.round((float)c.controlPoints.get(i).getX()),Math.round((float)c.controlPoints.get(i).getY())),Color.cyan.darker());
 		}
+		if (c.isEmpty())
+			return;
 		Vector<Point> projectionpoints = new Vector<Point>();
 		Iterator<VNode> iter = vG.modifyNodes.getIterator();
 		while (iter.hasNext())
@@ -292,7 +305,7 @@ public class VHyperGraphic extends VCommonGraphic
 			else
 				proj = new NURBSShapeProjection(c,p);
 			double dist = p.distance(proj.getResultPoint());
-			System.err.println("Node #"+(j+1)+" Projected onto Parameter "+proj.getResultParameter()+" in ["+c.Knots.get(c.degree)+""+c.Knots.get(c.maxKnotIndex-c.degree)+"]");
+//			System.err.println("Node #"+(j+1)+" Projected onto Parameter "+proj.getResultParameter()+" in ["+c.Knots.get(c.degree)+""+c.Knots.get(c.maxKnotIndex-c.degree)+"]");
 			Color cross = Color.magenta;
 			if (dist<=2.0)
 				cross = Color.green.darker().darker();

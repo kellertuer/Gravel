@@ -124,7 +124,8 @@ public class NURBSShapeProjection extends NURBSShape
 				{
 					umin = actualPart.Knots.firstElement();
 					umax = actualPart.Knots.lastElement();
-					double startvalue = umin + (double)qcControlPoints.indexOf(min)/((double)qcControlPoints.size()-1)*(umax-umin);
+					//take a look at where the minimum in the qcCP was and take the startvalue inside actual [umin,umax] (+1 ensures INSIDE umax-umin)
+					double startvalue = umin + (double)(qcControlPoints.indexOf(min))/((double)qcControlPoints.size()+1)*(umax-umin);
 					double candidate_u = NewtonIteration(actualPart.clone(), startvalue, p);
 					candidates.add(candidate_u);
 //					System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
@@ -183,9 +184,10 @@ public class NURBSShapeProjection extends NURBSShape
 		double epsilon2 = 0.0003d;
 		//So now we 
 		boolean running = true;
-		Point2D.Double Value = (Point2D.Double) c.CurveAt(startvalue);
-		Point2D.Double firstDeriv = (Point2D.Double) c.DerivateCurveAt(1,startvalue);
-		Point2D.Double secondDeriv = (Point2D.Double) c.DerivateCurveAt(2,startvalue);
+		Vector<Point2D> derivs = c.DerivateCurveValuesAt(2,startvalue);
+		Point2D.Double Value = (Point2D.Double) derivs.get(0); //c.CurveAt(startvalue);
+		Point2D.Double firstDeriv = (Point2D.Double) derivs.get(1); //c.DerivateCurveValuesAt(1,startvalue).get(1);
+		Point2D.Double secondDeriv = (Point2D.Double) derivs.get(2); //c.DerivateCurveValuesAt(2,startvalue).get(2);
 		Point2D.Double diff = new Point2D.Double(Value.x-p.getX(), Value.y-p.getY());
 		double u=startvalue;
 		int iterations=0;
@@ -195,29 +197,28 @@ public class NURBSShapeProjection extends NURBSShape
 			double nominator = firstDeriv.x*diff.x + firstDeriv.y*diff.y;
 			double denominator = secondDeriv.x*diff.x + secondDeriv.y*diff.y + firstDeriv.distanceSq(0d,0d);
 			double unext = u - nominator/denominator;
-			System.err.println(iterations+" has diff "+diff+"("+(diff.distance(0,0))+" and u="+u+" and undext = "+unext);
+//			System.err.println(iterations+" has diff "+diff+"("+(diff.distance(0,0))+" and u="+u+" and undext = "+unext);
 			if (unext > c.Knots.lastElement()) //Out of Range
 				unext = c.Knots.lastElement();
 			if (unext < c.Knots.firstElement()) //Out of Range
 				unext = c.Knots.firstElement();
-			  //System.err.print(" u="+unext);
-			  Value = (Point2D.Double) c.CurveAt(unext);
-			  firstDeriv = (Point2D.Double) c.DerivateCurveAt(1,unext);
-			  secondDeriv = (Point2D.Double) c.DerivateCurveAt(2,unext);
-			  diff = new Point2D.Double(Value.x-p.getX(), Value.y-p.getY());
-			  double coincidence = diff.distance(0d,0d);
-			  double movement = Math.abs(nominator/denominator);
-			  double movementu = Math.abs(unext-u)*Math.sqrt(firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y);
-			  if (iterations>50) //it sould converge fast so here we should change sth
-			  {
-				  u = (u+unext)/2;
-				  System.err.println("# "+iterations+"Criteria: "+coincidence+" and "+movement+" and "+movementu);
-				  iterations=0;
-			  }
-			  else
-				   u=unext;            
-			  if ((coincidence<=epsilon1)||(movement<=epsilon2)||(movementu<=epsilon1))
-				  running=false;
+			derivs = c.DerivateCurveValuesAt(2,unext);
+			Value = (Point2D.Double) derivs.get(0); //c.CurveAt(startvalue);
+			firstDeriv = (Point2D.Double) derivs.get(1); //c.DerivateCurveValuesAt(1,startvalue).get(1);
+			secondDeriv = (Point2D.Double) derivs.get(2); //c.DerivateCurveValuesAt(2,startvalue).get(2);
+			diff = new Point2D.Double(Value.x-p.getX(), Value.y-p.getY());
+			double coincidence = diff.distance(0d,0d);
+			double movement = Math.abs(nominator/denominator);
+			double movementu = Math.abs(unext-u)*Math.sqrt(firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y);
+			if (iterations>50) //it sould converge fast so here we should change sth
+			{
+				System.err.println("Warning: Newton-Iteration took too long.");
+				return (u+unext)/2; //Try to prevent circles
+			}
+			else
+				u=unext;            
+			if ((coincidence<=epsilon1)||(movement<=epsilon2)||(movementu<=epsilon1))
+				running=false;
 		  }
 		  return u;
 	}

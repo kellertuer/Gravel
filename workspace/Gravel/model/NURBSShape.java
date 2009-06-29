@@ -506,7 +506,7 @@ public class NURBSShape {
 		double a = Knots.get(degree);
 		double b = Knots.get(maxKnotIndex-degree);
 		double rel = a + (b-a)*u;
-		return DerivateCurveAt(deriv,rel);
+		return DerivateCurveValuesAt(deriv,rel).get(deriv);
 	}
 	/**
 	 * Evaluate the Curve at given point u \in [t_0,t_m]
@@ -538,37 +538,39 @@ public class NURBSShape {
 			return erg.z;
 	}
 	/**
-	 * get the Value of the degree-th Derivate of this NURBS at Position u
+	 * get the Value of all derivates up to derivate-th Degree of the NURBSShape at Position u
 	 * @param pDegree
 	 * @param u
 	 * @return
 	 */
-	public Point2D DerivateCurveAt(int derivate, double u)
+	public Vector<Point2D> DerivateCurveValuesAt(int derivate, double u)
 	{
+		Vector<Point2D> CK = new Vector<Point2D>(); //result
 		if (derivate==0)
-			return CurveAt(u);
-		Vector<Point3d> DerivatesBSpline = DerivatesHom(derivate, u);
-		Vector<Point2D> DerivatesNURBS = new Vector<Point2D>();
-		DerivatesNURBS.setSize(derivate+1);
+		{
+			CK.add(CurveAt(u));
+			return CK;
+		}
+		Vector<Point3d> AdersWders = getDerivatesHomAt(derivate, u); //x,y are the Aders, z is wders
+		CK.setSize(derivate+1);
 		for (int k=0; k<=derivate; k++)
 		{ //Calculate kth Derivate
-			Point2D.Double thisdeg //v = aders(k)
-				= new Point2D.Double(DerivatesBSpline.get(k).x,DerivatesBSpline.get(k).y);
+			double vx = AdersWders.get(k).x;
+			double vy = AdersWders.get(k).y;
 			for (int i=1; i<=k; i++)
 			{
-				double factor = binomial(k,i)*DerivatesBSpline.get(i).z; //bin(k,i)*wders(i)
-				Point2D prev = (Point2D) DerivatesNURBS.get(k-i); //get CK(k-i)
-				thisdeg.x = thisdeg.x - prev.getX()*factor; //v = v- bin(k,i)*wders(i)*ck(k-i)
-				thisdeg.y = thisdeg.y - prev.getY()*factor; //second componnt
+				double factor = binomial(k,i)*AdersWders.get(i).z;
+				vx -= factor*CK.get(k-i).getX();
+				vy -= factor*CK.get(k-i).getY();
 			}
-			if ((DerivatesBSpline.get(0).z!=0.0))
+			if ((AdersWders.get(0).z!=0.0)) //wders[0]!=0
 			{
-				thisdeg.x = thisdeg.x/DerivatesBSpline.get(0).z;
-				thisdeg.y = thisdeg.y/DerivatesBSpline.get(0).z;
+				vx /= AdersWders.get(0).z;
+				vy /= AdersWders.get(0).z;
 			}
-			DerivatesNURBS.set(k, new Point2D.Double(thisdeg.x,thisdeg.y));
+			CK.set(k,new Point2D.Double(vx,vy));
 		}
-		return DerivatesNURBS.elementAt(derivate);
+		return CK;
 	}
 	/**
 	 * Derivate-th derivate at u of the Curve computed in homogeneous Coordinates so its B-Spline-Derivate-Algorithm (
@@ -579,101 +581,96 @@ public class NURBSShape {
 	 * @param u
 	 * @return
 	 */
-	public Vector<Point3d> DerivatesHom(int derivate, double u)
+	/**
+	 * Calculate all Nonvanishing BasisFunctions at u
+	 * This is a Variation of Alg 2.2 from the NURBS-Book
+	 */
+	private Vector<Vector<Double>> AllBasisFunctions(double u)
 	{
-		int du = Math.min(degree, derivate);
-		Vector<Point3d> CK = new Vector<Point3d>();
-		int span = findSpan(u);
-		if (u==-1)
-			return null;
-		CK.setSize(derivate+1);
-		for (int k=degree+1; k<=derivate; k++)
-			CK.set(k,new Point3d(0d,0d,0d)); //All higher derivates zero
-		double[][] nders = DersBasisFuns(du,u);
-		for (int k=0; k<=du; k++) //compute kth value
+		Vector<Vector<Double>> N = new Vector<Vector<Double>>();
+		N.setSize(degree+1);
+		int i = findSpan(u);
+		if (i==-1)
+			return N;
+		for (int j=0; j<=degree; j++)
 		{
-			CK.set(k, new Point3d(0d,0d,0d));
-			for (int j=0; j<=degree; j++)
+			N.set(j, new Vector<Double>());
+			N.get(j).setSize(degree+1);
+		}				
+		for (int deg=0; deg<=degree; deg++) //All Degrees less then degree
+		{ //Inside this 
+			Vector<Double> left = new Vector<Double>(); left.setSize(deg+1);
+			Vector<Double> right = new Vector<Double>(); right.setSize(deg+1);
+			N.get(0).set(deg,1.0);
+			for (int j=1; j<=deg; j++) //All Basis Values of degree 
 			{
-				Point3d Addition = (Point3d) controlPointsHom.get(span-degree+j).clone();
-				Addition.scale(nders[k][j]);
-				CK.get(k).add(Addition);
+				left.set(j,u-Knots.get(i+1-j));
+				right.set(j,Knots.get(i+j)-u);
+				double saved = 0d;
+				for (int r=0; r<j; r++)
+				{
+					double temp = N.get(r).get(deg)/(right.get(r+1)+left.get(j-r));
+					N.get(r).set(deg, saved+right.get(r+1)*temp);
+					saved = left.get(j-r)*temp;
+				}
+				N.get(j).set(deg,saved);
+			}
+		}
+		return N;
+	}
+	/**
+	 * Compute ControlPoints of the Derivatives up to deriv
+	 * Based on Alg 3.3 with 
+	 * @param derivative
+	 */
+	private Vector<Vector<Point3d>> CurveDerivativeControlPointsHom(int d, int r1, int r2)
+	{ //n==maxCPIndex, d<=degree, p==degree, U==Knots, P==ControlPointsHom
+		//
+		Vector<Vector<Point3d>> PK = new Vector<Vector<Point3d>>();
+		if (d>degree)
+			return PK;
+		PK.setSize(d+1);
+		int r = r2-r1;
+		PK.set(0,new Vector<Point3d>());PK.get(0).setSize(r+1);
+		for (int i=0; i<=r; i++)
+			PK.get(0).set(i, (Point3d) controlPointsHom.get(r1+i).clone());
+		for (int k=1; k<=d; k++) //through all derivatives
+		{
+			PK.set(k,new Vector<Point3d>()); PK.get(k).setSize(r-k+1);
+			int tmp = degree-k+1;
+			for (int i=0; i<=r-k; i++)
+			{ //Code from p. 99
+				double denom = Knots.get(r1+i+degree+1)-Knots.get(r1+i+k);
+				double newx = tmp*(PK.get(k-1).get(i+1).x - PK.get(k-1).get(i).x)/denom;
+				double newy = tmp*(PK.get(k-1).get(i+1).y - PK.get(k-1).get(i).y)/denom;
+				double newz = tmp*(PK.get(k-1).get(i+1).z - PK.get(k-1).get(i).z)/denom;
+				PK.get(k).set(i, new Point3d(newx,newy,newz));
+			}
+		}	
+		return PK;
+	}
+	public Vector<Point3d> getDerivatesHomAt(int d, double u)
+	{//n==maxCPIndex, p==degree, U==Knots, P==controlPointsHom
+		Vector<Point3d> CK = new Vector<Point3d>();
+		CK.setSize(d+1);
+		int du = Math.min(d,degree);
+		for (int k=degree+1; k<=degree; k++)
+			CK.set(k, new Point3d(0d,0d,0d));
+		int span = findSpan(u);
+		Vector<Vector<Double>> N = AllBasisFunctions(u);
+		Vector<Vector<Point3d>> PK = CurveDerivativeControlPointsHom(du,span-degree,span);
+		for (int k=0; k<=du; k++)
+		{
+			CK.set(k,new Point3d(0d,0d,0d));
+			for (int j=0; j<=degree-k; j++)
+			{
+				double newx = CK.get(k).x + N.get(j).get(degree-k)*PK.get(k).get(j).x;
+				double newy = CK.get(k).y + N.get(j).get(degree-k)*PK.get(k).get(j).y;
+				double newz = CK.get(k).z + N.get(j).get(degree-k)*PK.get(k).get(j).z;
+				CK.set(k, new Point3d(newx,newy,newz));
 			}
 		}
 		return CK;
-	}
-	private double[][] DersBasisFuns(int derivate, double u)
-	{
-		//Adapted Alg 2.3 - U=Knots, p=degree, n=derivate 
-		double[][] derivates = new double[derivate+1][degree+1];
-		double[][] ndu = new double[degree+1][degree+1];
-		ndu[0][0]=1d;
-		int i = findSpan(u);
-		if (i==-1)
-			return null;
-		double[] left = new double[degree+1]; double[] right = new double[degree+1];
-		for (int j=1; j<=degree; j++)
-		{
-			left[j] = u-Knots.get(i+1-j);
-			right[j] = Knots.get(i+j)-u;
-			double saved=0d;
-			for (int r=0; r<j; r++)
-			{
-				ndu[j][r] = right[r+1]+left[j-r];
-				double temp = ndu[r][j-1]/ndu[j][r];
-				ndu[r][j] = saved+right[r+1]*temp;
-				saved = left[j-r]*temp;
-			}
-			ndu[j][j] = saved;
-		}
-		for (int j=0; j<=degree; j++) //Load Basis Funs
-			derivates[0][j] = ndu[j][degree];
-		//Compute Derivates
-		for (int r=0; r<=degree; r++)
-		{
-			int s1=0, s2=1;
-			double[][] a = new double[2][derivate+1];
-			a[0][0] = 1d;
-			for (int k=1; k<=derivate; k++)
-			{
-				double d=0d; int rk = r-k, degk = degree-k;
-				if (r>=k)
-				{
-					a[s2][0] = a[s1][0]/ndu[degk+1][rk];
-					d = a[s2][0]*ndu[rk][degk];
-				}
-				int j1,j2;
-				if (rk>=-1)
-					j1=1;
-				else
-					j1=-rk;
-				if (r-1<=degk)
-					j2=k-1;
-				else
-					j2=degree-r;
-				for (int j=j1; j<=j2; j++)
-				{
-					a[s2][j] = (a[s1][j]+a[s1][j-1])/ndu[degk+1][rk+j];
-					d += a[s2][j]*ndu[rk+j][degk];	
-				}
-				if (r<= degk)
-				{
-					a[s2][k] = -a[s1][k-1]/ndu[degk+1][r];
-					d += a[s2][k]*ndu[r][degk];
-				}
-				derivates[k][r] = d;
-				int j=s1; s1=s2; s2=j; //Switch rows
-			}
-		}
-		//Multiply throguh to correct factors to eq 2.9
-		int r=degree;
-		for (int k=1; k<=derivate; k++)
-		{
-			for (int j=0; j<=degree; j++)
-				derivates[k][j] *=r;
-			r *= (degree-k);
-		}
-		return derivates;
 	}
 	/**
 	 * Calulation of Alpha, refer to deBoer-Algorithm
@@ -798,98 +795,6 @@ public class NURBSShape {
 			denomin += N.get(k)* cpWeight.get(k+min); //See above shiftet by min
 		}
 		return (nomin/denomin);
-	}
-	//
-	// 29.06. New Approach to Derivatives
-	//
-	/**
-	 * Calculate all Nonvanishing BasisFunctions at u
-	 * This is a Variation of Alg 2.2 from the NURBS-Book
-	 */
-	private Vector<Vector<Double>> AllBasisFunctions(double u)
-	{
-		Vector<Vector<Double>> N = new Vector<Vector<Double>>();
-		N.setSize(degree+1);
-		for (int i=0; i<=degree; i++)
-		{
-			N.set(i, new Vector<Double>());
-			N.get(i).setSize(degree+1);
-		}				
-		int i = findSpan(u);
-		for (int deg=0; deg<=degree; deg++) //All Degrees less then degree
-		{ //Inside this 
-			Vector<Double> left = new Vector<Double>(); left.setSize(deg+1);
-			Vector<Double> right = new Vector<Double>(); right.setSize(deg+1);
-			N.get(0).set(deg,1.0);
-			for (int j=1; j<=deg; j++) //All Basis Values of degree 
-			{
-				left.set(j,u-Knots.get(i+1-j));
-				right.set(j,Knots.get(i+j)-u);
-				double saved = 0d;
-				for (int r=0; r<j; r++)
-				{
-					double temp = N.get(r).get(deg)/(right.get(r+1)+left.get(j-r));
-					N.get(r).set(deg, saved+right.get(r+1)*temp);
-					saved = left.get(j-r)*temp;
-				}
-				N.get(j).set(deg,saved);
-			}
-		}
-		return N;
-	}
-	/**
-	 * Compute ControlPoints of the Derivatives up to deriv
-	 * Based on Alg 3.3 with 
-	 * @param derivative
-	 */
-	private Vector<Vector<Point3d>> CurveDerivativeControlPointsHom(int d, int r1, int r2)
-	{ //n==maxCPIndex, d<=degree, p==degree, U==Knots, P==ControlPointsHom
-		//
-		Vector<Vector<Point3d>> PK = new Vector<Vector<Point3d>>();
-		if (d>degree)
-			return PK;
-		PK.setSize(d+1);
-		int r = r2-r1;
-		PK.set(0,new Vector<Point3d>());PK.get(0).setSize(r+1);
-		for (int i=0; i<=r; i++)
-			PK.get(0).set(i, (Point3d) controlPointsHom.get(r1+i).clone());
-		for (int k=1; k<=d; k++) //through all derivatives
-		{
-			PK.set(k,new Vector<Point3d>()); PK.get(k).setSize(r-k+1);
-			int tmp = degree-k+1;
-			for (int i=0; i<=r-k; i++)
-			{ //Code from p. 99
-				double denom = Knots.get(r1+i+degree+1)-Knots.get(r1+i+k);
-				double newx = tmp*(PK.get(k-1).get(i+1).x - PK.get(k-1).get(i).x)/denom;
-				double newy = tmp*(PK.get(k-1).get(i+1).y - PK.get(k-1).get(i).y)/denom;
-				double newz = tmp*(PK.get(k-1).get(i+1).z - PK.get(k-1).get(i).z)/denom;
-				PK.get(k).set(i, new Point3d(newx,newy,newz));
-			}
-		}	
-		return PK;
-	}
-	public Vector<Point3d> getDerivatesHomAt(int d, double u)
-	{//n==maxCPIndex, p==degree, U==Knots, P==controlPointsHom
-		Vector<Point3d> CK = new Vector<Point3d>();
-		CK.setSize(d+1);
-		int du = Math.min(d,degree);
-		for (int k=degree+1; k<=degree; k++)
-			CK.set(k, new Point3d(0d,0d,0d));
-		int span = findSpan(u);
-		Vector<Vector<Double>> N = AllBasisFunctions(u);
-		Vector<Vector<Point3d>> PK = CurveDerivativeControlPointsHom(du,span-degree,span);
-		for (int k=0; k<=du; k++)
-		{
-			CK.set(k,new Point3d(0d,0d,0d));
-			for (int j=0; j<=degree-k; j++)
-			{
-				double newx = CK.get(k).x + N.get(j).get(degree-k)*PK.get(k).get(j).x;
-				double newy = CK.get(k).y + N.get(j).get(degree-k)*PK.get(k).get(j).y;
-				double newz = CK.get(k).z + N.get(j).get(degree-k)*PK.get(k).get(j).z;
-				CK.set(k, new Point3d(newx,newy,newz));
-			}
-		}
-		return CK;
 	}
 	/**
 	 * Get the ControlPoint of the NURBSShape that is the nearest ofthe Point m
