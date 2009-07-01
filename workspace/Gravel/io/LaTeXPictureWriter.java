@@ -230,6 +230,43 @@ public class LaTeXPictureWriter implements TeXWriter {
 			  s.write(drawArrow(actual,start,ende));
 	       }//End while edges.hasNext()
 	}
+	private void writeHyperEdges(OutputStreamWriter s) throws IOException
+	{
+	       //Nodes
+	    	Iterator<VHyperEdge> hyperedgeiter = hyperedges.getIterator();
+	    	while (hyperedgeiter.hasNext())
+	    	{
+	    	   VHyperEdge actual = hyperedgeiter.next();
+	    	   MHyperEdge me = mhyperedges.get(actual.getIndex());
+			   //Mittlere Linie der Kante...immer Zeichnen
+	    	   
+			   s.write(NL+drawOneHyperedgeLine(actual,0.0d));
+			   if (actual.getWidth()>1)
+			   s.write("\\thicklines");
+			   for (int i=1; i<(actual.getWidth()-1)*(new Double(Math.round(LINESPPT/2))).intValue(); i++)
+			   {
+				   //One Side
+				   s.write(drawOneHyperedgeLine(actual,(new Double(i)).doubleValue()));
+				   //Other Side
+				   s.write(drawOneHyperedgeLine(actual,(new Double(-i)).doubleValue()));
+			   }
+			   //edge text
+		    	if (actual.getTextProperties().isVisible()) //draw name
+				{	
+		    		VEdgeText t = actual.getTextProperties();
+		    		Point m = actual.getTextCenter();
+		    		//get the text wich should be displayd
+				    String text = "";
+				    if (t.isshowvalue())
+						text = ""+me.Value;
+				    else
+				    	text = edgenames.get(actual.getIndex());
+				    double tsize = Math.round((double)t.getSize()*sizeppt*((double)1000))/1000;
+					s.write(NL+"\t\t\\put("+(m.x-offset.x)+","+(max.y-m.y)+"){\\makebox(0,0){\\fontsize{"+tsize+"mm}{10pt}\\selectfont "+formname(text)+"}}");
+				}
+			   //Nun die Liniendicke aufbauen
+	       }//End while hyperedges.hasNext()
+	}
 	/** DRaw an Edge from Start to ende with the offset movx, movy
 	 * 
 	 * @param actual
@@ -241,17 +278,33 @@ public class LaTeXPictureWriter implements TeXWriter {
 	 */
 	private String drawOneEdgeLine(VEdge actual,int start, int ende, double distancefromline)
 	{
-		String s ="";
-    	double[] coords = new double[2];
-    	double x = 0.0, y = 0.0, lastx=0.0, lasty = 0.0;
-		GeneralPath p = actual.getDrawPath(nodes.get(start).getPosition(),nodes.get(ende).getPosition(),1.0f); //no zoom on check! But with line style
+ 		GeneralPath p = actual.getDrawPath(nodes.get(start).getPosition(),nodes.get(ende).getPosition(),1.0f); //no zoom on check! But with line style
 		PathIterator path = p.getPathIterator(null, 0.005d/sizeppt); 
 		// 0.005/sizeppt =  = the flatness; reduce if result is not accurate enough!
-		Point2D.Double dir, orth_n_h;
-		double dlength=0.0d,movx=0.0d,movy=0.0d;
+		return drawOnePath(path, actual.getWidth(),distancefromline);
+	}
+	/** DRaw an Edge from Start to ende with the offset movx, movy
+	 * 
+	 * @param actual
+	 */
+	private String drawOneHyperedgeLine(VHyperEdge actual, double distancefromline)
+	{
+ 		GeneralPath p = actual.getLinestyle().modifyPath(actual.getShape().getCurve(10f*sizeppt),actual.getWidth(),1.0d);
+ 		PathIterator path = p.getPathIterator(null, 0.005d/sizeppt); 
+		// 0.005/sizeppt =  = the flatness; reduce if result is not accurate enough!
+		return drawOnePath(path, actual.getWidth(),distancefromline);
+	}
+
+	private String drawOnePath(PathIterator path, int linewidth,double distancefromline)
+	{
+		String s ="";
+	   	double[] coords = new double[2];
+	   	double x = 0.0, y = 0.0, lastx=0.0, lasty = 0.0;
 		int testcount=0; //don't let paths grow tooo long
 		boolean moved=false;
-		while( !path.isDone() ) 
+		Point2D.Double dir, orth_n_h;
+		double dlength=0.0d,movx=0.0d,movy=0.0d;
+	    while( !path.isDone() ) 
 		{
 		   int type = path.currentSegment(coords);
 		    x = coords[0]; y = coords[1];
@@ -288,7 +341,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 			   if (distancefromline==0.0d)
 			   {
 				   //Circle with diameter linewidth
-				   s += drawCircle(x-offset.x,max.y-y,actual.getWidth());
+				   s += drawCircle(x-offset.x,max.y-y,linewidth);
 			   }
 		   }
 		   lastx = x; lasty = y;
@@ -296,7 +349,6 @@ public class LaTeXPictureWriter implements TeXWriter {
 		 }
 		return s;
 	}
-	
 	/**
 	 * 
 	 * @param actual
@@ -362,10 +414,6 @@ public class LaTeXPictureWriter implements TeXWriter {
 	{
 	}
 
-	private void writeHyperEdges(OutputStreamWriter s) throws IOException
-	{
-		//TODO: LaTeX-Picture Writer Export Hyper Edge Shape
-	}
 	public String saveToFile(File f)
 	{
 		if (!f.exists())

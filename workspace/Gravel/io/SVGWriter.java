@@ -292,11 +292,60 @@ public class SVGWriter
 		}
 		private void writeSubgraphs(OutputStreamWriter s) throws IOException
 		{
+			//nothing to do up to now
 		}
 		private void writeHyperEdges(OutputStreamWriter s) throws IOException
 		{
+		       //Nodes
+	    	Iterator<VHyperEdge> hyperedgeiter = hyperedges.getIterator();
+	    	while (hyperedgeiter.hasNext())
+	    	{
+	    	   VHyperEdge actual = hyperedgeiter.next();
+	    	   MHyperEdge me = mhyperedges.get(actual.getIndex());
+	    	   s.write("<path "+drawOnePath(actual.getShape().getCurve(0.5d).getPathIterator(null,0.005d)));
+	    	   
+	    	   VEdgeLinestyle style = actual.getLinestyle();
+	    	 s.write(" style=\"stroke-dashoffset:0;");
+	    	  if (style.getType()==VEdgeLinestyle.DASHED)
+	    		s.write(" stroke-dasharray:"+style.getLength()+","+style.getDistance()+";");  
+		      if (style.getType()==VEdgeLinestyle.DOTTED)
+		    		s.write(" stroke-dasharray:0,"+style.getDistance()+";");  		    	  
+		      if (style.getType()==VEdgeLinestyle.DOTDASHED)
+		    		s.write(" stroke-dasharray:"+style.getLength()+","+style.getDistance()+",0,"+style.getDistance()+";");  
+		      
+			  s.write(" stroke-linecap:round; stroke-linejoin:round; stroke:"+getItemColorString(actual)+"; stroke-width:"+actual.getWidth()+"px; fill:none;\"/>"+NL);
+		      
+			  if (actual.getTextProperties().isVisible()) //draw name
+				{	
+		    		VEdgeText t = actual.getTextProperties();
+					Point m = actual.getTextCenter();
+					//get the text wich should be displayd
+				    String text = "";
+				    if (t.isshowvalue())
+						text = ""+me.Value;
+				    else
+				    	text = me.name;
+				    s.write(NL+"\t<text x=\""+(m.x)+"\" y=\""+(m.y)+"\" style=\"font-size:"+actual.getTextProperties().getSize()+"pt; baseline-shift:-"+(actual.getTextProperties().getSize()/2)+";\">"+formname(text)+"</text>"+NL);
+				}
+		   }//End while hyperedges.hasNext()
 		}
-
+		private String drawOnePath(PathIterator path)
+		{
+			String s ="d=\"";
+		   	double[] coords = new double[2];
+		   	double x = 0.0, y = 0.0;
+		    while( !path.isDone() ) 
+			{
+			   int type = path.currentSegment(coords);
+			    x = coords[0]; y = coords[1];
+		    	if (type==PathIterator.SEG_MOVETO)
+					s +="M"+x+" "+y+" ";
+		    	else if (type==PathIterator.SEG_LINETO)	
+		    		s +="L"+x+" "+y+" ";
+		    	path.next();
+			}
+			return s+" Z\""; //return as closed path
+		}
 		public String saveToFile(File f)
 		{
 			if (!f.exists())
