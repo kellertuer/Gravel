@@ -70,6 +70,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 		else if (vgc.getType()==VCommonGraphic.VHYPERGRAPHIC)
 		{
 				nodes = ((VHyperGraphic)vgc).getGraph().modifyNodes;
+				nodenames = ((VHyperGraphic)vgc).getGraph().getMathGraph().modifyNodes.getNames();
 				hyperedges = ((VHyperGraphic)vgc).getGraph().modifyHyperEdges;
 				mhyperedges = ((VHyperGraphic)vgc).getGraph().getMathGraph().modifyHyperEdges;
 				edgenames = ((VHyperGraphic)vgc).getGraph().getMathGraph().modifyHyperEdges.getNames();

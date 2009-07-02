@@ -955,7 +955,7 @@ public class GraphMLReader {
 					t.setDistance(Integer.parseInt(attr.getNodeValue()));
 				} catch (Exception e) {
 				}
-			else if (attr.getNodeName().equals("position")) // TODO Change model
+			else if (attr.getNodeName().equals("position"))
 				try {
 					t.setPosition(Float.parseFloat(attr
 							.getNodeValue()));

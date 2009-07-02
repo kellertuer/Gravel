@@ -4,7 +4,6 @@ import model.*;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,10 +19,11 @@ import view.VGraphic;
 import view.VHyperGraphic;
 
 	/**
-	 * each node is written to the tex file and translated therefore
+	 * each node is written to the svg file and translated therefore
 	 * x - offset to get rid of the free space left of the graph
 	 * y - offset to get rid of the free space above the graph
-	 * @author ronny
+	 * 
+	 * @author Ronny Bergmann
 	 *
 	 */
 public class SVGWriter

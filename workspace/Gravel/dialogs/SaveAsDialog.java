@@ -29,7 +29,7 @@ import javax.swing.KeyStroke;
  */
 public class SaveAsDialog extends JDialog implements ActionListener
 {
-	private JCheckBox IsVisual;
+	private JCheckBox IsVisual, SaveForLocal;
 	private JButton bOk, bCancel;
 	private boolean accepted = false;
 	private static final long serialVersionUID = 1L;

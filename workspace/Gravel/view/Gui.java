@@ -263,10 +263,10 @@ public class Gui implements WindowListener
         shapePart.setSize(graphpart.getBounds().getSize());
         shapePart.validate();
         gToolBar.changeVGraph(shapePart);
-        MenuBar.changeVGraph(shapePart);
-                
+        MenuBar.changeVGraph(shapePart);                
         //Das Ganze als Scrollpane
         shapeParameters = new HyperEdgeShapePanel(edge,shapePart);
+        shapeParameters.getContent().setMinimumSize(new Dimension(230,30));
         mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                    shapeScroll,shapeParameters.getContent());
         mainSplit.setDividerLocation(mainSplit.getSize().width

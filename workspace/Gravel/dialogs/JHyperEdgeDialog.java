@@ -90,7 +90,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		graphref = (VHyperGraph)Gui.getInstance().getVGraph();
 		int index = graphref.getMathGraph().modifyHyperEdges.getNextIndex();
 		oldmhyperedge = new MHyperEdge(index,gp.getIntValue("hyperedge.value"),gp.getHyperedgeName(index));
-		oldvhyperedge = new VHyperEdge(index,gp.getIntValue("hyperedge.width"),gp.getIntValue("hyperedge.margin")); //Width 1 TODO GP STd Values also for Distance
+		oldvhyperedge = new VHyperEdge(index,gp.getIntValue("hyperedge.width"),gp.getIntValue("hyperedge.margin"));
 		for (int i=0; i<=initNodes.length(); i++)
 		{
 			if (initNodes.get(i))

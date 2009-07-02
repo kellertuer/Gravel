@@ -21,6 +21,7 @@ import javax.vecmath.Point3d;
  * Other Methods are
  * - Min and Max of the Bounding Box of the ControlPolygon
  * - Addition (Refinement of Knots)
+ * - Removal of Knots
  * - TODO ?get&set knots &weights?
  * 
  * 
