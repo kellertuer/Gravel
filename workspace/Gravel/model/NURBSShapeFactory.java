@@ -338,7 +338,6 @@ public class NURBSShapeFactory {
 		NURBSShape temp = new NURBSShape(newKnots,newP);
 		temp = unclamp(temp); //So now they are unclamped, we can copy back to get s1 - s2
 		temp.updateCircular(OldOverCirc); //Update Front if over cirv else back
-		System.err.println(OldOverCirc);
 		newKnots = new Vector<Double>();
 		newP = new Vector<Point3d>();
 		for (int i=0; i<=s1.degree; i++)

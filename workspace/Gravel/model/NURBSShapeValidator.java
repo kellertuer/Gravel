@@ -40,8 +40,9 @@ import java.util.Map.Entry;
 public class NURBSShapeValidator extends NURBSShape {
 	private class PointInfo
 	{ //Additional Info for a Point
-		int set;
-		double radius;
+		int set; //Set the Point belongs to
+		boolean split = false; //Info, whether the path has been split before or not
+		double radius; //Radius of transformation may be NaN
 		Point2D projectionPoint=null, previousPoint=null;
 		//if this point belongs to a node, this is its index, else its null
 		int nodeIndex=-1;
@@ -62,8 +63,7 @@ public class NURBSShapeValidator extends NURBSShape {
 			if (nodeIndex==-1)
 				return "PointInfo: is in Set "+set+" and distance "+radius+" to Curve (C(u) = "+projectionPoint;
 			else
-				return "PointInfo: Node #"+nodeIndex+" is in Set "+set+" and distance "+radius+" to Curve (C(u) = "+projectionPoint;
-						
+				return "PointInfo: Node #"+nodeIndex+" is in Set "+set+" and distance "+radius+" to Curve (C(u) = "+projectionPoint;					
 		}
 	}
 	private final double TOL = 0.01d, MINRAD = 1d;
@@ -174,8 +174,12 @@ public class NURBSShapeValidator extends NURBSShape {
 							Points.offer(Succ.get(j));
 						}
 						else //Just offer, because its q
+						{
 							Points.offer(Succ.get(j));
+						}
 						g.drawCP(g2, new Point(Math.round((float)Succ.get(j).getX()),Math.round((float)Succ.get(j).getY())),Color.ORANGE);
+						//Set split to true if we have a pre and split. that way each node may only split twice
+						pointInformation.get(Succ.get(j)).split = actualInfo.split | ((Succ.size()>=2)&&(actualInfo.previousPoint!=null));							
 					}
 				}
 				if ((i%checkIntervall)==0)
@@ -372,22 +376,26 @@ public class NURBSShapeValidator extends NURBSShape {
 					p.getY() - Math.sin(alpha)*ProjDir.getX() + Math.cos(alpha)*ProjDir.getY());
 			Point2D q2 = new Point2D.Double(p.getX()+Math.cos(alpha)*ProjDir.getX() - Math.sin(alpha)*ProjDir.getY(),
 					p.getY() + Math.sin(alpha)*ProjDir.getX() + Math.cos(alpha)*ProjDir.getY());
-			if ((pointInformation.get(p).previousPoint!=null)&&(alpha>(Math.PI/2d)))
-					//We have a Predecessor, try to continue direction
-					//If we don't just split - then use both
-			{
-				//We take that qi with the greater angle, that is more
-				double c1 = pointInformation.get(p).previousPoint.distance(q1);
-				double c2 = pointInformation.get(p).previousPoint.distance(q2);
-				if (c1>=c2)
-					result.add(q1);
-				else
-					result.add(q2);
-			}
-			else //No predecessor - use both 
+			if ((pointInformation.get(p).previousPoint==null) //If we have no previouspoint or
+					||( (!pointInformation.get(p).split) && (alpha==(Math.PI/2d))) ) //we have both sides and no split befor
 			{
 				result.add(q1);
 				result.add(q2);
+			}
+			else //predecessor or split too often
+			{
+				if (pointInformation.get(p).previousPoint==null)
+					result.add(q1);
+				else
+				{
+					//We take that qi with the greater angle, that is more
+					double c1 = pointInformation.get(p).previousPoint.distance(q1);
+					double c2 = pointInformation.get(p).previousPoint.distance(q2);
+					if (c1>=c2)
+						result.add(q1);
+					else
+						result.add(q2);
+				}
 			}
 		}
 		return result;
