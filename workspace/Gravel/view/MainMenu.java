@@ -681,8 +681,11 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 		GraphMessage m = (GraphMessage)arg1;
 		if (m==null)
 			return;
-		mEdUndo.setEnabled(GraphHistory.CanUndo());
-		mEdRedo.setEnabled(GraphHistory.CanRedo());
+		if ((m.getModification()&GraphConstraints.HISTORY)>0)
+		{
+			mEdUndo.setEnabled(GraphHistory.CanUndo());
+			mEdRedo.setEnabled(GraphHistory.CanRedo());
+		}
 		//either Selection changed or was affected
 		if (((m.getAffectedElementTypes()&GraphConstraints.SELECTION)==GraphConstraints.SELECTION)||((m.getModifiedElementTypes()&GraphConstraints.SELECTION)==GraphConstraints.SELECTION))
 		{

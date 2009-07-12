@@ -420,7 +420,13 @@ public class CommonGraphHistoryManager implements Observer
 				{ //Block_END & not Aborted, so we have a Message to handle
 					active = true;
 					if (((m.getModification() & GraphConstraints.BLOCK_ABORT) != GraphConstraints.BLOCK_ABORT) && (Blockstart!=null))
+					{
 						addAction(Blockstart);
+						if (trackedGraph.getType()==VGraphInterface.GRAPH)
+							trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS, GraphConstraints.HISTORY));
+						else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
+							trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS, GraphConstraints.HISTORY));
+					}
 					else if(Blockstart!=null)
 						Blockstart=null;					
 				}
@@ -454,6 +460,10 @@ public class CommonGraphHistoryManager implements Observer
 			//Single Action or Selection change
 			if (m.getElementID() != 0)
 				addAction(m);
+			if (trackedGraph.getType()==VGraphInterface.GRAPH)
+				trackedGraph.pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS, GraphConstraints.HISTORY));
+			else if (trackedGraph.getType()==VGraphInterface.HYPERGRAPH)
+				trackedGraph.pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS, GraphConstraints.HISTORY));
 		}
 	}
 }
