@@ -180,17 +180,20 @@ public class HESFreeModComponent implements ActionListener {
 		c.gridx=0;
 		c.gridwidth=1;
 		
-		bLocalSetStart = new JButton("S");
+		bLocalSetStart = new JButton(new ImageIcon(IconDir+"temp_s.png"));
+		bLocalSetStart.setSize(new Dimension(17,17));
 		bLocalSetStart.addActionListener(this);
 		FreeModFields.add(bLocalSetStart,c);
 
 		c.gridx++;
-		bLocalInvert = new JButton("I");
+		bLocalInvert = new JButton(new ImageIcon(IconDir+"temp_i.png"));
+		bLocalInvert.setSize(new Dimension(17,17));
 		bLocalInvert.addActionListener(this);
 		FreeModFields.add(bLocalInvert,c);
 
 		c.gridx++;
-		bLocalSetEnd = new JButton("E");
+		bLocalSetEnd = new JButton(new ImageIcon(IconDir+"temp_e.png"));
+		bLocalSetEnd.setSize(new Dimension(17,17));
 		bLocalSetEnd.addActionListener(this);
 		FreeModFields.add(bLocalSetEnd,c);
 		

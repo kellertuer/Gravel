@@ -1,8 +1,5 @@
 package model;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -52,7 +49,7 @@ public class NURBSShapeProjection extends NURBSShape
 			clone = clamp(clone);
 		//Set internal Curve to this curve clone
 		setCurveTo(clone.Knots, clone.controlPoints, clone.cpWeight);
-		resultu=Knots.firstElement();
+		resultu=Knots.firstElement(); //u=a
 		this.p = p;
 		Queue<NURBSShape> Parts = new LinkedList<NURBSShape>();
 		if (!isInBezierForm())
@@ -306,8 +303,6 @@ public class NURBSShapeProjection extends NURBSShape
 				{
 					for (int j2=0; j2<c.controlPoints.size(); j2++)
 					{
-						if (((alphaP[j1]!=0d)&&(alphaP[j1]!=1d))||((alphaQ[j2]!=0d)&&(alphaQ[j2]!=1d)))
-							System.err.print(""+(alphaP[j1])+" and "+(alphaQ[j2])+" \n");
 						foronepx += c.controlPoints.get(j1).getX()*alphaP[j1]*c.controlPoints.get(j2).getX()*alphaQ[j2];
 						foronepy += c.controlPoints.get(j1).getY()*alphaP[j1]*c.controlPoints.get(j2).getY()*alphaQ[j2];
 						foronepw += c.cpWeight.get(j1).doubleValue()*alphaP[j1]*c.cpWeight.get(j2).doubleValue()*alphaQ[j2];

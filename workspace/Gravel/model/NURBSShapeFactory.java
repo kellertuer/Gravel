@@ -299,11 +299,11 @@ public class NURBSShapeFactory {
 		NURBSShape old = (new NURBSShapeFragment(origCurve,u2,u1)).getSubCurve();  //Unchanged Old part
 		if (u2<u1)
 		{
-			return combine(old,(new NURBSShapeFragment(c,u1,u2+offset)).getSubCurve(), false);
+			return combine(old,(new NURBSShapeFragment(c,u1,u2+offset)).getSubCurve(), true);
 		}
 		else
 		{
-			c = combine((new NURBSShapeFragment(c,u1,u2)).getSubCurve(),old,true);
+			c = combine((new NURBSShapeFragment(c,u1,u2)).getSubCurve(),old,false);
 		}
 		return c;
 	}
@@ -337,7 +337,8 @@ public class NURBSShapeFactory {
 		
 		NURBSShape temp = new NURBSShape(newKnots,newP);
 		temp = unclamp(temp); //So now they are unclamped, we can copy back to get s1 - s2
-		temp.updateCircular(OldOverCirc); //Update end if noncirc, else circ. TODO: Look why sometimes the last 2 might not be interpolated after that
+		temp.updateCircular(OldOverCirc); //Update Front if over cirv else back
+		System.err.println(OldOverCirc);
 		newKnots = new Vector<Double>();
 		newP = new Vector<Point3d>();
 		for (int i=0; i<=s1.degree; i++)
@@ -353,7 +354,7 @@ public class NURBSShapeFactory {
 			newP.add((Point3d)temp.controlPointsHom.get(i).clone());
 		temp = new NURBSShape(newKnots,newP);
 		temp = unclamp(temp); //Unclamp the part that stays at endvalues of the combinational curve
-		temp.updateCircular(OldOverCirc); //update start is noncircular, else end
+		temp.updateCircular(!OldOverCirc); //Update Front if normal, back if over circStart/End
 		return temp;
 	}
 	/**
