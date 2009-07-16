@@ -18,9 +18,9 @@
 		<value name="arrow_alpha" type="Integer">38</value>
 		<value name="arrow_alpha" type="Float">1.0</value>
 		<value name="arrow_part" type="Float">0.75</value>
-		<value name="arrow_pos" type="Float">1.0</value>
+		<value name="arrow_pos" type="Float">0.0</value>
 		<value name="arrow_size" type="Integer">10</value>
-		<value name="line_distance" type="Integer">10</value>
+		<value name="line_distance" type="Integer">15</value>
 		<value name="line_length" type="Integer">10</value>
 		<value name="line_type" type="Integer">1</value>
 		<value name="loop_clockwise" type="Boolean">true</value>
@@ -28,22 +28,23 @@
 		<value name="loop_length" type="Integer">33</value>
 		<value name="loop_proportion" type="Integer">100</value>
 		<value name="name" type="String">e_{$ID}</value>
-		<value name="orth_verticalfirst" type="Boolean">false</value>
+		<value name="orth_verticalfirst" type="Boolean">true</value>
 		<value name="text_distance" type="Integer">7</value>
 		<value name="text_position" type="Float">0.25</value>
 		<value name="text_showvalue" type="Boolean">false</value>
 		<value name="text_size" type="Integer">12</value>
 		<value name="text_visible" type="Boolean">false</value>
+		<value name="type" type="String">StraightLine</value>
 		<value name="value" type="Integer">1</value>
 		<value name="width" type="Integer">1</value>
 	</group>
 	<group name="graph">
-		<value name="allowloops" type="Boolean">false</value>
-		<value name="allowmultiple" type="Boolean">false</value>
+		<value name="allowloops" type="Boolean">true</value>
+		<value name="allowmultiple" type="Boolean">true</value>
 		<value name="directed" type="Boolean">true</value>
 		<value name="fileformat" type="String">visual</value>
-		<value name="lastfile" type="String">$NONE</value>
-		<value name="loadfileonstart" type="Boolean">false</value>
+		<value name="lastfile" type="String">/Users/ronny/Graveltemp/--DiplExample.xml</value>
+		<value name="loadfileonstart" type="Boolean">true</value>
 	</group>
 	<group name="grid">
 		<value name="enabled" type="Boolean">false</value>
@@ -57,7 +58,7 @@
 		<value name="trackSelection" type="Boolean">false</value>
 	</group>
 	<group name="hyperedge">
-		<value name="line_distance" type="Integer">10</value>
+		<value name="line_distance" type="Integer">15</value>
 		<value name="line_length" type="Integer">10</value>
 		<value name="line_type" type="Integer">1</value>
 		<value name="margin" type="Integer">8</value>
@@ -92,7 +93,7 @@
 		<value name="name" type="String">Untergraph #$ID</value>
 	</group>
 	<group name="vgraphic">
-		<value name="cpshow" type="Boolean">false</value>
+		<value name="cpshow" type="Boolean">true</value>
 		<value name="cpsize" type="Integer">3</value>
 		<value name="directed" type="Boolean">true</value>
 		<value name="framedistance" type="Integer">10</value>

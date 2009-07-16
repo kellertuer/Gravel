@@ -410,7 +410,7 @@ public class NURBSShapeProjection extends NURBSShape
 	 * @param c
 	 * @return
 	 */
-	private Vector<NURBSShape> DecomposeCurve(NURBSShape c)
+	public static Vector<NURBSShape> DecomposeCurve(NURBSShape c)
 	{			
 		int m = c.maxCPIndex+1;
 		int a = c.degree;

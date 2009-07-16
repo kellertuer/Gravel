@@ -172,7 +172,7 @@ public class HESFreeModComponent implements ActionListener {
 		c.gridx=0;
 		c.gridwidth=1;
 		bScalingDir = new JButton(new ImageIcon(IconDir+"scaledir32.png"));	
-		bScalingDir.setSize(new Dimension(17,17));
+		bScalingDir.setSize(new Dimension(32,32));
 		bScalingDir.addActionListener(this);
 		FreeModFields.add(bScalingDir,c);
 
@@ -180,20 +180,20 @@ public class HESFreeModComponent implements ActionListener {
 		c.gridx=0;
 		c.gridwidth=1;
 		
-		bLocalSetStart = new JButton(new ImageIcon(IconDir+"temp_s.png"));
-		bLocalSetStart.setSize(new Dimension(17,17));
+		bLocalSetStart = new JButton(new ImageIcon(IconDir+"start32.png"));
+		bLocalSetStart.setSize(new Dimension(32,32));
 		bLocalSetStart.addActionListener(this);
 		FreeModFields.add(bLocalSetStart,c);
 
 		c.gridx++;
-		bLocalInvert = new JButton(new ImageIcon(IconDir+"temp_i.png"));
-		bLocalInvert.setSize(new Dimension(17,17));
+		bLocalInvert = new JButton(new ImageIcon(IconDir+"invert32.png"));
+		bLocalInvert.setSize(new Dimension(32,32));
 		bLocalInvert.addActionListener(this);
 		FreeModFields.add(bLocalInvert,c);
 
 		c.gridx++;
-		bLocalSetEnd = new JButton(new ImageIcon(IconDir+"temp_e.png"));
-		bLocalSetEnd.setSize(new Dimension(17,17));
+		bLocalSetEnd = new JButton(new ImageIcon(IconDir+"end32.png"));
+		bLocalSetEnd.setSize(new Dimension(32,32));
 		bLocalSetEnd.addActionListener(this);
 		FreeModFields.add(bLocalSetEnd,c);
 		

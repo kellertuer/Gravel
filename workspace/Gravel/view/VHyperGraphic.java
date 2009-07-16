@@ -2,6 +2,7 @@ package view;
 
 
 import history.CommonGraphHistoryManager;
+import io.DiplExports;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -58,8 +59,7 @@ public class VHyperGraphic extends VCommonGraphic
 		Graphics2D g2 = (Graphics2D) g;
 		//Mit Antialiasing
 		paint(g2);
-	}
-	
+	}	
 	public void paint(Graphics2D g2)
 	{
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -73,33 +73,114 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.draw(Drag.getSelectionRectangle());
 		}
 //		paintDerivDEBUG(g2);
-//		paintPIDEBUG(g2);
+		paintDEBUG(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
-		Vector<Point2D> IP = new Vector<Point2D>();
-		IP.add(new Point2D.Double(60,200));
-		IP.add(new Point2D.Double(50,130));
-		IP.add(new Point2D.Double(150,60));
-		IP.add(new Point2D.Double(270,80));
-		IP.add(new Point2D.Double(270,120));
-		IP.add(new Point2D.Double(220,130));
-		IP.add(new Point2D.Double(200,200));
-		IP.add(new Point2D.Double(200,230));
-		IP.add(new Point2D.Double(270,230));
-		IP.add(new Point2D.Double(230,290));
-		IP.add(new Point2D.Double(200,280));
-		IP.add(new Point2D.Double(175,290));
-		IP.add(new Point2D.Double(185,320));
-		IP.add(new Point2D.Double(80,350));
-		int degree = 4;
-		NURBSCreationMessage nm = new NURBSCreationMessage(degree, NURBSCreationMessage.ADD_END, IP);
-		NURBSShape c = NURBSShapeFactory.CreateShape(nm);
-		NURBSShape drawSel = c.stripDecorations().clone(); //really only nurbs
-		drawSel.scale(zoomfactor);
-		g2.setColor(selColor);
-		g2.setStroke(new BasicStroke(1f*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-		g2.draw(drawSel.getCurve(5d/(double)zoomfactor)); //draw only a preview				
+		Point offset = new Point(17,18);
+		Point max = new Point(183,122);
+		if ((vG.modifyHyperEdges.get(1)!=null)&&(vG.modifyHyperEdges.get(1).getShape()!=null)&&(!vG.modifyHyperEdges.get(1).getShape().isEmpty()))
+		{
+			VEdgeLinestyle solid = new VEdgeLinestyle(VEdgeLinestyle.SOLID,0,0);
+			VEdgeLinestyle dashed = new VEdgeLinestyle(VEdgeLinestyle.DASHED,5,4);
+			NURBSShape c = vG.modifyHyperEdges.get(1).getShape().clone();
+			NURBSShape cs = c.clone();
+			cs.scale(zoomfactor);
+			g2.setColor(Color.white);
+			g2.setStroke(new BasicStroke(vG.modifyHyperEdges.get(1).getWidth()*2*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			g2.draw(cs.getCurve(5d/(double)zoomfactor));
+//			c.translate(0d,40d);
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(vG.modifyHyperEdges.get(1).getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			GeneralPath solidpath = solid.modifyPath(cs.getCurve(5d/(double)zoomfactor), 1, zoomfactor);
+			GeneralPath CPPath = new GeneralPath();
+			CPPath.moveTo((new Double(cs.controlPoints.get(0).getX())).floatValue(),(new Double(cs.controlPoints.get(0).getY())).floatValue());
+			CPPath.lineTo((new Double(cs.controlPoints.get(0).getX())).floatValue(),(new Double(cs.controlPoints.get(0).getY())).floatValue());
+			for (int j=1; j<cs.controlPoints.size(); j++)
+			{
+				CPPath.lineTo((new Double(cs.controlPoints.get(j).getX())).floatValue(),(new Double(cs.controlPoints.get(j).getY())).floatValue());					
+				//Force Circle
+				CPPath.lineTo((new Double(cs.controlPoints.get(j).getX())).floatValue(),(new Double(cs.controlPoints.get(j).getY())).floatValue());					
+			}
+			GeneralPath solidCPpath = solid.modifyPath(CPPath, 1, zoomfactor);
+			g2.setColor(Color.BLACK);
+			g2.draw(solidpath);g2.draw(solidCPpath);
+			System.err.println(
+					DiplExports.drawOnePath(solidpath.getPathIterator(null), 1,0d, offset, max,false));
+			System.err.println(
+					DiplExports.drawOnePath(solidCPpath.getPathIterator(null), 1,0d, offset, max,true));
+			System.err.println("%  KnotPoints");
+			for (int i=cs.degree; i<= cs.maxKnotIndex-cs.degree; i++)
+			{
+				Point2D p = cs.CurveAt(cs.Knots.get(i));
+				System.err.print(DiplExports.drawQuad(p.getX()-(double)offset.x,(double)max.y-p.getY(), 1.5));
+				System.err.println("At ("+(p.getX()-(double)offset.x)+","+((double)max.y-p.getY())+")");
+			}
+		}
+	}
+
+	private void paintBezierDEBUG(Graphics2D g2)
+	{
+		if ((vG.modifyHyperEdges.get(1)!=null)&&(vG.modifyHyperEdges.get(1).getShape()!=null)&&(!vG.modifyHyperEdges.get(1).getShape().isEmpty()))
+		{
+			VEdgeLinestyle solid = new VEdgeLinestyle(VEdgeLinestyle.SOLID,0,0);
+			VEdgeLinestyle dashed = new VEdgeLinestyle(VEdgeLinestyle.DASHED,5,4);
+			NURBSShape c = vG.modifyHyperEdges.get(1).getShape().clone();
+			NURBSShape cs = c.clone();
+			cs.scale(zoomfactor);
+			g2.setColor(Color.white);
+			g2.setStroke(new BasicStroke(vG.modifyHyperEdges.get(1).getWidth()*2*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			g2.draw(cs.getCurve(5d/(double)zoomfactor));
+//			c.translate(0d,40d);
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(vG.modifyHyperEdges.get(1).getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			Vector<NURBSShape> bezier = NURBSShapeProjection.DecomposeCurve(c);
+			for (int i=0; i<bezier.size();i++)
+			{
+				cs = bezier.get(i).clone();
+				cs.scale(zoomfactor);
+				GeneralPath solidpath = solid.modifyPath(cs.getCurve(5d/(double)zoomfactor), 1, zoomfactor);
+				GeneralPath dashedpath = dashed.modifyPath(cs.getCurve(5d/(double)zoomfactor), 1, zoomfactor);
+				GeneralPath CPPath = new GeneralPath();
+				CPPath.moveTo((new Double(cs.controlPoints.get(0).getX())).floatValue(),(new Double(cs.controlPoints.get(0).getY())).floatValue());
+				if (i==1)
+					CPPath.lineTo((new Double(cs.controlPoints.get(0).getX())).floatValue(),(new Double(cs.controlPoints.get(0).getY())).floatValue());
+				for (int j=1; j<cs.controlPoints.size(); j++)
+				{
+					CPPath.lineTo((new Double(cs.controlPoints.get(j).getX())).floatValue(),(new Double(cs.controlPoints.get(j).getY())).floatValue());					
+					//Force Circle
+					CPPath.lineTo((new Double(cs.controlPoints.get(j).getX())).floatValue(),(new Double(cs.controlPoints.get(j).getY())).floatValue());					
+				}
+				GeneralPath solidCPpath = solid.modifyPath(CPPath, 1, zoomfactor);
+				GeneralPath dashedCPpath = dashed.modifyPath(CPPath, 1, zoomfactor);
+				if ((i%2)==0)
+				{
+					g2.setColor(Color.BLACK);
+					g2.draw(solidpath);g2.draw(solidCPpath);
+					System.err.println(
+							DiplExports.drawOnePath(solidpath.getPathIterator(null), 1,0d, new Point(17,18), new Point(183,122),false));
+					System.err.println(
+							DiplExports.drawOnePath(solidCPpath.getPathIterator(null), 1,0d, new Point(17,18), new Point(183,122),true));
+				}
+				else
+				{
+					g2.setColor(new Color(204,204,235));
+					g2.draw(solidpath);g2.draw(solidCPpath);
+					System.err.println(
+							DiplExports.drawOnePath(solidpath.getPathIterator(null), 1,0d, new Point(17,18), new Point(183,122),false));
+					System.err.println(
+							DiplExports.drawOnePath(solidCPpath.getPathIterator(null), 1,0d, new Point(17,18), new Point(183,122),true));
+					g2.setColor(Color.BLACK);
+					System.err.println("\\color{maincolorlight}");
+					g2.draw(dashedpath);g2.draw(dashedCPpath);
+					System.err.println(
+							DiplExports.drawOnePath(dashedpath.getPathIterator(null), 1,0d, new Point(17,18), new Point(183,122),false));
+					System.err.println(
+							DiplExports.drawOnePath(dashedCPpath.getPathIterator(null), 1,0d, new Point(17,18), new Point(183,122),true));
+					System.err.println("\\color{black}");
+				}
+			}
+		}
 	}
 	private void paintSubCurveIP(Graphics2D g2)
 	{

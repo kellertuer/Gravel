@@ -1145,14 +1145,14 @@ public class NURBSShape {
 				Pk.getY() + direction.getY()/mov		
 		);
 		controlPoints.set(Pindex,Pnew);
-		if ((getType()&UNCLAMPED)==UNCLAMPED)
+		if ((getType()&UNCLAMPED)==UNCLAMPED) //unclamped is always used as periodic
 		{
-			if (Pindex<degree) //first degree ones
+			if (Pindex<degree) //first degree ones -> move last degree ones
 				controlPoints.set(maxCPIndex-degree+Pindex+1, (Point2D) Pnew.clone());
-			else if (Pindex > maxCPIndex-degree) // degree ones
+			else if (Pindex > maxCPIndex-degree) //last degree ones -> move first
 				controlPoints.set(Pindex-1- maxCPIndex+degree, (Point2D) Pnew.clone());
 		}
-		boolean closedclamped = ( ((getType()&CLAMPED)==CLAMPED) 
+		boolean closedclamped = ( ((getType()&CLAMPED)==CLAMPED) //Clamped but at least closed
 				&& (controlPoints.get(0).getX()==controlPoints.get(maxCPIndex).getX())
 				&& (controlPoints.get(0).getY()==controlPoints.get(maxCPIndex).getY()));
 		if (closedclamped)

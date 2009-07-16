@@ -1,12 +1,8 @@
 package model;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.Comparator;
-
-import view.VCommonGraphic;
 
 /**
  * This class represents the visual information of an edge.
