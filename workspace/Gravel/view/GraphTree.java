@@ -15,6 +15,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import model.*;
 import model.Messages.GraphConstraints;
@@ -109,7 +110,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		setRootVisible(false);
 		addTreeSelectionListener(this);
 		addMouseListener(this);
-		
+		getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		updateNodes();
 		updateEdges();
 		updateSubgraphs();
