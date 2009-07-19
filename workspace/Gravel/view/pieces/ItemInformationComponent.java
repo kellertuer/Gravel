@@ -105,6 +105,4 @@ public class ItemInformationComponent implements Observer, ActionListener
 			break;
 		}
 	}
-
-	
 }

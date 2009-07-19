@@ -110,11 +110,19 @@ public class NURBSShapeFactory {
 		int m=3; //
 		double alpha = 90d/(double)m;
 		Vector<Double> knots = new Vector<Double>();
-		for (int i=2; i<=3*(m+3+1); i++) //check for last element
-			knots.add(Math.floor(i/3d));
+//		knots.add(0d); knots.add(0d);
+		knots.add(0d);
+		knots.add(1d); knots.add(1d); knots.add(1d);
+		knots.add(2d); knots.add(2d); knots.add(2d);
+		knots.add(3d); knots.add(3d); knots.add(3d);
+		knots.add(4d); knots.add(4d); knots.add(4d);
+		knots.add(5d);
+		//4 weitere zum Schließen
+		knots.add(5d); knots.add(5d);
+		knots.add(6d); knots.add(6d);
 		Vector<Point2D> controlPoints = new Vector<Point2D>();
 		Vector<Double> weights = new Vector<Double>();
-		for (int l=0; l<=m+1; l++)
+		for (int l=1; l<=m; l++)
 		{
 			double beta = 2*(alpha)-90;
 			double cosa = Math.cos(alpha/180d*Math.PI);
@@ -135,10 +143,17 @@ public class NURBSShapeFactory {
 			controlPoints.add(new Point2D.Double(c*Math.cos(rad), c*Math.sin(rad) ));
 			weights.add(1d);
 		}
+		
+		for (int i=0; i<4; i++)
+		{
+			controlPoints.add((Point2D)controlPoints.get(i).clone());
+			weights.add(weights.get(i).doubleValue());			
+		}
 		NURBSShape c = new NURBSShape(knots,controlPoints,weights);
 		c.scale((double)radius);
 		c.translate(p.getX(),p.getY());
 		System.err.println(c.degree+" with "+(controlPoints.size())+" CP and "+knots.size()+" Knots");
+//		c.updateCircular(true);
 		return c;
 	}
 	/**

@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -89,7 +90,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	private VHyperShapeGraphic HShapeGraphicRef;
 	
 	private JPanel CircleFields, InterpolationFields, DegreeFields;
-	
+
 	private HESFreeModComponent FreeModPanel;
 	
 	/**
@@ -111,10 +112,10 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		HShapeGraphicRef = vhg;
 		cont = new Container();
 		cont.setLayout(new GridBagLayout());
-		cont.setMinimumSize(new Dimension(220,80));
+		cont.setMinimumSize(new Dimension(200,80));
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(0,2,0,2);
-		c.anchor = GridBagConstraints.CENTER;
+		c.anchor = GridBagConstraints.NORTH;
 		c.gridy = 0;
 		c.gridx = 0;
 		c.gridwidth=1;
@@ -140,28 +141,36 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		//
 		// Lay all Small Containers with Options at this position nonvisible
 		//
-
-		buildCirclePanel();
-		cont.add(CircleFields,c);
-		CircleFields.setVisible(true);
-
-		c.gridheight=1;
+		GridBagConstraints c2 = new GridBagConstraints();		
+		c2.anchor = GridBagConstraints.CENTER;
+		c2.gridx=0;
+		c2.insets = (Insets) c.insets.clone();
 		buildDegreePanel();
-		cont.add(DegreeFields,c);
+		JPanel firstmode = new JPanel();
+		firstmode.setLayout(new GridBagLayout());
+		c.gridy++;
+		firstmode.add(DegreeFields,c2);
 		DegreeFields.setVisible(true);
 		c.gridy++;
 		buildInterpolationPanel();
-		cont.add(InterpolationFields,c);
+		firstmode.add(InterpolationFields,c2);
 		setIPVisibility(true);
+		buildCirclePanel();
+		firstmode.add(CircleFields,c2);
+		CircleFields.setVisible(true);
+		c.fill = GridBagConstraints.NONE;
+		firstmode.validate();
+
 		//
 		//Container for the fields of the second mode
 		//
-		c.gridy-=2;
 		c.gridx=0;
 		c.gridwidth=2;
 		c.gridheight=3;
+		c.fill = GridBagConstraints.VERTICAL;
 		FreeModPanel = new HESFreeModComponent(HEdgeRefIndex, HShapeGraphicRef);
 		cont.add(FreeModPanel.getContent(),c);
+		cont.add(firstmode,c);
 		FreeModPanel.setVisible(false);
 		
 		c.gridy+=3;
@@ -172,6 +181,9 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		//
 		// General Buttons
 		//
+		c.fill = GridBagConstraints.NONE;
+
+		c.insets.bottom += 5;
 		c.anchor = GridBagConstraints.SOUTH;
 		bModeChange = new JButton("Modifikation"); //Name suchen!
 		bModeChange.setEnabled(true);
@@ -190,7 +202,6 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		cont.add(bCheckShape,c);
 		c.gridy++;
 		c.insets.top=0;
-		c.insets.bottom=0;
 		c.gridwidth=1;
 		c.anchor = GridBagConstraints.SOUTHWEST;
 		bCancel = new JButton("Abbrechen");
@@ -237,15 +248,14 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		CircleFields.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(5,7,5,7);
-		c.anchor = GridBagConstraints.WEST;
 		c.gridy = 0;
 		c.gridx = 0;
 		c.gridwidth=1;
 		c.gridheight=1;
 		iCOrigX = new IntegerTextField();
 		iCOrigX.addCaretListener(this);;
-		iCOrigX.setPreferredSize(new Dimension(100, 20));
-		CircleOriginX = new JLabel("<html><p>Mittelpunkt X</p></html>");
+		iCOrigX.setPreferredSize(new Dimension(50, 20));
+		CircleOriginX = new JLabel("<html><p>M<sub>X</sub></p></html>");
 		CircleFields.add(CircleOriginX,c);
 		c.gridx++;
 		CircleFields.add(iCOrigX,c);
@@ -254,8 +264,8 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		c.gridx=0;
 		iCOrigY = new IntegerTextField();
 		iCOrigY.addCaretListener(this);;
-		iCOrigY.setPreferredSize(new Dimension(100, 20));
-		CircleOriginY = new JLabel("<html><p>Mittelpunkt Y</p></html>");
+		iCOrigY.setPreferredSize(new Dimension(50, 20));
+		CircleOriginY = new JLabel("<html><p>M<sub>Y</sub></p></html>");
 		CircleFields.add(CircleOriginY,c);
 		c.gridx++;
 		CircleFields.add(iCOrigY,c);
@@ -264,28 +274,29 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		c.gridx=0;
 		iCRad = new IntegerTextField();
 		iCRad.addCaretListener(this);;
-		iCRad.setPreferredSize(new Dimension(80, 20));
+		iCRad.setPreferredSize(new Dimension(50, 20));
 		CircleRadius = new JLabel("<html><p>Radius</p></html>");
 		CircleFields.add(CircleRadius,c);
 		c.gridx++;
 		CircleFields.add(iCRad,c);
 		CircleFields.setBorder(BorderFactory.createTitledBorder("Kreis"));
+//
+		CircleFields.setSize(new Dimension(220,100));
 	}
-
 	private void buildDegreePanel()
 	{
 		DegreeFields = new JPanel();
 		DegreeFields.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(5,7,5,7);
-		c.anchor = GridBagConstraints.WEST;
 		c.gridy = 0;
 		c.gridx = 0;
 		c.gridwidth=2;
 		c.gridheight=1;
+		c.fill = GridBagConstraints.BOTH;
 		iDegree = new JSlider(JSlider.HORIZONTAL,2,7,3);
 	    iDegree.setMajorTickSpacing(1);
-	    Dimension d = new Dimension(180,50);
+	    Dimension d = new Dimension(170,50);
 	    iDegree.setSize(d);
 	    iDegree.setPreferredSize(d);
 	    iDegree.setPaintTicks(true);
@@ -299,7 +310,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		c.gridwidth=2;
 		IPInfo = new JLabel("<html><p>&nbsp;</p></html>");
 		DegreeFields.add(IPInfo,c);
-		DegreeFields.setMinimumSize(new Dimension(180,70));
+		DegreeFields.setMinimumSize(new Dimension(220,70));
 		DegreeFields.setBorder(BorderFactory.createTitledBorder("Polynomgrad"));
 	}
 	private void buildInterpolationPanel()
@@ -323,6 +334,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		c.gridx++;
 		InterpolationFields.add(rAddBetween,c);
 		InterpolationFields.setBorder(BorderFactory.createTitledBorder("neue Punkte einfügen"));
+		InterpolationFields.setSize(new Dimension(220,40));
 	}
 	
 	/**
@@ -451,7 +463,8 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	        {
 	        	CircleFields.setVisible(false);
 	        	InterpolationFields.setVisible(false);
-	        	DegreeFields.setVisible(false);
+	        	DegreeFields.setVisible(true);
+	        	iDegree.setEnabled(false);
 	        	String Shape = (String)cBasicShape.getModel().getSelectedItem();
 	        	if (Shape.equals("Kreis"))
 	        	{
@@ -463,12 +476,14 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.INTERPOLATION_MOUSEHANDLING);
 	        		InterpolationFields.setVisible(true);
 		        	DegreeFields.setVisible(true);
+		        	iDegree.setEnabled(true);
 	        	}
 	        	else if (Shape.equals("konvexe Hülle"))
 	        	{
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.NO_MOUSEHANDLING);
 	        		CalculateConvexHullShape();
 	        		DegreeFields.setVisible(true);
+		        	iDegree.setEnabled(true);
 	        	}
 	        	else
 	        	{
@@ -590,6 +605,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		iDegree.removeChangeListener(this);
 		iDegree.setValue(deg);
 		iDegree.addChangeListener(this);
+		iDegree.setEnabled(nm.getType()!=NURBSCreationMessage.CIRCLE);
 	}
 	
 	private void updateCircleFields(NURBSCreationMessage nm)
@@ -712,6 +728,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 				break;
 			case NURBSCreationMessage.CIRCLE: //Init to that
 				cBasicShape.setSelectedIndex(0);
+				updateDegreeFields(nm);
 				updateCircleFields(nm);
 			break;
 			case NURBSCreationMessage.CONVEX_HULL: //Init to that
