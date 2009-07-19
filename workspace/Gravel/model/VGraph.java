@@ -253,11 +253,20 @@ public class VGraph extends Observable implements VGraphInterface {
 		VNode SelNode = modifyNodes.getSingleSelectedNode();
 		VEdge SelEdge = modifyEdges.getSingleSelectedEdge();
 		if (SelNode==null) //Then it is only an edge if that is not null
-			return SelEdge;
-		else if (SelEdge==null)
-			return SelNode;
-		else
-			return null;
+		{
+			if ((SelEdge!=null)&&(SelEdge.getIndex()!=-1))
+				return SelEdge;
+			else
+				return null;
+		}
+		if (SelEdge==null)
+		{
+			if ((SelNode!=null)&&(SelNode.getIndex()!=-1))
+				return SelNode;
+			else
+				return null;
+		}
+		return null;
 	}
 
 	/**

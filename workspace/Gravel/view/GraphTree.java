@@ -211,32 +211,50 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	
 	public void mousePressed(MouseEvent e)
 	{
-	    if (e.isPopupTrigger()) 
+	    if (selectionHandling(e) && e.isPopupTrigger())
 	    	popuphandling(e);
 	}
 	
 	public void mouseReleased(MouseEvent e) 
+	{}
+	/**
+	 * Check whether we have to select anything and return true if clicked on an item else false
+	 * @param e
+	 * @return
+	 */
+	private boolean selectionHandling(MouseEvent e)
 	{
-	    if (e.isPopupTrigger()) 
-	    	popuphandling(e);
-	}
-
-	private void popuphandling(MouseEvent e)
-    {
-		TreePath selPath = getPathForLocation(e.getX(), e.getY()); 
+		TreePath selPath = getPathForLocation(e.getX(), e.getY());
 		DefaultMutableTreeNode selectedNode = null;
 		try { selectedNode = (DefaultMutableTreeNode)selPath.getLastPathComponent(); }
-		catch (Exception E){return;} 
-		setSelectionPath(selPath);
+		catch (Exception E){return false;}
+		if (e.isPopupTrigger())
+			removeSelectionPath(selPath);
 		selectedPosition = selectedNode.getParent().getIndex(selectedNode); //der wievielte Child Knoten man ist
 		if (selectedNode.getParent().toString().equals("Knoten"))
 		{
 			ParentType = USENODES;
 			int index = StringPos2Index(USENODES,selectedPosition);
+			Text.setText(Knotennamen.elementAt(index));
+			if (e.isPopupTrigger())
+				return true;
+			//Else select item in (Hyper)Graph
 			if (vG!=null)
-				Text.setText(vG.getMathGraph().modifyNodes.get(index).name);
+			{
+				vG.deleteObserver(this);
+				vG.deselect();
+				vG.modifyNodes.get(index).setSelectedStatus(VItem.SELECTED);
+				vG.pushNotify(new GraphMessage(GraphConstraints.SELECTION,index,GraphConstraints.UPDATE,GraphConstraints.SELECTION|GraphConstraints.NODE));
+				vG.addObserver(this);
+			}
 			else if (vhG!=null)
-				Text.setText(vhG.getMathGraph().modifyNodes.get(index).name);
+			{
+				vhG.deleteObserver(this);
+				vhG.deselect();
+				vhG.modifyNodes.get(index).setSelectedStatus(VItem.SELECTED);
+				vhG.pushNotify(new GraphMessage(GraphConstraints.SELECTION,index,GraphConstraints.UPDATE,GraphConstraints.SELECTION|GraphConstraints.NODE));
+				vhG.addObserver(this);
+			}
 		}
 		else if (selectedNode.getParent().toString().equals("Kanten"))
 		{
@@ -249,6 +267,13 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				if (vG.getMathGraph().isDirected()) t+="> "; 
 				t+=""+me.EndIndex;
 				Text.setText(t);
+				if (e.isPopupTrigger())
+					return true;
+				vG.deleteObserver(this);
+				vG.deselect();
+				vG.modifyEdges.get(index).setSelectedStatus(VItem.SELECTED);
+				vG.pushNotify(new GraphMessage(GraphConstraints.SELECTION,index,GraphConstraints.UPDATE,GraphConstraints.SELECTION|GraphConstraints.EDGE));
+				vG.addObserver(this);
 			}
 		}
 		else if (selectedNode.getParent().toString().equals("Hyperkanten"))
@@ -256,22 +281,32 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 			ParentType = USEEDGES;
 			int index = StringPos2Index(USEEDGES,selectedPosition);
 			if (vhG!=null)
+			{
 				Text.setText(vhG.getMathGraph().modifyHyperEdges.get(index).name);
+				if (e.isPopupTrigger())
+					return true;
+				vhG.deleteObserver(this);
+				vhG.deselect();
+				vhG.modifyHyperEdges.get(index).setSelectedStatus(VItem.SELECTED);
+				vhG.pushNotify(new GraphMessage(GraphConstraints.SELECTION,index,GraphConstraints.UPDATE,GraphConstraints.SELECTION|GraphConstraints.HYPEREDGE));
+				vhG.addObserver(this);
+			}
 		}
 		else if (selectedNode.getParent().toString().equals("Untergraphen"))
 		{
 			ParentType = USESUBGRAPHS;
 			int index = StringPos2Index(USESUBGRAPHS,selectedPosition);
-			if (vG!=null)
-				Text.setText(vG.getMathGraph().modifySubgraphs.get(index).getName());
-			else if (vhG!=null)
-				Text.setText(vhG.getMathGraph().modifySubgraphs.get(index).getName());			
+			Text.setText(Mengennamen.elementAt(index));
 		}
 		else //sonst kein menu anzeigen
 		{
-			return;
+			return false;
 		}
 		updateVisibility(ParentType);
+		return true;
+	}
+	private void popuphandling(MouseEvent e)
+    {
 		Menu.show(e.getComponent(), e.getX(), e.getY());
 	//	JOptionPane.showMessageDialog(this,message, "Fehler", JOptionPane.INFORMATION_MESSAGE);	
     }
@@ -389,7 +424,25 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		}
 		return index;
 	}
-
+	private int Index2StringPos(int type, int index)
+	{
+		Vector<String> s;
+		switch (type)
+		{
+			case USENODES : {s = Knotennamen; break;}
+			case USEEDGES : {s = Kantennamen; break;}
+			case USESUBGRAPHS : {s = Mengennamen; break;}
+			default : {return 0;}
+		}
+		int pos=0;
+		//Suche den #index Nr pos, der nicht 0 ist,
+		for (int i=0; i<=index; i++)
+		{
+			if (s.elementAt(i)!=null)
+				pos++;
+		}
+		return pos-1;
+	}
 	public void update(Observable o, Object arg)
 	{
 		GraphMessage m = (GraphMessage)arg;
@@ -410,7 +463,32 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				updateSubgraphs();
 			if ((m.getAffectedElementTypes()&GraphConstraints.SELECTION)==GraphConstraints.SELECTION)
 			{
-				//updateSelection();
+				VItem v = ((VGraphInterface)o).getSingleSelectedItem();
+				if (v==null)
+				{
+					removeSelectionPaths(getSelectionPaths()); //Deselect
+					return;
+				}
+				TreePath p = null;
+				switch(v.getType())
+				{
+					case VItem.NODE:
+						int npos = Index2StringPos(USENODES,v.getIndex());
+						DefaultMutableTreeNode tonSel = (DefaultMutableTreeNode) Knoten.getChildAt(npos);
+						p = new TreePath(Daten.getPathToRoot(tonSel));
+						break;
+					case VItem.EDGE:
+					case VItem.HYPEREDGE:
+						int epos = Index2StringPos(USEEDGES,v.getIndex());
+						DefaultMutableTreeNode toeSel = (DefaultMutableTreeNode) Kanten.getChildAt(epos);
+						p = new TreePath(Daten.getPathToRoot(toeSel));
+						break;
+				}
+				if (p!=null)
+				{
+					setSelectionPath(p);
+					scrollPathToVisible(p);
+				}
 			}
 		}	
 

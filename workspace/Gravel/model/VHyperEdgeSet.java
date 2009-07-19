@@ -266,7 +266,7 @@ public class VHyperEdgeSet extends Observable implements Observer {
 				if ((ve.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
 				{
 					if (result!=null) //This is the second selected Edge
-						return null;
+						return new VHyperEdge(-1,-1,-1);
 					else
 						result = ve;
 				}

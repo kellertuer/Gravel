@@ -238,7 +238,7 @@ public class VNodeSet extends Observable implements Observer {
 				if ((vn.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
 				{
 					if (result!=null) //This is the second selected Edge
-						return null;
+						return new VNode(-1,-1,-1,-1,-1,-1,-1,false);
 					else
 						result = vn;
 				}
