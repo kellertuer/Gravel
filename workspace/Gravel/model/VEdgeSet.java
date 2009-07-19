@@ -407,6 +407,32 @@ public class VEdgeSet extends Observable implements Observer {
 		finally{EdgeLock.unlock();}	
 		return result;
 	}
+	/**
+	 * Get the one and simple selected Edge iff such an edge exists, in every other case null is returned
+	 * @return
+	 */
+	public VEdge getSingleSelectedEdge()
+	{
+		Iterator<VEdge> e = vEdges.iterator();
+		EdgeLock.lock();
+		VEdge result = null;
+		try
+		{
+			while (e.hasNext())
+			{
+				VEdge ve = e.next();
+				if ((ve.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
+				{
+					if (result!=null) //This is the second selected Edge
+						return null;
+					else
+						result = ve;
+				}
+			}
+		}
+		finally{EdgeLock.unlock();}	
+		return result;
+	}	
 	//
 	//private Stuff for handling changes from other sets
 	//

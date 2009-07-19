@@ -1,15 +1,16 @@
 package view;
 
 
-import java.awt.GridBagConstraints;
+import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JToolBar;
 
-import view.pieces.ZoomComponent;
+import model.VGraphInterface;
+
+import view.pieces.*;
 
 //import model.GeneralPreferences;
 /**
@@ -19,11 +20,12 @@ import view.pieces.ZoomComponent;
  * @author Ronny Bergmann
  * @since 0.2
  */
-public class MainToolbar extends JToolBar implements ActionListener 
+public class MainToolbar extends JToolBar
 {	
 	private static final long serialVersionUID = 1L;
 	private VCommonGraphic vG;
 	private ZoomComponent internalZoomC;
+	private ItemInformationComponent internalInfoC;
 	/**
 	 * Init Toolbar, that is  added as an Control-Element to a VGraphic
 	 * @param g VGraphic it controls
@@ -41,28 +43,29 @@ public class MainToolbar extends JToolBar implements ActionListener
 	{
         setOpaque(true);
         this.setFloatable(false);
-		this.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.insets = new Insets(0,0,0,0);
-		c.anchor = GridBagConstraints.EAST;
-		c.gridy = 0;
-		c.gridx = 3;		
         internalZoomC = new ZoomComponent();
-		vG.addPiece("Zoom", internalZoomC);
-	    this.add(internalZoomC.getContent(),c);   
+        if (vG.getType()==VCommonGraphic.VGRAPHIC)
+        	internalInfoC = new ItemInformationComponent(((VGraphic)vG).getGraph());
+        else if (vG.getType()==VCommonGraphic.VHYPERGRAPHIC)
+        	internalInfoC = new ItemInformationComponent(((VHyperGraphic)vG).getGraph());
+        vG.addPiece("Zoom", internalZoomC);
+		this.setLayout(new BorderLayout());
+	    this.add(internalZoomC.getContent(),BorderLayout.CENTER);
+	    this.add(internalInfoC.getContent(),BorderLayout.EAST);
 	}
 	public void changeVGraph(VCommonGraphic newvg)
 	{
 		vG.removePiece("Zoom");
 		vG = newvg;
 		vG.addPiece("Zoom",internalZoomC);
+        if (vG.getType()==VCommonGraphic.VGRAPHIC)
+        	internalInfoC = new ItemInformationComponent(((VGraphic)vG).getGraph());
+        else if (vG.getType()==VCommonGraphic.VHYPERGRAPHIC)
+        	internalInfoC = new ItemInformationComponent(((VHyperGraphic)vG).getGraph());
 		validate();
 	}
 	public void validate()
 	{
 		internalZoomC.setZoom(internalZoomC.getZoom());
-	}
-	public void actionPerformed(ActionEvent e) 
-	{	
 	}
 }

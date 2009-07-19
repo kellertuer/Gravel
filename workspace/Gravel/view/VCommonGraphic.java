@@ -65,7 +65,7 @@ public abstract class VCommonGraphic extends Component implements Observer
 	//
 	public static final int VGRAPHIC = 1;
 	public static final int VHYPERGRAPHIC = 2;
-//	public static final int VHYPERSHAPEGRAPHIC = 4;
+//	public static final int VHYPERSHAPEGRAPHIC = 4; contained in previous Variable
 	
 	private HashMap<String,Observable> Controls;
 	protected Color selColor; //Color of selected Elements

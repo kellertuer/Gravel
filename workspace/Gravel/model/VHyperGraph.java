@@ -110,6 +110,20 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 		return modifyNodes.hasSelection()||modifyHyperEdges.hasSelection();
 	}
 	/* (non-Javadoc)
+	 * @see model.VGraphInterface#getSingleSelectedItem()
+	 */
+	public VItem getSingleSelectedItem()
+	{
+		VNode SelNode = modifyNodes.getSingleSelectedNode();
+		VHyperEdge SelEdge = modifyHyperEdges.getSingleSelectedEdge();
+		if (SelNode==null) //Then it is only an edge if that is not null
+			return SelEdge;
+		else if (SelEdge==null)
+			return SelNode;
+		else
+			return null;
+	}
+	/* (non-Javadoc)
 	 * @see model.VGraphInterface#translate(int, int)
 	 */
 	public void translate(int x, int y)

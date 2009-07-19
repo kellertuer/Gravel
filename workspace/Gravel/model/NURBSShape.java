@@ -574,15 +574,6 @@ public class NURBSShape {
 		return CK;
 	}
 	/**
-	 * Derivate-th derivate at u of the Curve computed in homogeneous Coordinates so its B-Spline-Derivate-Algorithm (
-	 * nurbs-book alg 3.2
-	 * so in the third coordinate are the wders and the first two are the aders, as mentioned in the nurbs-book
-	 * 
-	 * @param derivate
-	 * @param u
-	 * @return
-	 */
-	/**
 	 * Calculate all Nonvanishing BasisFunctions at u
 	 * This is a Variation of Alg 2.2 from the NURBS-Book
 	 */
@@ -829,7 +820,6 @@ public class NURBSShape {
 	{
 		return x.distance(ProjectionPoint(x))<=variance;
 	}
-
 	/**
 	 * After working on the front or end of the curve, it might be neccessary for unclamped closed curves to update
 	 * the other end,
@@ -869,7 +859,6 @@ public class NURBSShape {
 		}
 		refreshInternalValues();
 	}
-	
 	/**
 	 * Add a single Knot at u, if it's in range, update circular if it's an unclamped curve
 	 * @param u

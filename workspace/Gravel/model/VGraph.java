@@ -245,6 +245,21 @@ public class VGraph extends Observable implements VGraphInterface {
 								GraphConstraints.NODE|GraphConstraints.EDGE|GraphConstraints.SELECTION|GraphConstraints.SUBGRAPH) //Affected		
 			);
 	}
+	/* (non-Javadoc)
+	 * @see model.VGraphInterface#getSingleSelectedItem()
+	 */
+	public VItem getSingleSelectedItem()
+	{
+		VNode SelNode = modifyNodes.getSingleSelectedNode();
+		VEdge SelEdge = modifyEdges.getSingleSelectedEdge();
+		if (SelNode==null) //Then it is only an edge if that is not null
+			return SelEdge;
+		else if (SelEdge==null)
+			return SelNode;
+		else
+			return null;
+	}
+
 	/**
 	 * Get the Mathematical Graph this graph depends on. If you change stuff in there this Graph changes too
 	 * @return

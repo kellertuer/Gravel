@@ -222,6 +222,32 @@ public class VNodeSet extends Observable implements Observer {
 		return false;
 	}
 	/**
+	 * Get the one and simple selected Node iff such an edge exists, in every other case null is returned
+	 * @return
+	 */
+	public VNode getSingleSelectedNode()
+	{
+		Iterator<VNode> n = vNodes.iterator();
+		NodeLock.lock();
+		VNode result = null;
+		try
+		{
+			while (n.hasNext())
+			{
+				VNode vn = n.next();
+				if ((vn.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
+				{
+					if (result!=null) //This is the second selected Edge
+						return null;
+					else
+						result = vn;
+				}
+			}
+		}
+		finally{NodeLock.unlock();}	
+		return result;
+	}
+	/**
 	 * Get a new Node Iterator
 	 * 
 	 * @return the Iterator typed with VNode

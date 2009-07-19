@@ -31,17 +31,17 @@ public abstract class VItem {
 	}
 
 	//Definetly not selected
-	public static int DESELECTED = 0;
+	public final static int DESELECTED = 0;
 	//Just ATM not selected e.g. while you drag a mouse or sth like that
-	public static int SOFT_DESELECTED = 1;
+	public final static int SOFT_DESELECTED = 1;
 	//Definetly selected
-	public static int SELECTED = 2;
+	public final static int SELECTED = 2;
 	//Just ATM selected e.g. while you drag a mouse or sth like that
-	public static int SOFT_SELECTED = 4;
+	public final static int SOFT_SELECTED = 4;
 	
-	public static int EDGE = GraphConstraints.EDGE;
-	public static int HYPEREDGE = GraphConstraints.HYPEREDGE;
-	public static int NODE = GraphConstraints.NODE;
+	public final static int EDGE = GraphConstraints.EDGE;
+	public final static int HYPEREDGE = GraphConstraints.HYPEREDGE;
+	public final static int NODE = GraphConstraints.NODE;
 	
 	private int status;
 	

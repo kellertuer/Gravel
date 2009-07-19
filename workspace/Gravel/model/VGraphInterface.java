@@ -21,8 +21,16 @@ public interface VGraphInterface extends Observer {
 	 * deletes all selected Nodes and (Hyper)Edges. That means, that also all incident Edges of selected Nodes are deleted
 	 */
 	public void removeSelection();
-
+	/**
+	 * Indicator for an existing selection
+	 * @return
+	 */
 	public boolean hasSelection();
+	/**
+	 * Get a single element, if and only if just one element is selected
+	 * @return
+	 */
+	public VItem getSingleSelectedItem();
 	/**
 	 * Translates the Graph by the given Offset in x and y direction
 	 * <br><br>

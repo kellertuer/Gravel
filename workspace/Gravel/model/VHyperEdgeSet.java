@@ -249,6 +249,32 @@ public class VHyperEdgeSet extends Observable implements Observer {
 		finally{HyperEdgeLock.unlock();}	
 		return result;
 	}
+	/**
+	 * Get the one and simple selected Edge iff such an edge exists, in every other case null is returned
+	 * @return
+	 */
+	public VHyperEdge getSingleSelectedEdge()
+	{
+		Iterator<VHyperEdge> e = vHyperEdges.iterator();
+		HyperEdgeLock.lock();
+		VHyperEdge result = null;
+		try
+		{
+			while (e.hasNext())
+			{
+				VHyperEdge ve = e.next();
+				if ((ve.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
+				{
+					if (result!=null) //This is the second selected Edge
+						return null;
+					else
+						result = ve;
+				}
+			}
+		}
+		finally{HyperEdgeLock.unlock();}	
+		return result;
+	}
 	//
 	//private Stuff for handling changes from other sets
 	//
