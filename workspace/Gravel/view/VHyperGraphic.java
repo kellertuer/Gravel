@@ -105,16 +105,16 @@ public class VHyperGraphic extends VCommonGraphic
 			GeneralPath solidCPpath = solid.modifyPath(CPPath, 1, zoomfactor);
 			g2.setColor(Color.BLACK);
 			g2.draw(solidpath);g2.draw(solidCPpath);
-			System.err.println(
-					DiplExports.drawOnePath(solidpath.getPathIterator(null), 1,0d, offset, max,false));
-			System.err.println(
-					DiplExports.drawOnePath(solidCPpath.getPathIterator(null), 1,0d, offset, max,true));
+//			System.err.println(
+//					DiplExports.drawOnePath(solidpath.getPathIterator(null), 1,0d, offset, max,false));
+//			System.err.println(
+//					DiplExports.drawOnePath(solidCPpath.getPathIterator(null), 1,0d, offset, max,true));
 			System.err.println("%  KnotPoints");
 			for (int i=cs.degree; i<= cs.maxKnotIndex-cs.degree; i++)
 			{
 				Point2D p = cs.CurveAt(cs.Knots.get(i));
-				System.err.print(DiplExports.drawQuad(p.getX()-(double)offset.x,(double)max.y-p.getY(), 1.5));
-				System.err.println("At ("+(p.getX()-(double)offset.x)+","+((double)max.y-p.getY())+")");
+//				System.err.print(DiplExports.drawQuad(p.getX()-(double)offset.x,(double)max.y-p.getY(), 1.5));
+//				System.err.println("At ("+(p.getX()-(double)offset.x)+","+((double)max.y-p.getY())+")");
 			}
 		}
 	}
@@ -139,8 +139,8 @@ public class VHyperGraphic extends VCommonGraphic
 			{
 				cs = bezier.get(i).clone();
 				cs.scale(zoomfactor);
-				GeneralPath solidpath = solid.modifyPath(cs.getCurve(5d/(double)zoomfactor), 1, zoomfactor);
-				GeneralPath dashedpath = dashed.modifyPath(cs.getCurve(5d/(double)zoomfactor), 1, zoomfactor);
+				GeneralPath solidpath = solid.modifyPath(cs.getCurve(2.5d/(double)zoomfactor), 1, zoomfactor);
+				GeneralPath dashedpath = dashed.modifyPath(cs.getCurve(2.5d/(double)zoomfactor), 1, zoomfactor);
 				GeneralPath CPPath = new GeneralPath();
 				CPPath.moveTo((new Double(cs.controlPoints.get(0).getX())).floatValue(),(new Double(cs.controlPoints.get(0).getY())).floatValue());
 				if (i==1)
@@ -166,18 +166,12 @@ public class VHyperGraphic extends VCommonGraphic
 				{
 					g2.setColor(new Color(204,204,235));
 					g2.draw(solidpath);g2.draw(solidCPpath);
+					System.err.println("%%% DASHED");
 					System.err.println(
 							DiplExports.drawOnePath(solidpath.getPathIterator(null), 1,0d, new Point(17,18), new Point(183,122),false));
 					System.err.println(
 							DiplExports.drawOnePath(solidCPpath.getPathIterator(null), 1,0d, new Point(17,18), new Point(183,122),true));
 					g2.setColor(Color.BLACK);
-					System.err.println("\\color{maincolorlight}");
-					g2.draw(dashedpath);g2.draw(dashedCPpath);
-					System.err.println(
-							DiplExports.drawOnePath(dashedpath.getPathIterator(null), 1,0d, new Point(17,18), new Point(183,122),false));
-					System.err.println(
-							DiplExports.drawOnePath(dashedCPpath.getPathIterator(null), 1,0d, new Point(17,18), new Point(183,122),true));
-					System.err.println("\\color{black}");
 				}
 			}
 		}

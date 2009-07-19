@@ -40,6 +40,13 @@ public class NURBSShapeProjection extends NURBSShape
 	{
 		this(Curve,p,null,0f);
 	}
+	/**
+	 * Version with debug, Graphics2D and zoom
+	 * @param Curve
+	 * @param p
+	 * @param debug
+	 * @param z
+	 */
 	public NURBSShapeProjection(NURBSShape Curve, Point2D p,VCommonGraphic debug, float z)
 	{
 		origCurve = Curve;

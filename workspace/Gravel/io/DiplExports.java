@@ -34,7 +34,7 @@ public class DiplExports {
 		    		{
 		    			moved = false;
 		    			if (CP)
-		    				s += "\\draw[line width=0.9pt, draw=maincolormiod]";
+		    				s += "\\draw[line width=0.9pt, draw=maincolormid]";
 		    			else
 		    				s += "\\draw[line width=2pt, draw=black] ";
 		    		}

@@ -373,17 +373,19 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		if ((e.getSource()==iCOrigX)||(e.getSource()==iCOrigY)||(e.getSource()==iCRad))
 		{
 			
-			if ((iCOrigX.getValue()!=-1)&&(iCOrigY.getValue()!=-1)&&(iCRad.getValue()!=-1))
+			if ((iCOrigX.getValue() > 0)&&(iCOrigY.getValue() > 0)&&(iCRad.getValue() > 0))
 			{ //All valid
 				NURBSCreationMessage old = HShapeGraphicRef.getShapeParameters();
-				if ((old==null)||(!old.isValid())||(old.getType()!=NURBSCreationMessage.CIRCLE))
+				if (old==null)
 					return; //invalid
-				if  (  (iCOrigX.getValue()==Math.round((float)old.getPoints().firstElement().getX()))
+				if  (  
+					   (old.getType()==NURBSCreationMessage.CIRCLE)	
+					&& (iCOrigX.getValue()==Math.round((float)old.getPoints().firstElement().getX()))
 					&& (iCOrigY.getValue()==Math.round((float)old.getPoints().firstElement().getY()))
 					&& (iCRad.getValue()==old.getValues().firstElement().intValue())	)
 					return; //No Value changed
 				NURBSCreationMessage nm = new NURBSCreationMessage(
-						2, //TODO: Enable Circles with Degree
+						4, //TODO: Enable Circles with Degree
 						new Point2D.Double((new Integer(iCOrigX.getValue())).doubleValue(), (new Integer(iCOrigY.getValue())).doubleValue()),
 						iCRad.getValue()
 				);

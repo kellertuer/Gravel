@@ -68,8 +68,8 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 	{
 		if ((CircleOrigin==null) || (size<=0))
 			return new NURBSCreationMessage();
-		//TODO: CreationCircleHandler : Degree
-		return new NURBSCreationMessage(2, new Point2D.Double(CircleOrigin.getX(),CircleOrigin.getY()), size);
+		//TODO: CreationCircleHandler : Degree, at least 4
+		return new NURBSCreationMessage(4, new Point2D.Double(CircleOrigin.getX(),CircleOrigin.getY()), size);
 	}
 	/**
 	 * Set the internal values to another circle specified in the CreationMessage

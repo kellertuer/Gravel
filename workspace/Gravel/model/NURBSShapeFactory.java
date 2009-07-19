@@ -106,32 +106,41 @@ public class NURBSShapeFactory {
 	private static NURBSShape CreateCircle(Point2D origin, int radius)
 	{
 		Point p = new Point(Math.round((float)origin.getX()),Math.round((float)origin.getY()));
-		//See L. Piegl, W. Tiller: A Menagerie of rational B-Spline Circles
+		//See C. Bangert and H. Prautzsch for details
+		int m=3; //
+		double alpha = 90d/(double)m;
 		Vector<Double> knots = new Vector<Double>();
-		knots.add(0d);knots.add(0d);knots.add(0d);
-		knots.add(.25);
-		knots.add(.5);knots.add(.5);
-		knots.add(.75);
-		knots.add(1d);knots.add(1d);knots.add(1d);
-		
-		Vector<Double> weights = new Vector<Double>();
-		weights.add(1d); weights.add(.5); weights.add(.5);
-		weights.add(1d); weights.add(.5); weights.add(.5);
-		weights.add(1d);
-		
+		for (int i=2; i<=3*(m+3+1); i++) //check for last element
+			knots.add(Math.floor(i/3d));
 		Vector<Point2D> controlPoints = new Vector<Point2D>();
-		controlPoints.add(new Point2D.Double(p.x+radius, p.y)); //P0
-		controlPoints.add(new Point2D.Double(p.x+radius, p.y-radius)); //P1, Top right
-		controlPoints.add(new Point2D.Double(p.x-radius, p.y-radius)); //P2, Top left
-		controlPoints.add(new Point2D.Double(p.x-radius, p.y)); //P3
-		controlPoints.add(new Point2D.Double(p.x-radius, p.y+radius)); //P4, bottom left
-		controlPoints.add(new Point2D.Double(p.x+radius, p.y+radius)); //P5, bottom right
-		controlPoints.add(new Point2D.Double(p.x+radius, p.y)); //P6 again P0
+		Vector<Double> weights = new Vector<Double>();
+		for (int l=0; l<=m+1; l++)
+		{
+			double beta = 2*(alpha)-90;
+			double cosa = Math.cos(alpha/180d*Math.PI);
+			double cosaq = cosa*cosa;
+			double c = 1d/cosa;
+			double d = (cosaq+2d)/(3d*cosaq);
+			double omega = (2*cosaq*cosaq-cosaq+2d)/(3d*cosaq);
+			//3l-1
+			double rad = (beta+ ((double)(4*l-1))*alpha)/180d*Math.PI;
+			controlPoints.add(new Point2D.Double(c*Math.cos(rad), c*Math.sin(rad) ));
+			weights.add(1d);
+			//3l
+			rad = (beta+ ((double)4*l)*alpha)/180d*Math.PI;
+			controlPoints.add(new Point2D.Double(d*Math.cos(rad), d*Math.sin(rad) ));
+			weights.add(omega);
+			//3l+1
+			rad = (beta+ ((double)(4*l+1))*alpha)/180d*Math.PI;
+			controlPoints.add(new Point2D.Double(c*Math.cos(rad), c*Math.sin(rad) ));
+			weights.add(1d);
+		}
 		NURBSShape c = new NURBSShape(knots,controlPoints,weights);
-		c = unclamp(c);
+		c.scale((double)radius);
+		c.translate(p.getX(),p.getY());
+		System.err.println(c.degree+" with "+(controlPoints.size())+" CP and "+knots.size()+" Knots");
 		return c;
 	}
-
 	/**
   	  * Create and return a Smooth NURBS-Curve of degree degree through the given Interpolation Points,
   	  * that is degree-1 continuous at every Point

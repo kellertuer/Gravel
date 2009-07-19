@@ -43,7 +43,7 @@
 		<value name="allowmultiple" type="Boolean">true</value>
 		<value name="directed" type="Boolean">true</value>
 		<value name="fileformat" type="String">visual</value>
-		<value name="lastfile" type="String">/Users/ronny/Graveltemp/--DiplExample.xml</value>
+		<value name="lastfile" type="String">$NONE</value>
 		<value name="loadfileonstart" type="Boolean">true</value>
 	</group>
 	<group name="grid">
