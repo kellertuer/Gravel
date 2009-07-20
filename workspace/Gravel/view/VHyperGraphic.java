@@ -73,25 +73,27 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.draw(Drag.getSelectionRectangle());
 		}
 //		paintDerivDEBUG(g2);
-//		paintDEBUG(g2);
+		paintDEBUG(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
 		Point offset = new Point(17,18);
 		Point max = new Point(183,122);
-		if ((vG.modifyHyperEdges.get(1)!=null)&&(vG.modifyHyperEdges.get(1).getShape()!=null)&&(!vG.modifyHyperEdges.get(1).getShape().isEmpty()))
+		int sHEIndex = 4;
+		if ((vG.modifyHyperEdges.get(sHEIndex)!=null)&&(vG.modifyHyperEdges.get(sHEIndex).getShape()!=null)&&(!vG.modifyHyperEdges.get(sHEIndex).getShape().isEmpty()))
 		{
 			VEdgeLinestyle solid = new VEdgeLinestyle(VEdgeLinestyle.SOLID,0,0);
 			VEdgeLinestyle dashed = new VEdgeLinestyle(VEdgeLinestyle.DASHED,5,4);
-			NURBSShape c = vG.modifyHyperEdges.get(1).getShape().clone();
+			NURBSShape c = vG.modifyHyperEdges.get(sHEIndex).getShape().clone();
+//			c = NURBSShapeProjection.clamp(c);
 			NURBSShape cs = c.clone();
 			cs.scale(zoomfactor);
 			g2.setColor(Color.white);
-			g2.setStroke(new BasicStroke(vG.modifyHyperEdges.get(1).getWidth()*2*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			g2.setStroke(new BasicStroke(vG.modifyHyperEdges.get(sHEIndex).getWidth()*2*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(cs.getCurve(5d/(double)zoomfactor));
 //			c.translate(0d,40d);
 			g2.setColor(Color.BLACK);
-			g2.setStroke(new BasicStroke(vG.modifyHyperEdges.get(1).getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			g2.setStroke(new BasicStroke(vG.modifyHyperEdges.get(sHEIndex).getWidth()*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			GeneralPath solidpath = solid.modifyPath(cs.getCurve(5d/(double)zoomfactor), 1, zoomfactor);
 			GeneralPath CPPath = new GeneralPath();
 			CPPath.moveTo((new Double(cs.controlPoints.get(0).getX())).floatValue(),(new Double(cs.controlPoints.get(0).getY())).floatValue());
@@ -105,16 +107,17 @@ public class VHyperGraphic extends VCommonGraphic
 			GeneralPath solidCPpath = solid.modifyPath(CPPath, 1, zoomfactor);
 			g2.setColor(Color.BLACK);
 			g2.draw(solidpath);g2.draw(solidCPpath);
-//			System.err.println(
-//					DiplExports.drawOnePath(solidpath.getPathIterator(null), 1,0d, offset, max,false));
-//			System.err.println(
-//					DiplExports.drawOnePath(solidCPpath.getPathIterator(null), 1,0d, offset, max,true));
+			System.err.println(
+					DiplExports.drawOnePath(solidpath.getPathIterator(null), 1,0d, offset, max,false));
+			System.err.println(
+					DiplExports.drawOnePath(solidCPpath.getPathIterator(null), 1,0d, offset, max,true));
 			System.err.println("%  KnotPoints");
 			for (int i=cs.degree; i<= cs.maxKnotIndex-cs.degree; i++)
 			{
 				Point2D p = cs.CurveAt(cs.Knots.get(i));
-//				System.err.print(DiplExports.drawQuad(p.getX()-(double)offset.x,(double)max.y-p.getY(), 1.5));
-//				System.err.println("At ("+(p.getX()-(double)offset.x)+","+((double)max.y-p.getY())+")");
+				System.err.println("%%%Knoten t_"+i);
+				System.err.print(DiplExports.drawQuad(p.getX()-(double)offset.x,(double)max.y-p.getY(), 1.5));
+				System.err.println("At ("+(p.getX()-(double)offset.x)+","+((double)max.y-p.getY())+")");
 			}
 		}
 	}

@@ -486,7 +486,7 @@ public class NURBSShapeProjection extends NURBSShape
 		return BezierSegments;
 	}
 	
-	private NURBSShape clamp(NURBSShape c)
+	public static NURBSShape clamp(NURBSShape c)
 	{
 		double u1 = c.Knots.get(c.degree);
 		double u2 = c.Knots.get(c.maxKnotIndex-c.degree);

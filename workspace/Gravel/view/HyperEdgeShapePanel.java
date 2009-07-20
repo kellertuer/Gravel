@@ -1,6 +1,5 @@
 package view;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -79,7 +78,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	private JLabel CircleOriginX, CircleOriginY, CircleRadius;
 	private IntegerTextField iCOrigX, iCOrigY, iCRad;
 	//Interpolation Fields
-	private JLabel Degree, IPInfo;
+	private JLabel IPInfo;
 	private JSlider iDegree;
 	private ButtonGroup bAddIP;
 	private JRadioButton rAddEnd, rAddBetween;
