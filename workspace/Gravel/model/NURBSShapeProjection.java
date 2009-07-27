@@ -490,14 +490,15 @@ public class NURBSShapeProjection extends NURBSShape
 	{
 		double u1 = c.Knots.get(c.degree);
 		double u2 = c.Knots.get(c.maxKnotIndex-c.degree);
-		int Start = c.findSpan(u1);
-		int End = c.findSpan(u2)+1;
 		int multStart=0, multEnd=0;
 		//Raise both endvalues to multiplicity d to get an clamped curve
-		while (c.Knots.get(Start+multStart).doubleValue()==u1)
+		for (int i=0; i<=c.maxKnotIndex; i++)
+		{
+		 if (c.Knots.get(i).doubleValue()==u1)
 			multStart++;
-		while (c.Knots.get(End-multEnd).doubleValue()==u2)
+		 if (c.Knots.get(i).doubleValue()==u2)
 			multEnd++;
+		}
 		Vector<Double> Refinement = new Vector<Double>();
 		NURBSShape subcurve = c.clone();
 		for (int i=0; i<c.degree-multStart; i++)
@@ -509,8 +510,8 @@ public class NURBSShapeProjection extends NURBSShape
 		Vector<Point2D> newCP = new Vector<Point2D>();
 		Vector<Double> newWeight= new Vector<Double>();
 		int subStart = subcurve.findSpan(u1);
-		int subEnd = subcurve.findSpan(u2)+1;
-		for (int i=subStart-c.degree; i<=subEnd-c.degree; i++) //Copy needed CP
+		int subEnd = subcurve.findSpan(u2)-subcurve.degree+multEnd;
+		for (int i=subStart-c.degree; i<=subEnd; i++) //Copy needed CP
 		{
 			newCP.add((Point2D)subcurve.controlPoints.get(i).clone());
 			newWeight.add(subcurve.cpWeight.get(i).doubleValue());

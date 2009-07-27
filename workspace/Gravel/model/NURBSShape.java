@@ -546,6 +546,16 @@ public class NURBSShape {
 	 */
 	public Vector<Point2D> DerivateCurveValuesAt(int derivate, double u)
 	{
+		int maxMultiplicity = 1, temp=1;
+		for (int i=degree+1; i<=maxKnotIndex-degree; i++)
+		{
+			if (Knots.get(i).doubleValue()==Knots.get(i-1).doubleValue())
+				temp++;
+			else if (temp > maxMultiplicity)
+				maxMultiplicity = temp;
+		}
+		if (Knots.indexOf(u)!=-1)
+			System.err.println("Wah! Max Mult: "+maxMultiplicity+" and Degree "+degree+" so it is "+(degree-maxMultiplicity)+" times diff");
 		Vector<Point2D> CK = new Vector<Point2D>(); //result
 		if (derivate==0)
 		{

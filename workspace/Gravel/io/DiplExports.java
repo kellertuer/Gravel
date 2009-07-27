@@ -34,9 +34,9 @@ public class DiplExports {
 		    		{
 		    			moved = false;
 		    			if (CP)
-		    				s += "\\draw[line width=0.9pt, draw=highlightimgcolor]";
+		    				s += NL+"\\draw[line width=0.9pt, draw=highlightimgcolor]";
 		    			else
-		    				s += "\\draw[line width=2pt, draw=black] ";
+		    				s += "NL+\\draw[line width=2pt, draw=black] ";
 		    		}
 		    		dir = new Point2D.Double(x - lastx,y-lasty);
 			    	dlength = LINESPPT*Math.sqrt(dir.x*dir.x + dir.y*dir.y);
@@ -67,7 +67,7 @@ public class DiplExports {
 	}
 	public static String drawFullCircle(double x, double y, double s)
 	{	
-		return NL+"\\fill[fill=white,draw=black] ("+x+","+y+") circle ("+s+")";
+		return NL+"\\fill[fill=white,draw=black] ("+x+","+y+") circle ("+s+");";
 /*		String str="";
 		str += NL+"\\thicklines";
 		for (int i=s-1; i>=0; i--)
