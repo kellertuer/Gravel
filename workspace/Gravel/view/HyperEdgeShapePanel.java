@@ -196,7 +196,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		c.gridy++;
 		c.gridx=0;
 		c.insets.top+=5;
-		bCheckShape = new JButton("<html>Umriss pr&uuml;fen</html>");
+		bCheckShape = new JButton("<html>Pr&uuml;fen</html>");
 		bCheckShape.addActionListener(this);
 		cont.add(bCheckShape,c);
 		c.gridy++;
