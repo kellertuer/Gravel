@@ -215,7 +215,7 @@ public class NURBSShapeProjection extends NURBSShape
 			double coincidence = diff.distance(0d,0d);
 			double movement = Math.abs(nominator/denominator);
 			double movementu = Math.abs(unext-u)*Math.sqrt(firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y);
-			if (iterations>50) //it sould converge fast so here we should change sth
+			if (iterations>100) //it sould converge fast so here we should change sth
 			{
 				System.err.println("Warning: Newton-Iteration took too long.");
 				return (u+unext)/2; //Try to prevent circles

@@ -554,8 +554,8 @@ public class NURBSShape {
 			else if (temp > maxMultiplicity)
 				maxMultiplicity = temp;
 		}
-		if (Knots.indexOf(u)!=-1)
-			System.err.println("Wah! Max Mult: "+maxMultiplicity+" and Degree "+degree+" so it is "+(degree-maxMultiplicity)+" times diff");
+//		if (Knots.indexOf(u)!=-1)
+//			System.err.println("Wah! Max Mult: "+maxMultiplicity+" and Degree "+degree+" so it is "+(degree-maxMultiplicity)+" times diff");
 		Vector<Point2D> CK = new Vector<Point2D>(); //result
 		if (derivate==0)
 		{

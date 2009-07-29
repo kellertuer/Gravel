@@ -634,7 +634,10 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
      			mEdRedo.setEnabled(GraphHistory.CanRedo());
     		}
 			if(!isGraph)
+			{
+				Gui.getInstance().refresh();
 				return;
+			}
 	   	    if (item==mVGDirCh)
     	    {
     			//Only active if we have a Graph
@@ -674,6 +677,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
             	   		((VGraphic)graphpart).getGraph().modifyEdges.setMultipleAllowed(true);
              }
     	}
+		Gui.getInstance().refresh();
 	}
 	
 	public void update(Observable arg0, Object arg1) 
@@ -723,6 +727,6 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 	        else
 	        	mVGMultipleCh.setText("erlaube Mehrfachkanten");        	
 		}
-		this.repaint();
+		Gui.getInstance().refresh();
 	}
 }

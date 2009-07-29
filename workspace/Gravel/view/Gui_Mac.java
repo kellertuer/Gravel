@@ -128,7 +128,11 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
 	public void handlePrintFile(ApplicationEvent arg0) {}
 	public void handleReOpenApplication(ApplicationEvent arg0) {}
 	
-	public void windowActivated(WindowEvent arg0) {}
+	public void windowActivated(WindowEvent arg0)
+	{
+		System.err.println("USe Menubar?"+System.getProperty("apple.laf.useScreenMenuBar"));
+		System.err.println(instance.getParentWindow().getMenuBar());
+	}
 	public void windowClosed(WindowEvent arg0) 
 	{
 		GeneralPreferences gp = GeneralPreferences.getInstance();

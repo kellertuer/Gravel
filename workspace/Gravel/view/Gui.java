@@ -294,10 +294,15 @@ public class Gui implements WindowListener
         AboutLabel.setOpaque(true);
 		JOptionPane.showMessageDialog(frame, AboutLabel,"Über Gravel",JOptionPane.INFORMATION_MESSAGE);
     }
+    public void refresh()
+    {
+    	frame.validate();
+    	frame.setVisible(true);
+    }
     /**
      * Handle Quit
      */
-    public void doQuit()
+    public boolean doQuit()
     {
     		//Check File Saved
     		boolean quit = MenuBar.checkSavedBeforeQuit();
@@ -306,6 +311,7 @@ public class Gui implements WindowListener
     			frame.setVisible(false);
 				frame.dispose();
     		}
+    		return quit;
     }
     //External getting referrence of the Graph for manipulating ist
     /**
@@ -406,8 +412,8 @@ public class Gui implements WindowListener
 	}
    
    public void windowClosing(WindowEvent e) {
-		doQuit();
-		e.getWindow().dispose();		
+		if (doQuit())
+			e.getWindow().dispose();		
 	}
    public void windowDeactivated(WindowEvent arg0) {}
    

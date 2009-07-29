@@ -73,7 +73,7 @@ public class VHyperGraphic extends VCommonGraphic
 			g2.draw(Drag.getSelectionRectangle());
 		}
 //		paintDerivDEBUG(g2);
-		paintDEBUG(g2);
+//		paintDEBUG(g2);
 	}
 	private void paintDEBUG(Graphics2D g2)
 	{
