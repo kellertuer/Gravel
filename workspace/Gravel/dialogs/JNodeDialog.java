@@ -429,7 +429,7 @@ public class JNodeDialog extends JDialog implements ActionListener, ItemListener
 						graphref.pushNotify(new GraphMessage(GraphConstraints.NODE, GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, GraphConstraints.HYPERGRAPH_ALL_ELEMENTS));
 					nodes.changeIndex(oldindex, iNodeIndex.getValue());
 				}
-				else
+				else //Kein Index geändert
 				{
 					graphref.pushNotify(new GraphMessage(GraphConstraints.NODE, iNodeIndex.getValue(), GraphConstraints.UPDATE|GraphConstraints.BLOCK_START, GraphConstraints.NODE));
 				}

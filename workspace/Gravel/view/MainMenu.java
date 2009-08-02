@@ -702,7 +702,10 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     		mVModusShape.setEnabled(getIndexofSingeSelectedHyperEdge() > 0);
 		}
 		if (graphpart.getType()!=VCommonGraphic.VGRAPHIC)
+		{
+			Gui.getInstance().refresh();
 			return;
+		}
 		if ((m.getModifiedElementTypes()&GraphConstraints.DIRECTION)==GraphConstraints.DIRECTION) //directed changed
 		{
 			//Only active if we have a Graph

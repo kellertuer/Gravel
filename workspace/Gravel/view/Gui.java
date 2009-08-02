@@ -296,8 +296,6 @@ public class Gui implements WindowListener
     }
     public void refresh()
     {
-    	frame.validate();
-    	frame.setVisible(true);
     	frame.toFront();
     }
     /**
