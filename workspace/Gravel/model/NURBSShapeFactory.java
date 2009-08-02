@@ -174,10 +174,7 @@ public class NURBSShapeFactory {
 		for (int i=q.size()-degree-1; i<q.size(); i++)
 			IP.add((Point2D) q.get(i).clone());
 		for (int i=0; i<q.size(); i++)
-		{
-			System.err.println(i+" "+q.get(i));
 			IP.add((Point2D) q.get(i).clone());
-		}
 		for (int i=0; i<=degree; i++)
 			IP.add((Point2D) q.get(i).clone());
 
@@ -230,7 +227,7 @@ public class NURBSShapeFactory {
 		else if (fragment.getSubCurve().isEmpty())
 			return fragment.stripDecorations().clone();
 		if (!SubcurveSubstitutable(fragment))
-			return new NURBSShape();
+		   return new NURBSShape();
 		//So we have a real existing subcurve
 		double u1 = fragment.getStart(), u2 = fragment.getEnd();
 		NURBSShape origCurve = fragment.stripDecorations().clone();
@@ -248,7 +245,7 @@ public class NURBSShapeFactory {
 		//
 		// Prepare first degree+1 IP and lgspoints
 		//
-		for (int i=origCurve.degree; i>=0; i--)
+		for (int i=origCurve.degree+1; i>=0; i--)
 		{
 			double pos;
 			if ((k1-i)<0)
@@ -256,7 +253,7 @@ public class NURBSShapeFactory {
 			else
 				pos = keptFragment.Knots.get(k1-i);
 			
-			if (i<origCurve.degree)
+			if (i<=origCurve.degree)
 			{
 				double pos2 = (lgspoints.lastElement()+pos)/2;
 				lgspoints.add(pos2);
@@ -295,7 +292,7 @@ public class NURBSShapeFactory {
 		// Prepare last degree+1 IP and lgsPoints
 		// Replace old length by d
 		//
-		for (int i=0; i<=origCurve.degree; i++)
+		for (int i=0; i<=origCurve.degree+1; i++)
 		{
 			double pos;
 			if ((k2+i)>keptFragment.maxKnotIndex)

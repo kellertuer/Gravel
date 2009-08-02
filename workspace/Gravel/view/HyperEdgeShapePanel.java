@@ -468,6 +468,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	        	if (Shape.equals("Kreis"))
 	        	{
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CIRCLE_MOUSEHANDLING);
+	        		iDegree.setValue(4); //TODO: Think about using other degrees for circles
 	        		CircleFields.setVisible(true);
 	        	}
 	        	else if (Shape.equals("Interpolation"))
