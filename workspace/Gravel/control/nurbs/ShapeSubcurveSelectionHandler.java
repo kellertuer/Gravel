@@ -145,7 +145,7 @@ public class ShapeSubcurveSelectionHandler implements
 				((NURBSShapeFragment)temporaryShape).refreshDecoration();
 				HyperEdgeRef.setShape(getShape()); //Set shape to NURBSShapeFragment
 			}
-			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_END,GraphConstraints.HYPEREDGE));							
 		}
 		else //Default
 		{
@@ -274,7 +274,7 @@ public class ShapeSubcurveSelectionHandler implements
 			}
 			HyperEdgeRef.setShape(getShape()); //Set shape to NURBSShapeFragment
 			resetShape();
-			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_END,GraphConstraints.HYPEREDGE));							
 		}
 	}
 	public Point getMouseOffSet() {
