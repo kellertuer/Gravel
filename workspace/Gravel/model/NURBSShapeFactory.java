@@ -40,9 +40,9 @@ public class NURBSShapeFactory {
 	{
 		switch(nm.getType())
 		{
-			case NURBSCreationMessage.INTERPOLATION:
+			case NURBSCreationMessage.PERIODIC_INTERPOLATION:
 				if (nm.getDegree()>0) //Normal
-					return CreateInterpolation(nm.getPoints(), nm.getDegree());
+					return CreatePeriodicInterpolation(nm.getPoints(), nm.getDegree());
 				else if ((nm.getCurve().getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
 					return CreateSubcurveInterpolation((NURBSShapeFragment)nm.getCurve(),nm.getPoints());
 				else
@@ -156,14 +156,14 @@ public class NURBSShapeFactory {
 		return c;
 	}
 	/**
-  	  * Create and return a Smooth NURBS-Curve of degree degree through the given Interpolation Points,
-  	  * that is degree-1 continuous at every Point
+  	  * Create and return a Smooth NURBS-Curve of given degree through the given Interpolation Points,
+  	  * that is degree-1 continuous at every Point - and periodic
   	  * 
 	  * @param IP The Interpolation-Points, where Q_0 is already identical to Q_n
 	  * @param degree the degree
 	  * @return
 	 */
-	private static NURBSShape CreateInterpolation(Vector<Point2D> q, int degree)
+	private static NURBSShape CreatePeriodicInterpolation(Vector<Point2D> q, int degree)
 	{
 		//Based on Algorithm 9.1 from the NURBS-Book
 		//close IP to a closed curve
@@ -211,6 +211,43 @@ public class NURBSShapeFactory {
 		return c;
 	}
 
+	/**
+ 	  * Create and return a Smooth NURBS-Curve of given degree through the given Interpolation Points,
+ 	  * that is degree-1 continuous at every Point - and periodic
+ 	  * 
+	  * @param IP The Interpolation-Points, where Q_0 is already identical to Q_n
+	  * @param degree the degree
+	  * @return
+	 */
+	private static NURBSShape CreateInterpolation(Vector<Point2D> q, int degree)
+	{
+		//Based on Algorithm 9.1 from the NURBS-Book
+		//close IP to a closed curve
+		Vector<Point2D> IP = new Vector<Point2D>();
+		int IPCount = q.size();
+		if (IPCount <= degree) //only possible for at least degree +1 elements
+			return new NURBSShape();			
+		for (int i=0; i<q.size(); i++) //Copy
+			IP.add((Point2D) q.get(i).clone());
+
+		int maxIPIndex = IP.size()-1; //highest IP Index
+		int maxKnotIndex = maxIPIndex+degree+1;//highest KnotIndex in the resulting NURBS-Curve
+		//Determine Points to evaluate for IP with cetripetal Aproach
+		double d = 0d;
+		for (int i=1; i<=maxIPIndex; i++)
+			d += Math.sqrt(IP.get(i).distance(IP.get(i-1)));
+		Vector<Double> lgspoints = new Vector<Double>();
+		lgspoints.setSize(IP.size());
+		lgspoints.set(0,0d);
+		lgspoints.set(maxIPIndex, 1d);
+		for (int i=1; i<maxIPIndex; i++)
+			lgspoints.set(i, lgspoints.get(i-1).doubleValue() + Math.sqrt(IP.get(i).distance(IP.get(i-1)))/d);
+		//At the lgspoints we evaluate the Curve, get an LGS, that is totally positive and banded
+		Vector<Double> Knots = calculateKnotVector(degree, maxKnotIndex, lgspoints);
+		NURBSShape c = solveLGS(Knots, lgspoints, IP);
+		return c;
+	}
+	
 	/**
 	 * Create an replacement for the subcurve specified by the Interpolationpoints.
 	 * The parts before and following the subcurve-part are taken to get a smooth transition from the
@@ -424,6 +461,7 @@ public class NURBSShapeFactory {
 		}
 		return Knots;
 	}
+
 	/**
 	 * Cut the additionally added parts from the curve to get an 
 	 * unclamped closed NURBSCurve
@@ -618,8 +656,27 @@ public class NURBSShapeFactory {
 	 */
 	private static NURBSShape CreateConvexHullPolygon(Vector<Point2D> nodes, Vector<Integer> sizes, int degree, double distance)
 	{
-		if (nodes.size()<2) //mindestens 3 Knoten nötig
+		if (nodes.size()<1) //mindestens 3 Knoten nötig
 			return new NURBSShape();
+		if (nodes.size()==2) //Create Line, nonperiodic
+		{
+			Vector<Point2D> LineIP = new Vector<Point2D>();
+			int segments = degree;
+			LineIP.add((Point2D)nodes.firstElement().clone());
+			double length = nodes.firstElement().distance(nodes.lastElement());
+			double onelength = length/((double)segments);
+			Point2D direction = new Point2D.Double(
+					(nodes.lastElement().getX()-nodes.firstElement().getX())/length,
+					(nodes.lastElement().getY()-nodes.firstElement().getY())/length);
+			for (int i=1; i<segments; i++)
+				LineIP.add(
+						new Point2D.Double(
+								nodes.firstElement().getX() + ((double)i)*onelength*direction.getX(),
+								nodes.firstElement().getY() + ((double)i)*onelength*direction.getY())
+					);
+			LineIP.add((Point2D)nodes.lastElement().clone());
+			return CreateInterpolation(LineIP,degree);
+		}
 		Vector<Point2D> ConvexHull = GrahamsScan(nodes);
 		Vector<Point2D> IPoints = new Vector<Point2D>();
 		for (int i=0; i<ConvexHull.size(); i++)
@@ -692,7 +749,7 @@ public class NURBSShapeFactory {
 		}
 		if (IPoints.size()<=(2*degree))
 			return new NURBSShape();
-		return CreateInterpolation(IPoints, degree);
+		return CreatePeriodicInterpolation(IPoints, degree);
 	}
 	
 	/**

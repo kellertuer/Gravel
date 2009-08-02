@@ -487,7 +487,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			return;
 		switch (nm.getType())
 		{
-			case NURBSCreationMessage.INTERPOLATION:
+			case NURBSCreationMessage.PERIODIC_INTERPOLATION:
 				if (getMouseHandling()!=INTERPOLATION_MOUSEHANDLING) //really change
 					setMouseHandling(INTERPOLATION_MOUSEHANDLING);
 				break;			

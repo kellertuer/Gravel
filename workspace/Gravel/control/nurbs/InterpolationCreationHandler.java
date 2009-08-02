@@ -78,7 +78,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	
 	public void setShapeParameters(NURBSCreationMessage nm)
 	{
-		if ( (nm==null) || (nm.getType()!=NURBSCreationMessage.INTERPOLATION) || (!nm.isValid()))
+		if ( (nm==null) || (nm.getType()!=NURBSCreationMessage.PERIODIC_INTERPOLATION) || (!nm.isValid()))
 		{ //Unsuitable, reset to initial Values
 			reInit();
 			return;
@@ -91,8 +91,7 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		InterpolationPoints = local.getPoints();
 		PointAdditionStatus = local.getStatus();
 		MessageCurve = nm.getCurve();
-		degree = nm.getDegree();
-		
+		degree = nm.getDegree();			
 		if (notify)
 		{
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
@@ -224,7 +223,6 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 				//else Moving existentPoint, reinitialize lastshape
 				updateShape();
 				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));	
-					
 			}
 			else
 			{

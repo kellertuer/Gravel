@@ -24,6 +24,9 @@ import java.util.Map.Entry;
  * - their distance to the Shape is at most distance+their radius, for each v_i in e
  * - All Nodepositions p_i of nodes not belonging to e are outside the NURBSShape
  *
+ * For the case that the hyperedge consists of
+ *  - one node, it is also valid to have a loop that runs through the node
+ *  - two nodes, it is also valid if the shape is a curve from one to the other node
  *
  * The Result is as follows:
  * - If the Result is valid, alls Sets of wrong nodes are empty
@@ -79,6 +82,7 @@ public class NURBSShapeValidator extends NURBSShape {
 	private boolean ResultValidation;
 	
 	private NURBSShape origCurve;
+	
 	public NURBSShapeValidator(VHyperGraph vG, int HyperEdgeIndex, NURBSShape Curve, VCommonGraphic g)
 	{
 		ResultValidation=false;
@@ -95,6 +99,84 @@ public class NURBSShapeValidator extends NURBSShape {
 		//Now also the curve and the Hyperedge are correct for the check
 		ResultValidation=true;
 		setCurveTo(clone.Knots, clone.controlPoints, clone.cpWeight);
+
+		MHyperEdge mhe = vG.getMathGraph().modifyHyperEdges.get(HyperEdgeIndex); 
+		int card = mhe.cardinality();
+		if (card==1) //Curve must run through Node
+		{
+			Iterator<VNode> nodeiter = vG.modifyNodes.getIterator();
+			while (nodeiter.hasNext())
+			{
+				VNode actual = nodeiter.next();
+				if (mhe.containsNode(actual.getIndex())) //Only happens once, 
+				{ //Project onto curve
+					Point2D p = new Point2D.Double(actual.getPosition().getX(),actual.getPosition().getY());
+					NURBSShapeProjection projP = new NURBSShapeProjection(this,p);
+					ResultValidation = (p.distance(projP.getResultPoint()) <= (double)actual.getSize());
+					if (!ResultValidation)
+						runValidator(vG,HyperEdgeIndex,Curve,g); //perhaps its a normal shape
+				}
+			}
+		}
+		else if (card==2) //C(a) must be one Node, C(b) the other OR normal Validator
+		{
+			Point2D Start = CurveAt(Knots.get(degree));
+			Point2D End = CurveAt(Knots.get(maxKnotIndex-degree));
+			Point2D node1=new Point2D.Double(0,0),node2=new Point2D.Double(0,0);
+			boolean first=true;
+			double size1=Double.MAX_VALUE,size2=Double.MAX_VALUE;
+			int index1=0,index2=0;
+			Iterator<VNode> nodeiter = vG.modifyNodes.getIterator();
+			while (nodeiter.hasNext())
+			{
+				VNode actual = nodeiter.next();
+				if (mhe.containsNode(actual.getIndex())) //Only happens once, 
+				{ 
+					if (first)
+					{
+						node1 = new Point2D.Double(actual.getPosition().getX(),actual.getPosition().getY());
+						size1 = actual.getSize();
+						index1=actual.getIndex();
+						first=false;
+					}
+					else
+					{
+						node2 = new Point2D.Double(actual.getPosition().getX(),actual.getPosition().getY());
+						size2 = actual.getSize();
+						index2=actual.getIndex();
+					}
+				}
+			}
+			if (getType()==this.CLAMPED)
+			{	
+				if (Start.distance(node1)<=size1) //First fits
+				{
+					if (End.distance(node2)>size2) // second does not fit
+						invalidNodeIndices.add(index2);
+				}
+				else if (Start.distance(node2)<=size2) // second fits
+				{
+					if (End.distance(node1) > size1) //first not
+						invalidNodeIndices.add(index1);						
+				}
+				else
+				{
+					if ((Start.distance(node1) > size1) && (End.distance(node1) > size1)) //1 died not fit
+						invalidNodeIndices.add(index1);											
+					if ((Start.distance(node2) > size2) && (End.distance(node2) > size2)) //2 died not fit
+						invalidNodeIndices.add(index2);											
+				}
+				ResultValidation = (invalidNodeIndices.isEmpty());
+			}
+			else //Closed must be normal check
+				runValidator(vG,HyperEdgeIndex,Curve,g);
+		}
+		else //more than 2 nodes, alsways shape
+			runValidator(vG,HyperEdgeIndex,Curve,g);
+	}
+
+	private void runValidator(VHyperGraph vG, int HyperEdgeIndex, NURBSShape Curve, VCommonGraphic g)
+	{
 		//
 		// Start of Validation-Algorithm
 		//

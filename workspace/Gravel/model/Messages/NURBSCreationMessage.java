@@ -18,7 +18,7 @@ import model.NURBSShapeFragment;
  *  -a NURBSShape that may be a Fragment or another Decorator to handle specific Creations depenting on them
  *
  * == Types ==
- * - Interpolation
+ * - periodic Interpolation
  *  * Degree is needed
  *  * margin and Set of Integer not required
  *  * Status may be ADD_END or ADD_BETWEEN and indicates where new Interpolation Points are added
@@ -44,12 +44,12 @@ import model.NURBSShapeFragment;
  */
 public class NURBSCreationMessage {
 
-	public static final int INTERPOLATION = 0;
-	public static final int CIRCLE = 1;
-	public static final int CONVEX_HULL = 2; 
-
-	public static final int ADD_END = 1;
-	public static final int ADD_BETWEEN = 2;
+	public static final int PERIODIC_INTERPOLATION = 1;
+	public static final int CIRCLE = 2;
+	public static final int CONVEX_HULL = 4; 
+	
+	public static final int ADD_END = 16;
+	public static final int ADD_BETWEEN = 32;
 	
 	private int type, status=0, degree, margin=0;
 	private Vector<Point2D> points=new Vector<Point2D>();
@@ -75,7 +75,7 @@ public class NURBSCreationMessage {
 			type=-1;
 			return;
 		}
-		type = INTERPOLATION;
+		type = PERIODIC_INTERPOLATION;
 		degree = deg;
 			
 		this.status = status;
@@ -95,7 +95,7 @@ public class NURBSCreationMessage {
 			type=-1;
 			return;
 		}
-		type = INTERPOLATION;
+		type = PERIODIC_INTERPOLATION;
 		curve = sub;
 		
 		this.status = status;
@@ -152,7 +152,7 @@ public class NURBSCreationMessage {
 		}
 		switch(type)
 		{
-			case INTERPOLATION: 
+			case PERIODIC_INTERPOLATION: 
 				if (degree > 0)
 					return new NURBSCreationMessage(degree, status, pclone);
 				else
@@ -169,7 +169,7 @@ public class NURBSCreationMessage {
 	{
 		switch (type)
 		{
-			case INTERPOLATION:
+			case PERIODIC_INTERPOLATION:
 				return ((points!=null)&&(points.size()>=0)&&((status&(ADD_END|ADD_BETWEEN))>0)) //Both
 				&& ( (degree>=1) //Normal IP
 				   || ( (degree==0) && ((curve.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT))); //Sub replacement
@@ -221,7 +221,7 @@ public class NURBSCreationMessage {
 		return curve;
 	}
 	public void setCurve(NURBSShape curve) {
-		if ((type==INTERPOLATION)&&((curve.getDecorationTypes()&NURBSShape.FRAGMENT)!=NURBSShape.FRAGMENT))
+		if ((type==PERIODIC_INTERPOLATION)&&((curve.getDecorationTypes()&NURBSShape.FRAGMENT)!=NURBSShape.FRAGMENT))
 			this.curve = new NURBSShape();
 		else
 			this.curve = curve;

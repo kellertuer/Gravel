@@ -661,7 +661,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 			rAddEnd.addActionListener(this);
 			return;
 		}
-		if (nm.getType()!=NURBSCreationMessage.INTERPOLATION)
+		if (nm.getType()!=NURBSCreationMessage.PERIODIC_INTERPOLATION)
 			return; //unsuitable->ignore
 		if ((nm.getStatus()==NURBSCreationMessage.ADD_END)&&(rAddBetween.isSelected()))
 		{ //Update
@@ -721,7 +721,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		switch(nm.getType())
 		{
 			default:
-			case NURBSCreationMessage.INTERPOLATION: //Init to that
+			case NURBSCreationMessage.PERIODIC_INTERPOLATION: //Init to that
 				cBasicShape.setSelectedIndex(1);
 				updateDegreeFields(nm);
 				updateIPFields(nm);
