@@ -24,7 +24,7 @@ import view.VHyperShapeGraphic;
 public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 {	
 	private VHyperShapeGraphic ParameterVectorReference;
-	private int VHyperEdgeIndex;
+//	private int VHyperEdgeIndex;
 	/**
 	 * Create a new HyperGraphShapeHistoryManager for the given VHyperGraph
 	 * To track changes of the first Modus of shape creation 
@@ -41,7 +41,7 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 		lastGraph = vhsg.getGraph().clone();
 		ParameterVectorReference = vhsg;
 		CommonInitialization();
-		VHyperEdgeIndex=vheIndex;
+//		VHyperEdgeIndex=vheIndex;
 	}
 	
 	public void Undo()

@@ -50,7 +50,8 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		if (MessageCurve.isEmpty()||((MessageCurve.getDecorationTypes()&NURBSShape.FRAGMENT)!=NURBSShape.FRAGMENT))
 			MessageCurve=new NURBSShape(); //Jst keep it if its for an Subcurve Replacement
 	}
-	
+	public void removeGraphObservers()
+	{} //Nothing to remove
 	public void reInit()
 	{
 		degree = 3; //TODO: Define Std-Value for nURBSShape-Degree

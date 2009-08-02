@@ -77,6 +77,10 @@ public class ShapeSubcurveSelectionHandler implements
 		}
 		setModificationState(modstate);
 	}
+	public void removeGraphObservers()
+	{
+		gp.deleteObserver(this);
+	}
 	/**
 	 * Reset shape to last state that was really saved in the graph - doeas not
 	 * push any notification

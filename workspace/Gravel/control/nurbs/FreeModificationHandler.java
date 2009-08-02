@@ -45,7 +45,11 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 		HyperEdgeRef = vhg.modifyHyperEdges.get(hyperedgeindex);
 		temporaryShape = HyperEdgeRef.getShape().clone(); //Clone with eventual Decorations (if that decoration clones)
 	}
-	
+	public void removeGraphObservers()
+	{
+		gp.deleteObserver(this);
+	}
+
 	public Rectangle getSelectionRectangle()
 	{ //No Selections possible here
 		return null;

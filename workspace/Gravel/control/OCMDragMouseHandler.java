@@ -57,6 +57,8 @@ public class OCMDragMouseHandler implements DragMouseHandler
 		cEdgeDragActions = new CommonEdgeDragListener(g);
 	}
 
+	public void removeGraphObservers() {}
+
 	/**
 	 * return the mouseoffset. which is the startposition of any drag-action
 	 * 
@@ -117,4 +119,5 @@ public class OCMDragMouseHandler implements DragMouseHandler
 	public void setGrid(int x, int y) {}
 
 	public void setGridOrientated(boolean b) {}
+
 }

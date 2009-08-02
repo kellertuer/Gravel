@@ -59,7 +59,8 @@ public class StandardDragMouseHandler implements DragMouseHandler
 		cNodeDragActions = new CommonNodeDragListener(g);
 		cEdgeDragActions = new CommonEdgeDragListener(g);
 	}
-
+	public void removeGraphObservers()
+	{}
 	/**
 	 * Returns the actual Startpoint if a drag is running, if not it returns 0,0
 	 * 

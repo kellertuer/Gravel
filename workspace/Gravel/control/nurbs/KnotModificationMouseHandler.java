@@ -61,6 +61,10 @@ public class KnotModificationMouseHandler implements ShapeModificationMouseHandl
 		temporaryShape = HyperEdgeRef.getShape().clone(); //Clone with eventual Decorations (if that decoration clones)
 		setModificationState(modState);
 	}
+	public void removeGraphObservers()
+	{
+		gp.deleteObserver(this);
+	}
 	/**
 	 * Change the state of modification
 	 * Which is

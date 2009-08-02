@@ -232,6 +232,8 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		if (e.isPopupTrigger())
 			removeSelectionPath(selPath);
 		selectedPosition = selectedNode.getParent().getIndex(selectedNode); //der wievielte Child Knoten man ist
+		if (HyperEdgeShape!=null)
+			HyperEdgeShape.setVisible((selectedNode!=null)&&(selectedNode.getParent()!=null)&&selectedNode.getParent().toString().equals("Hyperkanten"));
 		if (selectedNode.getParent().toString().equals("Knoten"))
 		{
 			ParentType = USENODES;

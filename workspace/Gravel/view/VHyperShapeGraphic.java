@@ -406,6 +406,10 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	 */
 	private void resetMouseHandling()
 	{
+		if (firstModus!=null)
+			firstModus.removeGraphObservers();
+		if (secondModus!=null)
+			secondModus.removeGraphObservers();
 		this.removeMouseListener(firstModus);
 		this.removeMouseMotionListener(firstModus);
 		this.removeMouseListener(secondModus);

@@ -36,7 +36,7 @@ public class DiplExports {
 		    			if (CP)
 		    				s += NL+"\\draw[line width=0.9pt, draw=highlightimgcolor]";
 		    			else
-		    				s += "NL+\\draw[line width=2pt, draw=black] ";
+		    				s += NL+"\\draw[line width=2pt, draw=black] ";
 		    		}
 		    		dir = new Point2D.Double(x - lastx,y-lasty);
 			    	dlength = LINESPPT*Math.sqrt(dir.x*dir.x + dir.y*dir.y);

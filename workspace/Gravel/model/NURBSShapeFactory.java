@@ -152,7 +152,6 @@ public class NURBSShapeFactory {
 		NURBSShape c = new NURBSShape(knots,controlPoints,weights);
 		c.scale((double)radius);
 		c.translate(p.getX(),p.getY());
-		System.err.println(c.degree+" with "+(controlPoints.size())+" CP and "+knots.size()+" Knots");
 //		c.updateCircular(true);
 		return c;
 	}
@@ -160,7 +159,7 @@ public class NURBSShapeFactory {
   	  * Create and return a Smooth NURBS-Curve of degree degree through the given Interpolation Points,
   	  * that is degree-1 continuous at every Point
   	  * 
-	  * @param IP The Interpolation-Points
+	  * @param IP The Interpolation-Points, where Q_0 is already identical to Q_n
 	  * @param degree the degree
 	  * @return
 	 */
@@ -172,12 +171,16 @@ public class NURBSShapeFactory {
 		int IPCount = q.size();
 		if (IPCount < 2*degree) //we have less then 2*degree IP -> no interpolatin possible due to overlappings needed
 			return new NURBSShape();			
-		for (int i=q.size()-degree; i<q.size(); i++)
+		for (int i=q.size()-degree-1; i<q.size(); i++)
 			IP.add((Point2D) q.get(i).clone());
 		for (int i=0; i<q.size(); i++)
+		{
+			System.err.println(i+" "+q.get(i));
 			IP.add((Point2D) q.get(i).clone());
+		}
 		for (int i=0; i<=degree; i++)
 			IP.add((Point2D) q.get(i).clone());
+
 		int maxIPIndex = IP.size()-1; //highest IP Index
 		int maxKnotIndex = maxIPIndex+degree+1;//highest KnotIndex in the resulting NURBS-Curve
 		//Determine Points to evaluate for IP with cetripetal Aproach

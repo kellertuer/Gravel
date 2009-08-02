@@ -44,7 +44,7 @@ public class OCMClickMouseHandler implements ClickMouseHandler {
 		vg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
 	}
-	
+
 	public OCMClickMouseHandler(VHyperGraphic g)
 	{
 		NodeMouseActions = new CommonNodeClickListener(g);
@@ -54,6 +54,11 @@ public class OCMClickMouseHandler implements ClickMouseHandler {
 		vgc = g;
 		vhg = g.getGraph();
 		gp = GeneralPreferences.getInstance();
+	}
+	public void removeGraphObservers()
+	{
+		if (PopupClickActions!=null)
+			PopupClickActions.removeObservers();
 	}
 	/*
 	 * Mouse Listener fuer Tastenaktionen

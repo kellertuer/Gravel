@@ -35,4 +35,8 @@ public interface DragMouseHandler extends MouseListener, MouseMotionListener
 	 * @return the rectangle if it exists, else null
 	 */
 	public Rectangle getSelectionRectangle();
+	/**
+	 * RemoveObservable Stuff
+	 */
+	public void removeGraphObservers();
 }

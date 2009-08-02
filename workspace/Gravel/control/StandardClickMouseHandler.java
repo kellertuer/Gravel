@@ -43,7 +43,12 @@ public class StandardClickMouseHandler implements ClickMouseHandler {
 		SelectionMouseActions = new SelectionClickListener(g);;
 		PopupClickActions = new ContextMenuClickListener(g);
 	}
-	
+	public void removeGraphObservers()
+	{
+		if (PopupClickActions!=null)
+			PopupClickActions.removeObservers();
+	}
+
 	public void mouseClicked(MouseEvent e)
 	{
 		NodeMouseActions.mouseClicked(e);

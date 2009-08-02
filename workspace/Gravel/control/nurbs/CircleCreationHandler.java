@@ -54,7 +54,9 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 		MouseOffSet = new Point(0,0);
 		hyperedgeindex = vheI;
 	}
-	
+	public void removeGraphObservers()
+	{} //Nothing to remove
+
 	public Rectangle getSelectionRectangle()
 	{ //No Selections possible here
 		return null;

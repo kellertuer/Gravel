@@ -191,6 +191,10 @@ public class VGraphic extends VCommonGraphic
 	 */
 	private void resetMouseHandling()
 	{
+		if (Drag!=null)
+			Drag.removeGraphObservers();
+		if (Click!=null)
+			Click.removeGraphObservers();
 		this.removeMouseListener(Drag);
 		this.removeMouseMotionListener(Drag);
 		this.removeMouseListener(Click);

@@ -70,7 +70,10 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 		temporaryShape = HyperEdgeRef.getShape().clone();
 		setModificationState(modstate);
 	}
-	
+	public void removeGraphObservers()
+	{
+		gp.deleteObserver(this);
+	}
 	public Rectangle getSelectionRectangle()
 	{ //No Selections possible here
 		return null;

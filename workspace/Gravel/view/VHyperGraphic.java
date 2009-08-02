@@ -84,8 +84,17 @@ public class VHyperGraphic extends VCommonGraphic
 		{
 			VEdgeLinestyle solid = new VEdgeLinestyle(VEdgeLinestyle.SOLID,0,0);
 			VEdgeLinestyle dashed = new VEdgeLinestyle(VEdgeLinestyle.DASHED,5,4);
-			NURBSShape c = vG.modifyHyperEdges.get(sHEIndex).getShape().clone();
-			c.addKnot(0.16d);
+			Vector<Point2D> IP = new Vector<Point2D>();
+			IP.add(new Point2D.Double(125d,63d)); // was Point2D.Double[250.0, 125.0]
+			IP.add(new Point2D.Double(100d,88d)); // was Point2D.Double[200.0, 175.0]
+			IP.add(new Point2D.Double(63d,88d)); // was Point2D.Double[125.0, 175.0]
+			IP.add(new Point2D.Double(25d,100d)); // was Point2D.Double[50.0, 200.0]
+			IP.add(new Point2D.Double(25d,63d)); // was Point2D.Double[50.0, 125.0]
+			IP.add(new Point2D.Double(75d,25d)); // was Point2D.Double[150.0, 50.0]
+			IP.add(new Point2D.Double(113d,50d)); // was Point2D.Double[225.0, 100.0]
+			NURBSShape c = NURBSShapeFactory.CreateShape(new NURBSCreationMessage(3,NURBSCreationMessage.ADD_BETWEEN,IP));
+			max = new Point(Math.round((float)Math.ceil(c.getMax().getX())),Math.round((float)Math.ceil(c.getMax().getY())));
+			offset = new Point(Math.round((float)Math.floor(c.getMin().getX())),Math.round((float)Math.floor(c.getMin().getY())));
 			NURBSShape cs = c.clone();
 			cs.scale(zoomfactor);
 			g2.setColor(Color.white);
@@ -120,6 +129,16 @@ public class VHyperGraphic extends VCommonGraphic
 				System.err.print("%%%Knoten t_"+i);
 				System.err.println("At ("+(p.getX()-(double)offset.x)+","+((double)max.y-p.getY())+")");
 				System.err.print(DiplExports.drawQuad(p.getX()-(double)offset.x,(double)max.y-p.getY(), 1.5));
+			}
+			for (int i=0; i<IP.size(); i++)
+			{
+				Point2D p = IP.get(i);
+				p.setLocation(p.getX()-(double)offset.x,(double)max.y-p.getY());
+				System.err.print("%%%CP #"+i);
+				System.err.println(" At ("+(p.getX()-(double)offset.x)+","+((double)max.y-p.getY())+")");
+				System.err.println("\\draw[draw=black] ("+(p.getX()-1.5d)+","+(p.getY()-1.5d)+") -- ("+(p.getX()+1.5d)+","+(p.getY()+1.5d)+");"
+						+"\r\n\\draw[draw=black] ("+(p.getX()+1.5d)+","+(p.getY()-1.5d)+") -- ("+(p.getX()-1.5d)+","+(p.getY()+1.5d)+");");
+				System.err.println("\\coordinate [mark=x,label=above:\\textcolor{black}{$Q_{"+i+"}$}] (Q"+i+") at ("+p.getX()+","+p.getY()+");");				
 			}
 		}
 	}
@@ -502,6 +521,10 @@ public class VHyperGraphic extends VCommonGraphic
 	 */
 	private void resetMouseHandling()
 	{
+		if (Drag!=null)
+			Drag.removeGraphObservers();
+		if (Click!=null)
+			Click.removeGraphObservers();
 		this.removeMouseListener(Drag);
 		this.removeMouseMotionListener(Drag);
 		this.removeMouseListener(Click);
@@ -536,6 +559,7 @@ public class VHyperGraphic extends VCommonGraphic
 		else if (o.equals(gp)) //We got news from gp
 			handlePreferencesUpdate();
 	}
+	
 	public int getType() {
 		return VCommonGraphic.VHYPERGRAPHIC;
 	}

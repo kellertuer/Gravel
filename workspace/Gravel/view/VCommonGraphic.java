@@ -335,6 +335,7 @@ public abstract class VCommonGraphic extends Component implements Observer
 					gp.setBoolValue("grid.enabled",gridenabled);
 					gp.setBoolValue("grid.orientated",gridorientated);
 					gp.addObserver(this);
+					handleGraphUpdate(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
 					repaint();
 					//UpdateGrid
 				}

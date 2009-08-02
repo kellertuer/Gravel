@@ -63,7 +63,6 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 	private VSubgraph chSubgraph;
 	//Die Buttons
 	private JButton bOK, bCancel, bChangeColor;
-	
 	/**
 	 * Init the Dialog with Values for creation of a new VSubgraph
 	 * 
@@ -71,14 +70,16 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 	 * @param name	its new Name
 	 * @param color	its color and the
 	 * @param vg	corresponding VGraph
+	 * @param preNodes Init Dialog for a new Subgraph with these nodes selected
+	 * @param preEdges Init Dialog for a new Subgraph with these edges selected
 	 */
-	public JSubgraphDialog(int index, String name, Color color, VGraphInterface vg)
+	public JSubgraphDialog(int index, String name, Color color, VGraphInterface vg, BitSet preNodes, BitSet preEdges)
 	{
 		chSubgraph = null;
 		oldindex = index;
 		oldname = name;
 		oldcolor = color;
-		CreateDialog(null, vg);
+		CreateDialog(null, vg,preNodes,preEdges);
 	}
 	/**
 	 * Init the Dialog for Variation of a VSubgraph
@@ -88,14 +89,14 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 	 */
 	public JSubgraphDialog(VSubgraph s,VGraphInterface vg)
 	{
-		CreateDialog(s,vg);
+		CreateDialog(s,vg,null,null);
 	}
 	/**
 	 * Create and init the Dialog for a 
 	 * @param originalSubgraph given Subgraph
 	 * @param vG in a corresponding VGraph
 	 */
-	private void CreateDialog(VSubgraph originalSubgraph, VGraphInterface vG)
+	private void CreateDialog(VSubgraph originalSubgraph, VGraphInterface vG, BitSet preNodes, BitSet preEdges)
 	{
 		graphref = vG;
 		VSubgraphSet subgraphs;
@@ -128,6 +129,10 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		{
 			this.setTitle("Neuen Untergraphen erstellen");
 			chSubgraph = null;
+			if (preNodes!=null)
+				oldnodes=preNodes;
+			if (preEdges!=null)
+				oldedges=preEdges;
 		}
 		else
 		{
@@ -252,13 +257,10 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		bOK.addActionListener(this);
 		content.add(bOK,c);
 
-
-		
 		Colorfield.setBackground(oldcolor);
 		//Werte einfuegen
 		iSubgraphIndex.setValue(oldindex);
 		iSubgraphName.setText(oldname);	
-		
 		this.getRootPane().setDefaultButton(bOK);
 		setResizable(false);
 		this.setModal(true);
@@ -268,7 +270,6 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		p.x += Math.round(Gui.getInstance().getParentWindow().getWidth()/2);
 		p.y -= Math.round(getHeight()/2);
 		p.x -= Math.round(getWidth()/2);
-
 		setLocation(p.x,p.y);
 		this.setVisible(true);
 	}
@@ -384,6 +385,7 @@ public class JSubgraphDialog extends JDialog implements ActionListener, ItemList
 		}
 		if (event.getSource()==bCancel)
 		{
+			this.setVisible(false);
 			this.dispose();
 		}
 		if (event.getSource()==bOK)

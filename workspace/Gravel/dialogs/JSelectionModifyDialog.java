@@ -171,7 +171,6 @@ public class JSelectionModifyDialog extends JDialog implements ActionListener, C
 		graphRef = vhg;
 		InitDialog(arrangeknots, editValues, editValues, WindowTitle);
 	}
-
 	/**
 	 * Initializes the Dialog with the possibility to disable some tabs
 	 * and specify a title for the window

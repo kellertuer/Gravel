@@ -528,14 +528,13 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 	{
 		if (event.getSource()==bCancel)
 		{
-			this.dispose();
+			dispose();
 		}
 		else if (event.getSource()==bOK)
 		{
 			Check();
 		}
 	}
-	
 	public void itemStateChanged(ItemEvent event) 
 	{		
 		for (int i=0; i<SubgraphChecks.length; i++)

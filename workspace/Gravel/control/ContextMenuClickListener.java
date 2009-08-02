@@ -88,7 +88,6 @@ public class ContextMenuClickListener
 		initPopups();
 		updateSubgraphList();
 	}
-
 	public ContextMenuClickListener(VHyperGraphic g)
 	{
 		vgc= g;
@@ -98,7 +97,13 @@ public class ContextMenuClickListener
 		initPopups();
 		updateSubgraphList();
 	}
-
+	public void removeObservers()
+	{
+		if (vg!=null)
+			vg.deleteObserver(this);
+		else if (vhg!=null)
+			vhg.deleteObserver(this);
+	}
 	private void initPopups() {
 		initBackgroundPopup();
 		initNodePopup();
@@ -435,9 +440,45 @@ public class ContextMenuClickListener
 				}
 			} while(colorgone);
 			if (vg!=null)
-				new JSubgraphDialog(vg.getMathGraph().modifySubgraphs.getNextIndex(),gp.getSubgraphName(vg.getMathGraph().modifySubgraphs.getNextIndex()),c,vg);
+			{
+				BitSet selNodes = new BitSet();
+				Iterator<VNode> nodeiter = vg.modifyNodes.getIterator();
+				while (nodeiter.hasNext())
+				{
+					VNode actual = nodeiter.next();
+					if ((actual.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
+						selNodes.set(actual.getIndex());
+				}
+				BitSet selEdges = new BitSet();
+				Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
+				while (edgeiter.hasNext())
+				{
+					VEdge actual = edgeiter.next();
+					if ((actual.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
+						selEdges.set(actual.getIndex());
+				}
+				new JSubgraphDialog(vg.getMathGraph().modifySubgraphs.getNextIndex(),gp.getSubgraphName(vg.getMathGraph().modifySubgraphs.getNextIndex()),c,vg,selNodes,selEdges);
+			}
 			else if (vhg!=null)
-				new JSubgraphDialog(vhg.getMathGraph().modifySubgraphs.getNextIndex(),gp.getSubgraphName(vhg.getMathGraph().modifySubgraphs.getNextIndex()),c,vhg);
+			{
+				BitSet selNodes = new BitSet();
+				Iterator<VNode> nodeiter = vhg.modifyNodes.getIterator();
+				while (nodeiter.hasNext())
+				{
+					VNode actual = nodeiter.next();
+					if ((actual.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
+						selNodes.set(actual.getIndex());
+				}
+				BitSet selEdges = new BitSet();
+				Iterator<VHyperEdge> edgeiter = vhg.modifyHyperEdges.getIterator();
+				while (edgeiter.hasNext())
+				{
+					VHyperEdge actual = edgeiter.next();
+					if ((actual.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)
+						selEdges.set(actual.getIndex());
+				}
+				new JSubgraphDialog(vhg.getMathGraph().modifySubgraphs.getNextIndex(),gp.getSubgraphName(vhg.getMathGraph().modifySubgraphs.getNextIndex()),c,vhg,selNodes,selEdges);
+			}
 		}
 	}
 
