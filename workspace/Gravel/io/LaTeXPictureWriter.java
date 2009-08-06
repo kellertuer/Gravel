@@ -291,7 +291,7 @@ public class LaTeXPictureWriter implements TeXWriter {
 	private String drawOneHyperedgeLine(VHyperEdge actual, double distancefromline)
 	{
  		GeneralPath p = actual.getLinestyle().modifyPath(actual.getShape().getCurve(10f*sizeppt),actual.getWidth(),1.0d);
- 		PathIterator path = p.getPathIterator(null, 0.005d/sizeppt); 
+ 		PathIterator path = p.getPathIterator(null, 0.0025d/sizeppt); 
 		// 0.005/sizeppt =  = the flatness; reduce if result is not accurate enough!
 		return drawOnePath(path, actual.getWidth(),distancefromline);
 	}

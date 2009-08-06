@@ -871,6 +871,7 @@ public class GraphMLReader {
 				return;
 			}
 			VNode node = parseNodeText(n);
+			pre = "node.name"; //Change pre because i messed up consistency between GP and GraphML
 			gp.setIntValue(pre + "_distance", node.getNameDistance());
 			gp.setIntValue(pre + "_rotation", node.getNameRotation());
 			gp.setIntValue(pre + "_size", node.getNameSize());

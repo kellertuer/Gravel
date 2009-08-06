@@ -3,6 +3,7 @@ package dialogs;
 import io.GeneralPreferences;
 import io.GraphMLReader;
 import io.GraphMLWriter;
+import io.MyTikZPictureWriter;
 import io.PNGWriter;
 import io.GravelMLReader;
 import io.SVGWriter;
@@ -460,12 +461,12 @@ public class JFileDialogs implements Observer
 	    				else if (etexd.IsOnlyFigure())
 	    					type="fig";
 	    				TeXWriter lp;
-//	    				if (etexd.IsPlainTeX())
+	    				if (etexd.IsPlainTeX())
 	    					lp = new LaTeXPictureWriter(vGc,etexd.getSizeX(),type);
-//	    				else
-//	    				{	    			
-//	    					lp = new MyTikZPictureWriter(vGc,etexd.getSizeX(),type);
-//	    				}
+	    				else
+	    				{	    			
+	    					lp = new MyTikZPictureWriter(vGc,etexd.getSizeX(),type);
+	    				}
 	    				String error = lp.saveToFile(f);
 		    			if (error.equals(""))
 		    				return true;

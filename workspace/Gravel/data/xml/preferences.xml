@@ -19,7 +19,7 @@
 		<value name="arrow_alpha" type="Integer">38</value>
 		<value name="arrow_alpha" type="Float">0.0</value>
 		<value name="arrow_part" type="Float">0.75</value>
-		<value name="arrow_pos" type="Float">1.0</value>
+		<value name="arrow_pos" type="Float">0.0</value>
 		<value name="arrow_size" type="Integer">10</value>
 		<value name="arrpart" type="Integer">75</value>
 		<value name="arrpos" type="Integer">100</value>
@@ -48,11 +48,11 @@
 		<value name="width" type="Integer">1</value>
 	</group>
 	<group name="graph">
-		<value name="allowloops" type="Boolean">false</value>
-		<value name="allowmultiple" type="Boolean">false</value>
+		<value name="allowloops" type="Boolean">true</value>
+		<value name="allowmultiple" type="Boolean">true</value>
 		<value name="directed" type="Boolean">true</value>
 		<value name="fileformat" type="String">visual</value>
-		<value name="lastfile" type="String">$NONE</value>
+		<value name="lastfile" type="String">/Users/ronny/Graveltemp/HyperGraphs/aehx.xml</value>
 		<value name="loadfileonstart" type="Boolean">true</value>
 	</group>
 	<group name="grid">

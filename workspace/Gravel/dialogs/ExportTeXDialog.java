@@ -127,14 +127,13 @@ public class ExportTeXDialog extends JDialog implements ActionListener, CaretLis
 		TypeChoice.add(rPlainTeX);
 		TypeChoice.add(rTikZ);
 		rPlainTeX.setSelected(true);
-		//TODO: Enable TikZ-Export again, when it's finished
-		//content.add(rPlainTeX,c);
-		//c.gridx++;
-		//content.add(rTikZ,c);		
-		//c.gridy++;
+		content.add(rPlainTeX,c);
+		c.gridx++;
+		content.add(rTikZ,c);		
+		c.gridy++;
 		c.gridx = 0;
 		c.gridwidth=3;
-		content.add(new JLabel("<html><b>Achtung</b> : Im TeX-Picture-Export werden Farben ignoriert.<br>Schriftgr"+main.CONST.html_oe+main.CONST.html_sz+"en k"+main.CONST.html_oe+"nnen leicht varriieren, da TeX einen anderen Font verwendet.</html>"),c);
+		content.add(new JLabel("<html><b>Achtung</b> : Im normalen TeX-Picture-Export werden Farben ignoriert.<br>Schriftgr"+main.CONST.html_oe+main.CONST.html_sz+"en k"+main.CONST.html_oe+"nnen leicht varriieren, da TeX einen anderen Font verwendet.<br>Im TikZ-Export werden Schriftgrößen ignoriert.</html>"),c);
 		c.gridy++;
 		c.gridx = 1;
 		ButtonGroup b = new ButtonGroup();
