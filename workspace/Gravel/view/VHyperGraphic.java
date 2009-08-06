@@ -434,7 +434,7 @@ public class VHyperGraphic extends VCommonGraphic
 			{
 				NURBSShape s = temp.getShape().stripDecorations().clone();
 				s.scale(zoomfactor);
-				GeneralPath p = s.getCurve(5d/(double)zoomfactor);
+				GeneralPath p = s.getCurve(Math.min(2.5d,5d/(double)zoomfactor));
 				if ((((temp.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED)||((temp.getSelectedStatus()&VItem.SOFT_SELECTED)==VItem.SOFT_SELECTED))&&((temp.getSelectedStatus()&VItem.SOFT_DESELECTED)!=VItem.SOFT_DESELECTED))
 				{
 					//Falls die Kante Selektiert ist (und nicht temporär deselektiert, zeichne drunter eine etwas dickere Kante in der selectioncolor

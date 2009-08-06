@@ -69,7 +69,7 @@ public class NURBSShapeValidator extends NURBSShape {
 				return "PointInfo: Node #"+nodeIndex+" is in Set "+set+" and distance "+radius+" to Curve (C(u) = "+projectionPoint;					
 		}
 	}
-	private final double TOL = 0.01d, MINRAD = 1d;
+	private final double TOL = 0.025d, MINRAD = 1d;
 	float zoom = GeneralPreferences.getInstance().getFloatValue("zoom");
 	private Point2D CPOutside;
 	//Points we have to work on 

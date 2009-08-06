@@ -113,6 +113,8 @@ public class MyTikZPictureWriter implements TeXWriter {
 			s.write("%"+NL+"%   This Document is minimized in its usage of packages"+NL);
 			s.write(NL+"\\documentclass[a4paper, DIV=calc]{scrartcl}"+NL);
 			s.write("\\usepackage{tikz,xcolor}"+NL);
+			s.write("\\usepackage[utf8]{inputenc}"+NL);
+			s.write("\\usepackage[T1]{fontenc}"+NL);
 			produceColors(s);
 			s.write(NL+"\\providecolor{black}{rgb}{0,0,0}"+NL);
 			s.write(NL+"\\begin{document}");
@@ -314,9 +316,9 @@ public class MyTikZPictureWriter implements TeXWriter {
 	    	   VHyperEdge actual = hyperedgeiter.next();
 	    	   MHyperEdge me = mhyperedges.get(actual.getIndex());
 			   //Mittlere Linie der Kante...immer Zeichnen
-	    	   
-	    		GeneralPath p = actual.getShape().getCurve(10f/pixelpercm);
-	     		PathIterator path = p.getPathIterator(null, 2.5d/pixelpercm); 
+	    	   double res = Math.max(0.25d,75d/pixelpercm);
+	    		GeneralPath p = actual.getShape().getCurve(res);
+	     		PathIterator path = p.getPathIterator(null, 5d/pixelpercm); 
 	    		// 0.005/sizeppt =  = the flatness; reduce if result is not accurate enough!
 	    		s.write(drawOnePath(path, actual.getWidth(),produceColor(actual),produceLineSpec(actual.getLinestyle(),actual.getWidth())));
 
