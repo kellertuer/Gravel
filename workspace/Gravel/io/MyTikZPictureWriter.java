@@ -341,7 +341,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	       }//End while hyperedges.hasNext()
 	}
 
-	private String drawOnePath(PathIterator path, int linewidth, String ColorSpec, String LineSpec)
+	public String drawOnePath(PathIterator path, int linewidth, String ColorSpec, String LineSpec)
 	{
 		String s ="";
 	   	double[] coords = new double[2];
@@ -357,8 +357,13 @@ public class MyTikZPictureWriter implements TeXWriter {
 		    	{
 		    		if (!start)
 		    			s +=";";
-	    			s +=NL+"\\path["+LineSpec+",draw="+ColorSpec+", line width="+(((double)linewidth)/pixelpercm)+"cm] "
-	    			   +   " ("+(x-offset.x)/pixelpercm+","+(max.y-y)/pixelpercm+")";
+		    		s +=NL+"\\path["+LineSpec+",draw="+ColorSpec+", line width=";
+		    		if (linesinPT)
+		    			s += linewidth+"pt";
+		    		else
+		    			s += (((double)linewidth)/pixelpercm)+"cm";
+		    		
+		    		s+= "] ("+(x-offset.x)/pixelpercm+","+(max.y-y)/pixelpercm+")";
 		    	}
 		    	else if (type==PathIterator.SEG_LINETO)	
 		    	{
@@ -433,6 +438,18 @@ public class MyTikZPictureWriter implements TeXWriter {
 	private String drawCircle(double x, double y, double s, String color)
 	{	
 		return NL+"\\fill[fill="+color+"] ("+x+","+y+") circle ("+s+");";
+	}
+	public String drawCircle(double x, double y, double s, String fillcolor,String drawcolor)
+	{	
+		double x1 = (x-offset.getX())/pixelpercm;
+		double y1 = (max.getY()-y)/pixelpercm;
+		if (fillcolor.equals(""))
+			return NL+"\\fill[draw="+drawcolor+"] ("+x1+","+y1+") circle ("+s+");";
+		else if (drawcolor.equals(""))
+			return NL+"\\fill[fill="+fillcolor+"] ("+x1+","+y1+") circle ("+s+");";			
+		
+		return NL+"\\fill[fill="+fillcolor+",draw="+drawcolor+"] ("+x1+","+y1+") circle ("+s+");";			
+		
 	}
 	/* (non-Javadoc)
 	 * @see io.TeXWriter#isWholeDoc()

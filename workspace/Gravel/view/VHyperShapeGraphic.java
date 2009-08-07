@@ -1,7 +1,5 @@
 package view;
 
-
-
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
@@ -271,17 +269,17 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			{
 				Point2D Start = tempshape.CurveAt(t.getStart());
 				Point p2 = new Point(Math.round((float)Start.getX()),Math.round((float)Start.getY()));
-				this.drawCP(g2, p2, selColor.darker());
+				this.drawCP(g2, p2, Color.BLUE);
 			}
 			if (!Double.isNaN(t.getEnd()))
 			{
 				Point2D End = tempshape.CurveAt(t.getEnd());
 				Point p2 = new Point(Math.round((float)End.getX()),Math.round((float)End.getY()));
-				this.drawCP(g2, p2, selColor.darker());
+				this.drawCP(g2, p2, Color.BLUE);
 			}
-			Point2D StartCurve = tempshape.CurveAt(tempshape.Knots.get(tempshape.getDegree()));
-			Point p2 = new Point(Math.round((float)StartCurve.getX()),Math.round((float)StartCurve.getY()));
-			this.drawCP(g2, p2, Color.GREEN);
+		//	Point2D StartCurve = tempshape.CurveAt(tempshape.Knots.get(tempshape.getDegree()));
+		//	Point p2 = new Point(Math.round((float)StartCurve.getX()),Math.round((float)StartCurve.getY()));
+		//	this.drawCP(g2, p2, Color.GREEN);
 		}
 		if (!secondModus.dragged())
 			return; //Draw all other stuff only while drag
