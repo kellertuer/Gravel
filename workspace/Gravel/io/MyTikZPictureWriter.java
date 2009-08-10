@@ -91,6 +91,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 		offset = vg.getMinPoint(vgc.getGraphics());
 		max = vg.getMaxPoint(vgc.getGraphics());
 		linesinPT = scalelines;
+//		System.err.println(pixelpercm);
 	}
 	/**
 	 * Starts the LaTeX-Export with some parameters
@@ -281,7 +282,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	    		int start = me.StartIndex;
 	    		int ende = me.EndIndex;
 	    		GeneralPath p = actual.getPath(nodes.get(start).getPosition(),nodes.get(ende).getPosition(),1.0f); //without zoom nor line style!
-	    		PathIterator path = p.getPathIterator(null, 0.005d/pixelpercm); 
+	    		PathIterator path = p.getPathIterator(null, 5d/pixelpercm); 
 	    		s.write(NL+drawOnePath(path, actual.getWidth(), produceColor(actual), produceLineSpec(actual.getLinestyle(),actual.getWidth())));
 	    		//edge text
 		    	if (actual.getTextProperties().isVisible()) //draw name
@@ -318,7 +319,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 			   //Mittlere Linie der Kante...immer Zeichnen
 	    	   double res = Math.max(0.25d,75d/pixelpercm);
 	    		GeneralPath p = actual.getShape().getCurve(res);
-	     		PathIterator path = p.getPathIterator(null, 5d/pixelpercm); 
+	     		PathIterator path = p.getPathIterator(null, 0.5d/pixelpercm); 
 	    		// 0.005/sizeppt =  = the flatness; reduce if result is not accurate enough!
 	    		s.write(drawOnePath(path, actual.getWidth(),produceColor(actual),produceLineSpec(actual.getLinestyle(),actual.getWidth())));
 

@@ -282,7 +282,7 @@ public class GraphMLWriter {
 	    			noStdRot = (actual.getNameRotation()!=gp.getIntValue("node.name_rotation")),
 	    			noStdSize = (actual.getNameSize()!=gp.getIntValue("node.name_size")),
 	    			noStdVis =  (actual.isNameVisible()!=gp.getBoolValue("node.name_visible"));
-	    	if (noStdDist||noStdRot||noStdSize) //Do we need a nodename element?
+	    	if (noStdDist||noStdRot||noStdSize||noStdVis) //Do we need a nodename element?
 	    	{
 	    		s.write("\t\t\t<data key=\"nodetext\"><nodetext");
 	    		if (noStdDist)
