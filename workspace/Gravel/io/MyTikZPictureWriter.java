@@ -322,23 +322,24 @@ public class MyTikZPictureWriter implements TeXWriter {
 	     		PathIterator path = p.getPathIterator(null, 0.5d/pixelpercm); 
 	    		// 0.005/sizeppt =  = the flatness; reduce if result is not accurate enough!
 	    		s.write(drawOnePath(path, actual.getWidth(),produceColor(actual),produceLineSpec(actual.getLinestyle(),actual.getWidth())));
-
-			   //edge text
-	    		VEdgeText t = actual.getTextProperties();
-	    		Point m = actual.getTextCenter();
-	    		//get the text wich should be displayd
-			    String text = "";
-			    if (t.isshowvalue())
-					text = ""+me.Value;
-			    else
-			    	text = edgenames.get(actual.getIndex());
-	    		//mittelpunkt des Textes
-				double x = (m.getX()-offset.getX())/pixelpercm;
-				//Invert y
-				double y = (max.getY() - m.getY())/pixelpercm;
-				//TODO Size?
-	    		s.write("\\pgftext[x="+x+"cm,y="+y+"cm]{"+formname(text)+"}");
-			   //Nun die Liniendicke aufbauen
+	    		if (actual.getTextProperties().isVisible())
+	    		{
+	    			//edge text
+	    			VEdgeText t = actual.getTextProperties();
+	    			Point m = actual.getTextCenter();
+	    			//get the text wich should be displayd
+	    			String text = "";
+	    			if (t.isshowvalue())
+	    				text = ""+me.Value;
+	    			else
+	    				text = edgenames.get(actual.getIndex());
+	    			//mittelpunkt des Textes
+	    			double x = (m.getX()-offset.getX())/pixelpercm;
+	    			//Invert y
+	    			double y = (max.getY() - m.getY())/pixelpercm;
+	    			//TODO Size?
+	    			s.write("\\pgftext[x="+x+"cm,y="+y+"cm]{"+formname(text)+"}");
+	    		}
 	       }//End while hyperedges.hasNext()
 	}
 

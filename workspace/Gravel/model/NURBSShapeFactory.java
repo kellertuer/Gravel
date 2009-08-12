@@ -656,7 +656,7 @@ public class NURBSShapeFactory {
 	 */
 	private static NURBSShape CreateConvexHullPolygon(Vector<Point2D> nodes, Vector<Integer> sizes, int degree, double distance)
 	{
-		if (nodes.size()<1) //mindestens 3 Knoten nötig
+		if (nodes.size()<=1) //mindestens 3 Knoten nötig
 			return new NURBSShape();
 		if (nodes.size()==2) //Create Line, nonperiodic
 		{

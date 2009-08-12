@@ -131,6 +131,8 @@ public class NURBSShapeProjection extends NURBSShape
 					//take a look at where the minimum in the qcCP was and take the startvalue inside actual [umin,umax]
 					//(+1 and +2 ensures INSIDE umax-umin) and the first Method can't return -1 because we took min from the qcCP
 					double startvalue = umin + (double)(qcControlPoints.indexOf(min)+1)/((double)qcControlPoints.size()+2)*(umax-umin);
+	//				System.err.println("Starting Newton on ["+umin+","+umax+"] with startvalue "+startvalue);
+					
 					double candidate_u = NewtonIteration(actualPart.clone(), startvalue, p);
 					candidates.add(candidate_u);
 //					System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
