@@ -78,6 +78,7 @@ public class KnotModificationMouseHandler implements ShapeModificationMouseHandl
 		remove = ((i&VCommonGraphic.REMOVE) > 0);
 		if (add&&remove)
 			remove = false;
+		internalReset();
 	}
 
 	public Point2D getDragStartPoint()
@@ -181,8 +182,10 @@ public class KnotModificationMouseHandler implements ShapeModificationMouseHandl
 			{
 				HyperEdgeRef.setShape(temporaryShape);
 				resetShape();
-				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
+				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
+//				vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
 			}
+			internalReset();
 		}
 	}
 	public Point getMouseOffSet() {

@@ -374,7 +374,7 @@ public class VHyperShapeGraphic extends VHyperGraphic
 				if (listenerclasschanged)
 					secondModus = new KnotModificationMouseHandler(state&DETAIL_MASK, vG, highlightedHyperEdge);
 				else //Just update State
-					((KnotModificationMouseHandler)secondModus).setModificationState(state&(DETAIL_MASK));
+					((KnotModificationMouseHandler)secondModus).setModificationState(state&DETAIL_MASK);
 			break;
 			case NO_MOUSEHANDLING:
 			default:

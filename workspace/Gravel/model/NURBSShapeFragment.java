@@ -410,7 +410,8 @@ public class NURBSShapeFragment extends NURBSShape {
 		}
 		//Copy needed Knots
 		Vector<Double> newKnots = new Vector<Double>();
-		newKnots.add(u1);
+		if ((u1!=origCurve.Knots.get(origCurve.degree))||(origCurve.getType()!=NURBSShape.CLAMPED))
+			newKnots.add(u1);
 		int index = 0;
 		while (subcurve.Knots.get(index)<u1)
 			index++;
@@ -419,7 +420,8 @@ public class NURBSShapeFragment extends NURBSShape {
 			newKnots.add(subcurve.Knots.get(index).doubleValue());
 			index++;
 		}
-		newKnots.add(u2);
+		if ((u2!=origCurve.Knots.get(origCurve.maxKnotIndex-origCurve.degree))||(origCurve.getType()!=NURBSShape.CLAMPED))
+			newKnots.add(u2);
 		NURBSShape c = new NURBSShape(newKnots,newCP,newWeight);
 		return c;
 	}
