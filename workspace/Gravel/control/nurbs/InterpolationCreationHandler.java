@@ -125,6 +125,11 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		DragOriginIndex=-1;
 		resetShape();
 	}
+	/**
+	 * Returns the index of the Point that is within selection width of the given Point p
+	 * @param p
+	 * @return
+	 */
 	private int containsPoint(Point2D p)
 	{
 		Iterator<Point2D> iter = InterpolationPoints.iterator();
@@ -259,19 +264,36 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 	public void mouseExited(MouseEvent e) {}
 	public void mouseClicked(MouseEvent e)
 	{
-		//New Point without Zoom
 		Point2D.Double newPoint = new Point2D.Double((double)e.getPoint().x/((double)vgc.getZoom()/100d),(double)e.getPoint().y/((double)vgc.getZoom()/100));
-		if (containsPoint(newPoint)!=-1) //Do not add twice
-			return;
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
-		if (PointAdditionStatus==NURBSCreationMessage.ADD_END)
-			InterpolationPoints.add((Point2D.Double) newPoint.clone()); 
-		else
-			InterpolationPoints.add(getSecondOfNearestPair(InterpolationPoints,newPoint), (Point2D) newPoint.clone());
-		
-		updateShape();
-		vhg.modifyHyperEdges.get(hyperedgeindex).setShape(lastshape);
-		vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));			
+		if ( ((e.getModifiers()&MouseEvent.BUTTON1_MASK)>0) && ((e.getModifiers()&MouseEvent.CTRL_MASK)==0)) //Left click
+		{
+			//New Point without Zoom
+			if (containsPoint(newPoint)!=-1) //Do not add twice
+				return;
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
+			if (PointAdditionStatus==NURBSCreationMessage.ADD_END)
+				InterpolationPoints.add((Point2D.Double) newPoint.clone()); 
+			else
+				InterpolationPoints.add(getSecondOfNearestPair(InterpolationPoints,newPoint), (Point2D) newPoint.clone());
+			
+			updateShape();
+			vhg.modifyHyperEdges.get(hyperedgeindex).setShape(lastshape);
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
+		}
+		//Only react, if Right Click or Strg+Left Click
+		else if ( ((e.getModifiers()&MouseEvent.BUTTON3_MASK) > 0) || ( (e.getModifiers()& (MouseEvent.BUTTON1_MASK|MouseEvent.CTRL_MASK))>0) ) //Right or crtl+Click
+		{
+			int index = containsPoint(newPoint);
+			if (index==-1)
+				return;
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
+
+			InterpolationPoints.remove(index);
+			
+			updateShape();
+			vhg.modifyHyperEdges.get(hyperedgeindex).setShape(lastshape);
+			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
+		}
 	}	
 	public Point getMouseOffSet() {
 		return MouseOffSet;
