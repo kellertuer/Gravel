@@ -52,7 +52,7 @@
 		<value name="allowmultiple" type="Boolean">true</value>
 		<value name="directed" type="Boolean">false</value>
 		<value name="fileformat" type="String">visual</value>
-		<value name="lastfile" type="String">/Users/ronny/Graveltemp/HyperGraphs/convex.hull.xml</value>
+		<value name="lastfile" type="String">/Users/ronny/Graveltemp/HyperGraphs/aehx.xml</value>
 		<value name="loadfileonstart" type="Boolean">true</value>
 	</group>
 	<group name="grid">

@@ -30,7 +30,7 @@ import javax.vecmath.Point3d;
  */
 public class NURBSShape {
 
-	public final int CLAMPED = 0;
+	public final static int CLAMPED = 0;
 	public final static int UNCLAMPED = 1;
 	
 	public final static int NO_DECORATION = 0;

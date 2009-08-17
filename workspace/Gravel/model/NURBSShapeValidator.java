@@ -147,7 +147,7 @@ public class NURBSShapeValidator extends NURBSShape {
 					}
 				}
 			}
-			if (getType()==this.CLAMPED)
+			if (getType()==NURBSShape.CLAMPED)
 			{	
 				if (Start.distance(node1)<=size1) //First fits
 				{
@@ -191,6 +191,7 @@ public class NURBSShapeValidator extends NURBSShape {
 		initPointSets(vG);
 		
 		//Number of Projections made, 
+		boolean united=false;
 		int i=0;
 		//MaxSize of any circle used, because a circle with this radius is much bigger than the whole graph
 		//We need something to mearue font-size so...
@@ -200,12 +201,15 @@ public class NURBSShapeValidator extends NURBSShape {
 		Point MinPoint = vG.getMinPoint(g2);
 		int maxSize = Math.max(MaxPoint.x-MinPoint.x, MaxPoint.y-MinPoint.y);
 		//Check each Intervall, whether we are done
-		int checkIntervall = Points.size();
+//		int checkIntervall = Points.size();
 		boolean running=true;
 		
 		while (!Points.isEmpty()&&running) 
 		{
+			i++;
 			Point2D actualP = Points.poll();
+			if ((actualP.getX()==231.15877616630252) &&(actualP.getY()==287.56740125032775))
+				System.err.println("hm?");
 			PointInfo actualInfo = pointInformation.get(actualP);
 			if ((Double.isNaN(actualInfo.radius))||(actualInfo.projectionPoint==null))
 			{
@@ -215,7 +219,6 @@ public class NURBSShapeValidator extends NURBSShape {
 			}
 			if ((actualInfo.radius < maxSize)&&(actualInfo.radius > MINRAD))
 			{	
-				i++;
 				g2.setColor(Color.gray);
 				g2.drawOval(Math.round((float)(actualP.getX()-actualInfo.radius)*zoom),
 					Math.round((float)(actualP.getY()-actualInfo.radius)*zoom),
@@ -238,7 +241,11 @@ public class NURBSShapeValidator extends NURBSShape {
 							int a = actEntry.getValue().set;
 							int b = actualInfo.set;
 							if (a!=b) //not in the same set yet -> Union of both sets in the minimum (sameset)
+							{
+								System.err.println("Joining "+a+" "+b);
 								UnionSets(a,b);
+								united=true;
+							}
 						}
 					}
 				}
@@ -264,8 +271,9 @@ public class NURBSShapeValidator extends NURBSShape {
 						pointInformation.get(Succ.get(j)).split = actualInfo.split | ((Succ.size()>=2)&&(actualInfo.previousPoint!=null));							
 					}
 				}
-				if ((i%checkIntervall)==0)
+				if (united)
 				{
+					united=false;
 					System.err.print(i+"   -  ");
 					boolean valid = CheckSet(vG, HyperEdgeIndex);
 					Iterator<MNode> nodeiter = vG.getMathGraph().modifyNodes.getIterator();
