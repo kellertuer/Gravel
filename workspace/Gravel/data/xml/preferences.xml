@@ -17,9 +17,9 @@
 	<group name="edge">
 		<value name="arralpha" type="Integer">40</value>
 		<value name="arrow_alpha" type="Integer">38</value>
-		<value name="arrow_alpha" type="Float">0.0</value>
+		<value name="arrow_alpha" type="Float">1.0</value>
 		<value name="arrow_part" type="Float">0.75</value>
-		<value name="arrow_pos" type="Float">0.0</value>
+		<value name="arrow_pos" type="Float">1.0</value>
 		<value name="arrow_size" type="Integer">10</value>
 		<value name="arrpart" type="Integer">75</value>
 		<value name="arrpos" type="Integer">100</value>
@@ -52,7 +52,7 @@
 		<value name="allowmultiple" type="Boolean">true</value>
 		<value name="directed" type="Boolean">false</value>
 		<value name="fileformat" type="String">visual</value>
-		<value name="lastfile" type="String">/Users/ronny/Graveltemp/--t1.xml</value>
+		<value name="lastfile" type="String">/Users/ronny/Graveltemp/tutorialpetersen.xml</value>
 		<value name="loadfileonstart" type="Boolean">true</value>
 	</group>
 	<group name="grid">
@@ -81,11 +81,11 @@
 		<value name="width" type="Integer">1</value>
 	</group>
 	<group name="node">
-		<value name="name" type="String">v_{$ID}</value>
+		<value name="name" type="String">$ID</value>
 		<value name="name_distance" type="Integer">18</value>
 		<value name="name_rotation" type="Integer">270</value>
 		<value name="name_size" type="Integer">12</value>
-		<value name="name_visible" type="Boolean">false</value>
+		<value name="name_visible" type="Boolean">true</value>
 		<value name="size" type="Integer">9</value>
 		<value name="text_distance" type="Integer">18</value>
 		<value name="text_rotation" type="Integer">270</value>

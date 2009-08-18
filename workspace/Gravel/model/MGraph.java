@@ -76,7 +76,7 @@ public class MGraph extends Observable implements Observer, MGraphInterface
 		while (n2.hasNext())
 		{
 			MNode actualNode = n2.next();
-			MNode Nodeclone = new MNode(actualNode.index, actualNode.name);
+			MNode Nodeclone = actualNode.clone();
 			clone.modifyNodes.add(Nodeclone);
 			//In alle Sets einfuegen
 			n1 = modifySubgraphs.getIterator();
@@ -92,7 +92,7 @@ public class MGraph extends Observable implements Observer, MGraphInterface
 		while (n3.hasNext())
 		{
 			MEdge actualEdge = n3.next();
-			MEdge cEdge = new MEdge(actualEdge.index, actualEdge.StartIndex, actualEdge.EndIndex, actualEdge.Value, actualEdge.name);
+			MEdge cEdge = actualEdge.clone();
 			clone.modifyEdges.add(cEdge);
 			//In alle Sets einfuegen
 			n1 = modifySubgraphs.getIterator();

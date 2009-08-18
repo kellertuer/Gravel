@@ -216,7 +216,7 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 		while (n2.hasNext())
 		{
 			VNode nodeclone = n2.next().clone();
-			clone.modifyNodes.add(nodeclone, mG.modifyNodes.get(nodeclone.getIndex()));
+			clone.modifyNodes.add(nodeclone, mG.modifyNodes.get(nodeclone.getIndex()).clone());
 			//In alle Sets einfuegen
 			n1 = modifySubgraphs.getIterator();
 			while (n1.hasNext())

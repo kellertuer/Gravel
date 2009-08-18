@@ -331,7 +331,7 @@ public class VGraph extends Observable implements VGraphInterface {
 		while (n2.hasNext())
 		{
 			VNode nodeclone = n2.next().clone();
-			clone.modifyNodes.add(nodeclone, mG.modifyNodes.get(nodeclone.getIndex()));
+			clone.modifyNodes.add(nodeclone, mG.modifyNodes.get(nodeclone.getIndex()).clone());
 			//In alle Sets einfuegen
 			n1 = modifySubgraphs.getIterator();
 			while (n1.hasNext())
@@ -346,7 +346,7 @@ public class VGraph extends Observable implements VGraphInterface {
 		while (n3.hasNext())
 		{
 			VEdge cloneEdge = n3.next().clone();
-			MEdge me = mG.modifyEdges.get(cloneEdge.getIndex());
+			MEdge me = mG.modifyEdges.get(cloneEdge.getIndex()).clone();
 			clone.modifyEdges.add(cloneEdge, me, modifyNodes.get(me.StartIndex).getPosition(), modifyNodes.get(me.EndIndex).getPosition());
 			//In alle Sets einfuegen
 			n1 = modifySubgraphs.getIterator();

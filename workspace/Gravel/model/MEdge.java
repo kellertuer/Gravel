@@ -33,4 +33,8 @@ public class MEdge	{
 		Value = v;
 		name = n;
 	}
+	public MEdge clone()
+	{
+		return new MEdge (index,StartIndex,EndIndex,Value, new String(name.toCharArray()));
+	}
 }

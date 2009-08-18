@@ -12,4 +12,8 @@ public class MNode {
 		index = i;
 		name = n;
 	}
+	public MNode clone()
+	{
+		return new MNode(index,new String(name.toCharArray()));
+	}
 }

@@ -32,7 +32,7 @@ public class MHyperEdge {
 	 */
 	public MHyperEdge clone()
 	{
-		MHyperEdge c = new MHyperEdge(index, Value, name);
+		MHyperEdge c = new MHyperEdge(index, Value, new String(name.toCharArray()));
 		for (int i=0; i < EndNodes.size(); i++)
 			if (EndNodes.get(i))
 				c.addNode(i);

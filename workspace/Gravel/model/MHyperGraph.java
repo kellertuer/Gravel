@@ -61,7 +61,7 @@ public class MHyperGraph extends Observable implements Observer, MGraphInterface
 		while (n2.hasNext())
 		{
 			MNode actualNode = n2.next();
-			MNode Nodeclone = new MNode(actualNode.index, actualNode.name);
+			MNode Nodeclone = actualNode.clone();
 			clone.modifyNodes.add(Nodeclone);
 			//In alle Sets einfuegen
 			n1 = modifySubgraphs.getIterator();
