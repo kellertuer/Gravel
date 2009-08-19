@@ -366,7 +366,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				default : {return;}
 			}
 			msg +="</html>";
-			int answer  = JOptionPane.showConfirmDialog(this,msg,"L"+main.CONST.html_oe+"schen best"+main.CONST.html_ae+"tigen", JOptionPane.YES_NO_OPTION); 
+			int answer  = JOptionPane.showConfirmDialog(this,msg,"L"+main.CONST.utf8_oe+"schen best"+main.CONST.utf8_ae+"tigen", JOptionPane.YES_NO_OPTION); 
 			   if ( answer == JOptionPane.YES_OPTION ) //wirklich löschen !
 			   {
 				   switch (ParentType) //Wo war das zuletzt

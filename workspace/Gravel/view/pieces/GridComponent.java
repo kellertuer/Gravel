@@ -387,6 +387,8 @@ public class GridComponent extends Observable implements ChangeListener, ActionL
 			gp.setIntValue("grid.y",valuey);
 			bOk.setVisible(false);
 			bCancel.setVisible(false);
+			setChanged();
+			notifyObservers("Grid");
 			GridDialog.dispose();
 		}
 		else if (e.getSource()==bCancel)

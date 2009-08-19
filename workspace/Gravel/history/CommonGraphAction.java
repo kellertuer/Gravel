@@ -32,9 +32,9 @@ public abstract class CommonGraphAction {
 		if ((environment.getType()==VGraphInterface.HYPERGRAPH)&&(((VHyperGraph)environment).modifyNodes.get(o.getIndex())==null))
 			throw new GraphActionException("Could not Create Action: Environment must contains at least the node itself.");			
 		if (environment.getType()==VGraphInterface.GRAPH)
-			mn = ((VGraph)environment).getMathGraph().modifyNodes.get(o.getIndex());
+			mn = ((VGraph)environment).getMathGraph().modifyNodes.get(o.getIndex()).clone();
 		else if (environment.getType()==VGraphInterface.HYPERGRAPH)
-			mn = ((VHyperGraph)environment).getMathGraph().modifyNodes.get(o.getIndex());
+			mn = ((VHyperGraph)environment).getMathGraph().modifyNodes.get(o.getIndex()).clone();
 		else //Unknown Type
 			throw new GraphActionException("Could not Create Action: Environmental Graphtype unknown.");					
 		ActionObject = o;

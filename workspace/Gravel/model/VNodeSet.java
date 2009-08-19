@@ -166,11 +166,10 @@ public class VNodeSet extends Observable implements Observer {
 	 */
 	public void replace(VNode node, MNode mnode)
 	{
-		if ((node==null)||(mnode==null))
-			return;
 		if (mnode.index!=node.getIndex())
 			mnode.index = node.getIndex();
 		mnodes.replace(new MNode(node.getIndex(), mnode.name));
+
 		node = node.clone(); //Clone node to lose color
 		NodeLock.lock(); //Knoten finden
 		try

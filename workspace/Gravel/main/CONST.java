@@ -7,7 +7,7 @@ package main;
 public class CONST {
 
 	public final static String version = "0.4";
-	public final static String lastchanged = "12. September 2009";
+	public final static String lastchanged = "19. August 2009";
 	
 	public final static String html_ae = "&auml;";
 	public final static String html_oe = "&ouml;";

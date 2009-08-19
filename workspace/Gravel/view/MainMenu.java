@@ -574,8 +574,8 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     	    	GridComponent g = new GridComponent();
     	    	graphpart.addPiece("Grid",g);
     	    	g.showDialog(true);
-    	    	
     	    	graphpart.removePiece("Grid");
+    	    	graphpart.requestFocus();
     	    } else 
     	    if (item == mAVTest)
     		{

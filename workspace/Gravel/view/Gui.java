@@ -106,9 +106,9 @@ public class Gui implements WindowListener
 		else
 		{
 			//don't load a Graph on start
-		//	MainGraph = new VGraph(gp.getBoolValue("graph.directed"),gp.getBoolValue("graph.allowloops"),gp.getBoolValue("graph.allowmultiple"));			
+			MainGraph = new VGraph(gp.getBoolValue("graph.directed"),gp.getBoolValue("graph.allowloops"),gp.getBoolValue("graph.allowmultiple"));			
 		//For Debug Start with a HyperGraph	
-			MainGraph = new VHyperGraph();
+		//	MainGraph = new VHyperGraph();
 		}
         frame.addWindowListener(this);        
         BorderLayout test = new BorderLayout();
@@ -227,9 +227,14 @@ public class Gui implements WindowListener
         rightside.setPreferredSize(new Dimension(mainPanel.getBounds().getSize().width - graphpart.getBounds().getSize().width,mainPanel.getBounds().getSize().height - graphpart.getBounds().getSize().height));
         rightside.setResizeWeight(1.0);
         rightside.validate();
+        frame.validate();
         mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                    mainScroll,rightside/*graphlist*/);
-        mainSplit.setDividerLocation(0.66);
+        mainSplit.validate();
+        mainSplit.setDividerLocation(mainSplit.getSize().width
+        - mainSplit.getInsets().right
+        - mainSplit.getDividerSize()
+        - rightside.getWidth());
         mainSplit.setResizeWeight(1.0);
         mainPanel.add(mainSplit,BorderLayout.CENTER);
         mainPanel.doLayout();
@@ -266,17 +271,21 @@ public class Gui implements WindowListener
         MenuBar.changeVGraph(shapePart);                
         //Das Ganze als Scrollpane
         shapeParameters = new HyperEdgeShapePanel(edge,shapePart);
-        shapeParameters.getContent().setMinimumSize(new Dimension(240,80));
         mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                    shapeScroll,shapeParameters.getContent());
-        mainSplit.setDividerLocation(mainSplit.getSize().width
-                - mainSplit.getInsets().right
-                - mainSplit.getDividerSize()
-                - shapeParameters.getContent().getBounds().width);
-        mainSplit.setResizeWeight(1.0);
+        frame.validate();
+        mainSplit.validate();
+        shapeParameters.getContent().validate();
+        mainSplit.setResizeWeight(1.0); 
         mainPanel.add(mainSplit,BorderLayout.CENTER);
         mainPanel.doLayout();
-        getParentWindow().validate();
+       frame.setMinimumSize(new Dimension(300,200));
+       frame.getContentPane().setMinimumSize(new Dimension(300,200));
+//       mainSplit.setDividerLocation(mainSplit.getSize().width
+//               - mainSplit.getInsets().right
+//               - mainSplit.getDividerSize()
+//               - shapeParameters.getContent().getWidth());
+       getParentWindow().validate();
     }
     /**
      * Show About-Dialog

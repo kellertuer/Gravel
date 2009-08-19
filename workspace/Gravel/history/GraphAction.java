@@ -164,7 +164,7 @@ public class GraphAction extends CommonGraphAction {
 				if (g.modifyEdges.get(e.getIndex())==null) //edge does not exists
 					throw new GraphActionException("Can't replace edge, none there.");
 				ActionObject = g.modifyEdges.get(e.getIndex()).clone(); //save old edge
-				//Save Color of old node
+				//Save Color of old edge
 				Iterator<VSubgraph> esi = g.modifySubgraphs.getIterator();
 				while (esi.hasNext())
 				{
@@ -228,7 +228,7 @@ public class GraphAction extends CommonGraphAction {
 				VNode n = (VNode)ActionObject;	
 				if (g.modifyNodes.get(n.getIndex())!=null) //node exists
 					throw new GraphActionException("Can't create node, already exists.");
-				g.modifyNodes.add(n, mn);
+				g.modifyNodes.add(n, mn.clone());
 				id = n.getIndex();
 				//Recreate all Subgraphs
 				Iterator<VSubgraph> si = envG.modifySubgraphs.getIterator();

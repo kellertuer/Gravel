@@ -86,7 +86,7 @@ public class HyperGraphAction extends CommonGraphAction {
 	public HyperGraphAction(VNode o, int action, VHyperGraph environment) throws GraphActionException
 	{
 		super(o,action,environment);
-		envHG = environment;
+		envHG = environment.clone();
 	}
 	/**
 	 * Create a New Action induced by a Subgraph
@@ -228,7 +228,7 @@ public class HyperGraphAction extends CommonGraphAction {
 				VNode n = (VNode)ActionObject;	
 				if (g.modifyNodes.get(n.getIndex())!=null) //node exists
 					throw new GraphActionException("Can't create node, already exists.");
-				g.modifyNodes.add(n, mn);
+				g.modifyNodes.add(n, mn.clone());
 				id = n.getIndex();
 				//Recreate all Subgraphs
 				Iterator<VSubgraph> si = envHG.modifySubgraphs.getIterator();

@@ -111,7 +111,10 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		HShapeGraphicRef = vhg;
 		cont = new Container();
 		cont.setLayout(new GridBagLayout());
-		cont.setMinimumSize(new Dimension(200,80));
+		Dimension cd = new Dimension(225,80);
+		cont.setMinimumSize(cd);
+		cont.setPreferredSize(cd);
+		cont.setSize(cd);
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(0,2,0,2);
 		c.anchor = GridBagConstraints.NORTH;
@@ -124,10 +127,12 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		cBasicShapeEntries = new DefaultComboBoxModel(BasicShapes);
 		cBasicShape = new JComboBox(cBasicShapeEntries);
 		cBasicShape.setSelectedIndex(0);
-		cBasicShape.setPreferredSize(new Dimension(130, 30));
+		cBasicShape.setPreferredSize(new Dimension(140, 30));
 		cBasicShape.addActionListener(this);
 		BasicShape = new JLabel("<html><p>Grundform</p></html>");
+		c.anchor = GridBagConstraints.CENTER;
 		cont.add(BasicShape,c);
+		c.anchor = GridBagConstraints.NORTH;
 		c.gridx++;
 		cont.add(cBasicShape,c);
 		c.insets = new Insets(0,7,0,7);		
@@ -195,17 +200,20 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 
 		c.gridy++;
 		c.gridx=0;
-		c.insets.top+=5;
 		bCheckShape = new JButton("<html>Pr&uuml;fen</html>");
 		bCheckShape.addActionListener(this);
 		cont.add(bCheckShape,c);
-		c.gridy++;
-		c.insets.top=0;
-		c.gridwidth=1;
-		c.anchor = GridBagConstraints.SOUTHWEST;
+		c2.insets = (Insets) c.insets.clone();
+		c.insets = new Insets(0,0,0,0);
+		Container CancelOk = new Container();
+		CancelOk.setLayout(new GridBagLayout());
+		CancelOk.setMinimumSize(new Dimension(170,20));	
+		c2.gridx=0;
+		c2.gridy=0;
+		c2.anchor = GridBagConstraints.SOUTHWEST;
 		bCancel = new JButton("Abbrechen");
 		bCancel.addActionListener(this);
-		cont.add(bCancel,c);
+		CancelOk.add(bCancel,c2);
 		//Handling Escape as Cancel
 		//Add ESC-Handling
 		InputMap iMap = Gui.getInstance().getParentWindow().getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -221,12 +229,16 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 					bCancel.doClick();
 				}
 		 	});
-		c.gridx++;
-		c.anchor = GridBagConstraints.SOUTHEAST;
-		bOk = new JButton("Anwenden");
+		c2.gridx++;
+		c2.anchor = GridBagConstraints.SOUTHEAST;
+		bOk = new JButton("Ok");
 		bOk.addActionListener(this);
 		bOk.setEnabled(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
-		cont.add(bOk,c);
+		CancelOk.add(bOk,c2);
+
+		c.gridy++;
+		c.anchor=GridBagConstraints.SOUTH;
+		cont.add(CancelOk,c);
 		Gui.getInstance().getParentWindow().getRootPane().setDefaultButton(bOk);
 		
 		cont.validate();
@@ -280,7 +292,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		CircleFields.add(iCRad,c);
 		CircleFields.setBorder(BorderFactory.createTitledBorder("Kreis"));
 //
-		CircleFields.setSize(new Dimension(220,100));
+		CircleFields.setSize(new Dimension(170,100));
 	}
 	private void buildDegreePanel()
 	{
@@ -309,13 +321,16 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		c.gridwidth=2;
 		IPInfo = new JLabel("<html><p>&nbsp;</p></html>");
 		DegreeFields.add(IPInfo,c);
-		DegreeFields.setMinimumSize(new Dimension(220,70));
+		DegreeFields.setMinimumSize(d);
 		DegreeFields.setBorder(BorderFactory.createTitledBorder("Polynomgrad"));
 	}
 	private void buildInterpolationPanel()
 	{
 		InterpolationFields = new JPanel();
 		InterpolationFields.setLayout(new GridBagLayout());
+	    Dimension d = new Dimension(170,80);
+	    InterpolationFields.setSize(d);
+	    InterpolationFields.setPreferredSize(d);
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(5,7,5,7);
 		c.anchor = GridBagConstraints.WEST;
@@ -330,10 +345,9 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		rAddEnd.setSelected(true);
 		bAddIP.add(rAddEnd); bAddIP.add(rAddBetween);
 		InterpolationFields.add(rAddEnd,c);
-		c.gridx++;
+		c.gridy++;
 		InterpolationFields.add(rAddBetween,c);
-		InterpolationFields.setBorder(BorderFactory.createTitledBorder("neue Punkte einfügen"));
-		InterpolationFields.setSize(new Dimension(220,40));
+		InterpolationFields.setBorder(BorderFactory.createTitledBorder("IP einfügen"));
 	}
 	
 	/**
