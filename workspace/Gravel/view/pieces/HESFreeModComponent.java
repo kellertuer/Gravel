@@ -97,6 +97,8 @@ public class HESFreeModComponent implements ActionListener {
 		bLocalSetStart.setVisible(visible);
 		bLocalSetEnd.setVisible(visible);
 		bLocalInvert.setVisible(visible);
+		bIncKnots.setVisible(!visible);
+		bDecKnots.setVisible(!visible);
 	}
 	private void deselectLocalButtons()
 	{
