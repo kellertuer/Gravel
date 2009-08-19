@@ -201,8 +201,9 @@ public class CommonEdgeDragListener
 					movingEdge.setTextProperties(temp.getTextProperties().clone());
 					movingEdge.setArrow(temp.getArrow().clone());
 					MEdge me = vg.getMathGraph().modifyEdges.get(movingEdge.getIndex()).clone();
-					//Exchange
+					//Exchange - places a copy in the graph so we also have to get that bacl
 					vg.modifyEdges.replace(movingEdge,me);
+					movingEdge = vg.modifyEdges.get(movingEdge.getIndex());
 				}
 				else if ((!firstdrag)&&(movingEdge.getEdgeType()==VEdge.QUADCURVE))
 				{
