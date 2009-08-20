@@ -1,5 +1,7 @@
 package view;
 
+import io.GeneralPreferences;
+
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
@@ -63,7 +65,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(firstModus.getSelectionRectangle());
 		}
-	//	paintDEBUG(g2);
+		if (GeneralPreferences.getInstance().getBoolValue("vgraphic.cpshow"))
+			paintControlPolygon(g2);
 	}
 	/**
 	 * @param g
@@ -137,6 +140,28 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		g2.setStroke(new BasicStroke(selSize*zoomfactor,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 		g2.draw(drawSel.getCurve(5d/(double)zoomfactor)); //draw only a preview				
 	}
+	private void paintControlPolygon(Graphics2D g2)
+	{
+		g2.setColor(Color.green.brighter().brighter());
+		NURBSShape s =  vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().stripDecorations().clone();
+		s.scale(zoomfactor);
+		Iterator<Point2D> pi = s.controlPoints.iterator();
+		Point2D last=null, first=null;
+		while (pi.hasNext())
+		{
+			Point2D p = (Point2D) pi.next();
+			if (first==null)
+				first = p;
+			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			g2.drawLine(Math.round(((float)p.getX()-3)),Math.round((float)p.getY()),Math.round(((float)p.getX()+3)),Math.round((float)p.getY()));
+			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
+			if (last!=null)
+				g2.drawLine(Math.round((float)last.getX()),Math.round((float)last.getY()), Math.round((float)p.getX()), Math.round((float)p.getY()));
+			last = p;
+		}
+		s.scale(1/zoomfactor);
+	}
+
 	//@override from VCommonGraphic to only draw Nodes from the hyperedge normal and all other Gray
 	protected void paintNodes(Graphics g)
 	{
@@ -308,27 +333,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
 			g2.draw(draw.getCurve(5d/(double)zoomfactor)); //draw only a preview
 		}
-	}
-	private void paintDEBUG(Graphics2D g2)
-	{
-		g2.setColor(Color.orange.darker());
-		NURBSShape s =  vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().stripDecorations().clone();
-		s.scale(zoomfactor);
-		Iterator<Point2D> pi = s.controlPoints.iterator();
-		Point2D last=null, first=null;
-		while (pi.hasNext())
-		{
-			Point2D p = (Point2D) pi.next();
-			if (first==null)
-				first = p;
-			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
-			g2.drawLine(Math.round(((float)p.getX()-3)),Math.round((float)p.getY()),Math.round(((float)p.getX()+3)),Math.round((float)p.getY()));
-			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
-			if (last!=null)
-				g2.drawLine(Math.round((float)last.getX()),Math.round((float)last.getY()), Math.round((float)p.getX()), Math.round((float)p.getY()));
-			last = p;
-		}
-		s.scale(1/zoomfactor);
 	}
 	public int getMouseHandling()
 	{

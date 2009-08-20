@@ -13,8 +13,11 @@ import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.ActionMap;
 import javax.swing.ButtonGroup;
+import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -92,6 +95,14 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         GraphHistory = graphpart.getGraphHistoryManager();
         isGraph = vgraphic.getType()==VCommonGraphic.VGRAPHIC;
         refreshMenuBar();
+        if (vgraphic instanceof VHyperShapeGraphic)
+        	mVModusShape.setText("Umriss "+main.CONST.utf8_ue+"bernehmen");
+        else if (vgraphic.getType()==VCommonGraphic.VHYPERGRAPHIC)
+        {
+        	mVModusShape.setText("Hyperkantenumriss...");
+			mVModusShape.setEnabled(getIndexofSingeSelectedHyperEdge() > 0);
+        }
+              	
 		fileDialogs = new JFileDialogs(vgraphic);
         if (isGraph)
         	((VGraphic)graphpart).getGraph().addObserver(this);
@@ -343,15 +354,12 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         mVModusNormal.setSelected(true);
         //group.setSelected(mEdModusNormal, true);
         
-        if (isGraph)
-        {
-        	//      Editor Kontrollpunkte der Kanten
-        	mVShowBP = new JCheckBoxMenuItem("Kanten-Kontrollpunkte anzeigen");
-        	mVShowBP.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, MenuAccModifier));
-        	mVShowBP.setSelected(GeneralPreferences.getInstance().getBoolValue("vgraphic.cpshow"));
-        	if (!isMac) mVShowBP.setMnemonic(KeyEvent.VK_A);
+       	//      Editor Kontrollpunkte der Kanten - Für Hyperkanten in deren Umrissmodus
+       	mVShowBP = new JCheckBoxMenuItem("Kanten-Kontrollpunkte anzeigen");
+       	mVShowBP.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, MenuAccModifier));
+       	mVShowBP.setSelected(GeneralPreferences.getInstance().getBoolValue("vgraphic.cpshow"));
+       	if (!isMac) mVShowBP.setMnemonic(KeyEvent.VK_K);
         	mVShowBP.addActionListener(this);
-        }
         //Editor Raster
         mVGrid = new JMenuItem("Raster-Einstellungen...");
         mVGrid.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, MenuAccModifier));
@@ -396,8 +404,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         //--Editor Modus--
         mView.add(mEdModus);
         //normal
-        if (isGraph)//      Editor Kontrollpunkte der Kanten
-        	mView.add(mVShowBP);        
+       	mView.add(mVShowBP);        
         mView.add(mVGrid);                
         mView.add(mEdZoom);
 	}
@@ -407,7 +414,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         mHIndex = new JMenuItem("Index",KeyEvent.VK_I);
         	mHIndex.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1,0));
    
-        mHIndex.getAccessibleContext().setAccessibleDescription("Hilfe-Index");
+        mHIndex.getAccessibleContext().setAccessibleDescription("Index");
         mHIndex.addActionListener(this);
         if (!isMac) mHIndex.setMnemonic(KeyEvent.VK_I);
         if (!isMac)
@@ -549,16 +556,22 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     	    {
     	    	if (mVModusShape.getText().equals("Hyperkantenumriss..."))
     	    	{
-    	    		mVModusShape.setText("<html><p>Umriss "+main.CONST.html_ue+"bernehmen</p>");
+    	    		mVModusShape.setText("Umriss "+main.CONST.utf8_ue+"bernehmen");
     	    		mVModusOCM.setEnabled(false);
     	    		mVModusNormal.setEnabled(false);
     	    		if (((VHyperGraphic)graphpart).getGraph().modifyHyperEdges.get(getIndexofSingeSelectedHyperEdge())!=null)
     	    			Gui.getInstance().InitShapeModification(getIndexofSingeSelectedHyperEdge());
     	    	}
-    	    	else if (mVModusShape.getText().equals("<html><p>Umriss "+main.CONST.html_ue+"bernehmen</p>"))
+    	    	else if (mVModusShape.getText().equals("Umriss "+main.CONST.utf8_ue+"bernehmen"))
     	    	{
-    	    		mVModusOCM.setEnabled(false);
-    	    		mVModusNormal.setEnabled(false);
+    	    		mVModusOCM.setEnabled(true);
+    	    		mVModusNormal.setEnabled(true);
+    	    		InputMap iMap = Gui.getInstance().getParentWindow().getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    	    		iMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+
+    	    		ActionMap aMap = Gui.getInstance().getParentWindow().getRootPane().getActionMap();
+    	    		aMap.remove("escape");
+    	    		Gui.getInstance().getParentWindow().getRootPane().setDefaultButton(null); //Remove again
     	    		mVModusShape.setText("Hyperkantenumruss...");
     	    		Gui.getInstance().rebuildmaingrid(true);
     	    	}   	
@@ -699,7 +712,8 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 		}
 		if (graphpart.getType()==VCommonGraphic.VHYPERGRAPHIC)
 		{
-    		mVModusShape.setEnabled(getIndexofSingeSelectedHyperEdge() > 0);
+			if (!(graphpart instanceof VHyperShapeGraphic))
+				mVModusShape.setEnabled(getIndexofSingeSelectedHyperEdge() > 0);
 		}
 		if (graphpart.getType()!=VCommonGraphic.VGRAPHIC)
 		{

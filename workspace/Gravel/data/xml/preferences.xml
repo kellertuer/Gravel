@@ -52,7 +52,7 @@
 		<value name="allowmultiple" type="Boolean">true</value>
 		<value name="directed" type="Boolean">false</value>
 		<value name="fileformat" type="String">visual</value>
-		<value name="lastfile" type="String">/Users/ronny/Graveltemp/competition_hypergraph.xml</value>
+		<value name="lastfile" type="String">/Users/ronny/Uni/Diplomarbeit/Vorlagen/Graphen/competition_manual2.xml</value>
 		<value name="loadfileonstart" type="Boolean">true</value>
 	</group>
 	<group name="grid">
@@ -81,11 +81,11 @@
 		<value name="width" type="Integer">1</value>
 	</group>
 	<group name="node">
-		<value name="name" type="String">v_{$ID}</value>
+		<value name="name" type="String">$ID</value>
 		<value name="name_distance" type="Integer">18</value>
 		<value name="name_rotation" type="Integer">270</value>
 		<value name="name_size" type="Integer">12</value>
-		<value name="name_visible" type="Boolean">false</value>
+		<value name="name_visible" type="Boolean">true</value>
 		<value name="size" type="Integer">9</value>
 		<value name="text_distance" type="Integer">18</value>
 		<value name="text_rotation" type="Integer">270</value>
