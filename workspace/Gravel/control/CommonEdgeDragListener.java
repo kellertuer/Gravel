@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.Iterator;
-import java.util.Vector;
 
 import model.*;
 import model.Messages.GraphConstraints;
