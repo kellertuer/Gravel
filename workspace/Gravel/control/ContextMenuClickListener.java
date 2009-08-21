@@ -137,9 +137,9 @@ public class ContextMenuClickListener
 		Ndelete.addActionListener(this);
 		if (vg!=null) //Normal Graph
 		{
-			NaddEdgesTo = new JMenuItem("Kanten zu selektierten Knoten");
+			NaddEdgesTo = new JMenuItem("Kanten zu ausgewählten Knoten");
 			NaddEdgesTo.addActionListener(this);
-			NaddEdgesFrom = new JMenuItem("Kanten von selektierten Knoten");
+			NaddEdgesFrom = new JMenuItem("Kanten von ausgewählten Knoten");
 			NaddEdgesFrom.addActionListener(this);
 		}
 		else if (vhg!=null)
