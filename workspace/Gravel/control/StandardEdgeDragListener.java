@@ -12,8 +12,10 @@ import java.util.Vector;
 import view.VCommonGraphic;
 import view.VGraphic;
 
+import model.MEdge;
 import model.VEdge;
 import model.VGraph;
+import model.VQuadCurveEdge;
 import model.Messages.GraphConstraints;
 import model.Messages.GraphMessage;
 /**
@@ -32,6 +34,7 @@ public class StandardEdgeDragListener implements MouseListener, MouseMotionListe
 	private Point MouseOffSet;
 	private GeneralPreferences gp;
 	private VEdge movingControlPointEdge;
+	private VEdge movingEdge;
 	private int movingControlPointIndex;
 	private boolean firstdrag;
 	/**
@@ -54,7 +57,7 @@ public class StandardEdgeDragListener implements MouseListener, MouseMotionListe
 	 */
 	public boolean dragged()
 	{
-		return (movingControlPointEdge!=null);
+		return ((movingEdge!=null)||(movingControlPointEdge!=null));
 	}
 	/**
 	 * Handle a drag event, update the positions of moved nodes and theis adjacent edges
@@ -68,7 +71,7 @@ public class StandardEdgeDragListener implements MouseListener, MouseMotionListe
 		int Gtransx = Math.round(p.x/((float)vgc.getZoom()/100));
 		int Gtransy = Math.round(p.y/((float)vgc.getZoom()/100));
 		//Position im Graphen (ohne Zoom)
-		Point GPos = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100)));
+		Point posInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100)));
 		if (movingControlPointEdge!=null)
 		{
 			Point newpos;
@@ -78,19 +81,47 @@ public class StandardEdgeDragListener implements MouseListener, MouseMotionListe
 			if (newpos.x < 0)
 			{
 				vg.translate(Math.abs(newpos.x), 0);
-				GPos.x=0;
+				posInGraph.x=0;
 			}
 			if (newpos.y < 0)
 			{
 				vg.translate(0,Math.abs(newpos.y));
-				GPos.y = 0;
+				posInGraph.y = 0;
 			}
-			points.set(movingControlPointIndex, GPos);
+			points.set(movingControlPointIndex, posInGraph);
 			movingControlPointEdge.setControlPoints(points);
 			if (firstdrag) //On First Drag Movement start a Block for CP-Movement else just update it
 				vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,movingControlPointEdge.getIndex(),GraphConstraints.UPDATE|GraphConstraints.BLOCK_START,GraphConstraints.EDGE)); //Kanten aktualisiert
 			else
 				vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,movingControlPointEdge.getIndex(),GraphConstraints.UPDATE,GraphConstraints.EDGE)); //Kanten aktualisiert
+		}
+		//Neither Shift nor ALT
+		if ( ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) != InputEvent.ALT_DOWN_MASK) &&
+			((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) != InputEvent.SHIFT_DOWN_MASK))
+		{
+			if (movingEdge!=null)
+			{
+				if ((movingEdge.getEdgeType()==VEdge.STRAIGHTLINE)&&(firstdrag))
+				{
+					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,movingEdge.getIndex(),GraphConstraints.BLOCK_START|GraphConstraints.UPDATE,GraphConstraints.EDGE));
+					VEdge temp = movingEdge.clone();
+					movingEdge = new VQuadCurveEdge(movingEdge.getIndex(),movingEdge.getWidth(),posInGraph);
+					movingEdge.setLinestyle(temp.getLinestyle().clone());
+					movingEdge.setTextProperties(temp.getTextProperties().clone());
+					movingEdge.setArrow(temp.getArrow().clone());
+					MEdge me = vg.getMathGraph().modifyEdges.get(movingEdge.getIndex()).clone();
+					//Exchange - places a copy in the graph so we also have to get that bacl
+					vg.modifyEdges.replace(movingEdge,me);
+					movingEdge = vg.modifyEdges.get(movingEdge.getIndex());
+				}
+				else if ((!firstdrag)&&(movingEdge.getEdgeType()==VEdge.QUADCURVE))
+				{
+					Vector<Point> pp = new Vector<Point>();
+					pp.add(posInGraph);
+					((VQuadCurveEdge)movingEdge).setControlPoints(pp);
+					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,movingEdge.getIndex(),GraphConstraints.UPDATE, GraphConstraints.EDGE|GraphConstraints.SELECTION));
+				}
+			}
 		}
 		MouseOffSet = e.getPoint();
 		if (firstdrag)
@@ -117,6 +148,8 @@ public class StandardEdgeDragListener implements MouseListener, MouseMotionListe
 				movingControlPointIndex = ((Integer)c.get(1)).intValue();
 			}
 		}
+		if (movingControlPointEdge==null)
+			movingEdge = vg.getEdgeinRangeOf(p,2.0*((float)vgc.getZoom()/100));
 	}
 
 	public void mouseReleased(MouseEvent e) {
@@ -128,6 +161,7 @@ public class StandardEdgeDragListener implements MouseListener, MouseMotionListe
 		}
 		movingControlPointEdge=null;
 		movingControlPointIndex = -1;
+		movingEdge=null;
 		firstdrag = true;
 	}
 

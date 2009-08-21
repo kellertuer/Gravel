@@ -175,7 +175,7 @@ public class CommonEdgeDragListener
 		Point movement = new Point(e.getPoint().x-MouseOffSet.x, e.getPoint().y-MouseOffSet.y);
 		int horizontalMovInGraph = Math.round(movement.x/((float)vgc.getZoom()/100)); //Zoom rausrechnen
 		int verticalMovInGraph = Math.round(movement.y/((float)vgc.getZoom()/100));
-		Point posInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100)));
+//		Point posInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100)));
 		if ((altwaspressed)&&!(((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)))
 		{ //Drag begun with alt and was released
 			reset();
@@ -185,34 +185,6 @@ public class CommonEdgeDragListener
 		{ //Drag begun with shift and released
 			reset();
 			return;
-		}
-		//Neither Shift nor ALT
-		if ( ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) != InputEvent.ALT_DOWN_MASK) &&
-			((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) != InputEvent.SHIFT_DOWN_MASK))
-		{
-			if (movingEdge!=null)
-			{
-				if ((movingEdge.getEdgeType()==VEdge.STRAIGHTLINE)&&(firstdrag))
-				{
-					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,movingEdge.getIndex(),GraphConstraints.BLOCK_START|GraphConstraints.UPDATE,GraphConstraints.EDGE));
-					VEdge temp = movingEdge.clone();
-					movingEdge = new VQuadCurveEdge(movingEdge.getIndex(),movingEdge.getWidth(),posInGraph);
-					movingEdge.setLinestyle(temp.getLinestyle().clone());
-					movingEdge.setTextProperties(temp.getTextProperties().clone());
-					movingEdge.setArrow(temp.getArrow().clone());
-					MEdge me = vg.getMathGraph().modifyEdges.get(movingEdge.getIndex()).clone();
-					//Exchange - places a copy in the graph so we also have to get that bacl
-					vg.modifyEdges.replace(movingEdge,me);
-					movingEdge = vg.modifyEdges.get(movingEdge.getIndex());
-				}
-				else if ((!firstdrag)&&(movingEdge.getEdgeType()==VEdge.QUADCURVE))
-				{
-					Vector<Point> pp = new Vector<Point>();
-					pp.add(posInGraph);
-					((VQuadCurveEdge)movingEdge).setControlPoints(pp);
-					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,movingEdge.getIndex(),GraphConstraints.UPDATE, GraphConstraints.EDGE|GraphConstraints.SELECTION));
-				}
-			}
 		}
 		if ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)
 		//alt&drag auf nem Knoten oder einer Kante begonnen
