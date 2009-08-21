@@ -67,7 +67,8 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 	VCommonGraphic graphpart;
 	CommonGraphHistoryManager GraphHistory;
 	int MenuAccModifier;
-	boolean isMac, isGraph;
+	//Indicators for Macintosh Systems, Graph (iff fals Hypergraph) and the knowledge of file the graph is saved in
+	boolean isMac, isGraph, isFileKnown;
 	public MainMenu(VCommonGraphic vgraphic)
 	{
         graphpart = vgraphic;
@@ -82,6 +83,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         	((VGraphic)graphpart).getGraph().addObserver(this);
         else
         	((VHyperGraphic)graphpart).getGraph().addObserver(this);
+        isFileKnown=false;
  	}
 	public void changeVGraph(VCommonGraphic vgraphic)
 	{
@@ -162,7 +164,6 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         
         mFSave = new JMenuItem("Speichern");
         mFSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, MenuAccModifier));
-        //aktiv setzen, falls da ein File ist.
         mFSave.addActionListener(this);
         if (!isMac) mFSave.setMnemonic(KeyEvent.VK_S);
         
@@ -214,7 +215,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 		
 	        mFile.add(mFNew);
 	        mFile.add(mFOpen);
-	        mFSave.setEnabled(!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"));
+	        isFileKnown = !GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE");
 	        mFile.add(mFSave);
 	        mFile.add(mFSaveAs);
 
@@ -524,11 +525,16 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 			if (item == mFNew)
     			fileDialogs.NewGraph(); 
 			else if (item == mFOpen)
-    			mFSave.setEnabled(fileDialogs.Open()); //If Successfull set Save to true
+    			isFileKnown = fileDialogs.Open(); //If Successfull set Save to true
 			else if (item == mFSave)
-    			mFSave.setEnabled(fileDialogs.Save());
+			{
+				if (isFileKnown)
+					isFileKnown = fileDialogs.Save();
+				else
+					isFileKnown = fileDialogs.SaveAs();
+			}
 			else if (item == mFSaveAs)
-        		mFSave.setEnabled(fileDialogs.SaveAs());
+        		isFileKnown = fileDialogs.SaveAs();
 			else if (item == mFWinPrefs)
 			{
 		    	new JPreferencesDialog();
