@@ -168,8 +168,6 @@ public class CommonEdgeDragListener
 			else if ((hyperedgeInRange!=null)&&((hyperedgeInRange.getSelectedStatus()&VItem.SELECTED)==VItem.SELECTED))
 				multiplemoving = true;
 		}
-		else if ((!alt)&&(!shift))
-			movingEdge=edgeInRange;
 	}
 	public void mouseDragged(MouseEvent e) {
 		Point movement = new Point(e.getPoint().x-MouseOffSet.x, e.getPoint().y-MouseOffSet.y);
