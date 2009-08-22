@@ -169,28 +169,36 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 			return 0;
 		if (points.lastElement()==null) //if the last element is null, the point can be inserted there
 			return points.size()-1; 
-		double lastdistance;
+		Point2D lastP;
 		if (MessageCurve.isEmpty())
-			lastdistance = points.lastElement().distance(newPoint);
+			lastP = points.lastElement(); //.distance(newPoint);
 		else 
-			lastdistance = MessageCurve.CurveAt(((NURBSShapeFragment)MessageCurve).getStart()).distance(newPoint);
+			lastP = MessageCurve.CurveAt(((NURBSShapeFragment)MessageCurve).getStart()); //.distance(newPoint);
 		double min = Double.MAX_VALUE;
 		int returnindex = -1;
 		for (int i=0; i<points.size(); i++)
 		{
 			if (points.get(i)==null)
 				return points.size();
-			double actualdistance = points.get(i).distance(newPoint);
-			if (lastdistance+actualdistance<min)
+			double a = lastP.distance(newPoint);
+			double b =  points.get(i).distance(newPoint);
+			double c = lastP.distance(points.get(i));
+			//In the minimal case a+b = c so the quotient is one. if we substract 1, we search for the smallest value
+			double value = (a+b)/c-1;
+			if (value<min)
 			{
-				min = lastdistance+actualdistance;
+				min = value;
 				returnindex = i;
 			}
-			lastdistance = actualdistance;
+			lastP = (Point2D)points.get(i).clone();
 		}
 		if (!MessageCurve.isEmpty())
 		{
-			if ((lastdistance + MessageCurve.CurveAt(((NURBSShapeFragment)MessageCurve).getEnd()).distance(newPoint))<min)
+			double a = lastP.distance(newPoint);
+			double b =  MessageCurve.CurveAt(((NURBSShapeFragment)MessageCurve).getEnd()).distance(newPoint);
+			double c = lastP.distance(MessageCurve.CurveAt(((NURBSShapeFragment)MessageCurve).getEnd()));
+			double value = (a+b)/c-1;
+			if (value<min)
 				returnindex = points.size();
 		}
 		return returnindex;
