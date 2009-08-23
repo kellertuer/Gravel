@@ -35,6 +35,9 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import control.DisplayRunningController;
+import control.JButtonMouseOverListener;
+
 import view.pieces.HESFreeModComponent;
 
 import dialogs.IntegerTextField;
@@ -82,7 +85,6 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	private JSlider iDegree;
 	private ButtonGroup bAddIP;
 	private JRadioButton rAddEnd, rAddBetween;
-
 	private JButton bModeChange, bOk, bCancel,	bCheckShape;
 	private int HEdgeRefIndex; //Reference to the HyperEdge in the Graph that is edited here
 	private VHyperGraph HGraphRef; //Reference to the edited Graph, should be a copy of the Graph from the main GUI because the user might cancel this dialog 
@@ -91,7 +93,70 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	private JPanel CircleFields, InterpolationFields, DegreeFields;
 
 	private HESFreeModComponent FreeModPanel;
-	
+	//
+	//Helping functions for the Button animation
+	//
+	private ValidatorThread myValidatorThread=null;
+	private DisplayRunningController runText=null;
+	private JButtonMouseOverListener stopTextDisplay;
+	/**
+	 * Little helping Thread for the Validator 
+	 * @author ronny
+	 *
+	 */
+	private class ValidatorThread extends Thread
+	{
+		NURBSShapeValidator validator;
+		boolean running=true;
+		public ValidatorThread()
+		{
+        	validator = new NURBSShapeValidator(
+        			HGraphRef,//In this graph
+        			HEdgeRefIndex, //this edge with
+        			null, //its own shape (no special shape for the validator
+        			HShapeGraphicRef //Debug Graphics
+        	);
+        	System.err.println("Init.");
+        	if (runText==null)
+        	runText = new DisplayRunningController(bCheckShape);
+		}
+		public void run()
+		{
+			if (runText.isAlive())
+				runText.setAnimationPaused(false);
+			else
+				runText.start();
+    		while (running&&validator.oneStep()) 
+    		{
+    		}
+    		runText.stopAnimation();
+    		if (!running)
+    			return;
+    		if (validator.isShapeValid())
+    		{
+    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><center>Der Umriss ist korrekt.</center><br><br><ul><li>Alle Knoten der Hyperkante sind innerhalb des Umrisses</li><li>Alle Knoten der Hyperkante sind mindestens "+HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin()+"px</li><li>Alle anderen Knoten sind außerhalb des Umrisses</li></ul></html>", "Der Umriss ist korrekt.", JOptionPane.INFORMATION_MESSAGE);
+    			HShapeGraphicRef.setHighlightedNodes(new Vector<Integer>());
+    		}
+    		else
+    		{
+	    		String msg = "<html><center>Der Umriss ist nicht korrekt</center><br><br>Die folgenden Knoten erfüllen nicht die Korrektheit.<br>"+
+	    				"Einer der folgenden F"+CONST.html_ae+"lle trifft also zu:<ul><li>au"+CONST.html_sz+"erhalb des Umrisses und geh"+CONST.html_oe+"ren zur Kante</li><li>im Umriss und geh"+CONST.html_oe+"ren nicht zur Kante</li><li>Sie sind im Umriss, aber erf"+CONST.html_ue+"llen den Innenabstand nicht</li></ul>Diese Knoten werden bis zur n"+CONST.html_ae+"chten Uberpr"+CONST.html_ue+"fung rot hervorgehoben.<br><br>";		    		
+	    		Vector<Integer> WrongNodes = validator.getInvalidNodeIndices();
+	    		for (int j=0; j<WrongNodes.size(); j++)
+	    				msg+="#"+WrongNodes.get(j);
+	    		if (WrongNodes.size()==0)
+	    			msg += "Es gab keine eindeutige Entscheidung, am Ende mehr als 2 Mengen verblieben.";
+	    		msg+="</html>";
+    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), msg, "Der Umriss ist nicht korrekt.", JOptionPane.ERROR_MESSAGE);
+    			HShapeGraphicRef.setHighlightedNodes(WrongNodes);
+    		}
+    		reInitPanel();
+		}
+		public void stopValidation()
+		{
+			running=false;
+		}
+	}
 	/**
 	 * Create the Dialog for an hyperedge with index i
 	 * and the corresponding VHyperGraph
@@ -359,6 +424,18 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		return cont;
 	}
 
+	private void reInitPanel()
+	{
+		bCheckShape.removeMouseListener(stopTextDisplay);
+		myValidatorThread=null;
+		runText=null;
+		setEnabled(true);
+		updatePanel(HShapeGraphicRef.getShapeParameters());
+	}
+	
+	/**
+	 * Create the Vector for Convex Hull Calculation
+	 */
 	private void CalculateConvexHullShape()
 	{
 		Iterator<VNode> nodeiter = HGraphRef.modifyNodes.getIterator();
@@ -461,6 +538,24 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		}
 	}
 
+	private void setEnabled(boolean enabled)
+	{
+		cBasicShape.setEnabled(enabled);
+		iCOrigX.setEnabled(enabled);
+		iCOrigY.setEnabled(enabled);
+		iCRad.setEnabled(enabled);
+		iDegree.setEnabled(enabled);
+		rAddEnd.setEnabled(enabled);
+		rAddBetween.setEnabled(enabled);
+		bModeChange.setEnabled(enabled);
+		bOk.setEnabled(enabled);
+		bCancel.setEnabled(enabled);
+		bCheckShape.setEnabled(enabled);
+		FreeModPanel.setEnabled(enabled);
+		if (enabled)
+			updatePanel(HShapeGraphicRef.getShapeParameters());
+	}
+	
 	public void actionPerformed(ActionEvent e) {
 	        if ((e.getSource()==bCancel)||(e.getSource()==bOk))
 	        {
@@ -556,25 +651,23 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	        }	
 	        else if (e.getSource()==bCheckShape)
 	        {
-	        	NURBSShapeValidator validator = new NURBSShapeValidator(HGraphRef, HEdgeRefIndex, null, HShapeGraphicRef); //Check actual Shape of the Edge
-	    		if (validator.isShapeValid())
-	    		{
-	    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><center>Der Umriss ist korrekt.</center><br><br><ul><li>Alle Knoten der Hyperkante sind innerhalb des Umrisses</li><li>Alle Knoten der Hyperkante sind mindestens "+HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin()+"px</li><li>Alle anderen Knoten sind außerhalb des Umrisses</li></ul></html>", "Der Umriss ist korrekt.", JOptionPane.INFORMATION_MESSAGE);
-	    			HShapeGraphicRef.setHighlightedNodes(new Vector<Integer>());
-	    		}
-	    		else
-	    		{
-		    		String msg = "<html><center>Der Umriss ist nicht korrekt</center><br><br>Die folgenden Knoten erfüllen nicht die Korrektheit.<br>"+
-		    				"Einer der folgenden F"+CONST.html_ae+"lle trifft also zu:<ul><li>au"+CONST.html_sz+"erhalb des Umrisses und geh"+CONST.html_oe+"ren zur Kante</li><li>im Umriss und geh"+CONST.html_oe+"ren nicht zur Kante</li><li>Sie sind im Umriss, aber erf"+CONST.html_ue+"llen den Innenabstand nicht</li></ul>Diese Knoten werden bis zur n"+CONST.html_ae+"chten Uberpr"+CONST.html_ue+"fung rot hervorgehoben.<br><br>";		    		
-		    		Vector<Integer> WrongNodes = validator.getInvalidNodeIndices();
-		    		for (int j=0; j<WrongNodes.size(); j++)
-		    				msg+="#"+WrongNodes.get(j);
-		    		if (WrongNodes.size()==0)
-		    			msg += "Es gab keine eindeutige Entscheidung, am Ende mehr als 2 Mengen verblieben.";
-		    		msg+="</html>";
-	    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), msg, "Der Umriss ist nicht korrekt.", JOptionPane.ERROR_MESSAGE);
-	    			HShapeGraphicRef.setHighlightedNodes(WrongNodes);
-	    		}
+	        	if (myValidatorThread==null) //none running
+	        	{
+	        		//Disable Buttons
+	        		setEnabled(false);
+	        		bCheckShape.setEnabled(true);
+	        		if (runText==null)
+	        			runText = new DisplayRunningController(bCheckShape);
+	        		stopTextDisplay = new JButtonMouseOverListener(bCheckShape,"Stop",runText);
+	        		myValidatorThread = new ValidatorThread();
+	        		myValidatorThread.start();
+	        	}
+	        	else
+	        	{
+	        		myValidatorThread.stopValidation();
+	        		System.err.println("Validation abgebrochen");
+	        		reInitPanel();
+	        	}
 	        }
 	        getContent().validate();
 	        getContent().repaint();
@@ -697,15 +790,15 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	{
 		if ((nm==null)||(!nm.isValid()))
 			return;
+		if (nm.getType()==NURBSCreationMessage.CONVEX_HULL)
+			return;
 		int deg= nm.getDegree();
 		Vector<Point2D> p= nm.getPoints();
 		if (p==null)
 			return;
 		
 		int i= p.size();
-		if (nm.getType()==NURBSCreationMessage.CONVEX_HULL)
-			i *= 3;
-			
+	
 		i = 2*deg-i;
 		
 		if (i==1)
@@ -754,71 +847,76 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		FreeModPanel.refresh();
 	}
 
-	public void update(Observable o, Object arg) {
-		if (arg instanceof GraphMessage) //All Other GraphUpdates are handled in VGRaphCommons
+	private void update(GraphMessage m)
+	{
+		if ( ((m.getModifiedElementTypes()&(GraphConstraints.HYPEREDGESHAPE))==GraphConstraints.HYPEREDGESHAPE)
+			&&(m.getModification()==GraphConstraints.HISTORY))
+		{ //Shape changed by History - Check For correct Modus and right buttons
+			updatePanel(HShapeGraphicRef.getShapeParameters());
+			return;
+		}
+		if ((m.getModifiedElementTypes()==GraphConstraints.HYPEREDGE)
+			&&(m.getModification()==(GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION))) 
 		{
-			GraphMessage m = (GraphMessage) arg;
-			if ( ((m.getModifiedElementTypes()&(GraphConstraints.HYPEREDGESHAPE))==GraphConstraints.HYPEREDGESHAPE)
-					&&(m.getModification()==GraphConstraints.HISTORY))
-			{ //Shape changed by History - Check For correct Modus and right buttons
-				updatePanel(HShapeGraphicRef.getShapeParameters());
-				return;
-			}
-			if ((m.getModifiedElementTypes()==GraphConstraints.HYPEREDGE)
-					&&(m.getModification()==(GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION))) 
+			if  (cBasicShape.isVisible()) //We're in mode one and got an HyperEdgeShape Creation Update
 			{
-				if  (cBasicShape.isVisible()) //We're in mode one and got an HyperEdgeShape Creation Update
+				NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
+				if (DegreeFields.isVisible())
+					updateDegreeFields(nm);
+			if (CircleFields.isVisible())//with circles
+				updateCircleFields(nm);
+			else if (InterpolationFields.isVisible())
+				updateIPFields(nm);
+			}
+		}
+		//Button Activity
+		boolean shape = ((HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape()!=null)&&(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty()));
+		if ((FreeModPanel.isLocal())&&(!cBasicShape.isVisible())) //Mode2 and SubcurveSelection
+		{
+			NURBSShape s = HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape();
+			if ((s.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT) //Looks fuzzy but the Cast next if can't be in the same as this
+				if (!((NURBSShapeFragment)s).getSubCurve().isEmpty())
 				{
-					NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
-					if (DegreeFields.isVisible())
-						updateDegreeFields(nm);
-					if (CircleFields.isVisible())//with circles
-						updateCircleFields(nm);
-					else if (InterpolationFields.isVisible())
-						updateIPFields(nm);
+					bModeChange.setEnabled(NURBSShapeFactory.SubcurveSubstitutable((NURBSShapeFragment)s));
 				}
-			}
-			//Button Activity
-			boolean shape = ((HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape()!=null)&&(!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty()));
-			if ((FreeModPanel.isLocal())&&(!cBasicShape.isVisible())) //Mode2 and SubcurveSelection
-			{
-				NURBSShape s = HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape();
-				if ((s.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT) //Looks fuzzy but the Cast next if can't be in the same as this
-					if (!((NURBSShapeFragment)s).getSubCurve().isEmpty())
-					{
-						bModeChange.setEnabled(NURBSShapeFactory.SubcurveSubstitutable((NURBSShapeFragment)s));
-					}
-					else
-						bModeChange.setEnabled(false);
 				else
 					bModeChange.setEnabled(false);
-			}
 			else
-				bModeChange.setEnabled(shape);
+				bModeChange.setEnabled(false);
+		}
+		else
+			bModeChange.setEnabled(shape);
 
-			bCheckShape.setEnabled(shape);
-			bOk.setEnabled(shape);
-			if (shape)
+		bCheckShape.setEnabled(shape);
+		bOk.setEnabled(shape);
+		if (shape)
+		{
+			IPInfo.setText("<html><p>&nbsp;</p></html>");
+			if (FreeModPanel.getContent().isVisible())
+				FreeModPanel.refresh();
+		}
+		else //empty shape
+		{
+			if (cBasicShape.isVisible()) //-> clear values
 			{
-				IPInfo.setText("<html><p>&nbsp;</p></html>");
-				if (FreeModPanel.getContent().isVisible())
-					FreeModPanel.refresh();
+				NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
+				if (CircleFields.isVisible())//with circles
+					updateCircleFields(nm);
+				else if (InterpolationFields.isVisible())
+					updateIPFields(nm);
 			}
-			else //empty shape
+			else //Second Modus -> change to first
 			{
-				if (cBasicShape.isVisible()) //-> clear values
-				{
-					NURBSCreationMessage nm = HShapeGraphicRef.getShapeParameters();
-					if (CircleFields.isVisible())//with circles
-						updateCircleFields(nm);
-					else if (InterpolationFields.isVisible())
-						updateIPFields(nm);
-				}
-				else //Second Modus -> change to first
-				{
-					actionPerformed(new ActionEvent(bModeChange,0,"Change Modus"));
-				}
+				actionPerformed(new ActionEvent(bModeChange,0,"Change Modus"));
 			}
-		}	//End Handling Graph Messages
+		}
+	}
+	public void update(Observable o, Object arg)
+	{
+		if (arg instanceof GraphMessage) //All Other GraphUpdates are handled in VGRaphCommons
+		{
+			update((GraphMessage) arg);
+		}
+		
 	}
 }

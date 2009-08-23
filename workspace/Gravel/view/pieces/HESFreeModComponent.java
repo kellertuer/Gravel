@@ -46,7 +46,7 @@ public class HESFreeModComponent implements ActionListener {
 
 	public void resetModus()
 	{
-    	setButtonsEnabled(true);
+    	setGlobalButtonsEnabled(true);
    		NURBSShape shape = HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).getShape();
    		if (rModGlobal.isSelected())
    			shape = shape.stripDecorations();
@@ -82,7 +82,7 @@ public class HESFreeModComponent implements ActionListener {
 		bIncKnots.setSelected(false);
 		bDecKnots.setSelected(false);
 	}
-	private void setButtonsEnabled(boolean enabled)
+	private void setGlobalButtonsEnabled(boolean enabled)
 	{
 		bIncKnots.setEnabled(enabled);
 		bDecKnots.setEnabled(enabled);
@@ -91,7 +91,21 @@ public class HESFreeModComponent implements ActionListener {
 		bScaling.setEnabled(enabled);
 		bScalingDir.setEnabled(enabled);
 	}
-	
+	private void setLocalButtonsEnabled(boolean enabled)
+	{
+		bLocalSetStart.setEnabled(enabled);
+		bLocalSetEnd.setEnabled(enabled);
+		bLocalInvert.setEnabled(enabled);
+	}
+	public void setEnabled(boolean enabled)
+	{
+		setGlobalButtonsEnabled(enabled);
+		setLocalButtonsEnabled(enabled);
+		rModGlobal.setEnabled(enabled);
+		rModLocal.setEnabled(enabled);
+		if (enabled)
+			refresh();
+	}
 	private void setLocalVisibility(boolean visible)
 	{
 		bLocalSetStart.setVisible(visible);
@@ -201,7 +215,7 @@ public class HESFreeModComponent implements ActionListener {
 		
 		setLocalVisibility(rModLocal.isSelected());
 	}
-
+	
 	private void handleLocalAction(ActionEvent e)
 	{
 		if (e.getSource()==bLocalSetStart)
@@ -248,7 +262,7 @@ public class HESFreeModComponent implements ActionListener {
         	deselectGlobalButtons();
         	if (rModGlobal.isSelected())
         	{
-            	setButtonsEnabled(true);
+            	setGlobalButtonsEnabled(true);
            		NURBSShape shape = HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).getShape();
            		HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).setShape(shape.stripDecorations());
         		HShapeGraphicRef.setMouseHandling(VCommonGraphic.CURVEPOINT_MOVEMENT_MOUSEHANDLING);
@@ -266,7 +280,7 @@ public class HESFreeModComponent implements ActionListener {
         			HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).setShape(new NURBSShapeFragment(shape,Double.NaN,Double.NaN));
         			selectionExists = false;
         		}
-        		setButtonsEnabled(selectionExists);
+        		setGlobalButtonsEnabled(selectionExists);
         		if (!selectionExists)
         			HShapeGraphicRef.setMouseHandling(VCommonGraphic.SUBCURVE_MOUSEHANDLING);
         	}
@@ -369,11 +383,11 @@ public class HESFreeModComponent implements ActionListener {
 		NURBSShape editshape = HShapeGraphicRef.getGraph().modifyHyperEdges.get(HEdgeRefIndex).getShape();
 		if ((editshape.getDecorationTypes()&NURBSShape.FRAGMENT)==NURBSShape.FRAGMENT)
 		{
-			 this.setButtonsEnabled(!((NURBSShapeFragment)editshape).getSubCurve().isEmpty());
+			 this.setGlobalButtonsEnabled(!((NURBSShapeFragment)editshape).getSubCurve().isEmpty());
 		}
 		else if (rModLocal.isSelected())
 		{
-			setButtonsEnabled(true);
+			setGlobalButtonsEnabled(true);
 			rModGlobal.doClick();
 		}
 	}

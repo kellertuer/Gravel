@@ -4,7 +4,9 @@ import view.VCommonGraphic;
 
 import io.GeneralPreferences;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -71,6 +73,8 @@ public class NURBSShapeValidator extends NURBSShape {
 	}
 	private final double TOL = 0.025d, MINRAD = 1d;
 	float zoom = GeneralPreferences.getInstance().getFloatValue("zoom");
+	int StepCount=0,maxRadius,baseIndex;
+	VCommonGraphic DebugGraphics;
 	private Point2D CPOutside;
 	//Points we have to work on 
 	private Queue<Point2D> Points = new LinkedList<Point2D>();
@@ -83,10 +87,16 @@ public class NURBSShapeValidator extends NURBSShape {
 	
 	private NURBSShape origCurve;
 	
-	public NURBSShapeValidator(VHyperGraph vG, int HyperEdgeIndex, NURBSShape Curve, VCommonGraphic g)
+	private VHyperGraph vG;
+	private int HEIndex;
+	
+	public NURBSShapeValidator(VHyperGraph PvG, int HyperEdgeIndex, NURBSShape Curve, VCommonGraphic g)
 	{
 		ResultValidation=false;
+		vG = PvG;
+		HEIndex = HyperEdgeIndex;
 		VHyperEdge e = vG.modifyHyperEdges.get(HyperEdgeIndex);
+		DebugGraphics = g;
 		if (e==null)
 			return;
 		if (Curve!=null)
@@ -114,7 +124,7 @@ public class NURBSShapeValidator extends NURBSShape {
 					NURBSShapeProjection projP = new NURBSShapeProjection(this,p);
 					ResultValidation = (p.distance(projP.getResultPoint()) <= (double)actual.getSize());
 					if (!ResultValidation)
-						runValidator(vG,HyperEdgeIndex,Curve,g); //perhaps its a normal shape
+						InitRunValidator(); //perhaps its a normal shape
 				}
 			}
 		}
@@ -169,13 +179,13 @@ public class NURBSShapeValidator extends NURBSShape {
 				ResultValidation = (invalidNodeIndices.isEmpty());
 			}
 			else //Closed must be normal check
-				runValidator(vG,HyperEdgeIndex,Curve,g);
+				InitRunValidator();
 		}
 		else //more than 2 nodes, alsways shape
-			runValidator(vG,HyperEdgeIndex,Curve,g);
+			InitRunValidator();
 	}
 
-	private void runValidator(VHyperGraph vG, int HyperEdgeIndex, NURBSShape Curve, VCommonGraphic g)
+	private void InitRunValidator()
 	{
 		//
 		// Start of Validation-Algorithm
@@ -188,39 +198,48 @@ public class NURBSShapeValidator extends NURBSShape {
 			if (actual.getY()<CPOutside.getY())
 				CPOutside = (Point2D)actual.clone();	
 		}
-		initPointSets(vG);
-		
-		//Number of Projections made, 
-		boolean united=false;
-		int i=0;
+		initPointSets();
 		//MaxSize of any circle used, because a circle with this radius is much bigger than the whole graph
-		//We need something to mearue font-size so...
-		Graphics2D g2 = (Graphics2D) g.getGraphics();
-		//(Graphics2D)(new VHyperGraphic(new Dimension(0,0),vG)).getGraphics();
-		Point MaxPoint = vG.getMaxPoint(g2);
-		Point MinPoint = vG.getMinPoint(g2);
-		int maxSize = Math.max(MaxPoint.x-MinPoint.x, MaxPoint.y-MinPoint.y);
+		//We need something to measure font-size so...
+		Point MaxPoint = vG.getMaxPoint(DebugGraphics.getGraphics());
+		Point MinPoint = vG.getMinPoint(DebugGraphics.getGraphics());
+		maxRadius = Math.max(MaxPoint.x-MinPoint.x, MaxPoint.y-MinPoint.y);
 		//Check each Intervall, whether we are done
 //		int checkIntervall = Points.size();
-		boolean running=true;
-		
-		while (!Points.isEmpty()&&running) 
+	}
+
+	public void run()
+	{
+		while (oneStep()) 
+		{}	
+	}
+	
+	/**
+	 * Do one single step and indicate wether we are done after that one 
+	 * @return
+	 */
+	public boolean oneStep()
+	{
+		boolean unionHappened=false;
+		boolean resultValue=true;
+		if (Points.isEmpty())
 		{
-			i++;
-			Point2D actualP = Points.poll();
-			if ((actualP.getX()==231.15877616630252) &&(actualP.getY()==287.56740125032775))
-				System.err.println("hm?");
-			PointInfo actualInfo = pointInformation.get(actualP);
-			if ((Double.isNaN(actualInfo.radius))||(actualInfo.projectionPoint==null))
-			{
-				NURBSShapeProjection proj = new NURBSShapeProjection(this,actualP);
-				actualInfo.radius = proj.getResultPoint().distance(actualP);
-				actualInfo.projectionPoint = proj.getResultPoint();
-			}
-			if ((actualInfo.radius < maxSize)&&(actualInfo.radius > MINRAD))
+			prepareResult();
+			return false;
+		}	
+		StepCount++;
+		Point2D actualP = Points.poll();
+		PointInfo actualInfo = pointInformation.get(actualP);
+		if ((Double.isNaN(actualInfo.radius))||(actualInfo.projectionPoint==null))
+		{
+			NURBSShapeProjection proj = new NURBSShapeProjection(this,actualP);
+			actualInfo.radius = proj.getResultPoint().distance(actualP);
+			actualInfo.projectionPoint = proj.getResultPoint();
+		}
+		if ((actualInfo.radius < maxRadius)&&(actualInfo.radius > MINRAD))
 			{	
-				g2.setColor(Color.gray);
-				g2.drawOval(Math.round((float)(actualP.getX()-actualInfo.radius)*zoom),
+				((Graphics2D)DebugGraphics.getGraphics()).setColor(Color.gray);
+				((Graphics2D)DebugGraphics.getGraphics()).drawOval(Math.round((float)(actualP.getX()-actualInfo.radius)*zoom),
 					Math.round((float)(actualP.getY()-actualInfo.radius)*zoom),
 					Math.round((float)(2*actualInfo.radius)*zoom), Math.round((float)(2*actualInfo.radius)*zoom));
 				//Calculate Distance and direction from Point to its projection
@@ -244,7 +263,7 @@ public class NURBSShapeValidator extends NURBSShape {
 							{
 								System.err.println("Joining "+a+" "+b);
 								UnionSets(a,b);
-								united=true;
+								unionHappened=true;
 							}
 						}
 					}
@@ -266,16 +285,15 @@ public class NURBSShapeValidator extends NURBSShape {
 						{
 							Points.offer(Succ.get(j));
 						}
-						g.drawCP(g2, new Point(Math.round((float)Succ.get(j).getX()),Math.round((float)Succ.get(j).getY())),Color.ORANGE);
+						DebugGraphics.drawCP(DebugGraphics.getGraphics(), new Point(Math.round((float)Succ.get(j).getX()),Math.round((float)Succ.get(j).getY())),Color.ORANGE);
 						//Set split to true if we have a pre and split. that way each node may only split twice
 						pointInformation.get(Succ.get(j)).split = actualInfo.split | ((Succ.size()>=2)&&(actualInfo.previousPoint!=null));							
 					}
 				}
-				if (united)
+				if (unionHappened)
 				{
-					united=false;
-					System.err.print(i+"   -  ");
-					boolean valid = CheckSet(vG, HyperEdgeIndex);
+					System.err.print(StepCount+"   -  ");
+					boolean valid = CheckSet();
 					Iterator<MNode> nodeiter = vG.getMathGraph().modifyNodes.getIterator();
 					while (nodeiter.hasNext()) //Iterator for all node-positions
 					{
@@ -286,14 +304,20 @@ public class NURBSShapeValidator extends NURBSShape {
 					System.err.println("- All nodes in #"+pointInformation.get(CPOutside).set+" are outside ("+Points.size()+" nodes left)");
 					//If either ResultValid=true Wrong.size()==0 we're ready because the shape is valid
 					//If ResultValid=false and Wrong.size()>0 we're ready because the shape is invalid
-					running = ! (  (valid&&(invalidNodeIndices.size()==0)) || (!valid&&(invalidNodeIndices.size()>0)) );
-					if (!running)
+					resultValue = !(  (valid&&(invalidNodeIndices.size()==0)) || (!valid&&(invalidNodeIndices.size()>0)) );
+					if (!resultValue)
 						ResultValidation = valid;
 				}
 			}	//end if circle big enough
-		} //end while
+		if (!resultValue)
+			prepareResult();
+		return resultValue;
+	}
+	
+	private void prepareResult()
+	{
 		if (ResultValidation) //Nodes are valid due to inside or outside
-		{	checkDistances(vG,HyperEdgeIndex);
+		{	checkDistances();
 			//Check whether we got after all points and CheckDistance to more than 2 sets without wrong nodes
 			Vector<Integer> Insets = new Vector<Integer>();
 			Vector<Integer> Outsets = new Vector<Integer>();
@@ -302,7 +326,7 @@ public class NURBSShapeValidator extends NURBSShape {
 			{
 				int id = nodeiter.next().index;
 				Point2D pos = getPointOfNode(id);
-				if (vG.getMathGraph().modifyHyperEdges.get(HyperEdgeIndex).containsNode(id))
+				if (vG.getMathGraph().modifyHyperEdges.get(HEIndex).containsNode(id))
 				{
 					if (!Insets.contains(pointInformation.get(pos).set))
 						Insets.add(pointInformation.get(pos).set);
@@ -316,15 +340,7 @@ public class NURBSShapeValidator extends NURBSShape {
 				ResultValidation = false;
 		}
 	}
-	/**
-	 * Returns whether the input was valid, if it was not valid, no Check was done
-	 * @return
-	 */
-	public boolean isInputValid()
-	{
-		return !(!ResultValidation&&(invalidNodeIndices.size()==0));
-	}
-	/**
+   /**
 	 * Main result of the Algorithm
 	 * (if it was persormed @see isInputValid())
 	 * 
@@ -395,7 +411,7 @@ public class NURBSShapeValidator extends NURBSShape {
 			}
 		}
 	}
-	private void initPointSets(VHyperGraph vG)
+	private void initPointSets()
 	{
 		Points = new LinkedList<Point2D>();
 		Iterator<VNode> vti = vG.modifyNodes.getIterator();
@@ -502,7 +518,7 @@ public class NURBSShapeValidator extends NURBSShape {
 	 * @param vG
 	 * @param HEIndex
 	 */
-	private boolean CheckSet(VHyperGraph vG, int HEIndex)
+	private boolean CheckSet()
 	{
 		boolean result;
 		//All Hyperedge nodes must be in a set (inSet) and all other in exactely one other set (outset)
@@ -563,7 +579,7 @@ public class NURBSShapeValidator extends NURBSShape {
 	 * If all nodes are valid due to the NURBSShape the last point is, whether their distance to the shape is
 	 * bigger than the given minimal distance of the NURBSShape
 	 */
-	private void checkDistances(VHyperGraph vG, int HEIndex)
+	private void checkDistances()
 	{
 		if ((!ResultValidation)||(invalidNodeIndices.size()>0)) //already nonvalid
 			return;
