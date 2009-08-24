@@ -94,8 +94,11 @@ public class NURBSShapeProjection extends NURBSShape
 			}
 			if (min>alpha) //definetly outside -> do nothing
 			{}
-			else if (min==partAlpha) //might be projected onto end-element -> do nothing
-			{}
+			else if (min==partAlpha) //might be projected onto one of the end-elements, add them to the candidates-> do nothing
+			{
+				candidates.add(actualPart.Knots.firstElement()); //Because its Bezier parts, first 
+				candidates.add(actualPart.Knots.lastElement()); //and last Element of Knot vector do
+			}
 			else //may be inside polygon
 			{
 				int k=0; //None found
@@ -131,11 +134,11 @@ public class NURBSShapeProjection extends NURBSShape
 					//take a look at where the minimum in the qcCP was and take the startvalue inside actual [umin,umax]
 					//(+1 and +2 ensures INSIDE umax-umin) and the first Method can't return -1 because we took min from the qcCP
 					double startvalue = umin + (double)(qcControlPoints.indexOf(min)+1)/((double)qcControlPoints.size()+2)*(umax-umin);
-		//			System.err.println("Starting Newton on ["+umin+","+umax+"] with startvalue "+startvalue);
+					//System.err.println("Starting Newton on ["+umin+","+umax+"] with startvalue "+startvalue);
 					
 					double candidate_u = NewtonIteration(actualPart.clone(), startvalue, p);
 					candidates.add(candidate_u);
-		//			System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
+					//System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
 					double newdistsq = CurveAt(candidate_u).distanceSq(p);
 					if (alpha > newdistsq)
 						alpha = newdistsq;

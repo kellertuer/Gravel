@@ -36,7 +36,7 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 	 */
 	public HyperEdgeShapeHistoryManager(VHyperShapeGraphic vhsg, int vheIndex)
 	{
-		super(vhsg.getGraph());
+		super(vhsg.getGraph()); //Super does the normal stuff
 		trackedGraph = vhsg.getGraph();
 		lastGraph = vhsg.getGraph().clone();
 		ParameterVectorReference = vhsg;

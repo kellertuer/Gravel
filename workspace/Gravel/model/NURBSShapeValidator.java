@@ -204,8 +204,6 @@ public class NURBSShapeValidator extends NURBSShape {
 		Point MaxPoint = vG.getMaxPoint(DebugGraphics.getGraphics());
 		Point MinPoint = vG.getMinPoint(DebugGraphics.getGraphics());
 		maxRadius = Math.max(MaxPoint.x-MinPoint.x, MaxPoint.y-MinPoint.y);
-		//Check each Intervall, whether we are done
-//		int checkIntervall = Points.size();
 	}
 
 	public void run()
@@ -238,8 +236,9 @@ public class NURBSShapeValidator extends NURBSShape {
 		}
 		if ((actualInfo.radius < maxRadius)&&(actualInfo.radius > MINRAD))
 			{	
-				((Graphics2D)DebugGraphics.getGraphics()).setColor(Color.gray);
-				((Graphics2D)DebugGraphics.getGraphics()).drawOval(Math.round((float)(actualP.getX()-actualInfo.radius)*zoom),
+				Graphics2D g = ((Graphics2D)DebugGraphics.getGraphics());
+					g.setColor(Color.gray);
+					g.drawOval(Math.round((float)(actualP.getX()-actualInfo.radius)*zoom),
 					Math.round((float)(actualP.getY()-actualInfo.radius)*zoom),
 					Math.round((float)(2*actualInfo.radius)*zoom), Math.round((float)(2*actualInfo.radius)*zoom));
 				//Calculate Distance and direction from Point to its projection

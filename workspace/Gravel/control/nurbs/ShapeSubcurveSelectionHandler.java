@@ -43,6 +43,7 @@ public class ShapeSubcurveSelectionHandler implements
 	double tempStart=Double.NaN, tempEnd=Double.NaN;
 	//Only used for double click, because double click is no fun in java
 	double lastStart,lastEnd;
+	int actualState=0;
 	//For single clicks which value to handle next
 	boolean setStartNext = true, DragsetsStart, toggleOnClick=true; 
 	private VHyperEdge HyperEdgeRef;
@@ -86,13 +87,18 @@ public class ShapeSubcurveSelectionHandler implements
 	 * push any notification
 	 */
 	public void resetShape() {
-		if ((!Double.isNaN(tempStart)) && (!Double.isNaN(tempEnd)) && (!temporaryShape.isEmpty()))
+	//	if ((!Double.isNaN(tempStart)) && (!Double.isNaN(tempEnd)) && (!temporaryShape.isEmpty()))
+	//	{
 			temporaryShape = HyperEdgeRef.getShape().clone(); // Reset to actual Edge Shape as NURBSShape
+			NURBSShapeFragment t = (NURBSShapeFragment)temporaryShape;
+			tempStart = t.getStart();
+			tempEnd = t.getEnd();
+	//	}
 	}
 
 	public NURBSShape getShape() {
 		NURBSShapeFragment actualFragment = new NURBSShapeFragment(temporaryShape.stripDecorations(), tempStart, tempEnd);
-		return actualFragment; //maybe subcurve is empty...that dies not matter
+		return actualFragment; //maybe subcurve is empty...that does not matter
 	}
 	public Point2D getDragStartPoint() {
 		if (!dragged())
@@ -116,12 +122,13 @@ public class ShapeSubcurveSelectionHandler implements
 			DragOrigin = null;
 			HyperEdgeRef.setShape(getShape()); //Set shape to NURBSShapeFragment
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
+			resetShape();
 		}
 		DragOrigin=null;
-		resetShape();
 	}
 
 	public void setModificationState(int i) {
+		//Get actual Edge from graph
 		if ((i&VCommonGraphic.SET_START)==VCommonGraphic.SET_START)
 		{
 			setStartNext = true;
@@ -265,15 +272,15 @@ public class ShapeSubcurveSelectionHandler implements
 //					System.err.println("Exchanging");
 //			}
 //			else
-			{
+//			{
 				if (setStartNext)
 					tempStart = proj.getResultParameter();					
 				else
 					tempEnd = proj.getResultParameter();
 				setStartNext ^= toggleOnClick; //Toggle if toggleonclick
-			}
+//			}
 			HyperEdgeRef.setShape(getShape()); //Set shape to NURBSShapeFragment
-			resetShape();
+			internalReset();
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_END,GraphConstraints.HYPEREDGE));							
 		}
 	}

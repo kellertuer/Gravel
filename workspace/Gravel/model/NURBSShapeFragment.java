@@ -84,6 +84,24 @@ public class NURBSShapeFragment extends NURBSShape {
 		return origCurve.getDecorationTypes()|NURBSShape.FRAGMENT;
 	}
 
+	public void refreshDecoration()
+	{
+		//Copy this to origCurve
+		origCurve.controlPoints = controlPoints;
+		origCurve.controlPointsHom = controlPointsHom;
+		origCurve.cpWeight = cpWeight;
+		origCurve.degree = degree;
+		origCurve.Knots = Knots;
+		origCurve.maxCPIndex = maxCPIndex;
+		origCurve.maxKnotIndex = maxKnotIndex;
+		if ((!Double.isNaN(u1))&&(!Double.isNaN(u2)))
+			subcurve = ClampedSubCurve(u1,u2);
+		else
+			subcurve = new NURBSShape();
+		if (subcurve.isEmpty()) //something went wrong in subcurve creation, set this all to empty
+			clearSubcurve();
+	}
+
 	private void clearSubcurve()
 	{
 		if (subcurve!=null)
@@ -251,23 +269,6 @@ public class NURBSShapeFragment extends NURBSShape {
 		refreshDecoration();
 	}
 	
-	public void refreshDecoration()
-	{
-		//Copy this to origCurve
-		origCurve.controlPoints = controlPoints;
-		origCurve.controlPointsHom = controlPointsHom;
-		origCurve.cpWeight = cpWeight;
-		origCurve.degree = degree;
-		origCurve.Knots = Knots;
-		origCurve.maxCPIndex = maxCPIndex;
-		origCurve.maxKnotIndex = maxKnotIndex;
-		if ((!Double.isNaN(u1))&&(!Double.isNaN(u2)))
-			subcurve = ClampedSubCurve(u1,u2);
-		else
-			subcurve = new NURBSShape();
-		if (subcurve.isEmpty()) //something went wrong in subcurve creation, set this all to empty
-			clearSubcurve();
-	}
 	/**
 	 * Return the clamped Subcurve between the parameters u1 and u2
 	 * This is realized by knot insertion at u1 and u2 until the multiplicity in these

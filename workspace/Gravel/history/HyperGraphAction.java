@@ -161,7 +161,7 @@ public class HyperGraphAction extends CommonGraphAction {
 				ret = g; //return graph
 			break;
 			case GraphConstraints.HYPEREDGE: //Replace Edge in graph and keep the replaced one as old one 
-				VHyperEdge e = (VHyperEdge)ActionObject;
+				VHyperEdge e = ((VHyperEdge)ActionObject);
 				if (g.modifyHyperEdges.get(e.getIndex())==null) //edge does not exists
 					throw new GraphActionException("Can't replace hyper edge, none there.");
 				ActionObject = g.modifyHyperEdges.get(e.getIndex()).clone(); //save old edge
@@ -171,7 +171,7 @@ public class HyperGraphAction extends CommonGraphAction {
 				{
 					VSubgraph s = esi.next();
 					if (g.getMathGraph().modifySubgraphs.get(s.getIndex()).containsEdge(e.getIndex()))
-						((VEdge)ActionObject).addColor(s.getColor());
+						((VHyperEdge)ActionObject).addColor(s.getColor());
 				}
 				MHyperEdge tempmhe = mhe.clone();
 				MHyperEdge mhe = g.getMathGraph().modifyHyperEdges.get(e.getIndex());
