@@ -103,14 +103,12 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         {
     		fileDialogs = new JFileDialogs(vgraphic); //This results in only new filedialogs iff
     												  //We don't edit on a shape
-    		
         	if (vgraphic.getType()==VCommonGraphic.VHYPERGRAPHIC)
         	{
         		mVModusShape.setText("Hyperkantenumriss...");
         		mVModusShape.setEnabled(getIndexofSingeSelectedHyperEdge() > 0);
         	}
         }
-        if (!(vgraphic instanceof VHyperShapeGraphic))
         if (isGraph)
         	((VGraphic)graphpart).getGraph().addObserver(this);
         else

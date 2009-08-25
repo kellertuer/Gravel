@@ -269,15 +269,19 @@ public class Gui implements WindowListener
     {
 		if (Gui.getInstance().isShapeModificationActive())
 		{
-			int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Der aktuelle Hyperkantenumriss<br>ist noch nicht im Graphen gespeichert.<br>M"+main.CONST.html_oe+"chten Sie den Umriss "+main.CONST.html_ue+"bernehmen?</html>","Umriss übernehmen",JOptionPane.YES_NO_CANCEL_OPTION);
-			if (n==JOptionPane.YES_OPTION)
-				Gui.getInstance().rebuildmaingrid(true);
-			else if (n==JOptionPane.NO_OPTION)
-				Gui.getInstance().rebuildmaingrid(false);
-			else
-				return false; //Do not continue
-			//continue
-			return true;
+			if (!shapePart.getGraphHistoryManager().IsGraphUnchanged()) //Edge changed
+			{
+				int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Der aktuelle Hyperkantenumriss<br>ist noch nicht im Graphen gespeichert.<br>M"+main.CONST.html_oe+"chten Sie den Umriss "+main.CONST.html_ue+"bernehmen?</html>","Umriss übernehmen",JOptionPane.YES_NO_CANCEL_OPTION);
+				if (n==JOptionPane.YES_OPTION)
+					rebuildmaingrid(true);
+				else if (n==JOptionPane.NO_OPTION)
+					rebuildmaingrid(false);
+				else
+					return false; //Do not continue
+			}
+			else //no Changes, so we don't need to apply
+				rebuildmaingrid(false);
+			return true; //All the else cases here mean we continue.
 		}
 		else
 			return true; //No Shape - continue anyway
