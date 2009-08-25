@@ -245,6 +245,44 @@ public class Gui implements WindowListener
     	shapeParameters = null;
     }
     /**
+     * Indicates whether there any hyperedge shape modification going on
+     * @return true if there is a shape in modification, else false
+     */
+    public boolean isShapeModificationActive()
+    {
+    	return shapePart!=null;
+    }
+    /**
+     * Ask for the unchanged hyperedge shape, if there is one,
+     * whether to apply these changes, discard them or cancle action
+     * 
+     * The return value indicates whether to proceed with the started action (e.g. quit or load ...)
+     * So that means
+     * - YES applies the last hyperedge shape changes to the graph and proceeds
+     * - NO does not apply the changes and proceeds
+     * - CANCEL does not apply changes and does not proceed
+     * 
+     * @return true if the action should proceed, so false iff the user clicked abort
+     * 
+     */
+    public boolean ApplyChange()
+    {
+		if (Gui.getInstance().isShapeModificationActive())
+		{
+			int n = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(), "<html>Der aktuelle Hyperkantenumriss<br>ist noch nicht im Graphen gespeichert.<br>M"+main.CONST.html_oe+"chten Sie den Umriss "+main.CONST.html_ue+"bernehmen?</html>","Umriss übernehmen",JOptionPane.YES_NO_CANCEL_OPTION);
+			if (n==JOptionPane.YES_OPTION)
+				Gui.getInstance().rebuildmaingrid(true);
+			else if (n==JOptionPane.NO_OPTION)
+				Gui.getInstance().rebuildmaingrid(false);
+			else
+				return false; //Do not continue
+			//continue
+			return true;
+		}
+		else
+			return true; //No Shape - continue anyway
+    }
+    /**
      * buildmaingrid() baut ein Grid in dem oben eine Buttonliste ist und dadrunter ein
      * SplitPane in dem man die beiden Inhalte, den Graph und den Tree mit Eigenschaften in der Breite variieren kann
      */

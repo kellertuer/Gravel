@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -99,6 +101,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	private ValidatorThread myValidatorThread=null;
 	private DisplayRunningController runText=null;
 	private JButtonMouseOverListener stopTextDisplay;
+	private Lock ValidatorStartLock;
 	/**
 	 * Little helping Thread for the Validator 
 	 * @author ronny
@@ -130,8 +133,11 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
     		{
     		}
     		runText.stopAnimation();
-    		if (!running)
+    		if (!running) //Someone endet by clicking stop
+    		{
+    			reActivatePanel();
     			return;
+    		}
     		if (validator.isShapeValid())
     		{
     			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><center>Der Umriss ist korrekt.</center><br><br><ul><li>Alle Knoten der Hyperkante sind innerhalb des Umrisses</li><li>Alle Knoten der Hyperkante sind mindestens "+HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getMinimumMargin()+"px</li><li>Alle anderen Knoten sind außerhalb des Umrisses</li></ul></html>", "Der Umriss ist korrekt.", JOptionPane.INFORMATION_MESSAGE);
@@ -150,7 +156,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
     			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), msg, "Der Umriss ist nicht korrekt.", JOptionPane.ERROR_MESSAGE);
     			HShapeGraphicRef.setHighlightedNodes(WrongNodes);
     		}
-    		reInitPanel();
+    		reActivatePanel();
 		}
 		public void stopValidation()
 		{
@@ -170,6 +176,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	{
 		if (vhg.getGraph().modifyHyperEdges.get(index)==null)
 			return;
+		ValidatorStartLock = new ReentrantLock();
 		HEdgeRefIndex = index;
 		HGraphRef = vhg.getGraph();
 		HGraphRef.addObserver(this);
@@ -424,7 +431,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		return cont;
 	}
 
-	private void reInitPanel()
+	private void reActivatePanel()
 	{
 		bCheckShape.removeMouseListener(stopTextDisplay);
 		myValidatorThread=null;
@@ -651,23 +658,27 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	        }	
 	        else if (e.getSource()==bCheckShape)
 	        {
-	        	if (myValidatorThread==null) //none running
+	        	ValidatorStartLock.lock(); //Only let one action at a time enter this block
+	        	try
 	        	{
-	        		//Disable Buttons
-	        		setEnabled(false);
-	        		bCheckShape.setEnabled(true);
-	        		if (runText==null)
-	        			runText = new DisplayRunningController(bCheckShape);
-	        		stopTextDisplay = new JButtonMouseOverListener(bCheckShape,"Stop",runText);
-	        		myValidatorThread = new ValidatorThread();
-	        		myValidatorThread.start();
+	        		if (myValidatorThread==null) //none running
+	        		{
+	        			//Disable Buttons
+	        			setEnabled(false);
+	        			bCheckShape.setEnabled(true);
+	        			if (runText==null)
+	        				runText = new DisplayRunningController(bCheckShape);
+	        			stopTextDisplay = new JButtonMouseOverListener(bCheckShape,"Stop",runText);
+	        			myValidatorThread = new ValidatorThread();
+	        			myValidatorThread.start();
+	        		}
+	        		else
+	        		{
+	        			myValidatorThread.stopValidation();
+	        			System.err.println("Validation abgebrochen");
+	        		}
 	        	}
-	        	else
-	        	{
-	        		myValidatorThread.stopValidation();
-	        		System.err.println("Validation abgebrochen");
-	        		reInitPanel();
-	        	}
+	        	finally {ValidatorStartLock.unlock();}
 	        }
 	        getContent().validate();
 	        getContent().repaint();

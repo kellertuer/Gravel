@@ -28,7 +28,8 @@ public class JButtonMouseOverListener implements MouseListener
 
 	public void mouseExited(MouseEvent e)
 	{
-		origin.setText(origText);
+		if (origin.getText()==mouseText) //We really entered
+			origin.setText(origText);
 		if (c!=null)
 			c.setAnimationPaused(false);
 	}

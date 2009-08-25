@@ -89,6 +89,7 @@ public class ShapeSubcurveSelectionHandler implements
 	public void resetShape() {
 	//	if ((!Double.isNaN(tempStart)) && (!Double.isNaN(tempEnd)) && (!temporaryShape.isEmpty()))
 	//	{
+			HyperEdgeRef = vhg.modifyHyperEdges.get(HyperEdgeRef.getIndex());
 			temporaryShape = HyperEdgeRef.getShape().clone(); // Reset to actual Edge Shape as NURBSShape
 			NURBSShapeFragment t = (NURBSShapeFragment)temporaryShape;
 			tempStart = t.getStart();

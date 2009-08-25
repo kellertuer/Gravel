@@ -99,13 +99,18 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         refreshMenuBar();
         if (vgraphic instanceof VHyperShapeGraphic)
         	mVModusShape.setText("Umriss "+main.CONST.utf8_ue+"bernehmen");
-        else if (vgraphic.getType()==VCommonGraphic.VHYPERGRAPHIC)
+        else 
         {
-        	mVModusShape.setText("Hyperkantenumriss...");
-			mVModusShape.setEnabled(getIndexofSingeSelectedHyperEdge() > 0);
+    		fileDialogs = new JFileDialogs(vgraphic); //This results in only new filedialogs iff
+    												  //We don't edit on a shape
+    		
+        	if (vgraphic.getType()==VCommonGraphic.VHYPERGRAPHIC)
+        	{
+        		mVModusShape.setText("Hyperkantenumriss...");
+        		mVModusShape.setEnabled(getIndexofSingeSelectedHyperEdge() > 0);
+        	}
         }
-              	
-		fileDialogs = new JFileDialogs(vgraphic);
+        if (!(vgraphic instanceof VHyperShapeGraphic))
         if (isGraph)
         	((VGraphic)graphpart).getGraph().addObserver(this);
         else
@@ -461,6 +466,8 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 	 */
 	public boolean checkSavedBeforeQuit() 
 	{
+		if (!Gui.getInstance().ApplyChange())
+			return false; //do not quit
 		if (!fileDialogs.isGraphSaved()) //Not Saved
 		{
 			//Fragen

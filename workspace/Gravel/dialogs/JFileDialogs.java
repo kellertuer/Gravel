@@ -192,6 +192,8 @@ public class JFileDialogs implements Observer
 	 */
 	public boolean Open()
 	{
+		if (!Gui.getInstance().ApplyChange())
+			return false; //do not proceed with loading
 		if (!SaveOnNewOrOpen()) //s.o. aborted
 			return false; //Chosen cancel
 		JFileChooser fc = new JFileChooser("Öffnen einer Gravel-Datei");
@@ -282,8 +284,10 @@ public class JFileDialogs implements Observer
 	 */
 	public boolean Save()
 	{
+		if (!Gui.getInstance().ApplyChange())
+			return false; //do not save
 		if (GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
-		{
+		{ //Can't save
 			return false;
 		}
 		String filename = GeneralPreferences.getInstance().getStringValue("graph.lastfile");
@@ -325,6 +329,8 @@ public class JFileDialogs implements Observer
 	 */
 	public boolean SaveAs()
 	{
+		if (!Gui.getInstance().ApplyChange())
+			return false; //do not save as
 		JOverwriteCheckFileChooser fc = new JOverwriteCheckFileChooser("Speichern unter");
 		//Last used Directory
 		if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
@@ -401,6 +407,8 @@ public class JFileDialogs implements Observer
 	 */
 	public boolean Export()
 	{
+		if (!Gui.getInstance().ApplyChange())
+			return false; //do not export
 		JFileChooser fc = new JOverwriteCheckFileChooser("Exportieren");
 		if (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
 			fc.setCurrentDirectory(new File(GeneralPreferences.getInstance().getStringValue("graph.lastfile")).getParentFile());
@@ -554,6 +562,8 @@ public class JFileDialogs implements Observer
 	 */
 	public void NewGraph() 
 	{
+		if (!Gui.getInstance().ApplyChange())
+			return; //s.o. aborted the apply
 		if (!SaveOnNewOrOpen()) //s.o. aborted
 			return;
 		VGraphInterface vg;
@@ -579,7 +589,7 @@ public class JFileDialogs implements Observer
 		if (this.actualState!=vGc.getGraphHistoryManager().IsGraphUnchanged()) //State Changed
 			actualState = vGc.getGraphHistoryManager().IsGraphUnchanged();
 		else
-			return;
+			return; //Don't update title too often
 		String newtitle="";
 		if (actualState) //Graph is unchanged again
 		{			
