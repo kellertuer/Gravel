@@ -539,6 +539,7 @@ public class ContextMenuClickListener
 				new JNodeDialog(selectedNode,vg);
 			else
 				new JNodeDialog(selectedNode,vhg);
+			Gui.getInstance().refresh();
 		} 
 		//KnotenMenü : Knoten entfernen
 		if (e.getSource() == Ndelete) {

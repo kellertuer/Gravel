@@ -71,12 +71,12 @@ public class StandardNodeDragListener  implements MouseListener, MouseMotionList
 	 * @param x
 	 * @param y
 	 */
-	private void translateAdjacentEdges(int nodeindex, int x, int y)
+	private void translateAdjacentEdges(int nodeindex, int px, int py)
 	{
 		if (vg==null)
 			return;
-		x = Math.round(x/2);
-		y = Math.round(y/2);
+		int x = Math.round(px/2);
+		int y = Math.round(py/2);
 		Iterator<VEdge> edgeiter = vg.modifyEdges.getIterator();
 		while (edgeiter.hasNext())
 		{
@@ -244,6 +244,9 @@ public class StandardNodeDragListener  implements MouseListener, MouseMotionList
 					newpos.y = (new Double(Math.ceil((double)movingNode.getPosition().y/(double)gridy)).intValue())*gridy;
 				else 
 					newpos.y =  (new Double(Math.floor((double)movingNode.getPosition().y/(double)gridy)).intValue())*gridy;
+				int movX = newpos.x-movingNode.getPosition().x;
+				int movY = newpos.y-movingNode.getPosition().y;
+				this.translateAdjacentEdges(movingNode.getIndex(),movX,movY);
 				movingNode.setPosition(newpos);	
 			}
 			if (movingNode!=null) //End Nove Movement-Block

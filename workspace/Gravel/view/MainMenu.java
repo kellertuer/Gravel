@@ -80,10 +80,20 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 		setOpaque(true);
         setPreferredSize(new Dimension(200, 20));
         if (isGraph)
+        {
         	((VGraphic)graphpart).getGraph().addObserver(this);
+    		isFileKnown = ( (GeneralPreferences.getInstance().getBoolValue("graph.loadfileonstart"))
+    				&& (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
+    				&& (((VGraphic)graphpart).getGraph().getMathGraph().modifyNodes.cardinality()>0));
+
+        }
         else
+        {
         	((VHyperGraphic)graphpart).getGraph().addObserver(this);
-        isFileKnown=false;
+    		isFileKnown = ( (GeneralPreferences.getInstance().getBoolValue("graph.loadfileonstart"))
+    				&& (!GeneralPreferences.getInstance().getStringValue("graph.lastfile").equals("$NONE"))
+    				&& (((VHyperGraphic)graphpart).getGraph().getMathGraph().modifyNodes.cardinality()>0));
+        }
  	}
 	public void changeVGraph(VCommonGraphic vgraphic)
 	{

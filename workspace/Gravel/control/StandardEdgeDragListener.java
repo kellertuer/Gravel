@@ -28,13 +28,12 @@ import model.Messages.GraphMessage;
  */
 public class StandardEdgeDragListener implements MouseListener, MouseMotionListener
 {
-
 	private VGraph vg;
 	private VCommonGraphic vgc;
 	private Point MouseOffSet;
 	private GeneralPreferences gp;
-	private VEdge movingControlPointEdge;
-	private VEdge movingEdge;
+	private VEdge movingControlPointEdge=null;
+	private VEdge movingEdge=null;
 	private int movingControlPointIndex;
 	private boolean firstdrag;
 	/**
@@ -149,7 +148,12 @@ public class StandardEdgeDragListener implements MouseListener, MouseMotionListe
 			}
 		}
 		if (movingControlPointEdge==null)
+		{
 			movingEdge = vg.getEdgeinRangeOf(p,2.0*((float)vgc.getZoom()/100));
+			if ( (movingEdge!=null) &&
+					((movingEdge.getEdgeType()!=VEdge.STRAIGHTLINE)||(vg.modifyNodes.getFirstinRangeOf(p)!=null)))
+				movingEdge=null;
+		}
 	}
 
 	public void mouseReleased(MouseEvent e) {

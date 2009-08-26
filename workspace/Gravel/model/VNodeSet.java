@@ -136,7 +136,7 @@ public class VNodeSet extends Observable implements Observer {
 		mnodes.changeIndex(oldi, newi);
 		get(oldi).setIndex(newi);
 		setChanged();
-		notifyObservers(new GraphMessage(GraphConstraints.NODE,newi,GraphConstraints.INDEXCHANGED, GraphConstraints.GRAPH_ALL_ELEMENTS));	
+		notifyObservers(new GraphMessage(GraphConstraints.NODE,GraphConstraints.INDEXCHANGED, GraphConstraints.GRAPH_ALL_ELEMENTS));	
 	}
 	/**
 	 * Removes a node and push an Message that should be handled by other

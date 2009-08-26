@@ -52,11 +52,11 @@
 		<value name="allowmultiple" type="Boolean">true</value>
 		<value name="directed" type="Boolean">false</value>
 		<value name="fileformat" type="String">visual</value>
-		<value name="lastfile" type="String">/Users/ronny/Graveltemp/competitiontutorial.xml</value>
+		<value name="lastfile" type="String">/Users/ronny/Uni/Diplomarbeit/Vorlagen/Graphen/edgesetstd.xml</value>
 		<value name="loadfileonstart" type="Boolean">true</value>
 	</group>
 	<group name="grid">
-		<value name="enabled" type="Boolean">false</value>
+		<value name="enabled" type="Boolean">true</value>
 		<value name="orientated" type="Boolean">true</value>
 		<value name="synchron" type="Boolean">true</value>
 		<value name="x" type="Integer">50</value>
@@ -105,7 +105,7 @@
 		<value name="name" type="String">Untergraph #$ID</value>
 	</group>
 	<group name="vgraphic">
-		<value name="cpshow" type="Boolean">false</value>
+		<value name="cpshow" type="Boolean">true</value>
 		<value name="cpsize" type="Integer">3</value>
 		<value name="directed" type="Boolean">true</value>
 		<value name="framedistance" type="Integer">10</value>

@@ -133,7 +133,6 @@ public class MNodeSet extends Observable implements Observer {
 		notifyObservers(new MGraphMessage(GraphConstraints.NODE, newi, oldi, GraphConstraints.INDEXCHANGED));
 		//And Change the oldnode aswell
 		oldn.index=newi;
-		replace(newn);
 		setChanged();
 		notifyObservers(new GraphMessage(GraphConstraints.NODE, GraphConstraints.INDEXCHANGED, GraphConstraints.GRAPH_ALL_ELEMENTS));	
 	}

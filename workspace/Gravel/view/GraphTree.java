@@ -325,12 +325,14 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 						new JNodeDialog(vG.modifyNodes.get(StringPos2Index(ParentType,selectedPosition)),vG); 
 					else if (vhG!=null)
 						new JNodeDialog(vhG.modifyNodes.get(StringPos2Index(ParentType,selectedPosition)),vhG); 
+					requestFocus();
 					break;}
 				case USEEDGES : {
 					if (vG!=null)
 						new JEdgeDialog(vG.modifyEdges.get(StringPos2Index(ParentType,selectedPosition)),vG); 
 					else if (vhG!=null)
 						new JHyperEdgeDialog(vhG.modifyHyperEdges.get(StringPos2Index(ParentType,selectedPosition)));
+					requestFocus();
 					break;
 					}
 				case USESUBGRAPHS :
@@ -339,6 +341,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 						new JSubgraphDialog(vG.modifySubgraphs.get(StringPos2Index(ParentType,selectedPosition)),vG);
 					else if (vhG!=null)
 						new JSubgraphDialog(vhG.modifySubgraphs.get(StringPos2Index(ParentType,selectedPosition)),vhG);
+					requestFocus();
 					break;
 				}
 				default : {return;}
