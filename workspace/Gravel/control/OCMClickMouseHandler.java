@@ -83,13 +83,13 @@ public class OCMClickMouseHandler implements ClickMouseHandler {
 		if (e.getModifiers()==MouseEvent.BUTTON1_MASK) // Button 1/Links
 		{
 			if (r==null) 
-			{	//Kein Knoten in der Nähe, also einen erstellen
-				if (vg!=null)
+			{	//Only create a node iff there is no node and no edge near the point in Graph p.
+				if ( (vg!=null)&&(vg.getEdgeinRangeOf(p,2.0*((float)vgc.getZoom()/100))==null) )
 				{
 					int i = vg.getMathGraph().modifyNodes.getNextIndex();
 					vg.modifyNodes.add(new VNode(i,p.x,p.y, gp.getIntValue("node.size"), gp.getIntValue("node.name_distance"), gp.getIntValue("node.name_rotation"), gp.getIntValue("node.name_size"), gp.getBoolValue("node.name_visible")), new MNode(i,gp.getNodeName(i)));
 				}
-				else if (vhg!=null)
+				else if ((vhg!=null) && (vhg.getEdgeinRangeOf(pointInGraph, 2.0*((float)vgc.getZoom()/100))==null))
 				{
 					int i = vhg.getMathGraph().modifyNodes.getNextIndex();
 					vhg.modifyNodes.add(new VNode(i,p.x,p.y, gp.getIntValue("node.size"), gp.getIntValue("node.name_distance"), gp.getIntValue("node.name_rotation"), gp.getIntValue("node.name_size"), gp.getBoolValue("node.name_visible")), new MNode(i,gp.getNodeName(i)));
