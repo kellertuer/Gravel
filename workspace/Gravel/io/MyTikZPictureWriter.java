@@ -226,7 +226,8 @@ public class MyTikZPictureWriter implements TeXWriter {
 	    {
 	    	VNode actual = nodeiter.next();
 	    	Point2D drawpoint = new Point2D.Double(((double)(actual.getPosition().x-offset.x))/pixelpercm,((double)(max.y - actual.getPosition().y))/pixelpercm);
-	    	s.write(drawCircle(drawpoint.getX(),drawpoint.getY(),((double)actual.getSize())/(2*pixelpercm),produceColor(actual)));
+	    	s.write(NL+NL+"\t\t% Output of Node #"+actual.getIndex());
+	    	s.write("\t\t"+drawCircle(drawpoint.getX(),drawpoint.getY(),((double)actual.getSize())/(2*pixelpercm),produceColor(actual)));
 	    	if (actual.isNameVisible()) //draw name
 			{					
 	    		//mittelpunkt des Textes
@@ -234,7 +235,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 				//Invert y
 				double y = drawpoint.getY() + (((double)actual.getNameDistance())/pixelpercm) * Math.sin(Math.toRadians((double)actual.getNameRotation()));
 				//TODO Size?
-	    		s.write(NL+"\\pgftext[x="+x+"cm,y="+y+"cm]{"+formname(nodenames.get(actual.getIndex()))+"}");
+	    		s.write(NL+"\t\t\\pgftext[x="+x+"cm,y="+y+"cm]{"+formname(nodenames.get(actual.getIndex()))+"}");
 			}
 		}
 	}
@@ -272,7 +273,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	}
 	private void writeEdges(OutputStreamWriter s) throws IOException
 	{
-	       //Nodes
+	       //Edges
 	    	Iterator<VEdge> edgeiter = edges.getIterator();
 	    	while (edgeiter.hasNext())
 	    	{
@@ -280,6 +281,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	    		MEdge me = medges.get(actual.getIndex());
 	    		int start = me.StartIndex;
 	    		int ende = me.EndIndex;
+	    		s.write(NL+"\t\t% Edge #"+actual.getIndex()+" from "+start+" to "+ende);
 	    		GeneralPath p = actual.getPath(nodes.get(start).getPosition(),nodes.get(ende).getPosition(),1.0f); //without zoom nor line style!
 	    		PathIterator path = p.getPathIterator(null, 5d/pixelpercm); 
 	    		s.write(NL+drawOnePath(path, actual.getWidth(), produceColor(actual), produceLineSpec(actual.getLinestyle(),actual.getWidth())));
@@ -317,6 +319,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	    	   MHyperEdge me = mhyperedges.get(actual.getIndex());
 			   //Mittlere Linie der Kante...immer Zeichnen
 	    	   double res = Math.max(0.25d,75d/pixelpercm);
+	    	   s.write(NL+"\t\t% Hyperedge #"+actual.getIndex());
 	    		GeneralPath p = actual.getShape().getCurve(res);
 	     		PathIterator path = p.getPathIterator(null, 0.5d/pixelpercm); 
 	    		// 0.005/sizeppt =  = the flatness; reduce if result is not accurate enough!
@@ -336,8 +339,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 	    			double x = (m.getX()-offset.getX())/pixelpercm;
 	    			//Invert y
 	    			double y = (max.getY() - m.getY())/pixelpercm;
-	    			//TODO Size?
-	    			s.write("\\pgftext[x="+x+"cm,y="+y+"cm]{"+formname(text)+"}");
+	    			s.write(NL+"\t\t\\pgftext[x="+x+"cm,y="+y+"cm]{"+formname(text)+"}");
 	    		}
 	       }//End while hyperedges.hasNext()
 	}
@@ -358,7 +360,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 		    	{
 		    		if (!start)
 		    			s +=";";
-		    		s +=NL+"\\path["+LineSpec+",draw="+ColorSpec+", line width=";
+		    		s +=NL+"\t\t\\path["+LineSpec+",draw="+ColorSpec+", line width=";
 		    		if (linesinPT)
 		    			s += linewidth+"pt";
 		    		else
@@ -438,18 +440,18 @@ public class MyTikZPictureWriter implements TeXWriter {
 	}
 	private String drawCircle(double x, double y, double s, String color)
 	{	
-		return NL+"\\fill[fill="+color+"] ("+x+","+y+") circle ("+s+");";
+		return NL+"\t\t\\fill[fill="+color+"] ("+x+","+y+") circle ("+s+");";
 	}
 	public String drawCircle(double x, double y, double s, String fillcolor,String drawcolor)
 	{	
 		double x1 = (x-offset.getX())/pixelpercm;
 		double y1 = (max.getY()-y)/pixelpercm;
 		if (fillcolor.equals(""))
-			return NL+"\\fill[draw="+drawcolor+"] ("+x1+","+y1+") circle ("+s+");";
+			return NL+"\t\t\\fill[draw="+drawcolor+"] ("+x1+","+y1+") circle ("+s+");";
 		else if (drawcolor.equals(""))
-			return NL+"\\fill[fill="+fillcolor+"] ("+x1+","+y1+") circle ("+s+");";			
+			return NL+"\t\t\\fill[fill="+fillcolor+"] ("+x1+","+y1+") circle ("+s+");";			
 		
-		return NL+"\\fill[fill="+fillcolor+",draw="+drawcolor+"] ("+x1+","+y1+") circle ("+s+");";			
+		return NL+"\t\t\\fill[fill="+fillcolor+",draw="+drawcolor+"] ("+x1+","+y1+") circle ("+s+");";			
 		
 	}
 	/* (non-Javadoc)
