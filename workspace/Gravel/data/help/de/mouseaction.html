@@ -1,51 +1,49 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
-
-<html lang="en">
+<html lang="de">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="format.css" />  
 	<title>Gravel - Hilfe - Mausaktionen</title>
-
 </head>
 <body>
-<div align=center><a name="title"><h2>Mausaktionen</h2>in der grafischen Darstellung</a></div>
-<p>Mit der Maus lassen sich viele Eigenschaften des Graphen verändern. Dazu stehen zwei unterschiedliche Modi zur Verfügung. Der Standardmodus und den OneClick-Modus.<br>	
-<br>Das Ziehen (Drag) bezieht sich stets auf die linke Maustaste.
-<br>
-<a name="both"><h3>In beiden Modi</h3></a>
-In beiden Modi sind folgende Aktionen möglich:
-<br>
-<table border="0" cellspacing="5" cellpadding="5">
-	<tr><th>Aktion</th><th>Beschreibung</th></tr>	
-	<tr><td>Klicken mit<br>der rechten Maustaste oder<br>Strg+linke Maustaste</td><td>Öfnet das entsprechende <a href="popup_menus.html">Kontextmenüs</a>, je nachdem worauf geklickt wird.</td></tr>
-	<tr><td>Shift und<br>Klicken mit der linken Maustaste</td><td>Erweitert die Selektion. Selektiert angeklickte Knoten und Kanten bzw. deselektiert diese, wenn sie selektiert sind.</td></tr>
-	<tr><td colspan=2>&nbsp;</td></tr>
-	<tr><td>Ziehen (Drag)</td><td>Begonnen auf dem Hintergrund<br>Bewirkt das aufziehen eines Rechtecks, dargestellt in der Selektionsfarbe, in dessen Fläche alle Elemente selektiert werdem.</td></tr>
-	<tr><td>Alt+Ziehen (Drag)</td><td>Begonnen auf einer Kante<br>Verändert die Position des Pfeils entlang der Kante. Dabei wird die X-Achse der Mausbewegung als Eingabe verwendet</td></tr>
-	<tr><td>Alt+Ziehen (Drag)</td><td>Begonnen auf einem Knoten<br>Verändert die Position des Knotennamens, so dieser angezeigt wird.<br>Dabei verändert die X-Achse die Rotation, die Y-Achse den Abstand vom Knotenmittelpunkt.</td></tr>
-	<tr><td>Alt+Shift+Ziehen (Drag)</td><td>Begonnen auf einer selektierten Kante<br>Verändert die Position der Pfeile aller selektierten Kanten, analog zur Veränderung bei einer Kante</td></tr>
-	<tr><td>Alt+Shift+Ziehen (Drag)</td><td>Begonnen auf einem selektierten Knoten<br>Verändert die Position des Knotennamens aller selektierten Knoten, bei denen die Namensanzeige aktiv ist.<br>Dabei verändert die X-Achse die Rotation, die Y-Achse den Abstand vom Knotenmittelpunkt.</td></tr> 
+<h2><a name="title">Mausaktionen</a></h2>
+<p>Es gibt seit der Erweiterung auf Hypergraphen an sich drei Modi im Hauptbereich von „Gravel“: Den Standard- und One-Click-Modus sowie denjenigen zur Bearbeitung eines Hyperkantenumrisses. In diesem gibt es meist nur wenige Maus-Aktionen, dafür mehrere Modifikationsmöglichkeiten über die Buttons. Daher sind dessen Aktionen extra <a href="umrissbearbeiten.html">hier aufgeführt.</p>
+
+<p>Die folgenden Tabellen stellen für den Standard- und den One-Click-Modus eine Übersicht über deren Mausaktionen dar. Alle Aktionen werden, so sie mit gedrückter Shift-Taste begonnen werden und bezogen auf eine ausgewählten (Hyper-)Kante oder einen ausgewählten Knoten, auch auf alle ausgewählten (Hyper-)Kanten bzw. Knoten angewendet.</p>
+
+<p>Die gemeinsamen Aktionen beider Modi sind in Tabelle 1 dargestellt, diejenigen des Standard-Modus in Tabelle 2 und die des One-Click-Modus in Tabelle 3. Bei aktivem Raster mit Ausrichtung an demselben werden nur einzeln bewegte Knoten im Standard-Modus ausgerichtet.
+<table class="nicetable">
+<tr class="head"><td> Mausgeste </td><td>(begonnen) auf </td><td> Taste </td><td> Komentar</td></tr>
+<tr class="strong"><td>Klick </td><td> Graphenelement </td><td> </td><td> wählt das Element aus</td></tr>
+<tr class="light"><td>Klick </td><td> Graphenelement </td><td> Shift </td><td> Ändert die Auswahl des Elements</td></tr>
+<tr class="strong"><td>Klick </td><td> Knoten </td><td> Alt </td><td> Anzeige des Namens (de-)aktivieren</td></tr>
+<tr class="light"><td>Ziehen </td><td> Knoten </td><td> Alt </td><td> Ändern der Namensposition</td></tr>
+<tr class="strong"><td>Klick </td><td> (Hyper-)Kante </td><td> Alt </td><td> Anzeige des Namens (de-)aktivieren</td></tr>
+<tr class="light"><td>Ziehen </td><td> (Hyper-)Kante</td><td> Alt </td><td> Ändern der Namensposition</td></tr>
+<tr class="strong"><td>Rechtsklick </td><td> allem </td><td> </td><td> Kontextmenü</td></tr>
+<tr class="light"><td>Ziehen </td><td> Hintergrund</td><td>       </td><td> Auswahl aller Elemente im aufgezogenen Rechteck</td></tr>
+<tr class="strong"><td>Ziehen </td><td> Hintergrund</td><td> Shift </td><td> Erweitert die Auswahl um das Rechteck</td></tr>
+<tr class="light"><td>Ziehen </td><td> Hintergrund</td><td> Alt   </td><td> Verringert die Auswahl um das Rechteck</td></tr>
+	<caption align="bottom"><span class="title">Tabelle 1:</span> gemeinsame Mausaktionen beider Modi</caption>
 </table>
-<br><br>
-<a name="std"><h3>Im Standard-Modus</h3></a>
-<br>Der Standard-Modus ist zum verschieben von Knoten und Teilen des Graphen gedacht.
-<table border="0" cellspacing="5" cellpadding="5">
-	<tr><th>Aktion</th><th>Beschreibung</th></tr>	
-	<tr><td>Klicken mit<br>der linken Maustaste</td><td>Selektiert einen Knoten oder eine Kante, wenn auf diese geklickt wird. Dabei wird die vorherige Selektion aufgehoben. Ebenso hebt ein Klick auf den Hintergrund die Selektion auf, ohne etwas zu selektieren</td></tr>
-	<tr><td colspan=2>&nbsp;</td></tr>
-	<tr><td>Ziehen (Drag)</td><td>Begonnen auf einem Knoten<br>"Heftet" Den Knoten an die Maus, so dass er mit einer Mausbewegung verschoben wird. Ist ein Ausrichten am Raster aktiviert, so wird beim Loslassen der Maustaste der Knoten am Raster ausgerichtet.</td></tr>
-	<tr><td>Shift+Ziehen (Drag)</td><td>Bewegt die aktuelle Selektion um die Mausbewegung. Eine Ausrichtung am Raster findet nicht statt.</td></tr> 
+
+<table class="nicetable">
+<tr class="head"><td> Mausgeste </td><td> (begonnen) auf </td><td> Taste </td><td> Komentar</td></tr>
+<tr class="strong"><td> Ziehen </td><td> Kantenkontrollpukt </td><td> </td><td> Bewegen des Punktes</td></tr>
+<tr class="light"><td> Ziehen </td><td> Kante (Gerade) </td><td> </td><td> Umformen von gerader zu gebogener Kante</td></tr>
+<tr class="strong"><td> Ziehen </td><td> Knoten </td><td> </td><td> Bewegen des Knotens</td></tr>
+<tr class="light"><td> Ziehen </td><td> sel. Knoten </td><td> Shift </td><td> Bewegen der selektierten Knoten</td></tr>
+	<caption align="bottom"><span class="title">Tabelle 2:</span> zusätzliche Mausaktionen im Standard-Modus</caption>
 </table>
-<br><br><a name="OneClick"><h3>Im OneClick-Modus</h3></a>
-<div align=center></h2><a name="Abb1"><img src="img/OneClick.png"><br><font size="-1">Abbildung 1: Shift+Drag erzeugt mehrere Kanten.</a></div>
-<br>
-Der OneClick-Modus dient dem zügigen Erstellen eines neuen Graphen, Dabei werden Knoten und Kanten durch einfache Mausaktionen erzeugt.
-<table border="0" cellspacing="5" cellpadding="5">
-	<tr><th>Aktion</th><th>Beschreibung</th></tr>	
-	<tr><td>Klicken mit<br>der linken Maustaste</td><td>Auf den Hintergrund<br>Erstellt einen neuen Knoten an der Mausposition. Dabei wird der Knotendialog nicht verwendet, sondern die Standard-Werte verwendet. Die Knoten werden dabei nicht am Raster ausgerichtet.</td></tr>
-	<tr><td colspan=2>&nbsp;</td></tr>
-	<tr><td>Ziehen (Drag)</td><td>Begonnen auf einem Knoten<br>Erstellt eine Kante von diesem Knoten zum Mauscursor. Endet die Aktion auf einem anderen Knoten als dem Startknoten, so wird eine Kante in den Graphen eingefügt. Andernfalls wird die Kante wieder gelöscht.</td></tr>
-	<tr><td>Shift+Ziehen (Drag)</td><td>Begonnen auf einem selektierten Knoten<br>Erzeugt Kanten von allen selektierten Knoten zum Mauscursor. Entdet die Bewegung auf einem Knoten, so werden Kanten von allen selektierten zu diesem Knoten erstellt. Ist der Endknoten ebenso selektiert, wird die Schleife nicht erstellt. Siehe auch Abbildung 1.</td></tr> 
+
+<table class="nicetable">
+<tr class="head"><td> Mausgeste </td><td>(begonnen) auf </td><td> Taste </td><td> Komentar</td></tr>
+<tr class="strong"><td>Klick </td><td> Hintergrund </td><td> </td><td> Erzeugen eines neuen Knotens</td></tr>
+<tr class="light"><td>Ziehen </td><td> Knoten </td><td> </td><td> Erzeugen einer Kante, so die Aktion auf einem Knoten endet</td></tr>
+<tr class="strong"><td>Ziehen </td><td> sel. Knoten </td><td> Shift </td><td> Erzeugen von Kanten aller sel. Knoten zum Zielknoten</td></tr>
+	<caption align="bottom"><span class="title">Tabelle 3:</span> zusätzliche Mausaktionen im One-Click-Modus</caption>
 </table>
+
 </body>
 </html>

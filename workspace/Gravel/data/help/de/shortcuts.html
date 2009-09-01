@@ -1,33 +1,63 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
-
-<html lang="en">
+<html lang="de">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="format.css" />  
 	<title>Gravel - Hilfe - Tastenk&uuml;rzel</title>
 </head>
 <body>
-<div align=center><h2>Tastenkürzel</h2></div>
-<table border="0" cellspacing="5" cellpadding="5">
-<tr><th>Windows & Linux</th><th>Macintosh</th><th>Bedeutung</th></tr>
-<tr><td>Strg+A </td><td>  &#x2318;+A </td><td> Anzeige von Kontrollpunkten ein/aus schalten</td></tr>
-<tr><td>Strg+D </td><td>  &#x2318;+D </td><td>  Umformen zu gerichtetem/ungerichtetem Graph</td></tr>
-<tr><td>Strg+E </td><td>           &#x2318;+E </td><td>                           Graph exportieren.</td></tr>
-<tr><td>Strg+N </td><td>           &#x2318;+N </td><td>                                 Neuer Graph.</td></tr>
-<tr><td>Strg+O </td><td>           &#x2318;+O </td><td>                    Öffnen einer Graph Datei</td></tr>
-<tr><td>Strg+Q </td><td>           &#x2318;+Q </td><td>                               Gravel beenden</td></tr>
-<tr><td>Strg+R </td><td>           &#x2318;+R </td><td>                Raster-Einstellungen aufrufen</td></tr>
-<tr><td>Strg+Shift+S </td><td>     &#x2318;+Shift+S </td><td>                              Speichern unter</td></tr>
-<tr><td>Strg+S </td><td>           &#x2318;+S </td><td>                                    Speichern</td></tr>
-<tr><td>Strg+P </td><td>           &#x2318;+, </td><td>                        Einstellungen öffnen</td></tr>
-<tr><td>Strg+1 </td><td>           &#x2318;+1 </td><td>                 Maßstab auf 50% setzen</td></tr>
-<tr><td>Strg+2 </td><td>           &#x2318;+2 </td><td>                    Maßstab auf 100% setzen</td></tr>
-<tr><td>Strg+3 </td><td>           &#x2318;+3 </td><td>                    Maßstab auf 200% setzen</td></tr>
-<tr><td>Strg+4 </td><td>           &#x2318;+4 </td><td>                Den Standard-Modus aktivieren</td></tr>
-<tr><td>Strg+5 </td><td>           &#x2318;+5 </td><td>                Den OneClick-Modus aktivieren</td></tr>
-<tr><td>F1 </td><td>           (Fn)+F1  </td><td>Hilfe</td></tr>
-<tr><td>entf</td><td>entf</td><td>aktuelle Selektion entfernen</td></tr>
+<h2><a name="title">Tastenkürzel</a></h2>
+<p>Die Tastenkürzel in Gravel beziehen sich &#x2014; mit einer Ausnahme &#x2014; alle auf Menüpunkte. Daher ist hier im Folgenden das Menü aufgelistet. Die einzige Ausnahme bildet die Escape-Taste, welche einen aktuellen Dialog abbricht und zum Hauptfenster zurückkehrt.</p>
+<p> Die Aktivierung der Tastenkürzel unterscheidet sich in den unterschiedlichen Betriebssystemen: Unter Mac OS X ist die Command- bzw. Apfeltaste (&#x2318;-Taste) üblich, bei Windows und Linux ist zur Aktivierung die Strg-Taste zu verwenden. Daher ist diese Aktivierungstaste im Folgenden nie genannt.
 
+<table class="nicetable">
+	<tr class="head"><td colspan="3">Menüpunkt</td><td>Taste</td><td>Komentar</td></tr>
+
+	<tr class="strong"><td colspan="4" class="menupunkt">Gravel</td><td> nur u. Mac OS X</td></tr>
+	<tr class="light"><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbspp;</td><td colspan="2">Über Gravel</td><td>n.v.</td><td></td></tr>
+	<tr class="strong"><td>&nbsp;</td><td colspan="2">Einstellungen...</td><td> , </td><td></td></tr>
+	<tr class="lightbottomline"><td>&nbsp;</td><td colspan="2">Beenden</td><td> Q </td><td></td></tr>
+	<tr class="strong"><td colspan="5" class="menupunkt"> Datei <font style="font-weight:normal">bzw.</font> Ablage <font style="font-weight:normal">(Mac OS X)</font></td></tr>
+
+	<tr class="light"><td></td><td colspan="2">Neuer Graph</td><td> N </td><td></td></tr>
+	<tr class="strong"><td>&nbsp;</td><td colspan="2">Öffnen…</td><td> O </td><td></td></tr>
+	<tr class="light"><td>&nbsp;</td><td colspan="2">Speichern</td><td> S </td><td></td></tr>
+	<tr class="strong"><td>&nbsp;</td><td colspan="2">Speichern unter…</td><td> Shift+S </td><td></td></tr>
+	<tr class="light"><td>&nbsp;</td><td colspan="2">Einstellungen…</td><td> P </td><td> nur u. Windows</td></tr>
+	<tr class="strong"><td>&nbsp;</td><td colspan="2">Export…</td><td> E </td><td> zu PNG, SVG oder \TeX</td></tr>
+	<tr class="lightbottomline"><td>&nbsp;</td><td colspan="2">Beenden</td><td> Q </td><td> nur u. Windows</td></tr>
+
+	<tr class="strong"><td colspan="5" class="menupunkt"> Bearbeiten</td></tr>
+
+	<tr class="light"><td>&nbsp;</td><td colspan="2">Widerrufen</td><td> Z </td><td></td></tr>
+	<tr class="strong"><td>&nbsp;</td><td colspan="2">Wiederholen</td><td> Shift+Z </td><td></td></tr>
+	<tr class="light"><td>&nbsp;</td><td colspan="2">Auswahl löschen</td><td> Entf. </td><td>Mac OS X: Rücklöschtaste</td></tr>
+	<tr class="strong"><td>&nbsp;</td><td colspan="2">Auswahl bearbeiten…</td><td> M </td><td></td></tr>
+	<tr class="lightbottomline"><td>&nbsp;</td><td colspan="2">Auswahl anordnen…</td><td> n.v. </td><td></td></tr>
+
+	<tr class="strong"><td colspan="5" class="menupunkt"> Ansicht</td></tr>
+
+	<tr class="light"><td>&nbsp;</td><td colspan="4" class="menupunkt">Graph umformen (zu) <font style="font-weight:normal">(bei Graphen)</font></td></tr>
+	<tr class="strong"><td></td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>(un)gerichtet</td><td>D</td><td></td></tr>
+	<tr class="light"><td>&nbsp;</td><td></td><td>mit/ohne Schleifen</td><td>L</td><td></td></tr>
+	<tr class="strong"><td>&nbsp;</td><td></td><td>mit/ohne Mehrfachkanten</td><td>n.v.</td><td></td></tr>
+
+	<tr class="light"><td>&nbsp;</td><td colspan="4" class="menupunkt">Modus</td></tr>
+	<tr class="strong"><td>&nbsp;</td><td></td><td> Standard</td><td>4</td><td></td></tr>
+	<tr class="light"><td>&nbsp;</td><td></td><td> One-Click</td><td>5</td><td></td></tr>
+	<tr class="strong"><td>&nbsp;</td><td></td><td> Hyperkantenumriss…</td><td>6</td><td>bei Hypergraphen</td></tr>
+	<tr class="light"><td>&nbsp;</td><td colspan="2">Raster-Einstellungen…</td><td> R </td><td></td></tr>
+	<tr class="strong"><td>&nbsp;</td><td colspan="2">Kontrollpunkte anzeigen</td><td> A </td><td></td></tr>
+
+	<tr class="light"><td>&nbsp;</td><td colspan="4" class="menupunkt">Zoom</td></tr>
+	<tr class="strong"><td>&nbsp;</td><td></td><td> 50\%</td><td>1</td><td></td></tr>
+	<tr class="light"><td>&nbsp;</td><td></td><td> 100\%</td><td>2</td><td></td></tr>
+	<tr class="strongbottomline"><td>&nbsp;</td><td></td><td> 200\%</td><td>3</td><td></td></tr>
+	<tr class="light"><td colspan="5" class="menupunkt">Hilfe</td></tr>
+	<tr class="strong"><td>&nbsp;</td><td colspan="2">Index</td><td> F1 </td><td></td></tr>
+	<tr class="light"><td>&nbsp;</td><td colspan="2">Über Gravel</td><td>n.v.</td><td> nur u. Windows</td></tr>
+	<caption align="bottom"><span class="title">Tabelle 1:</span> Tastenkürzel der Menüpunkte</caption>
 </table>
 </body>
 </html>

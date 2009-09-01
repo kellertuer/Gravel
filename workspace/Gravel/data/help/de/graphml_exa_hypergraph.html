@@ -1,0 +1,341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="de">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="format.css" />  
+  <title>Gravel - Hilfe - GraphML</title>
+</head>
+<body>
+<h2><a name="title">GraphML-Beispiel: Ein Hypergraph</a></h2>
+Die aufgeführte XML-Date enthält den Graphen aus der Abbildung 1
+<div class="imagebox">
+  <a name="Abb1"><img src="img/graphml_exa_hypergraph.png"></a><br>
+  <font size=-1>Abbildung 1: Ein Hypergraph</font>
+</div>         
+
+<pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns 
+                    http://gravel.darkmoonwolf.de/xmlns/gravelml.xsd"&gt;
+
+  &lt;!--                          --&gt;
+  &lt;!-- mathematsche Datenfelder  --&gt;
+  &lt;!--                          --&gt;
+  &lt;key id="graphtype" for="graph" attr.name="type" attr.type="string" /&gt;
+
+    &lt;!-- Values for hyperedges --&gt;
+  &lt;key id="hyperedgevalue" for="hyperedge" attr.name="hyperedge.value" attr.type="int"&gt;
+    &lt;default&gt;1&lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="hyperedgename" for="hyperedge" attr.name="hyperedge.name" attr.type="string"&gt;
+    &lt;default&gt;E_{$ID}&lt;/default&gt;
+  &lt;/key&gt;
+    &lt;!-- Values for nodes --&gt;
+  &lt;key id="nodename" for="node" attr.name="node.name" attr.type="string"&gt;
+    &lt;default&gt;v_{$ID}&lt;/default&gt;
+  &lt;/key&gt;
+
+
+  &lt;!--                      --&gt;
+  &lt;!-- visuelle Datenfelder  --&gt;
+  &lt;!--                      --&gt;
+
+    &lt;!-- Hyperedge Details --&gt;
+  &lt;key id="hyperedgewidth" for="hyperedge" attr.name="hyperedge.width" attr.type="int"&gt;
+    &lt;default&gt;1&lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="hyperedgemargin" for="hyperedge" attr.name="hyperedge.margin" attr.type="int"&gt;
+    &lt;default&gt;8&lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="hyperedgetext" for="hyperedge" attr.name="hyperedge.text" attr.complexType="edge.text.type"&gt;
+    &lt;default&gt;
+      &lt;hyperedgetext distance="7" position="0.25" size="12" show="name" visible="false"/&gt;
+    &lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="hyperedgeline" for="hyperedge" attr.name="hyperedge.line" attr.complexType="edge.line.type"&gt;
+    &lt;default&gt;
+      &lt;hyperedgeline length="10" distance="15" type="solid"/&gt;
+    &lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="hyperedgeshape" for="hyperedge" attr.name="hyperedge.shape" attr.complexType="hyperedge.shape.type"/&gt;
+
+    &lt;!-- Node Values --&gt;
+  &lt;key id="nodeform" for="node" attr.name="node" attr.complexType="node.form.type"&gt;
+    &lt;default&gt;
+      &lt;form type="Circle" x="0" y="0" size="9"/&gt;
+    &lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="nodetext" for="node" attr.name="node.text" attr.complexType="node.text.type"&gt;
+    &lt;default&gt;
+      &lt;nodetext distance="18" rotation="270"  size="12" visible="true"/&gt;
+    &lt;/default&gt;
+  &lt;/key&gt;
+
+  &lt;!--             --&gt;
+  &lt;!-- der Graph    --&gt;
+  &lt;!--             --&gt;
+
+
+  &lt;graph id="HG" edgedefault="undirected"&gt;
+    &lt;data key="graphtype"&gt;visual hypergraph&lt;/data&gt;
+
+    &lt;node id="1"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="122" y="190" size="5"/&gt;&lt;/data&gt;
+      &lt;data key="nodetext"&gt;&lt;nodetext distance="12"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+
+    &lt;node id="2"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="122" y="95" size="5"/&gt;&lt;/data&gt;
+      &lt;data key="nodetext"&gt;&lt;nodetext distance="12" rotation="0"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+
+    &lt;node id="3"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="215" y="87" size="5"/&gt;&lt;/data&gt;
+      &lt;data key="nodetext"&gt;&lt;nodetext distance="12" rotation="315"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+
+    &lt;node id="4"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="315" y="73" size="5"/&gt;&lt;/data&gt;
+      &lt;data key="nodetext"&gt;&lt;nodetext distance="12" rotation="225"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+
+    &lt;node id="5"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="315" y="125" size="5"/&gt;&lt;/data&gt;
+      &lt;data key="nodetext"&gt;&lt;nodetext distance="12" rotation="90"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+
+    &lt;node id="6"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="186" y="226" size="5"/&gt;&lt;/data&gt;
+      &lt;data key="nodetext"&gt;&lt;nodetext distance="12"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+
+    &lt;node id="7"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="193" y="170" size="5"/&gt;&lt;/data&gt;
+      &lt;data key="nodetext"&gt;&lt;nodetext distance="12"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+
+    &lt;node id="8"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="266" y="204" size="5"/&gt;&lt;/data&gt;
+      &lt;data key="nodetext"&gt;&lt;nodetext distance="12"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+
+    &lt;hyperedge id="1"&gt;
+      &lt;endpoint node="3"/&gt;
+      &lt;endpoint node="4"/&gt;
+      &lt;endpoint node="5"/&gt;
+      &lt;data key="hyperedgetext"&gt;
+        &lt;hyperedgetext distance="10" position="0.06999927" size="14" visible="true" show="name"/&gt;
+      &lt;/data&gt;
+      &lt;data key="hyperedgeshape"&gt;
+        &lt;hyperedgeshape degree="3"&gt;
+          &lt;knot id="0" u="0.024088222498584833"/&gt;
+          &lt;knot id="1" u="0.09044953019775176"/&gt;
+          &lt;knot id="2" u="0.1608663832870772"/&gt;
+          &lt;knot id="3" u="0.21125055926797648"/&gt;
+          &lt;knot id="4" u="0.2296038392485844"/&gt;
+          &lt;knot id="5" u="0.2952956182565288"/&gt;
+          &lt;knot id="6" u="0.3535672889221105"/&gt;
+          &lt;knot id="7" u="0.4040184250906109"/&gt;
+          &lt;knot id="8" u="0.4492826771514327"/&gt;
+          &lt;knot id="9" u="0.49791149216445874"/&gt;
+          &lt;knot id="10" u="0.5560402388023845"/&gt;
+          &lt;knot id="11" u="0.6224015465015514"/&gt;
+          &lt;knot id="12" u="0.6928183995908769"/&gt;
+          &lt;knot id="13" u="0.7432025755717762"/&gt;
+          &lt;knot id="14" u="0.761555855552384"/&gt;
+          &lt;knot id="15" u="0.8272476345603283"/&gt;
+          &lt;knot id="16" u="0.88551930522591"/&gt;
+          &lt;controlpoint id="0" x="191.51715209045585" y="86.17288974230557" w="1.0"/&gt;
+          &lt;controlpoint id="1" x="207.59669176909526" y="73.76870280945923" w="1.0"/&gt;
+          &lt;controlpoint id="2" x="243.54470521976157" y="62.51550688994614" w="1.0"/&gt;
+          &lt;controlpoint id="3" x="308.5167452986514" y="50.11287188126119" w="1.0"/&gt;
+          &lt;controlpoint id="4" x="330.33482386485576" y="64.21288223353189" w="1.0"/&gt;
+          &lt;controlpoint id="5" x="331.327427387478" y="69.80636231297703" w="1.0"/&gt;
+          &lt;controlpoint id="6" x="331.3833894866537" y="131.7134471917151" w="1.0"/&gt;
+          &lt;controlpoint id="7" x="328.0106455896844" y="135.34783191555394" w="1.0"/&gt;
+          &lt;controlpoint id="8" x="307.7332952147372" y="148.58057086646275" w="1.0"/&gt;
+          &lt;controlpoint id="9" x="215.24645364163763" y="108.20182097112499" w="1.0"/&gt;
+          &lt;controlpoint id="10" x="191.51715209045585" y="86.17288974230557" w="1.0"/&gt;
+          &lt;controlpoint id="11" x="207.59669176909526" y="73.76870280945923" w="1.0"/&gt;
+          &lt;controlpoint id="12" x="243.54470521976157" y="62.51550688994614" w="1.0"/&gt;
+        &lt;/hyperedgeshape&gt;
+      &lt;/data&gt;
+    &lt;/hyperedge&gt;
+
+    &lt;hyperedge id="2"&gt;
+      &lt;endpoint node="5"/&gt;
+      &lt;endpoint node="8"/&gt;
+      &lt;data key="hyperedgetext"&gt;
+        &lt;hyperedgetext distance="14" position="0.2599993" size="14" visible="true" show="name"/&gt;
+      &lt;/data&gt;
+      &lt;data key="hyperedgeshape"&gt;
+        &lt;hyperedgeshape degree="2"&gt;
+          &lt;knot id="0" u="0.0"/&gt;
+          &lt;knot id="1" u="0.0"/&gt;
+          &lt;knot id="2" u="0.0"/&gt;
+          &lt;knot id="3" u="1.0"/&gt;
+          &lt;knot id="4" u="1.0"/&gt;
+          &lt;knot id="5" u="1.0"/&gt;
+          &lt;controlpoint id="0" x="315.0" y="125.0" w="1.0"/&gt;
+          &lt;controlpoint id="1" x="290.5" y="164.5" w="1.0"/&gt;
+          &lt;controlpoint id="2" x="266.0" y="204.0" w="1.0"/&gt;
+        &lt;/hyperedgeshape&gt;
+      &lt;/data&gt;
+    &lt;/hyperedge&gt;
+
+    &lt;hyperedge id="3"&gt;
+      &lt;endpoint node="6"/&gt;
+      &lt;endpoint node="7"/&gt;
+      &lt;endpoint node="8"/&gt;
+      &lt;data key="hyperedgetext"&gt;
+        &lt;hyperedgetext distance="11" position="0.44000015" size="14" visible="true" show="name"/&gt;
+      &lt;/data&gt;
+      &lt;data key="hyperedgeshape"&gt;
+        &lt;hyperedgeshape degree="3"&gt;
+          &lt;knot id="0" u="0.009818027331952167"/&gt;
+          &lt;knot id="1" u="0.0782033404850159"/&gt;
+          &lt;knot id="2" u="0.14789459305998423"/&gt;
+          &lt;knot id="3" u="0.20907375772490536"/&gt;
+          &lt;knot id="4" u="0.20980924948704727"/&gt;
+          &lt;knot id="5" u="0.2740793477309445"/&gt;
+          &lt;knot id="6" u="0.3391120987414589"/&gt;
+          &lt;knot id="7" u="0.4038386932237428"/&gt;
+          &lt;knot id="8" u="0.46805733691881635"/&gt;
+          &lt;knot id="9" u="0.54002541575732"/&gt;
+          &lt;knot id="10" u="0.6084107289103837"/&gt;
+          &lt;knot id="11" u="0.6781019814853521"/&gt;
+          &lt;knot id="12" u="0.7392811461502732"/&gt;
+          &lt;knot id="13" u="0.7400166379124151"/&gt;
+          &lt;knot id="14" u="0.8042867361563124"/&gt;
+          &lt;knot id="15" u="0.8693194871668268"/&gt;
+          &lt;controlpoint id="0" x="156.43056873733195" y="229.204996510821" w="1.0"/&gt;
+          &lt;controlpoint id="1" x="173.6509910753852" y="202.29868074930425" w="1.0"/&gt;
+          &lt;controlpoint id="2" x="181.02894220881393" y="168.11193468282403" w="1.0"/&gt;
+          &lt;controlpoint id="3" x="178.25230509220606" y="123.64559240169469" w="1.0"/&gt;
+          &lt;controlpoint id="4" x="234.44355271182732" y="150.83476634895462" w="1.0"/&gt;
+          &lt;controlpoint id="5" x="267.8001316124766" y="170.38188443521148" w="1.0"/&gt;
+          &lt;controlpoint id="6" x="319.48634879411" y="216.34506369915425" w="1.0"/&gt;
+          &lt;controlpoint id="7" x="263.7521539731703" y="231.44171174908996" w="1.0"/&gt;
+          &lt;controlpoint id="8" x="181.88424587884413" y="273.5154546978116" w="1.0"/&gt;
+          &lt;controlpoint id="9" x="156.43056873733195" y="229.204996510821" w="1.0"/&gt;
+          &lt;controlpoint id="10" x="173.6509910753852" y="202.29868074930425" w="1.0"/&gt;
+          &lt;controlpoint id="11" x="181.02894220881393" y="168.11193468282403" w="1.0"/&gt;
+        &lt;/hyperedgeshape&gt;
+      &lt;/data&gt;
+    &lt;/hyperedge&gt;
+
+    &lt;hyperedge id="4"&gt;
+      &lt;endpoint node="2"/&gt;
+      &lt;endpoint node="3"/&gt;
+      &lt;endpoint node="7"/&gt;
+      &lt;data key="hyperedgetext"&gt;
+        &lt;hyperedgetext distance="10" position="0.059999518" size="14" visible="true" show="name"/&gt;
+      &lt;/data&gt;
+      &lt;data key="hyperedgeshape"&gt;
+        &lt;hyperedgeshape degree="3"&gt;
+          &lt;knot id="0" u="0.03139788194215004"/&gt;
+          &lt;knot id="1" u="0.09216948148969312"/&gt;
+          &lt;knot id="2" u="0.152184107976382"/&gt;
+          &lt;knot id="3" u="0.18004387946006656"/&gt;
+          &lt;knot id="4" u="0.20884497872932775"/&gt;
+          &lt;knot id="5" u="0.2664590350160721"/&gt;
+          &lt;knot id="6" u="0.32582937009652796"/&gt;
+          &lt;knot id="7" u="0.3852577863820957"/&gt;
+          &lt;knot id="8" u="0.41277085103905575"/&gt;
+          &lt;knot id="9" u="0.4429364676446231"/&gt;
+          &lt;knot id="10" u="0.49961584317429325"/&gt;
+          &lt;knot id="11" u="0.5595908932325947"/&gt;
+          &lt;knot id="12" u="0.6203624927801378"/&gt;
+          &lt;knot id="13" u="0.6803771192668266"/&gt;
+          &lt;knot id="14" u="0.7082368907505112"/&gt;
+          &lt;knot id="15" u="0.7370379900197724"/&gt;
+          &lt;knot id="16" u="0.7946520463065168"/&gt;
+          &lt;knot id="17" u="0.8540223813869726"/&gt;
+          &lt;controlpoint id="0" x="108.65313976173258" y="91.04426615348255" w="1.0"/&gt;
+          &lt;controlpoint id="1" x="111.01327572341367" y="84.25175785436737" w="1.0"/&gt;
+          &lt;controlpoint id="2" x="129.21874582201127" y="78.0562035208234" w="1.0"/&gt;
+          &lt;controlpoint id="3" x="216.9698356181118" y="68.8462849889103" w="1.0"/&gt;
+          &lt;controlpoint id="4" x="225.8808132923515" y="77.65894292284334" w="1.0"/&gt;
+          &lt;controlpoint id="5" x="231.96269253516232" y="86.01815423097682" w="1.0"/&gt;
+          &lt;controlpoint id="6" x="246.70815224878598" y="136.57692256290045" w="1.0"/&gt;
+          &lt;controlpoint id="7" x="205.33242715237566" y="190.27808352913485" w="1.0"/&gt;
+          &lt;controlpoint id="8" x="196.79066029693124" y="190.7836276256578" w="1.0"/&gt;
+          &lt;controlpoint id="9" x="184.30985616238874" y="196.1704550050542" w="1.0"/&gt;
+          &lt;controlpoint id="10" x="102.72373941496734" y="100.8307539179445" w="1.0"/&gt;
+          &lt;controlpoint id="11" x="108.65313976173258" y="91.04426615348255" w="1.0"/&gt;
+          &lt;controlpoint id="12" x="111.01327572341367" y="84.25175785436737" w="1.0"/&gt;
+          &lt;controlpoint id="13" x="129.21874582201127" y="78.0562035208234" w="1.0"/&gt;
+        &lt;/hyperedgeshape&gt;
+      &lt;/data&gt;
+    &lt;/hyperedge&gt;
+
+    &lt;hyperedge id="5"&gt;
+      &lt;endpoint node="1"/&gt;
+      &lt;endpoint node="2"/&gt;
+      &lt;data key="hyperedgetext"&gt;
+        &lt;hyperedgetext distance="12" position="0.24999999" size="14" visible="true" show="name"/&gt;
+      &lt;/data&gt;
+      &lt;data key="hyperedgeshape"&gt;
+        &lt;hyperedgeshape degree="2"&gt;
+          &lt;knot id="0" u="0.0"/&gt;
+          &lt;knot id="1" u="0.0"/&gt;
+          &lt;knot id="2" u="0.0"/&gt;
+          &lt;knot id="3" u="1.0"/&gt;
+          &lt;knot id="4" u="1.0"/&gt;
+          &lt;knot id="5" u="1.0"/&gt;
+          &lt;controlpoint id="0" x="122.0" y="190.0" w="1.0"/&gt;
+          &lt;controlpoint id="1" x="122.0" y="142.5" w="1.0"/&gt;
+          &lt;controlpoint id="2" x="122.0" y="95.0" w="1.0"/&gt;
+        &lt;/hyperedgeshape&gt;
+      &lt;/data&gt;
+    &lt;/hyperedge&gt;
+
+    &lt;hyperedge id="6"&gt;
+      &lt;endpoint node="7"/&gt;
+      &lt;data key="hyperedgetext"&gt;
+        &lt;hyperedgetext distance="23" position="0.6399996" size="14" visible="true" show="name"/&gt;
+      &lt;/data&gt;
+      &lt;data key="hyperedgeshape"&gt;
+        &lt;hyperedgeshape degree="4"&gt;
+          &lt;knot id="0" u="0.0"/&gt;
+          &lt;knot id="1" u="1.0"/&gt;
+          &lt;knot id="2" u="1.0"/&gt;
+          &lt;knot id="3" u="1.0"/&gt;
+          &lt;knot id="4" u="2.0"/&gt;
+          &lt;knot id="5" u="2.0"/&gt;
+          &lt;knot id="6" u="2.0"/&gt;
+          &lt;knot id="7" u="3.0"/&gt;
+          &lt;knot id="8" u="3.0"/&gt;
+          &lt;knot id="9" u="3.0"/&gt;
+          &lt;knot id="10" u="4.0"/&gt;
+          &lt;knot id="11" u="4.0"/&gt;
+          &lt;knot id="12" u="4.0"/&gt;
+          &lt;knot id="13" u="5.0"/&gt;
+          &lt;knot id="14" u="5.0"/&gt;
+          &lt;knot id="15" u="5.0"/&gt;
+          &lt;knot id="16" u="6.0"/&gt;
+          &lt;knot id="17" u="6.0"/&gt;
+          &lt;controlpoint id="0" x="192.89175070476225" y="171.13804379325848" w="1.0"/&gt;
+          &lt;controlpoint id="1" x="191.2555260757867" y="168.48372202886634" w="1.0"/&gt;
+          &lt;controlpoint id="2" x="193.62619757835813" y="164.61565968149944" w="1.0"/&gt;
+          &lt;controlpoint id="3" x="203.0089373111368" y="158.62355131392664" w="1.0"/&gt;
+          &lt;controlpoint id="4" x="208.4572155858809" y="157.49819002164955" w="1.0"/&gt;
+          &lt;controlpoint id="5" x="211.65723017031956" y="159.15382705811288" w="1.0"/&gt;
+          &lt;controlpoint id="6" x="210.92278329672365" y="165.6762111698719" w="1.0"/&gt;
+          &lt;controlpoint id="7" x="207.11072965095508" y="169.4558942265411" w="1.0"/&gt;
+          &lt;controlpoint id="8" x="201.54004356394498" y="171.6683195374447" w="1.0"/&gt;
+          &lt;controlpoint id="9" x="192.89175070476225" y="171.13804379325848" w="1.0"/&gt;
+          &lt;controlpoint id="10" x="191.2555260757867" y="168.48372202886634" w="1.0"/&gt;
+          &lt;controlpoint id="11" x="193.62619757835813" y="164.61565968149944" w="1.0"/&gt;
+          &lt;controlpoint id="12" x="203.0089373111368" y="158.62355131392664" w="1.0"/&gt;
+        &lt;/hyperedgeshape&gt;
+      &lt;/data&gt;
+    &lt;/hyperedge&gt;
+  &lt;/graph&gt;
+&lt;/graphml&gt;
+</pre>
+</body>
+</html>

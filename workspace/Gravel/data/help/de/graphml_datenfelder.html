@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="de">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="format.css" />  
+	<title>Gravel - Hilfe - GraphML</title>
+</head>
+<body>
+<h2><a name="title">GraphML-Datenfelder</a></h2>
+Für Gravel wurden in GraphML verschiedene Datenfelder mittels <code>&lt;key&gt;</code>-Tag definiert. zunächst sind hier die einfachen Datenfelder aufgelistet, welche einfache Werte für einzelne Elemente des Graphen speichern.
+<h3>Einfache Datenfelder</h3>
+Dabei werden zunächst die mathematischen Daten aufgelistet, dann die visuellen, jeweils gruppiert nach Element. 
+<table class="nicetable">
+	<tr class="head"><td>Datenfeld (id)</td><td>für</td><td>Typ</td><td>Kommentar</td></tr>
+
+	<tr class="light"><td><code>graphtype</code></td><td>graph</td><td><code>string</code></td><td>Gibt den Typ an, der im Dokument gespeichert ist: mathematischer oder visualler Graph bzw. Hypergraph</td></tr>
+	<tr class="strong"><td><code>graphloops</code></td><td>graph</td><td><code>boolean</code></td><td>Gibt an, ob in einem Graphen Schleifen erlaubt sind</td></tr>
+	<tr class="light"><td><code>graphmultipleedges</code></td><td>graph</td><td><code>boolean</code></td><td>Gibt an, ob in einem Graphen Mehrfachkanten erlaubt sind.</td></tr>
+	<tr class="strong"><td><code>edgevalue</code></td><td>edge</td><td><code>integer</code></td><td>Gewicht einer Kante</td></tr>
+	<tr class="light"><td><code>edgename</code></td><td>edge</td><td><code>string</code></td><td>Kantenname<sup>1,2,3</sup></td></tr>
+	<tr class="strong"><td><code>hyperedgevalue</code></td><td>hyperedge</td><td><code>integer</code></td><td>Gewicht einer Hyperkante</td></tr>
+	<tr class="light"><td><code>hyperedgename</code></td><td>hyperedge</td><td><code>string</code></td><td>Hyperkantenname<sup>1</sup></td></tr>
+	<tr class="strongbottomline"><td><code>nodename</code></td><td>node</td><td><code>string</code></td><td>Knotenname<sup>1</sup></td></tr>
+	<tr class="light"><td><code>edgewidth</code></td><td>edge</td><td><code>int</code></td><td>Linienbreite der Kante</td></tr>
+	<tr class="strong"><td><code>edgetype</code></td><td>edge</td><td><code>string</code></td><td>Kantentyp, einer der vier aus dem Editor, Standard ist stets Straightline, weil dieser Type keine Zusatzinformationen benötigt.</td></tr>
+	<tr class="light"><td><code>edgeorthogonal</code></td><td>edge</td><td><code>boolean</code></td><td>Angabe, welche richtung die orthogonal gezeichnete Kante zuerst wählt (<code>true</code> entspricht vertikal vom Start entfernen)</td></tr>
+	<tr class="strong"><td><code>edgewidth</code></td><td>edge</td><td><code>int</code></td><td>Linienbreite der Kante</td></tr>
+	<tr class="light"><td><code>hyperedgewidth</code></td><td>hyperedge</td><td><code>int</code></td><td>Linienbreite des Hyperkantenumrisses</td></tr>
+	<tr class="strong"><td><code>hyperedgemargin</code></td><td>hyperedge</td><td><code>int</code></td><td>Innenabstand des Hyperkantenumrisses</td></tr>
+</table>
+
+<h3>komplexe Datenfelder</h3>
+Die komplexen Datenfelder sind eigene XML-Strukturen, da die Werte komplizierter sind. Dabei kann ein Element weitere Elemente enthalten. Ein Datenelement mit einer <code>id</code> kann dann in dem entsprechend angegebenen Graphenelement verwendet werden.
+<table class="nicetable">
+	<tr class="head"><td>Datenfeld (id)</td><td>für</td><td>Typ</td><td>Kommentar</td></tr>
+	<tr class="light"><td><code>subgraphX</code><sup>4</sup></td><td>graph</td><td><code>graph.subgraph.type</code></td><td>Untergraphenspezifikation</td></tr>
+	<tr class="strong"><td><code>edgearrow</code></td><td>edge</td><td><code>edge.arrow.type</code></td><td>Pfeil einer Kante</td></tr>
+	<tr class="light"><td><code>edgepoints</code></td><td>edge</td><td><code>edge.points.type</code></td><td>Menge der Kantenkontrollpunkte</td></tr>
+	<tr class="strong"><td><code>loopedge</code></td><td>edge</td><td><code>edge.loop.type</code></td><td>Werte der Schleife</td></tr>
+	<tr class="light"><td><code>edgetext</code></td><td>edge</td><td><code>edge.text.type</code></td><td>Werte zum Kantentext</td></tr>
+	<tr class="strongbottomline"><td><code>edgeline</code></td><td>edge</td><td><code>edge.line.type</code></td><td>Werte der Linienart einer Kante</td></tr>
+
+	<tr class="light"><td><code>hyperedgetext</code></td><td>hyperedge</td><td><code>edge.text.type</code></td><td>Werte zum Hyperkantentext (Typ identisch mit Kantentext)</td></tr>
+	<tr class="strong"><td><code>hyperedgeline</code></td><td>hyperedge</td><td><code>edge.line.type</code></td><td>Linienart der Hyperkante (Typ wie bei Linie der Kante)</td></tr>
+	<tr class="lightbottomline"><td><code>hyperedgeshape</code></td><td>hyperedge</td><td><code>hyperedge.shape.type</code></td><td>Umriss der Hpyerkante (NURBS-Kurve)</td></tr>	
+	<tr class="strong"><td><code>nodeform</code></td><td>node</td><td><code>node.form.type</code></td><td>Knotenform (bisher nur Kreis) und -position</td></tr>
+	<tr class="light"><td><code>nodetext</code></td><td>node</td><td><code>node.text.type</code></td><td>Knotentext</td></tr>
+</table>
+
+<h3>komplexe Datentypen</h3>
+Die mit <code>*</code> gekennzeichneten Elemente in einem Typ können mehrfach vorkommen. Die meisten enthalten Elemente, etwa <code>id</code> oder <code>name</code> sind vom Typ her aus dem Kontext ersichtlich. Besondere Elemente sind direkt danach erläutert. Attribute sind ebenso meist aus dem Kontext klar, 
+<table class="nicetable">
+	<tr class="head"><td>Datentyp</td><td>Attribute</td><td>Elemente</td><td>Kommentar</td></tr>
+	<tr class="light"><td><code>graph.subgraph.type</code></td><td></td><td><code>color,name,nodeid*,(hyper)edgeid*</code></td><td>Untergraphenspezifikation, wobei nur entweder Kanten- <em>oder</em> Hyperkantenindizes vorkommen.</td></tr>
+		<tr class="strongbottomline"><td><code>color.type</code></td><td></td><td><code>r,g,b</code> (jeweils 8 Bit)</td><td>Farbangabe im RGB-Farbraum</td></tr>
+	<tr class="light"><td><code>edge.arrow.type</code></td><td><code>size,part,position,headalpha</code></td><td></td><td>Pfeil mit seiner Größe, des Füllteils, der Position auf der Kante und dem Winkel in der Spitze (jeweils <code>float</code>-Werte)</td></tr>
+	<tr class="strong"><td><code>edge.points.type</code></td><td></td><td><code>edge.point*</code></td><td>Menge an Punkten.</td></tr>
+	<tr class="light"><td><code>edge.point.type</code></td><td><code>id,x,y</code></td><td></td><td>Ein Punkt mit Position im Bild und dem Index im Punktvektor</td></tr>
+	<tr class="strong"><td><code>edge.loop.type</code></td><td><code>length,proportion,direction,clockwise</code></td><td></td><td>Eine Schleife, in Größe und Ellipsenform (Proportion Haupt- zu Nebenachse), Richtung der Hauptachse und (bei gerichteten Schleifen) die Umlaufrichtung</td></tr>	
+	<tr class="light"><td><code>edge.text.type</code></td><td><code>position, distance, size, visible, show</code></td></td><td><td>Ein Kantentext mit Position und Abstand, Textgröße und Sichtbarkeit, sowie der Angabe ob Kantentext oder -wert angezeigt werden sollen.<sup>5</sup></td></tr>
+	<tr class="strong"><td><code>edge.line.type</code></td><td><code>length, distance,type</td></td><td><td>Die Angabe der Linie einer Kante mit Länge und Abstand (beides Integer) und einem Typ (siehe nächste Zeile)</td></tr>
+	<tr class="lightbottomline"><td><code>edge.line.type.type</code></td><td></td></td><td><td>Ein Linientyp aus der Menge <code>solid,dashed,dotted,dotdashed</code></td></tr>
+	<tr class="strong"><td><code>node.form.type</code></td><td><code>form,x,y</td></td><td><td>Die Knotenform (stets <code>form=Cicle</code>) und Position im Bild</td></tr>
+	<tr class="light"><td><code>node.text.type</code></td><td><code>distance, rotation, size, visible</td></td><td><td>Der Knotentext mit Abstand, Orientierung, Textgröße und Sichtbarkeit</td></tr>
+		<tr class="strong"><td><code>hyperedge.shape.type</code></td><td><code>degree</td></td><code>knot, controlpoint</code></td><td>Hyperkantenumriss mit dem Grad als Attribut und den Knoten/Kontrollpunkten</td></tr>
+		<tr class="light"><td><code>shape.point.type</code></td><td><code>id,x,y,w</td></td><td><td>NURBS-Kontrollpunkt mit gewicht <code>w</code> und dem Index als Position im Vektor</td></tr>
+		<tr class="strong"><td><code>shape.knot.type</code></td><td><code>id,u</td></td><td><td>NURBS-Knoten Wert und Index</td></tr>
+	</table>	
+
+
+<sup>1</sup> Enthält der Standardname <code>$ID</code> so wird dies beim Erstellen eines Knotens oder beim bearbeiten mehrer Knoten, Kanten bzw. Untergraphen durch den Index des jeweiligen Elements ersetzt.
+<br>
+<sup>2</sup> Enthält der Standardname <code>$EID</code> so wird beim Erstellen einr oder dem Bearbeiten mehrerer Kanten durch den Endknotenindex ersetzt (hier ist auch bei ungerichteten Kanten die unterscheidung Start- und Endknoten wichtig).
+<br>
+<sup>3</sup> Enthält der Standardname <code>$SID</code> so wird dies analog zu <code>$EID</code> verwendet, nur bezeichnet dies den Startknotenindex.
+<br>
+<sup>4</sup>Ein Graph enthält stets die Untergraphen-Datenschlüssel seiner Untergraphen, wobei <code>X</code> jeweils durch den Index ersetzt wird.
+<br>
+<sup>5</sup><code>show</code> ist einer der beiden Werte <code>name</code> oder <code>value</code>.
+</body>
+</html>

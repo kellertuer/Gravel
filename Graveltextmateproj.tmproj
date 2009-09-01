@@ -147,25 +147,10 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>workspace/Gravel/model/VSubSet.java</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>13</integer>
-		</dict>
 	</dict>
 	<key>openDocuments</key>
 	<array>
 		<string>workspace/Gravel/model/VStraightLineEdge.java</string>
-		<string>workspace/Gravel/model/VSubSet.java</string>
 		<string>workspace/Gravel/model/VNode.java</string>
 		<string>workspace/Gravel/model/VGraph.java</string>
 		<string>workspace/Gravel/model/VEdge.java</string>

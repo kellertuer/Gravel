@@ -625,6 +625,7 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     		else if (item==mHIndex)
     		{
     			HelpPanel.getInstance().showHelp();
+    			return; //Don't call the refresh below
     		}
     		else if (item == mHAbout)
     		{  

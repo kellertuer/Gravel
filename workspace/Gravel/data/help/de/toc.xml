@@ -4,19 +4,25 @@
   PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN"
          "http://java.sun.com/products/javahelp/toc_2_0.dtd">
 <toc version="2.0">
-    <tocitem expand=false openimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Einleitung" target="intro">
+    <tocitem expand=false image="icon.chapter.closed"openimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Einleitung" target="intro">
 			<tocitem image="icon.page" text="Verwendung der Hilfe" target="helppage"/>			
+			<tocitem image="icon.page" text="Systemanforderungen" target="intro.anforderungen"/>			
 			<tocitem image="icon.anchor" text="Versionen" target="intro.versions"/>
 		</tocitem>
 		
 		            
     <tocitem expand=false openimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Definition" target="definition">
-			<tocitem image="icon.anchor" text="Graphen" target="definition.math"/>
-			<tocitem image="icon.anchor" text="Grafik" target="definition.grafik"/>
-			<tocitem image="icon.anchor" text="Visualisierung" target="definition.vis"/>
+			<tocitem image="icon.anchor" text="Graphen" target="definition.graph"/>
+			<tocitem image="icon.anchor" text="Hypergraphen" target="definition.hypergraph"/>
+			<tocitem image="icon.anchor" text="Hyperkantenumriss" target="definition.hyperkantenumriss"/>
 		</tocitem>            
     
-		<tocitem image="icon.page" text="GravelML" target="gravelml"/>			
+		<tocitem expand=false image="icon.chapter.closed" openimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Speicherformat (GraphML)" target="graphml">
+				<tocitem image="icon.page" text="Datenfelder" target="graphml.datenfelder"/>
+				<tocitem image="icon.page" text="Beispiel 1: Graph" target="graphml.beispielgraph"/>
+				<tocitem image="icon.page" text="Beispiel 2: Hypergraph" target="graphml.beispielhypergraph"/>
+			</tocitem>            
+					
 
 		<tocitem expand=false openimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Oberfläche">
 		 	<tocitem expand=false openimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Hauptfenster" target="mainwindow">
@@ -43,7 +49,7 @@
 			</tocitem> <!--Ende Export -->
 
 
-			<tocitem expand=false categoryclosedimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Statistik" target="stats">
+			<tocitem expand=false image="icon.chapter.closed" categoryclosedimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Statistik" target="stats">
 			<tocitem image="icon.anchor" text="atomare Werte" target="stats.atoms"/>
 		</tocitem>
 		
@@ -54,5 +60,7 @@
 		<tocitem image="icon.page" text="Tastenkürzel" target="shortcuts" />
     
 
-		 <tocitem image="icon.page" text="Lizenzbestimmungen" target="license"/>
+			<tocitem expand=false image="icon.chapter.closed" categoryclosedimage="icon.chapter.closed" categoryopenimage="icon.chapter.open" text="Lizenzbestimmungen" target="license">
+			<tocitem image="icon.page" text="vollständige GPL 3" target="liz.full"/>
+		</tocitem>
 </toc>

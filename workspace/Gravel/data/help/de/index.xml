@@ -102,9 +102,8 @@
 			<indexitem text="Gewicht (Kante)" target="def.gewicht"/>		
 			<indexitem text="Grad (Knoten)" target="def.grad"/>
 			<indexitem text="Graph" target="def.graph"/>
-			<indexitem text="GraphML" target="gravelml.title"/>
+			<indexitem text="GraphML" target="graphml.title"/>
 			<indexitem text="Gravel" target="intro.name"/>
-			<indexitem text="GravelML" target="gravelml.title"/>
 		  <indexitem text="Größe">
 				<indexitem text="Knoten" target="def.groesse"/>
 				<indexitem text="Pfeil" target="dia.kan.groesse"/>
@@ -155,8 +154,9 @@
 			<indexitem text="Laden" target="dia.file.title"/>
 			<indexitem text="LaTeX (Export)" target="exp.tex.title"/>
 			<indexitem text="Links (externe, in der Hilfe)" target="help.abs2"/>	
-			<indexitem text="Lizenz " target="liz.title"/>	
-			<indexitem text="Löschen (über Kontextmenü)" target="pop.title"/>	
+			<indexitem text="Lizenz" target="liz.title"/>	
+			<indexitem text="Lizenz (gesamter Text) " target="liz.full"/>	
+			<indexitem text="Löschen (eines Elementes)" target="pop.title"/>	
 		</indexitem>
 		<indexitem text="M" expand=false>
 			<indexitem text="Mausaktionen" target="mouse.title"/>
@@ -203,6 +203,7 @@
 				<indexitem text="Hauptfenster" target="main.stats" />
 				<indexitem text="Funktion" target="stats.abs1" />
 			</indexitem>	
+			<indexitem text="Systemanforderungen" target="intro.anforderungen" />
 		</indexitem>
 		<indexitem text="T" expand=false>
 			<indexitem text="Tag (GravelML)" target="gravelml.abs1"/>

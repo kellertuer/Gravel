@@ -46,12 +46,12 @@
 	    <location x="0" y="0" />
 	    <title>Gravel - Hilfe</title>
 			<toolbar> 
-					<helpaction>javax.help.BackAction</helpaction>
-					<helpaction>javax.help.ForwardAction</helpaction>
-					<helpaction>javax.help.HomeAction</helpaction>
+					<helpaction image="icon.ToolbarPre">javax.help.BackAction</helpaction>
+					<helpaction image="icon.ToolbarPost">javax.help.ForwardAction</helpaction>
+					<helpaction image="icon.ToolbarHome">javax.help.HomeAction</helpaction>
 					<helpaction>javax.help.SeparatorAction</helpaction>
-					<helpaction>javax.help.PrintAction</helpaction>
-					<helpaction>javax.help.PrintSetupAction</helpaction>			
+					<helpaction image="icon.ToolbarPrint">javax.help.PrintAction</helpaction>
+					<helpaction image="icon.ToolbarPrintSettings">javax.help.PrintSetupAction</helpaction>			
 			</toolbar>
 	</presentation>	
 

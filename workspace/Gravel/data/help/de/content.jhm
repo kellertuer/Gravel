@@ -4,13 +4,28 @@
          "http://java.sun.com/products/javahelp/map_1_0.dtd">
 
 <map version="2.0">
+
+<!-- image icons of the toc -->
+	<mapID target="icon.anchor" url="img/icons/anchor_16.png" />
+	<mapID target="icon.chapter.closed" url="img/icons/folder_sans_down_16.png" />
+	<mapID target="icon.chapter.open" url="img/icons/folder_sans_up_16.png" />
+	<mapID target="icon.page" url="img/icons/document_sans_16.png" />
+
+	<mapID target="icon.ToolbarPre" url="img/icons/arrow_full_left_32.png" />
+	<mapID target="icon.ToolbarPost" url="img/icons/arrow_full_right_32.png" />
+	<mapID target="icon.ToolbarHome" url="img/icons/home_32.png" />
+	<mapID target="icon.ToolbarPrint" url="img/icons/printer_32.png" />
+	<mapID target="icon.ToolbarPrintSettings" url="img/icons/printer_settings_32.png" />
+
 <!--
-	
+
+
+<!--
 	Help Pages and anchors inside the pages used on the table of contents
-	
 -->
 	<mapID target="intro" xml:lang="de" url="introduction.html" />
 	<mapID target="intro.versions" xml:lang="de" url="introduction.html#Versionen" />	
+	<mapID target="intro.anforderungen" xml:lang="de" url="systemanforderungen.html" />	
   
 	<mapID target="helppage" xml:lang="de" url="help.html" />
 	
@@ -19,7 +34,7 @@
 	<mapID target="definition.grafik" xml:lang="de" url="definitions.html#grafik">
 	<mapID target="definition.vis" xml:lang="de" url="definitions.html#vis">
 
-  <mapID target="gravelml" xml:lang="de" url="gravelml.html" />
+  <mapID target="graphml" xml:lang="de" url="graphml.html" />
  
 	<mapID target="mainwindow" xml:lang="de" url="mainwindow.html" />
 	<mapID target="mainwindow.toolbar" xml:lang="de" url="mainwindow.html#toolbar">
@@ -40,6 +55,7 @@
  
 	<mapID target="export" xml:lang="de" url="export.html">
 	<mapID target="export.png" xml:lang="de" url="export_png.html">
+	<mapID target="export.svg" xml:lang="de" url="export_svg.html">
 	<mapID target="export.tex" xml:lang="de" url="export_tex.html">
 
 	<mapID target="stats" xml:lang="de" url="statistic.html" />
@@ -50,17 +66,10 @@
 	<mapID target="shortcuts" xml:lang="de" url="shortcuts.html" />
 	<mapID target="mouseaction" xml:lang="de" url="mouseaction.html" />
 	
-<!-- image icons of the toc -->
-	<mapID target="icon.anchor" url="img/anchor.gif" />
-	<mapID target="icon.chapter.closed" url="img/ch_closed.gif" />
-	<mapID target="icon.chapter.open" url="img/ch_open.gif" />
-	<mapID target="icon.page" url="img/page.gif" />
-<!--
 
 	maps used for the Index, single words inside the text anchored
 	sortet by the filenames, inside a file sortet by order of appearance
 	
--->
 <mapID target="def.grundlagen" url="definitions.html#grundlagen" />
 <mapID target="def.graph" url="definitions.html#graph" />
 
@@ -74,21 +83,16 @@
 <mapID target="def.gewicht" url="definitions.html#gewicht" />
 <mapID target="def.mehrfachkante" url="definitions.html#mehrfachkante" />
 <mapID target="def.schleife" url="definitions.html#schleife" />
-<mapID target="def.gerichtet2" url="definitions.html#gerichtet2" />   <!-- Graph-->
-<mapID target="def.ungerichtet2" url="definitions.html#ungerichtet2" />
 <mapID target="def.inzident" url="definitions.html#inzident" />
 <mapID target="def.benachbart" url="definitions.html#benachbart" />
 <mapID target="def.grad" url="definitions.html#grad" />
-<mapID target="def.untergraph" url="definitions.html#def5" />
-<mapID target="def.pixelgrafik" url="definitions.html#def6" />
-<mapID target="def.breite" url="definitions.html#def6" />       <!--Grafik-->
-<mapID target="def.hoehe" url="definitions.html#def6" />
-<mapID target="def.pixel" url="definitions.html#def6" />
-<mapID target="def.vektorgrafik" url="definitions.html#vektorgrafik" />
-<mapID target="def.breite2" url="definitions.html#breite2" />    <!--Kante-->
-<mapID target="def.groesse" url="definitions.html#groesse" />
-<mapID target="def.typen" url="definitions.html#typen" />
-<mapID target="def.pfeil" url="definitions.html#pfeil" />
+
+<mapID target="def.hypergraph" url="definitions.html#hypergraph" />
+<mapID target="def.hyperkante" url="definitions.html#hyperkante" />
+<mapID target="def.hyperkantenumriss" url="definitions.html#hyperkantenumriss" />
+
+<mapID target="def.figgraph" url="definitions.html#figGraph" />
+<mapID target="def.fighypergraph" url="definitions.html#figHypergraph" />
 
 <mapID target="dia" url="dialog.html#dia" />
 <mapID target="dia.kantendialog" url="dialog_edge.html#title" />
@@ -132,11 +136,11 @@
 <mapID target="exp.tex.abs6" url="export_tex.html#abs6" /><!--Anordnen, CodeBeispiel, -->
 <mapID target="exp.png.title" url="export_png.html#title" />
 
-<mapID target="gravelml.title" url="gravelml.html#title" />
-<mapID target="gravelml.abs1" url="gravelml.html#abs1" /><!-- Tag, Dokumenttypdefinition -->
-<mapID target="gravelml.abs2" url="gravelml.html#abs2" /><!-- Datenschlüssel, default -->
-<mapID target="gravelml.table" url="gravelml.html#keys" /><!-- Tabelle der Datenschlüssel -->
-<mapID target="gravelml.example" url="gravelml.html#example" /><!-- Beispiel -->
+<mapID target="graphml.title" url="graphml.html#title" />
+
+<mapID target="graphml.datenfelder" url="graphml_datenfelder.html" />
+<mapID target="graphml.beispielgraph" url="graphml_exa_graph.html" />
+<mapID target="graphml.beispielhypergraph" url="graphml_exa_hypergraph.html" />
 
 <mapID target="help.title" url="help.html#title" /><!-- Titel, Drucken -->
 <mapID target="help.abs1" url="help.html#abs1" /><!-- Verzeichnis -->
@@ -149,6 +153,7 @@
 <mapID target="liz.title" url="license.html#title" /><!-- Titel, Drucken -->
 <mapID target="liz.hp" url="license.html#hp" /><!-- gravel.dmw.de -->
 <mapID target="liz.abs1" url="license.html#abs1" /><!-- andre Software -->
+<mapID target="liz.full" url="lizenz_gpl_full.html" /><!-- komplette Lizenz -->
 
 <mapID target="main.title" url="mainwindow.html#title" /><!-- Hauptfenster -->
 <mapID target="main.graphic" url="mainwindow.html#graphic" /><!-- Darstellung, grafische -->

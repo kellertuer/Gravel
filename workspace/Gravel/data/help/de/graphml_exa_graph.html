@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="de">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="format.css" />  
+  <title>Gravel - Hilfe - GraphML</title>
+</head>
+<body>
+<h2><a name="title">GraphML-Beispiel: Der Birkhoff-Diamant</a></h2>
+Die aufgeführte XML-Date enthält den Graphen aus der Abbildung 1
+<div class="imagebox">
+  <a name="Abb1"><img src="img/graphml_exa_birkhoff.png"></a><br>
+  <font size=-1>Abbildung 1: Der Birkhoff Diamant</font>
+</div>         
+
+<pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns 
+                    http://gravel.darkmoonwolf.de/xmlns/gravelml.xsd"&gt;
+
+  &lt;!                           --&gt;
+  &lt;! mathematische Datenfelder --&gt;
+  &lt;!                           --&gt;
+
+  &lt;key id="graphtype" for="graph" attr.name="graph.type" attr.type="string" /&gt;
+
+    &lt;!-- Values for allowance of loops and multiple edges --&gt;
+  &lt;key id="graphloops" for="graph" attr.name="graph.allowloops" attr.type="boolean"&gt;
+    &lt;default&gt;true&lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="graphmultipleedges" for="graph" attr.name="graph.allowmultiple" attr.type="boolean"&gt;
+    &lt;default&gt;true&lt;/default&gt;
+  &lt;/key&gt;
+
+    &lt;!-- Values for edges --&gt;
+  &lt;key id="edgevalue" for="edge" attr.name="edge.value" attr.type="int"&gt;
+    &lt;default&gt;1&lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="edgename" for="edge" attr.name="edge.name" attr.type="string"&gt;
+    &lt;default&gt;e_{$ID}&lt;/default&gt;
+  &lt;/key&gt;
+    &lt;!-- Values for nodes --&gt;
+  &lt;key id="nodename" for="node" attr.name="node.name" attr.type="string"&gt;
+    &lt;default&gt;v_{$ID}&lt;/default&gt;
+  &lt;/key&gt;
+    &lt;!-- One Value for each individual subgraph so that the data keys are unique --&gt;
+  &lt;key id="subgraph1" for="graph" attr.name="subgraph1" attr.complexType="graph.subgraph.type"/&gt;
+
+
+  &lt;!                      --&gt;
+  &lt;! Visuelle Datenfelder --&gt;
+  &lt;!                      --&gt;
+
+    &lt;!-- Edge Details --&gt;
+  &lt;key id="edgearrow" for="edge" attr.name="edge.arrow" attr.complexType="edge.arrow.type"&gt;
+    &lt;default&gt;
+      &lt;arrow size="10" part="0.75" position="1.0" headalpha="38"/&gt;
+    &lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="edgepoints" for="edge" attr.name="edge.points" attr.complexType="edge.points.type"/&gt;
+  &lt;key id="edgewidth" for="edge" attr.name="edge.width" attr.type="int"&gt;
+    &lt;default&gt;1&lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="edgetype" for="edge" attr.name="edge.type" attr.type="string"&gt;
+    &lt;default&gt;StraightLine&lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="edgeorthogonal" for="edge" attr.name="edge.orth_verticalfirst" attr.type="boolean"&gt;
+    &lt;default&gt;true&lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="loopedge" for="edge" attr.name="edge.loop" attr.complexType="edge.loop.type"&gt;
+    &lt;default&gt;
+      &lt;loopedge length="33" proportion="100" direction="0" clockwise="true"/&gt;
+    &lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="edgetext" for="edge" attr.name="edge.text" attr.complexType="edge.text.type"&gt;
+    &lt;default&gt;
+      &lt;edgetext distance="7" position="0.25" size="12" show="name" visible="false"/&gt;
+    &lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="edgeline" for="edge" attr.name="edge.line" attr.complexType="edge.line.type"&gt;
+    &lt;default&gt;
+      &lt;edgeline length="10" distance="15" type="solid"/&gt;
+    &lt;/default&gt;
+  &lt;/key&gt;
+    &lt;!-- Node Values --&gt;
+  &lt;key id="nodeform" for="node" attr.name="node" attr.complexType="node.form.type"&gt;
+    &lt;default&gt;
+      &lt;form type="Circle" x="0" y="0" size="8"/&gt;
+    &lt;/default&gt;
+  &lt;/key&gt;
+  &lt;key id="nodetext" for="node" attr.name="node.text" attr.complexType="node.text.type"&gt;
+    &lt;default&gt;
+      &lt;nodetext distance="18" rotation="270"  size="12" visible="false"/&gt;
+    &lt;/default&gt;
+  &lt;/key&gt;
+
+  &lt;!                    --&gt;
+  &lt;! Beginn des Graphen --&gt;
+  &lt;!                    --&gt;
+
+  &lt;graph id="G" edgedefault="undirected"&gt;
+    &lt;data key="graphtype"&gt;visual graph&lt;/data&gt;
+    &lt;data key="graphloops"&gt;true&lt;/data&gt;
+    &lt;data key="graphmultipleedges"&gt;true&lt;/data&gt;
+
+    &lt;! Knoten-Spezifikation --&gt;
+    &lt;node id="1"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="20" y="60"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+    &lt;node id="2"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="95" y="20"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+    &lt;node id="3"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="170" y="60"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+    &lt;node id="4"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="20" y="160"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+    &lt;node id="5"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="170" y="160"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+    &lt;node id="6"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="95" y="200"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+    &lt;node id="7"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="95" y="160"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+    &lt;node id="8"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="95" y="60"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+    &lt;node id="9"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="55" y="110"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+    &lt;node id="10"&gt;
+      &lt;data key="nodeform"&gt;&lt;form type="Circle" x="135" y="110"/&gt;&lt;/data&gt;
+    &lt;/node&gt;
+
+    &lt;! Kanten-Spezifikation --&gt;
+    &lt;edge id="1" source="4" target="6"/&gt;
+    &lt;edge id="2" source="6" target="5"/&gt;
+    &lt;edge id="3" source="5" target="3"/&gt;
+    &lt;edge id="4" source="3" target="2"/&gt;
+    &lt;edge id="5" source="2" target="1"/&gt;
+    &lt;edge id="6" source="1" target="4"/&gt;
+    &lt;edge id="7" source="4" target="7"&gt;
+      &lt;data key="edgeline"&gt;
+        &lt;edgeline distance="6" length="8" type="dashed"/&gt;
+      &lt;/data&gt;
+    &lt;/edge&gt;
+    &lt;edge id="8" source="7" target="6"&gt;
+      &lt;data key="edgeline"&gt;
+        &lt;edgeline distance="6" length="8" type="dashed"/&gt;
+      &lt;/data&gt;
+    &lt;/edge&gt;
+    &lt;edge id="9" source="7" target="5"&gt;
+      &lt;data key="edgeline"&gt;
+        &lt;edgeline distance="6" length="8" type="dashed"/&gt;
+      &lt;/data&gt;
+    &lt;/edge&gt;
+    &lt;edge id="10" source="4" target="9"&gt;
+      &lt;data key="edgeline"&gt;
+        &lt;edgeline distance="6" length="8" type="dashed"/&gt;
+      &lt;/data&gt;
+    &lt;/edge&gt;
+    &lt;edge id="11" source="9" target="1"&gt;
+      &lt;data key="edgeline"&gt;
+        &lt;edgeline distance="6" length="8" type="dashed"/&gt;
+      &lt;/data&gt;
+    &lt;/edge&gt;
+    &lt;edge id="12" source="1" target="8"&gt;
+      &lt;data key="edgeline"&gt;
+        &lt;edgeline distance="6" length="8" type="dashed"/&gt;
+      &lt;/data&gt;
+    &lt;/edge&gt;
+    &lt;edge id="13" source="8" target="2"&gt;
+      &lt;data key="edgeline"&gt;
+        &lt;edgeline distance="6" length="8" type="dashed"/&gt;
+      &lt;/data&gt;
+    &lt;/edge&gt;
+    &lt;edge id="14" source="8" target="3"&gt;
+      &lt;data key="edgeline"&gt;
+        &lt;edgeline distance="6" length="8" type="dashed"/&gt;
+      &lt;/data&gt;
+    &lt;/edge&gt;
+    &lt;edge id="15" source="10" target="3"&gt;
+      &lt;data key="edgeline"&gt;
+        &lt;edgeline distance="6" length="8" type="dashed"/&gt;
+      &lt;/data&gt;
+    &lt;/edge&gt;
+    &lt;edge id="16" source="10" target="5"&gt;
+      &lt;data key="edgeline"&gt;
+        &lt;edgeline distance="6" length="8" type="dashed"/&gt;
+      &lt;/data&gt;
+    &lt;/edge&gt;
+    &lt;edge id="17" source="9" target="10"/&gt;
+    &lt;edge id="18" source="10" target="8"/&gt;
+    &lt;edge id="19" source="8" target="9"/&gt;
+    &lt;edge id="20" source="9" target="7"/&gt;
+    &lt;edge id="21" source="7" target="10"/&gt;
+    
+    
+    &lt;! Untergraphen-Spezifikation --&gt;
+    &lt;data key="subgraph1"&gt;
+      &lt;subgraph id="1"&gt;
+        &lt;name&gt;Untergraph #1&lt;/name&gt;
+        &lt;color r="46" g="138" b="230"/&gt;
+        &lt;edgeid&gt;17&lt;/edgeid&gt;
+        &lt;edgeid&gt;18&lt;/edgeid&gt;
+        &lt;edgeid&gt;19&lt;/edgeid&gt;
+        &lt;edgeid&gt;20&lt;/edgeid&gt;
+        &lt;edgeid&gt;21&lt;/edgeid&gt;
+      &lt;/subgraph&gt;
+    &lt;/data&gt;
+  &lt;/graph&gt;
+&lt;/graphml&gt;
+</pre>
+</body>
+</html>

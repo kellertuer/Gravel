@@ -1,40 +1,32 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
-
-<html lang="en">
+<html lang="de">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<link rel="stylesheet" type="text/css" href="../format.css" />  
-	<title>Gravel - Hilfe - Einleitung</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="format.css" />  
+  <title>Gravel - Hilfe - Einleitung</title>
 </head>
 <body>
-	<div align=center><a name="title"><h2>Einleitung</h2></a></div>
-	<p>Die klare und deutliche Darstellung von Informationen ist in schriftlichen Ausarbeitungen von großer Bedeutung. 
-	Eine Grafik visualisiert Zusammenhänge oder stellt einen Ablauf genauer dar. In der Informatik sind viele Darstellungen von Graphen vorhanden.
-	Endliche Automaten in der theoretischen Informatik, bei denen Zustände in Knoten und Zustandsübergänge in Kanten visualisiert werden, sind ein solches Beispiel.
-	Aber auch Petri-Netze in der Softwaretechnik zur Darstellung paralleler Abläufe, Entity-Relationship-Modelle bei den Datenbanksystemen sind Graphen.</p>
-	<p>Dabei ist die Struktur meist gegeben, jedoch gibt es vielfältige Möglichkeiten, diesen Graphen darzustellen.<br>
-	Es gibt unterschiedliche Anforderungen an eine Darstellung des bekannten Graphen. Diese können etwa umfassen:</p>
-	<ul>
-		<li>Planarität - eine Zeichnung ohne dass sich Linien überkreuzen</li>
-		<li>Seitenverhältnis - eine Zeichnung, die ein Format erfüllt</li>
-		<li>Die Anzahl Überkreuzungen von Kanten</li>
-		<li>Darstellung von Symmetrie</li>
-	</ul>
-<br>
-<p>Gravel setzt an diesem Punkt an und bietet neben einem Editor für Graphen ebenso die Möglichkeit, verschiedene Eigenschaften des Graphen während der Bearbeitung zu verfolgen und somit den Graphen den eigenen Bedürfnissen in der Darstellung anzupassen.
-</p>
-<br><br>
-<br><a name="name"><b>Der Name Gravel</b></a>
+  <h2><a name="title">Einleitung</a></h2>
+  <p>Die übersichtliche Darstellung von Informationen ist für das Verständnis des präsentierten Sachverhaltes stets von Bedeutung. Besonders in wissenschaftlichen Veröffentlichungen und bei Lernmaterialien ist dies von großem Interesse, da komplizierte Sachverhalte erläutert und verständlich dargebracht werden sollen. In vielen Bereichen finden sich dabei Graphen zur Modellierung von Szenarien und Zusammenhängen.</p>
+<p>		
+<p>Gravel stellt hierfür einen Editor zur Verfügung, der neben den weit verbreiteten Graphen auch Hypergraphen und deren Darstellungen bearbeiten kann. Dazu werden die Hyperkanten in der Teilmengenmethapher verwendet, in der eine Hyperkante durch eine Kurve dargestellt wird, die alle ihre Knoten umläuft. Für die Bearbeitung dieses Umrisses einer Hyperkante stehen vielfältige Werkzeuge zur Verfügung. Ein Umriss wird mittels NURBS-Kurven modelliert.</p>
+
+<h3><a name="name">Der Name Gravel</a></h3>
 <p>Der Name Gravel enthält sowohl den <i>Gra</i>phen, als auch deren <i>V</i>isualisierung und <i>E</i>valuation. das <i>l</i> entstammt dem englischen Verb <i>to unravel</i>, das im Deutschen entwirren oder enträtseln bedeutet. Gravel selbst ist das englische Wort für Kies oder kleinere Flußsteine. Kleine Steine im Fluss liegen quer durcheinander, bis die Strömung sie nach ihrem Gewicht sortiert, also ebenso entwirrt.
 </p>
-<br><br>
-<br>
-
-<p>
-<a name="Versionen"><b>Versionen</b></a>	
-<table border="0" cellspacing="5" cellpadding="5">
-	<tr><td valign=top><b>0.2.2</b></td><td>
+<h3><a name="Versionen"><b>Versionen</b></a></h3>
+<table class="nicetable">
+	<tr class="strong"><td><b>0.3</b></td><td><i>8. Februar 2009</i></b></td></tr>
+	<tr class="light"><td>&nbsp;</td><td>
+		- Undo/Redo<br>
+		- SVG-Export<br>
+		- Optimierungen am TeX- und PNG-Export<br>
+		- Auswahl per Mausdrag erweitern/verringern<br>
+		- Mehr Tastenkürzel
+	</td></tr> 
+		<tr class="strong"><td><b>0.2.2&nbsp;&nbsp;</b></td><td><i>4. März 2008</i></b></td></tr>
+		<tr class="light"><td>&nbsp;</td><td>
 		- Kantenname eingefügt<br>
 		- Standardwert für Kantenname eingefügt<br>
 		- Aufbau der Standardnamen verändert, verwenden nun <tt>$ID</tt> - <a href="dialog_prefs.html#Vorbemerkung">Details</a><br>
@@ -42,7 +34,8 @@
 		- Kantenarten eingefügt; neben der durchgehenden Linie 3 neue Kantenlinienarten<br>
 		- TeX-Export erweitert, so dass auch ausschließlich die <tt><code>figure</code></tt>-Umgebung exportiert werden kann.<br>
 		- Hilfe überarbeitet</td></tr> 
-	<tr><td valign=top><b>0.2.1</b></td><td>
+		<tr class="strong"><td><b>0.2.2</b></td><td> <i>17. Oktober 2007</i></b></td></tr>
+		<tr class="light"><td>&nbsp;</td><td>
 		- Korrektur der Größenänderungen beim Verändern der Fenstergröße<br>
     - Korrektur einiger Dialogfenster-Positionen<br>
 		- Wird im Speichern Dialog keine Endung angegeben, wird die des aktuellen Dateiformats angefügt<br>
@@ -52,7 +45,8 @@
 		- Selektion optimiert in Handhabung und Wirkung<br>
 		- Neue Hilfe basierend auf JavaHelp 2.0 erstellt und ist seit dieser Version inhaltlich vollständig<br>
 		<i>Ein Dank geht hier an Richard für die umfanreichen Hinweise.</i></tr>	
-	<tr><td valign=top><b>0.2</b></td><td>Erste offizielle Version</tr>
+		<tr class="strong"><td><b>0.2</b></td><td><i>3. Oktober 2007</i></b></td></tr>
+		<tr class="light"><td>&nbsp;</td><td>Erste offizielle Version</td></tr>
 </table>
 </p>
 </body>

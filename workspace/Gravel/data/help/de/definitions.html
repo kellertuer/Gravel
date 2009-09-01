@@ -7,79 +7,25 @@
 	<title>Gravel - Hilfe - Definitionen</title>
 </head>
 <body>
-	<div align=center><h2>Definitionen</h2></div>
+	<h2><a name="title">Definitionen</a></h2>
 	<p>In diesem Abschnitt werden die mathematischen und grafischen <a name="grundlagen">Grundlagen</a> kurz dargestellt, auf denen Gravel die Verarbeitung von Graphen aufbaut.</p>
-	<a name="math"><h3>Graphen</h3></a>
-	<p><b>Definition 1</b>&nbsp;
-	Ein <a name="graph"><b>Graph</b></a> G=(V,E) besteht aus einer Menge V von Knoten und einer Menge E &#x2286; V x V von Kanten. 
-	</p>
-	<p>Um einen <a name="knoten">Knoten</a> v &#x2208; V zu identifizieren, hat dieser einen eindeutigen Index n(v) &#x2208; &#x2115;. Zusätzlich kann einem Knoten ein Name in Form einer beliebigen Zeichenkette zugewiesen werden. Knoten werden als Punkte dargestellt.<br>
-	Eine <a name="kante">Kante</a> e=(u,v) &#x2208; E mit u,v &#x2208; V bezeichnet eine Verbindung zwischen 2 Knoten und wird als Linie zwischen den beiden Knoten dargestellt.</p>
-	<p><b>Definition 2</b>
-	Eine Kante e=(u,v) &#x2208; E mit <a name="start">Startknoten</a> u und <a name="end">Endknoten</a> v heißt <a name="gerichtet"><b>gerichtet</b></a> und verläuft von u nach v. Ist die Richtung nicht gegeben, heißt die Kante <a name="ungerichtet"><b>ungerichtet</b></a> und die beiden Knoten sind gleichwertig.
-	</p>
-	<p>
-	Gerichtete Kanten werden werden mit einem Pfeil in Richtung Endknoten gekennzeichnet, wie in Abbildung 1.<br>
-	Eine Kante ist eindeutig definiert durch die beiden Knoten u,v. Zwischen 2 Knoten existiert also genau eine Kante. <a name="mehrfachkante">Mehrfachkanten</a> sind nicht möglich.<br>
-	Zusätzlich besitzt eine Kante ein <a name="gewicht">Gewicht</a> w(e) &#x2208; &#x2115;.<br>
-	Bei gerichteten Kanten ist die Reihenfolge wichtig, es gilt e=(u,v)&#x2260;(v,u). Im ungerichteten Fall bezeichnen die beiden Tupel (u,v) und (v,u) dieselbe Kante.
-	Außerdem gibt es in den hier verwendeten Graphen keine <a name="schleife">Schleifen</a>, für alle Kanten e=(u,v) &#x2208; E mit u,v &#x2208; V gilt u\neq v.</p>
-	<p><b>Definition 3</b>
-	Ein Graph G=(V,E) heißt <a name="gerichtet2"><b>gerichtet</b></a>, wenn alle Kanten e &#x2208; E gerichtet sind. Analog heißt ein Graph G=(V,E) <a name="ungerichtet2"><b>ungerichtet</b></a>, wenn alle Kanten des Graphen ungerichtet sind.
-	</p>
-	<p>
-	Ein Graph mit gerichteten und ungerichteten Kanten ist im Umfang dieser Arbeit nicht möglich. Eine Darstellung eines gerichteten und eines ungerichteten Graphen befindet sich in Abbildung 1.</p>
-	<p><b>Definition 4</b>
-	Eine Kante e &#x2208; E und ein Knoten v &#x2208; V heißen <a name="inzident"><b>inzident</b></a> oder <a name="benachbart"><b>benachbart</b></a>, falls v in e enthalten ist.</p>
-	<p>Die Anzahl inzidenter Kanten eines Knotens v &#x2208; V heißt <a name="grad"><b>Grad</b></a> des Knotens v.<br>
-	Im gerichteten Graphen wird dies noch differenziert durch den <a name="eingrad"><b>Eingrad</b></a>, die Anzahl Kanten deren Endknoten v ist, und den <a name="ausgrad"><b>Ausgrad</b></a>, welcher die Anzahl Kanten bezeichnet, deren Startknoten v ist.</p>
-	<p><a name="def5"><b>Definition 5</b></a>
-	Sei G=(V,E) ein Graph. Ein Graph G'=(V',E') mit V'&#x2286; V und E'&#x2286; E heißt <b>Untergraph</b> von G.</p><br><br>
-<div  align=center>
-<a name="Abb1"><img src="img/def_abb1_s.png"></a><br>
-<font size=-1>Abbildung 1: Ein Graph mit gerichteten Kanten und sein ungerichtetes Pendant</font></div>
 
-<a name="grafik"><h3>Grafik</h3></a>  
-<p><a name="def6"><b>Definition 6</b></a>
-	Ein zweidimensionales gleichmäßiges Raster, dessen Flächen mit Farben gefüllt werden, heißt <b>Pixelgrafik</b>. In dieser Arbeit sind stets vertikaler und horizontaler Abstand des Rasters identisch, wodurch die Flächen Quadraten entsprechen. Ein einzelnes Quadrat heißt <b>Pixel</b>. Das Raster ist endlich. Die Anzahl Pixel in horizontaler Richtung bezeichnet die <b>Breite</b>, die Anzahl in vertikaler die <b>Höhe</b> der Pixelgrafik.</p>
+	<div align=Center><font color="#FF0000">TODO</font></div>
+	<h3><a name="graph">Graphen</a></h3>
+	<a name="graph">Graph</a>
+	<a name="knoten">Knoten</a>
+	<a name="kante">Kante</a>
+	<a name="start">Startknoten</a><a name="end">Endknoten</a> <a name="gerichtet"><b>gerichtet</b></a> <a name="ungerichtet"><b>ungerichtet</b></a>
+	<a name="mehrfachkante">Mehrfachkanten</a>
+	<a name="gewicht">Gewicht</a> w(e) &#x2208; &#x2115;.<br>
+	<a name="schleife">Schleifen</a>
+		<a name="inzident"><b>inzident</b></a>oder <a name="benachbart"><b>benachbart</b></a>
+	<a name="grad"><b>Grad</b></a><a name="eingrad"><b>Eingrad</b></a><a name="ausgrad"><b>Ausgrad</b></a>
+	<a name="figGraph">Abbildung Graph (Petersen)</a>
+ 	<h3><a name="hypergraph">Hypergraphen</a></h3>
+	<a name="hyperkante">Hyperkante</a>
+	<a name="hyperkantenumriss">Hyperkantenumriss</a>
+	<a name="figHypergraph">Abbildung Hypergraph (Berge)</a>
 	
-<p>Ist das Raster fest vorgegeben, etwa durch einen Bildschirm, läßt sich eine Pixelgrafik als Zuordnung von Farbwerten zu den Pixeln beschreiben. Dabei werden die Pixel anhand ihrer horizontalen und vertikalen Position adressiert. Die horizontale Position wird mit x &#x2208; &#x2115; bezeichnet. Der Wert 0 wird der Spalte zugeordnet, mit der die Pixelgrafik links beginnt. Den maximalen Wert nimmt x am rechten Rand ein. Dieser entspricht der Breite reduziert um 1. Analog ist die vertikale Position mit mit y &#x2208; &#x2115; bezeichnet. Diese beginnt am oberen Rand mit 0 und endet am unteren mit der Höhe verringert um 1. Die Position wird meist als Tupel (x,y) angegeben.
-<br>Die Pixelgrafik wird auch kurz als <b>Grafik</b> bezeichnet.</p>
-<p><a name="vektorgrafik"><b>Definition 7</b></a>
-Die Positionierung zweidimensionaler geometrischer Formen in der Ebene heißt <b>Vektorgrafik</b>. Dabei werden die positionierten Elemente um Attribute, wie etwa Strichstärke oder Farbe, angereichert. Ebenso ist bei einer geschlossenen Form, etwa einem Kreis, eine Farbe zur Füllung möglich.</p>
-<p>Die Vektorgrafik bietet den Vorteil der Skalierbarkeit. Wenn ein Kreis, angegeben durch Mittelpunkt und Radius, in seiner Größe verändert wird, bleibt er ein Kreis. Ist ein Kreis in Pixel umgerechnet und in einer Pixelgrafik platziert worden, so bewirkt eine Vergrößerung lediglich eine größere Darstellung der einzelnen Pixel. Dies wird in Abbildung 2 am Viertelkreis demonstriert.</p>
-<br>
-<div  align=center>
-<a name="Abb2"><img src="img/def_abb2.png"></a><br>
-<font size=-1>Abbildung 2: Vergrößerung von Vektorgrafik (links) und Pixelgrafik (rechts) im Vergleich</font></div>
-<br>
-<a name="vis"><h3>Visualisierung</h3></a>
-<p>Ein Graph, wie er zu Beginn dieser Seite definiert wurde, ist unabhängig von seiner Darstellung.
-	Bei der zweidimensionalen Darstellung eines Graphen wird zunächst jedem Knoten ein Punkt in der Grafik zugeordnet und danach werden die Kanten zwischen den Knoten eingezeichnet.
-	In Abbildung 3 sind zwei Darstellungen des selben Graphen gezeigt.<br>
-	Um eine Darstellung zu erstellen, erhält jeder Knoten eine <a name="groesse">Größe</a>. In dieser Größe wird ein Kreis an der Position des Knotens gezeichnet. Die Anzeige seines Namens ist möglich und wird mit Abstand vom Knoten und Orientierung angegeben.<br>
-Jede besitzt Kante eine <a name="breite2">Liniendicke.</a></p>
-<div  align=center>
-	<a name="Abb3"><img src="img/def_abb3.png"></a><br>
-	<font size=-1>Abbildung 3: Zwei Darstellungen des selben Graphen</font></div>
-<p>Dabei kann es von Nachteil sein, ausschließlich gerade Linien für die Kanten zu verwenden. Daher werden hier folgende visuelle <a name="typen">Kantentypen</a> unterschieden, siehe Abbildung 4: 
-<ul>
-		<li>direkte Linie zwischen 2 Knoten</li>
-		<li>quadratische Kurve spezifiziert durch eine Beziér-Kurve mit einem Kontrollpunkt</li>
-		<li>eine Folge von Linien spezifiziert durch mehrere Kontrollpunkte</li>
-		<li>eine orthogonale Darstellung, bei der spezifiziert wird, ob mit dem vertikalen oder dem horizontalen Anteil am Start begonnen wird</li>
-</ul>
-<div  align=center>
-	<a name="Abb4"><img src="img/def_abb4.png"></a><br>
-	<font size=-1>Abbildung 4: Die vier Kantentypen im Überblick</font></div>
-</p>
-<p>Die letzten beiden Typen können in der Darstellung zu Irritationen führen, da es ebenso sein kann, dass in der Zeichnung ein Knotenpunkt vergessen worden ist. Zumindest bei elektrischen Schaltplänen findet der letzte Typ jedoch häufige Anwendung.
-<br>
-Zusätzlich ist bei gerichteten Kanten die Art des <a name="pfeil">Pfeils</a> von Interesse, etwa wenn ein Knoten viele eingehende Kanten besitzt. Dann sind Pfeilspitzen mit engerem Winkel von Vorteil.
-	Der Pfeil kann variiert werden in seiner Größe s, dem Winkel &#x03B1; in der Pfeilspitze sowie seiner Füllweite b. Diese drei Werte verdeutlicht die Abbildung 5.<br>
-	Die Position entlang der Kante ist ebenso einstellbar. Die Einstellungsmöglichkeiten werden bei dem <a href="dialog_edge.html">Dialog zu den Kanteneigenschaften</a> erklärt.</p>
-	<div  align=center>
-		<a name="Abb5"><img src="img/def_abb5.png"></a><br>
-		<font size=-1>Abbildung 5: Darstellung der Parameter eines Pfeils</font></div>
 </body>
 </html>

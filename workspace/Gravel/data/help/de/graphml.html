@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="de">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="format.css" />  
+	<title>Gravel - Hilfe - GraphML</title>
+</head>
+<body>
+<h2><a name="title">GraphML</a></h2>
+<p>Die Definition des Dateiformates für Gravel über XMLSchema bietet den Vorteil der Validierung. Hier soll die Definition eines Elementes anhand zweier Beispiele erläutert werden. Anschlie&szlig;end folgt eine Übersicht der Datenelemente, die in der Erweiterung von GraphML zur Verwendung in Gravel definiert sind.
+
+<h3>Allgemeine Angabe der einfachen Attribute</h3>
+<p>Um Attribute für die einzelnen Elemente der Datei, also Graph, (Hyper)Kante und Knoten, verwenden zu können, müssen sie zunächst definiert werden. GraphML stellt dazu bereits die einfachen Datentypen <code>int, boolean, string</code> bereit. So wird etwa der Name eines Knotens als Attribut definiert, indem innerhalb des Wurzelelements <code><graphml></code> ein Datenschlüssel spezifiziert wird:</p>
+<pre>
+&lt;graphml&gt;
+	[...] &lt;!-- vorherige key-Spezifikationen --&gt;
+	&lt;key id='nodename' for='node' attr.name='node.name' attr.type='string'&gt;
+		&lt;default&gt;v_{$ID}&lt;/default&gt;
+	&lt;/key&gt;
+	[...]&lt;!-- nachfolgende keys und der Graph --&gt;
+&lt;/graphml&gt;
+</pre>
+<p>Dabei gibt <code>nodename</code> eindeutig einen Referenznamen an, der Datenschlüssel ist nur für Knoten (<code>for='node'</code>) definiert und ein <code>string</code>. Zusätzlich wird ein Standardwert innerhalb von <code><default></code> angegeben.<br>
+Der Graph folgt in der Datei nach den Schlüsselangaben innerhalb des
+<code><graphml></code>-Elementes. Dort werden Knotennamen wie folgt angegeben:</p>
+<pre>
+&lt;node id='1'&gt;&lt;/node&gt;
+&lt;node id='2'&gt;
+	&lt;data key='nodename'&gt;u&lt;/data&gt;
+&lt;/node&gt;
+</pre>
+<p>Das Attribut <code>'nodename'</code> verweist auf die ID der Schlüsseldefinition. Dadurch ist die Angabe in Zeile 4 als Name des Knotens 2 festgelegt. Da der erste Knoten keinen expliziten Namen erhält, wird ihm <code>v_{$ID}</code> zugewiesen, wobei innerhalb von Gravel <code>$ID</code> ersetzt wird durch dessen Index. Der Name von Knoten 1 lautet dann <code>v_{1}</code>.</p>
+
+<h3>Definition komplexer Datentypen</h3>
+<p>Für komplexere Datentypen werden in der Erweiterung des GraphML"=XMLSchemas für Gravel (verfügbar unter <i>http://gravel.darkmoonwolf.de/xmlns/gravelml.xsd</i>) spezielle komplexe Typen definiert, die als Datenschlüssel verwendet werden dürfen. Für die Darstellung eines Knotens etwa</p>
+<pre>
+&lt;xs:simpleType name='node.form.type.type'&gt;
+	&lt;xs:restriction base='xs:string'&gt;
+		&lt;xs:enumeration value='Circle'/&gt;
+	&lt;/xs:restriction&gt;
+&lt;/xs:simpleType&gt;
+&lt;xs:complexType name='node.form.type'&gt;
+	&lt;xs:attribute name='type' type='node.form.type.type' use='required'/&gt;
+	&lt;xs:attribute name='x' type='xs:integer' use='required'/&gt;
+	&lt;xs:attribute name='y' type='xs:integer' use='required'/&gt;
+	&lt;xs:attribute name='size' type='xs:nonNegativeInteger'/&gt;
+&lt;/xs:complexType&gt;
+</pre>
+<p>Der Typ der Knotenform <code>node.form.type.type</code> (Zeile 1 bis 5) ist bisher lediglich ein Kreis, daher wird auf Basis des Strings (Zeile 2) der Typ als Aufzählung von nur einer Möglichkeit definiert.</p>
+
+<p>Der komplexe Typ der Gesamten Knotenform <pre>node.form.type</pre> wird nun durch 4 Attribute definiert (Zeile 6 bis 11)</p>
+<ul>
+<li><code>type</code> der eben erwähnte Formtyp, bei Gravel ausschließlich der Kreis. Die Angabe des Typs ist stets Pflicht (<code>use='required'</code>)</li>
+<li><code>x</code> als ganze Zahl für die horizontale Position, ebenso Pflicht</li> 
+<li><code>y</code> als vertikale Position analog zu <code>x</code></li>
+<li><code>size</code> ist die Größe des Knotens, hier der Durchmesser des Kreises</li>
+</ul>
+<p>Zur Verwendung im Dokument muss nun ein weiterer Schlüssel im XML-Dokument angegeben werden, die derjenigen aus des einfachen Datentyps ähnelt:</p>
+<pre>
+&lt;key id='nodeform' for='node' attr.name='node.form' attr.complexType='node.form.type'&gt;
+	&lt;default&gt;
+		&lt;form type='Circle' x='0' y='0' size='9'/&gt;
+	&lt;/default&gt;
+&lt;/key&gt;
+</pre>
+anstelle des <code>attr.type</code> wird nun mit <code>attr.complexType</code> der eben erwähnte Knotenformtyp angegeben. Die Angabe des Standards legt eine Knotengröße von 9 fest, die Position ist der Knotenform Pflicht, wird aber in Gravel bezüglich des Standards ignoriert.
+
+Im Graphen lassen sich dann Knoten wie folgt positionieren:
+<pre>
+&lt;node id='2'&gt;
+	&lt;data key='nodename'&gt;u&lt;/data&gt;
+	&lt;data key='nodeform'&gt;
+		&lt;form type='Circle' x='274' y='110'/&gt;
+	&lt;/data&gt;
+&lt;/node&gt;
+&lt;node id='3'&gt;
+	&lt;data key='nodeform'&gt;
+		&lt;form type='Circle' x='23' y='42' size='12'/&gt;
+	&lt;/data&gt;
+&lt;/node&gt;
+</pre>
+<p>Der Knoten 2 hat keine Größenangabe, er erhält die Größe 9, der Knoten 3 hingegen Ihm wird die Größe 9 zugeordnet, da diese nicht explizit angegeben ist. Der Knoten 3 erhält die Größe 12.</p>
+<p>Eine Auflistung aller Datenfelder mit ihren Attributen findet sich in der <a href="graphml_datenfelder.html"> entsprechenden Übersicht</a>.</p>
+</body>
+</html>
