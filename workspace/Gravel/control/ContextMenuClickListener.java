@@ -145,7 +145,7 @@ public class ContextMenuClickListener
 		else if (vhg!=null)
 		{
 			NCreateHyperEdgefromSel = new JMenuItem("Neue Hyperkante...");
-			NCreateHyperEdgefromSel.setEnabled(vhg.modifyNodes.hasSelection());
+			NCreateHyperEdgefromSel.setEnabled(true);
 			NCreateHyperEdgefromSel.addActionListener(this);
 		}
 		NaddtoSet = new JMenu("Knoten hinzufügen zu");
@@ -366,7 +366,7 @@ public class ContextMenuClickListener
 			{
 				Nname.setText(vhg.getMathGraph().modifyNodes.get(r.getIndex()).name + " - (#" + r.getIndex() + ")");
 				NDelSelection.setEnabled(vhg.modifyHyperEdges.hasSelection()||vhg.modifyNodes.hasSelection());
-				NCreateHyperEdgefromSel.setEnabled(vhg.modifyNodes.hasSelection());
+//				NCreateHyperEdgefromSel.setEnabled(vhg.modifyNodes.hasSelection());
 			}
 			NodePopup.show(e.getComponent(), e.getX(), e.getY());
 		} 

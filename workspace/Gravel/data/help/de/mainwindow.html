@@ -1,39 +1,46 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
-
-<html lang="en">
+<html lang="de">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="format.css" />  
 	<title>Gravel - Hilfe - Hauptfenster</title>
 </head>
 <body>
-<div align=center><a name="title"><h2>Hauptfenster</h2></a></div>
-Auf dieser Seite wird das Hauptfenster vorgestellt. Es gliedert sich in vier Bereiche:
+<h2><a name="title">Hauptfenster</a></h2>
+<p>Auf dieser Seite wird das Hauptfenster vorgestellt. Es gliedert sich in vier Bereiche:
+<ul>
+	<li>der Hauptbereich mit der Darstellung des aktuellen Graphen</li>
+	<li>die Toolbar am oberen Rand des Fensters</li>
+	<li>die Liste der Elemente des Graphen</li>
+	<li>die Statistik</li>
+</ul>
+Diese Bereiche werden nun nacheinander vorgestellt.
+</p>
 <a name="graphic"><h3>Darstellung des Graphen</h3></a>
-<p>Dieser Bereich ist beim ersten Start von Gravel komplett weiß. Später kann hier beim Starten ebenso das Raster aktiv sein oder ein Graph geladen werden.
-In diesem Bereich lassen sich mit <a href="mouseactions.html">Mausaktionen</a> viele Eigenschaften des erstellten Graphen verändern. Dies betrifft auch mit der Maus ausgewählte Teile des Graphen, also Selektionen. Diese sind farblich hervorgehoben, wie etwa in Abbildung 1.</p>
-<br><div  align=center>
+<p>Der Berech der Darstellung ist beim ersten Start komplett weiß, denn es wird ein leerer Graph dargestellt. Später kann hier beim Starten ebenso das Raster aktiv sein oder ein Graph geladen werden. In diesem Bereich lassen sich mit <a href="mouseactions.html">Mausaktionen</a> die Elemente des Graphen erzeugen und viele ihrer Eigenschaften verändern. Dies betrifft auch mit der Maus ausgewählte Teile des Graphen, also eine Auswahl an Elementen, die farblich hervorgehoben wird, wie in in Abbildung 1 dargestellt.</p>
+<div class="imagebox">
 	<a name="Abb1"><img src="img/selection.png"></a><br>
-	<font size=-1>Abbildung 1: Eine Selektion</font></div>
-<br><br><br>
+	<font size=-1>Abbildung 1: Eine Selektion</font>
+</div>
 <a name="toolbar"><h3>Toolbar</h3></a>
-<div  align=center>
+<div class="imagebox">
 	<a name="Abb2"><img src="img/toolbar.png"></a><br>
-	<font size=-1>Abbildung 2: Die Toolbar</font></div>
-	<br>
-<p>Die Toolbar (Abbildung 2) bietet einen schnellen Zugriff auf den Maßstab, in dem der Graph dargestellt wird. Entweder durch verändern des Reglers oder durch explizite Eingabe eines Maßstabes ändert sich die Darstellung des Graphen.</p>                      
-<br><br><br>
-<a name="list"><h3>Liste der Elemente des Graphen</h3></a>
-<p>Die Liste enthält 3 Listen, je eine für Knoten, Kanten und Untergraphen. Zu Beginn (Abbildung 3 links) sind alle 3 Listen leer. Später (Abb. 3 rechts) lassen sich einzelne Listen zusammenklappen. Alle Elemente sind dort aufgelistet und über die rechte Maustaste lassen sich deren <a href="dialogs.html">Eigenschaften</a> verändern. Die rechte Abbildung zeigt den Zustand der Liste, die zum Zeitpunkt der Abbildung 1 existierte.</p> 
-<br><div  align=center>
+	<font size=-1>Abbildung 2: Die Toolbar</font>
+</div>
+<p>Die Toolbar (Abbildung 2) bietet einen schnellen Zugriff auf den Maßstab, in dem der Graph dargestellt wird. Entweder durch verändern des Reglers oder durch explizite Eingabe eines Maßstabes ändert sich die Darstellung des Graphen.</p>
+<p>Zusätzlich existiert ein Informations-Icon am rechten Rand der Toolbar. Ist im Graphen (oder in der Liste der Elemente) genau ein Element ausgewählt, so ruft dieses Icon die Eigenschaften des ausgewählten Elementes auf.</p>              
+<h3><a name="list">Liste der Elemente des Graphen</a></h3>
+<p>Die Liste enthält 3 Listen, je eine für Knoten, Kanten und Untergraphen. Zu Beginn (Abbildung 3 links) sind alle 3 Listen leer. Später (Abb. 3 rechts) lassen sich einzelne Listen zusammenklappen. Bei Hypergraphen ist der erste Bereich anstelle mit „Kanten“ mit „Hyperkanten“ betitelt. Wählt man ein Element mit der linken Maustaste an, so wird dieses gleichzeitig im Graphen ausgewählt. Über die rechte Maustaste erhält man ein Kontextmenü, dass neben einem Menüpunkt für die <a href="dialogs.html">Eigenschaften</a> einen Eintrag zum Löschen enthält. Bei Hyperkanten läßt sich über dieses Kontextmenü zusätzlich die Bearbeitung des Umrisses beginnen.</p> 
+<div class="imagebox">
 	<a name="Abb3"><img src="img/list_start.png">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="img/list_inuse.png"></a><br>
-	<font size=-1>Abbildung 3: Die Liste zu Beginn und mit Inhalt</font></div>
-<br><br><br>
-<a name="stats"><h3>Statistik</h3></a>
-In der Statistik werden Eingetragene Werte beobachtet. Zu Beginn sind dies die Anzahl Kanten sowie Anzahl Knoten. Erstellt man nun einen Graphen, so ändern sich diese Werte. Die rechte Abbildung entspricht dem Zustand der Statistik im Moment der Abbildung 1. Dabei wurde ein Eintrag Eingefügt. Näheres dazu in der
-<br><a href="statistic.html">Funktionsweise der Statistik</a>.
-<br><div  align=center>
+	<font size=-1>Abbildung 3: Die Liste zu Beginn und mit Inhalt</font>
+	</div>
+<h3><a name="stats">Statistik</a></h3>
+<p>In der Statistik werden Eingetragene Werte beobachtet. Zu Beginn sind dies die Anzahl Kanten sowie Anzahl Knoten. Erstellt man nun einen Graphen, so ändern sich diese Werte. Die rechte Abbildung entspricht dem Zustand der Statistik im Moment der Abbildung 1. Dabei wurde ein Eintrag Eingefügt. Näheres dazu in der <a href="statistic.html">Funktionsweise der Statistik</a>.</p>
+<div class="imagebox">
 	<a name="Abb4"><img src="img/stats_start.png">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="img/stats_inuse.png"></a><br>
-	<font size=-1>Abbildung 4: Die Statistik zu Beginn und während der Benutzung</font></div>                                      
+	<font size=-1>Abbildung 4: Die Statistik zu Beginn und während der Benutzung</font>
+</div>
 </body>
 </html>

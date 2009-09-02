@@ -7,7 +7,6 @@
 		<indexitem text="Beispiel des Exports zweier Graphen nebeneinander" target="exp.tex.abb2"/>
 		<indexitem text="Darstellung der Parameter eines Pfeils" target="def.abb5"/>
 		<indexitem text="Der Bearbeiten-Dialog zum Eintrag 'Grad'" target="stats.abb2"/>
-		<indexitem text="Der Speichern-Dialog am Beispiel GravelML" target="dia.file.abb1"/>
 		<indexitem text="Die Liste zu Beginn und mit Inhalt" target="main.abb3"/>
 		<indexitem text="Die vier Kantentypen im Überblick" target="def.abb4"/>
 		<indexitem text="Die Registerkarte 'Allgemein' der Einstellungen" target="def.abb1"/>
@@ -55,8 +54,6 @@
 			<indexitem text="Datenschlüssel (GravelML)" target="gravelml.abs2"/>
 			<indexitem text="default-Wert (GravelML)" target="gravelml.abs2"/>
 			<indexitem text="Dialog" target="dia">
-				<indexitem text="Datei" target="dia.file.title" />
-				<indexitem text="Einstellungen" target="dia.pref.title"/>
 				<indexitem text="Kante" target="dia.kantendialog" />
 				<indexitem text="Knoten" target="dia.kno.title" />
 				<indexitem text="Untergraph" target="dia.sub.title" />
@@ -69,7 +66,6 @@
 			<indexitem text="Eingrad (Knoten)" target="def.grad"/>
 			<indexitem text="Einleitung" target="intro.title" expand=false />			
 			<indexitem text="Endknoten (Kante)" target="def.end"/>
-			<indexitem text="Endung (Datei)" target="dia.file.endung"/>
 			<indexitem text="Einstellungen" target="dia.pref.title">
 				<indexitem text="Allgemein" target="dia.pref.general" />	
 				<indexitem text="Ansicht" target="dia.pref.view" />	
@@ -90,7 +86,6 @@
 			  <indexitem text="Knoten" target="dia.kno.farbe" />
 			  <indexitem text="Untergraph" target="dia.sub.farbe" />
 			</indexitem>
-	 		<indexitem text="Filter (Dateidialog)" target="dia.file.filter"/>		
 			<indexitem text="Form (Pfeil)" target="dia.kan.form"/>
 			<indexitem text="Formel (Statistik)" target="stats.formel" />
 		</indexitem>
@@ -151,7 +146,6 @@
 			<indexitem text="Kontextmenü (allgemein)" target="pop.title" />
 		</indexitem>
 		<indexitem text="L" expand=false>
-			<indexitem text="Laden" target="dia.file.title"/>
 			<indexitem text="LaTeX (Export)" target="exp.tex.title"/>
 			<indexitem text="Links (externe, in der Hilfe)" target="help.abs2"/>	
 			<indexitem text="Lizenz" target="liz.title"/>	
@@ -189,7 +183,6 @@
 		</indexitem>
 		<indexitem text="S" expand=false>
 			<indexitem text="Schleife (Kante)" target="def.schleife"/>
-			<indexitem text="Speichern" target="dia.file.title"/>
 			<indexitem text="Standard (Modus)" target="mouse.std" />
 			<indexitem text="Standardwerte">
 				<indexitem text="Ansicht" target="dia.pref.view" />

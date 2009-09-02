@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="de">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="format.css" />  
+	<title>Gravel - Hilfe - Dialoge - Hyperkante</title>
+</head>
+<body>
+<h2>Dialog: Eigenschaften einer Hyperkante</h2>
+<p>Die Eigenschaften der Hyperkante lassen sich entweder in Hauptfenster in der Liste oder in der Anzeige durch das Kontextmenü (rechte Maustaste bzw. Strg+Linksklick) aufrufen.</p>
+<div class="imagebox"><a name="Abb1"><img src="img/dialog_hyperedge_general.png"></a><br><font size="-1">Abbildung 1: Allgemeine bzw. mathematische Eigenschaften der Hyperkante</font></div>
+<p>Die Hyperkante ist in ihren Eigenschaften denen der <a href="dialog_edge.html">Kante</a> sehr ähnlich. In Abbildung 1 findet sich der Allgemeine Teil der Hyperkante. Der Unterschied zur Kante ist, dass hier eine Liste der Knoten aufgeführt ist, in der die beteiligten Knoten ausgewählt werden können. Index, Name, Gewicht und (Linien-)Breite sind analog zur Kante definiert.</p>
+
+<p>In der zweiten Registerkarte finden sich die gleichen Einstellungen für die Beschriftung und Linienart, wie bei der <a Kante in der Registerkarte href="dialog_edge.html#view">„Ansicht“</a>, lediglich der <a name="Innenabstand">Innenabstand</a> ist zusätzlich vorhanden. Dieser wird bei der <a href="dialog_shape.html#proof">Überprüfung</a> eines Umrisses der Hyperkante verwendet sowie bei der Erzeugung der <a href="dialog_shape.html#convexhull">konvexen Hülle</a> als Grundform des Umrisses.</p>
+<h3>Validitätsbedingungen</h3>
+<p>Damit der Dialog die Hyperkante im Graphen erstellt bzw. verändert, darf keine zweite Kante existieren, welche exakt die gleichen Knoten umfasst. Der Index darf noch keiner anderen Hyperkante zugeordnet sein. Ist die Textanzeige aktiviert, so müssen die drei Werte Größe, Position und Abstand existieren.</p>
+<p>Sind all diese Bedingungen erfüllt, so wird die Hyperkante in dem Graphen erstellt bzw. mit den Änderungen im Graphen gespeichert.
+</body>
+</html>

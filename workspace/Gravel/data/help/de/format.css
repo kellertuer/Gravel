@@ -17,6 +17,7 @@ h2 {
 	font-size:20pt;
 	font-weight:bold;
 	border-style: solid;
+	border-width:0px;
 	border-bottom-width: 1px;
 	border-color: #000066;
 }
@@ -33,9 +34,12 @@ padding:0px;
 code {
 	padding: 12px;
 }
+ul { list-style-image: url(img/icons/bullet.png); }
 li
 {
-	list-style-type:cirlce;
+	padding-top:2px;
+	padding-bottom:2px;
+	padding-left:-2px;
 }
 
 .imagebox{
@@ -109,6 +113,10 @@ table.nicetable caption span.title {
 	font-weight: bold;
 }
 
+div.notes
+{
+	margin-top:20px;
+}
 a:link { color:#5555FF; text-decoration:underline; }
 
 a:visited { color:#3333AA; text-decoration:underline; }

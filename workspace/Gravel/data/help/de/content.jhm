@@ -9,6 +9,7 @@
 	<mapID target="icon.anchor" url="img/icons/anchor_16.png" />
 	<mapID target="icon.chapter.closed" url="img/icons/folder_sans_down_16.png" />
 	<mapID target="icon.chapter.open" url="img/icons/folder_sans_up_16.png" />
+	<mapID target="icon.chapter.todo" url="img/icons/folder_text_16.png" />
 	<mapID target="icon.page" url="img/icons/document_sans_16.png" />
 
 	<mapID target="icon.ToolbarPre" url="img/icons/arrow_full_left_32.png" />
@@ -35,6 +36,8 @@
 	<mapID target="definition.vis" xml:lang="de" url="definitions.html#vis">
 
   <mapID target="graphml" xml:lang="de" url="graphml.html" />
+
+	<mapID target="gui" xml:lang="de" url="gui.html" />
  
 	<mapID target="mainwindow" xml:lang="de" url="mainwindow.html" />
 	<mapID target="mainwindow.toolbar" xml:lang="de" url="mainwindow.html#toolbar">
@@ -48,10 +51,11 @@
 
 	<mapID target="dialog" xml:lang="de" url="dialog.html">
 	<mapID target="dialog.edge" xml:lang="de" url="dialog_edge.html">
+	<mapID target="dialog.hyperedge" xml:lang="de" url="dialog_hyperedge.html">
+	<mapID target="dialog.shape" xml:lang="de" url="dialog_shape.html">
 	<mapID target="dialog.node" xml:lang="de" url="dialog_node.html">
 	<mapID target="dialog.subgraph" xml:lang="de" url="dialog_subgraph.html">
 	<mapID target="dialog.prefs" xml:lang="de" url="dialog_prefs.html">
-	<mapID target="dialog.file" xml:lang="de" url="dialog_file.html">
  
 	<mapID target="export" xml:lang="de" url="export.html">
 	<mapID target="export.png" xml:lang="de" url="export_png.html">
@@ -103,10 +107,6 @@
 <mapID target="dia.kan.winkel" url="dialog_edge.html#winkel" />
 <mapID target="dia.kan.form" url="dialog_edge.html#form" />
 <mapID target="dia.kan.position" url="dialog_edge.html#position" />
-
-<mapID target="dia.file.title" url="dialog_file.html#title" />
-<mapID target="dia.file.filter" url="dialog_file.html#filter" />
-<mapID target="dia.file.endung" url="dialog_file.html#endung" />
 
 <mapID target="dia.kno.title" url="dialog_node.html#title" />
 <mapID target="dia.kno.math" url="dialog_node.html#math" />
@@ -161,9 +161,6 @@
 <mapID target="main.list" url="mainwindow.html#list" /><!-- Liste -->
 <mapID target="main.stats" url="mainwindow.html#stats" /><!-- Statistik (Hauptfenster) -->
 
-<mapID target="menu.title" url="menu.html#title" />
-<mapID target="menu.table" url="menu.html#table" />
-
 <mapID target="mouse.title" url="mouseaction.html#title" />
 <mapID target="mouse.both" url="mouseaction.html#both" />
 <mapID target="mouse.std" url="mouseaction.html#std" />
@@ -172,6 +169,8 @@
 <mapID target="pop.title" url="popup_menus.html#title" /><!--Kontextmenü, Maustaste, rechts, Löschen -->
 <mapID target="pop.node" url="popup_menus.html#node" /><!--Kontextmenü (Knoten) -->
 <mapID target="pop.edge" url="popup_menus.html#edge" /><!--Kontextmenü (Kante) -->
+<mapID target="pop.hyperedge" url="popup_menus.html#hyperedge" /><!--Kontextmenü (Kante) -->
+<mapID target="pop.background" url="popup_menus.html#background" /><!--Kontextmenü (Kante) -->
 
 <mapID target="stats.title" url="statistic.html#title" /><!-- Funktion der Statistik -->
 <mapID target="stats.abs1" url="statistic.html#abs1" /><!--Buttons(Statistik), -->
@@ -191,11 +190,11 @@
 <mapID target="def.abb3" url="definitions.html#Abb3" />
 <mapID target="def.abb4" url="definitions.html#Abb4" />
 <mapID target="def.abb5" url="definitions.html#Abb5" />
+<mapID target="dia.hkan.abb1" url="dialog_hyperedge.html#Abb1" />
 <mapID target="dia.kan.abb1" url="dialog_edge.html#Abb1" />
 <mapID target="dia.kan.abb2" url="dialog_edge.html#Abb2" />
 <mapID target="dia.kan.abb3" url="dialog_edge.html#Abb3" />
 <mapID target="dia.kan.abb4" url="dialog_edge.html#Abb4" />
-<mapID target="dia.file.abb1" url="dialog_file.html#Abb1" />
 <mapID target="dia.kno.abb1" url="dialog_node.html#Abb1" />
 <mapID target="dia.kno.abb2" url="dialog_node.html#Abb2" />
 <mapID target="dia.pref.abb1" url="dialog_prefs.html#Abb1" />

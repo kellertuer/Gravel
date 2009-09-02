@@ -52,7 +52,7 @@
 		<value name="allowmultiple" type="Boolean">true</value>
 		<value name="directed" type="Boolean">false</value>
 		<value name="fileformat" type="String">visual</value>
-		<value name="lastfile" type="String">/Users/ronny/Graveltemp/HyperGraphs/berge.xml</value>
+		<value name="lastfile" type="String">$NONE</value>
 		<value name="loadfileonstart" type="Boolean">true</value>
 	</group>
 	<group name="grid">
@@ -105,7 +105,7 @@
 		<value name="name" type="String">Untergraph #$ID</value>
 	</group>
 	<group name="vgraphic">
-		<value name="cpshow" type="Boolean">true</value>
+		<value name="cpshow" type="Boolean">false</value>
 		<value name="cpsize" type="Integer">3</value>
 		<value name="directed" type="Boolean">true</value>
 		<value name="framedistance" type="Integer">10</value>
