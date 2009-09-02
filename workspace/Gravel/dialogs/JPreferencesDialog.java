@@ -62,8 +62,8 @@ import view.pieces.GridComponent;
 	private JTextField tNodeName, tSubgraphName, tEdgeName;
 	private JLabel tNodePreview, tSubgraphPreview, tEdgePreview;
 	private JCheckBox bControlPoint,bSaveOnExit,bAllowLoops, bAllowMultiple, bLoadLastGraphOnStart, bUndotrackSelection;
-	private ButtonGroup GraphType;
-	private JRadioButton rDirected, rUndirected;
+	private ButtonGroup GraphType,GraphMainType;
+	private JRadioButton rDirected, rUndirected,rGraph,rHyperGraph;
 	private GridComponent grid;
 	private JButton bOK, bCancel,bSave,bRestore,bLoad;
 	private JLabel prefStatus;
@@ -179,6 +179,8 @@ import view.pieces.GridComponent;
 		
 		rDirected.setSelected(gp.getBoolValue("graph.directed"));
 		rUndirected.setSelected(!gp.getBoolValue("graph.directed"));
+		rGraph.setSelected(gp.getBoolValue("graph.new_with_graph"));
+		rHyperGraph.setSelected(!gp.getBoolValue("graph.new_with_graph"));
 		bAllowLoops.setSelected(gp.getBoolValue("graph.allowloops"));
 		bAllowMultiple.setSelected(gp.getBoolValue("graph.allowmultiple"));
 		
@@ -215,7 +217,18 @@ import view.pieces.GridComponent;
 		
 		c.gridx = 0; c.gridy = 0;
 		c.gridwidth=3; c.anchor = GridBagConstraints.CENTER;
-		content.add(new JLabel("<html>Graph<</html>"),c);
+		content.add(new JLabel("<html>Graph</html>"),c);
+
+		c.gridx = 0; c.gridy++;c.gridwidth=2; 
+		c.anchor = GridBagConstraints.WEST;
+		GraphMainType = new ButtonGroup();
+		content.add(new JLabel("<html>Beim Start beginnen mit</html>"),c);
+		
+		c.gridx = 0; c.gridy++;c.gridwidth=1; 
+		rGraph = new JRadioButton("Graph");
+		rHyperGraph = new JRadioButton("Hypergraph");
+		GraphMainType.add(rGraph); GraphMainType.add(rHyperGraph);
+		content.add(rGraph,c); c.gridx++; content.add(rHyperGraph,c);
 
 		c.gridx = 0; c.gridy++;c.gridwidth=2; 
 		c.anchor = GridBagConstraints.WEST;
@@ -550,6 +563,7 @@ import view.pieces.GridComponent;
 		gp.setIntValue("node.name_distance",n.getNameDistance());
 		gp.setBoolValue("node.name_visible",n.isNameVisible());
 		
+		gp.setBoolValue("graph.new_with_graph", rGraph.isSelected());
 		gp.setBoolValue("graph.directed", this.rDirected.isSelected());
 		gp.setBoolValue("graph.allowloops", bAllowLoops.isSelected());
 		gp.setBoolValue("graph.allowmultiple", bAllowMultiple.isSelected());

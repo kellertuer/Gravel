@@ -552,9 +552,14 @@ public class JFileDialogs implements Observer
 	private String buildNewGraph()
 	{
 	  String[] selections = { "Graph", "Hypergraph"};
+	  int sel;
+	  if (GeneralPreferences.getInstance().getBoolValue("graph.new_with_graph"))
+		  sel=0;
+	  else
+		  sel=1;
 	  return (String) JOptionPane.showInputDialog(Gui.getInstance().getParentWindow(), "<html>Bitte Graphentyp w"+main.CONST.html_ae+"hlen:</html>",
 	            "Neue Graphen erstellen", JOptionPane.QUESTION_MESSAGE,null,
-	            selections, selections[0]);
+	            selections, selections[sel]);
 	}
 	/**
 	 * Create a New Graph in the GUI

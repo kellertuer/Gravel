@@ -437,7 +437,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		myValidatorThread=null;
 		runText=null;
 		setEnabled(true);
-		updatePanel(HShapeGraphicRef.getShapeParameters());
+//		updatePanel(HShapeGraphicRef.getShapeParameters());
 	}
 	
 	/**
@@ -558,9 +558,8 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		bOk.setEnabled(enabled);
 		bCancel.setEnabled(enabled);
 		bCheckShape.setEnabled(enabled);
-		FreeModPanel.setEnabled(enabled);
-		if (enabled)
-			updatePanel(HShapeGraphicRef.getShapeParameters());
+		if (FreeModPanel.getContent().isVisible())
+			FreeModPanel.setEnabled(enabled);
 	}
 	
 	public void actionPerformed(ActionEvent e) {

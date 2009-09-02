@@ -160,12 +160,18 @@ public class StandardNodeDragListener  implements MouseListener, MouseMotionList
 					newpoint.translate(Gtransx,Gtransy); //Bewegung im Graphen aber mit Rungungsfehlern, also nur zurbetrachtung der Gesamtgraphbewegung
 					if (newpoint.x < 0)
 					{
-						vg.translate(Math.abs(newpoint.x), 0); //Um die Differenz verschieben (Zoomfactor aufheben)
+						if (vg!=null)
+							vg.translate(Math.abs(newpoint.x), 0); //move graph by difference we would leave the area (in their coordinates without zoom)
+						else if (vhg!=null)
+							vhg.translate(Math.abs(newpoint.x), 0); //same as in graph
 						newpoint.x=0;
 					}
 					if (newpoint.y < 0)
 					{
-						vg.translate(0,Math.abs(newpoint.y));
+						if (vg!=null)
+							vg.translate(0,Math.abs(newpoint.y));
+						else if (vhg!=null)
+							vhg.translate(0,Math.abs(newpoint.y));
 						newpoint.y = 0;
 					}
 					temp.setPosition(newpoint); //Translate selected node

@@ -366,6 +366,7 @@ public class GeneralPreferences extends Observable
 		
 		if (FloatValues.get("zoom")==null) return false;
 		
+		if (BoolValues.get("graph.new_with_graph")==null) return false;
 		if (BoolValues.get("graph.directed")==null) return false;
 		//Dieser Wert ist nicht schlimm, also einfach Std setzen, schon okay
 		if (BoolValues.get("graph.loadfileonstart")==null) return false;
@@ -428,7 +429,7 @@ public class GeneralPreferences extends Observable
 		IntValues.put("edge.arrow_size",10);          // Size of the arrow segment
 		FloatValues.put("edge.arrow_part",0.75f);          // Size of the arrow segments
 		IntValues.put("edge.arrow_alpha",38);
-		FloatValues.put("edge.arrow_pos",1f);
+		FloatValues.put("edge.arrow_pos",1.0f);
 		IntValues.put("edge.text_distance",7);
 		FloatValues.put("edge.text_position",.25f);
 		IntValues.put("edge.text_size",12);
@@ -469,6 +470,7 @@ public class GeneralPreferences extends Observable
 		BoolValues.put("edge.text_showvalue",false);
 		BoolValues.put("edge.loop_clockwise",true);
 		BoolValues.put("graph.allowmultiple",false);
+		BoolValues.put("graph.new_with_graph",true);
 		BoolValues.put("graph.allowloops",false);
 		BoolValues.put("graph.directed",true);
 		BoolValues.put("graph.loadfileonstart",false);

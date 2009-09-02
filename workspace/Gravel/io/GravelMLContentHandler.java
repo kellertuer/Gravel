@@ -96,7 +96,7 @@ public class GravelMLContentHandler implements ContentHandler
 		if (Status==PARSE_NODES) //Just parsed all nodes an std keys
 		{
 			if (Float.isNaN(gp.getFloatValue("edge.arrow_pos"))) //not found
-				gp.setFloatValue("edge.arrow_pos",1f); //Set again, because this value was new
+				gp.setFloatValue("edge.arrow_pos",1.0f); //Set again, because this value was new
 		}
 		if (Status==PARSE_EDGES)
 		{

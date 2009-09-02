@@ -126,7 +126,7 @@ public class JStatisticsDialog extends JDialog implements ActionListener, TextLi
 		content.add(iExpr,c);
 		
 		c.gridy++;
-		c.gridx = 0; c.gridwidth=3;
+		c.gridx = 0; c.gridwidth=2;
 		lError = new JLabel("");
 		lError.setPreferredSize(new Dimension(400,35));
 		content.add(lError,c);
@@ -140,6 +140,7 @@ public class JStatisticsDialog extends JDialog implements ActionListener, TextLi
 		bCancel = new JButton("Abbrechen");
 		bCancel.addActionListener(this);
 		c.insets = new Insets(3,3,3,3);
+		c.anchor = c.anchor = GridBagConstraints.WEST;
 		content.add(bCancel,c);
 		//Add ESC-Handling
 		InputMap iMap = getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -159,7 +160,8 @@ public class JStatisticsDialog extends JDialog implements ActionListener, TextLi
 		
 		
 		c.anchor = GridBagConstraints.EAST;
-		c.gridx = 1;
+		c.gridx++;
+		c.gridwidth=2;
 		if (isNew)
 			bOK = new JButton("Neuen Statistik Eintrag erstellen");
 		else
@@ -167,7 +169,7 @@ public class JStatisticsDialog extends JDialog implements ActionListener, TextLi
 		bOK.addActionListener(this);
 		content.add(bOK,c);
 		
-		c.gridy=0; c.gridx=3; c.gridwidth=1;c.gridheight=2;
+		c.gridy=0; c.gridx=2; c.gridwidth=1;c.gridheight=2;
 		bHelp = new JButton("Hilfe");
 		bHelp.addActionListener(this);
 		content.add(bHelp,c);
