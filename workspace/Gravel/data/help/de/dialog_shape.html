@@ -8,7 +8,49 @@
 </head>
 <body>
 <h2>Dialog: Der Umriss einer Hyperkante</h2>
-<a name="prrof">Überprüfen</a>
-<a name="convexhull">konvexe Hülle</a>.
+<p>Der Umriss einer Hyperkante wird in zwei Schritten erzeugt: Zunächst wird eine Grundform erstell, die dann modifiziert werden kann. Wird der Dialog für den Umriss mit einer Hyperkante aufgerufen, die bereits einen Umriss hat, so beginnt gleich die Modifikation.</p>
+<p>Beide Modi haben drei gemeinsame Buttons: <a name="proof">„Prüfen“</a> zur Validierung des Umrisses sowie „Abrechen“ und „Ok“ zum Verwerfen bzw. Übernehmen des aktuellen Umrisses. Zum übernehmen muss ein nichtleerer Umriss existieren. In der Darstellung werden alle bisherigen Hyperkantenumrisse sowie alle nicht zur aktuellen Hyperkante gehörenden Knoten kaum sichtbar gezeichnet, außer, wenn Knoten nach dem Prüfen im Umriss liegen. Anstelle der Liste auf der rechten Seite werden Parameter eingeblendet.</p>
+
+<h3>Erzeugen eines Umrisses</h3>
+<div class="imagebox"><a name="Abb1"></a><img src="img/dialog_shape_creation.png"><br><font size="-1">Abbildung 1: Erzeugen eines Umrisses<br>Hier mit der Grundform des Kreises</font></div>
+<p>Das Erzeugen eines Umrisses ist der erste Schritt zu einem Umriss. Dieser Modus wird auch verwendet, wenn ein Teil des Umrisses ersetzt werden soll, dann steht allerdings lediglich die Interpolation zur Verfügung und deren Grad ist durch den bisherigen Umriss gegeben. Für die drei Grundformen gibt es jeweils verschiedene Parameter, um die Erzeugung zu beeinflussen: 
+<dl>
+	<dt>Kreis</dt><dd>Hierbei wird der Polynomgrad auf 4 festgelegt. Dann kann durch Angabe eines Mittelpunktes und eines Radius der Kreis angegeben werden. Alternativ kann er auch mit der Maus aufgezogen werden, die Felder auf der rechten Seite werden dann mit den entsprechenden Werten gefüllt.</dd>
+	<dt>Interpolation</dt><dd>Neben dem Polynomgrad kann noch spezifiziert werden, wo neu erzeugte Punkte im Vektor der Interpolationspunkte eingefügt werden sollen, am Ende oder zwischen den zwei aufeinanderfolgenden Interpolationspunkten, bei denen der neue Punkt am nächsten an der Verbindungsstrecke dran liegt. Jeder linke Mausklick fügt einen neuen Punkt ein, ein Rechtsklick auf einen Punkt entfernt diesen.</dd>
+	<dt><a name="convex hull">konvexe Hülle</a></dt><dd>Hier ist lediglich der Polynomgrad notwendig, basierend auf den Knotenpositionen, dem Innenabstand und diesem Grad wird dann der Umriss berechnet.</dd>
+</dl>
+</p>
+<p>Mit dem Button „Modifikation“ gelangt man in den zweiten Modus zur Modifikation des erstellten Umrisses.</p>
+
+<h3>Modifizieren eines Umrisses</h3>
+<div class="imagebox"><a name="Abb2"></a><img src="img/dialog_shape_modification.png"><br><font size="-1">Abbildung 2: Modifikation eines Umrisses<br>Hier wurde der erzeugte kreis zu einer Ellipse verformt.</font></div>
+<p>Da es in diesem Modus sehr viele Buttons gibt, schauen wir uns die einmal kurz alle einzeln an:
+<dl>
+	<dt>global und lokal </dt><dd> Mit diesem Optionsfeld wechselt man zwischen dem globalen und dem lokalen Bearbeitungsmodus. Im globalen Modus werden die Aktionen auf den gesamten Umriss angewandt. Im lokalen Modus muss zunächst ein Bereich des Umrisses gewählt werden, alle Modifikationen wirken dann nur auf diesem Bereich.</dd>
+	<dt>+</dt><dd> Dieser Button ist nur im globalen Modus verfügbar. Er schaltet die Anzeige des Knotenvektors an; es werden dann die Positionen auf der Kurve angezeigt, an denen die Knoten auf der Kurve liegen. Durch anklicken der Kurve wird an der Stelle ein Knoten eingefügt.</dd>
+	<dt>-</dt><dd> Analog zum „+“-Button wird hier der Modus zum Entfernen von Knoten aktiviert. Kann ein Knoten nicht entfernt werden, passiert nichts, andernfalls wird er entfernt. Dabei kann sich die Kurve (unter Umständen sogar stark) verändern. Man kann jedoch jede Aktion stets rückgängig machen.</dd>
+</dl>
+</p>
+<p>Jede der folgenden Aktionen verläuft durch Ziehen, wobei der Ursprungspunkt $p$ des Ziehens und der Richtungsvektor $v$ vom Ursprung zur aktuellen Mausposition jeweils in der Berechnung verwendet werden:
+<dl>
+	<dt><img src="img/icons/rotate32.png" class="icon"></dt><dd class="icon"> Rotiert den Umriss (bzw. den lokalen Bereich) um den Punkt $p$ und zwar um den Winkel, der zwischen der positiven $X-$Achse im Uhrzeigersinn zur Richtung $v$ vorliegt. $v$ wird dabei auch eingezeichnet, um dies zu verdeutlichen.</dd>
+	<dt><img src="img/icons/scale32.png" class="icon"></dt><dd class="icon">Skalieren der Kurve (bzw. des lokalen Bereichs) mit dem Fixpunkt $p$. Die Skalierung ergibt sich aus dem Verhältnis von $v$ zur Größe der ursprünglichen Kurve. Ist also $v$ nahe der Kurve, ergibt sich etwa ein Faktor von $1$. Die Richtung wird dabei ignoriert.</dd>
+	<dt><img src="img/icons/scaledir32.png" class="icon"></dt><dd class="icon">Skalieren mit Richtung. Verläuft analog zur Skalierung (dem vorherigen Icon), nur dass lediglich in Richtung $v$ skaliert wird. Die Richtung orthogonal zu $v$ bleibt unverändert. So können beispielsweise aus Kreisen Ellipsen geformt werden.</dd>
+	<dt><img src="img/icons/translate32.png" class="icon"></dt><dd class="icon">Verschieben. Der Umriss (bzw. der lokale Bereich) wird um $v$ verschoben.</dd>
+</dl></p>
+<p>Ist keiner dieser Modi aktiv, so kann die Kurve verändert werden, indem direkt auf der Kurve mit dem Ziehen begonnen wird, dann wird dieser Punkt an die aktuelle Mausposition verschoben. Aufgrund der lokalen Eigenschaften der NURBS"=Kurven hat dies ebenfalls nur lokalen Einfluss. Im lokalen Modus gibt es drei weitere Icons, die zur Auswahl der Teilkurve dienen: 
+<dl>
+<dt><img src="img/icons/start32.png" class="icon"></dt><dd class="icon"> Setzen des Startpunktes der lokalen Bereichs. Start- und Ende sind nicht direkt unterscheidbar, die Darstellung auf den Icons entspricht folgender Situation:
+	<p>
+Ist die Kurve im Uhrzeigersinn definiert -- also bei der Interpolation die Reihenfolge der Knoten im Uhrzeigersinn gegeben worden, sonst ist das stets der Fall -- so verläuft die Auswahl ebenso im Uhrzeigersinn. Dann entspricht die Darstellung auf dem Startpunkt-Icon der Situation, dass der Startpunkt auf einer horizontalen Linie der oberen Umrisshälfte liegt.</p>
+Jeder Mausklick wird dabei auf die Kurve projiziert und dieser Punkt als neuer Startpunkt verwendet.</dd>
+<dt><img src="img/icons/invert32.png" class="icon"></dt><dd class="icon">Invertieren. Die Punkte Start und Ende werden vertauscht, was in der Auswahl genau des Kurvenanteils resultiert, der vorher nicht der lokale Bereich war.</dd>
+<dt><img src="img/icons/end32.png" class="icon"></dt><dd class="icon">Setzen des Endpunktes. Analog zu den Ausführungen des Startpunktes, nur bezeichnet dies dann das andere Ende des Teilstücks.</dd>
+</dl>
+Ist hier keiner der Modi aktiv, so wird im lokalen Modus bei jedem Klick bzw. Ziehen abwechselnd Start und Ende der Kurve gesetzt. Der Button „neue Grundform“ erstellt eine neue Grundform wie folgt:
+<dl>
+	<dt>im globalen Fall</dt><dd>gelangt man zu dem zurück, was bereits vorgestellt worden ist: Der Erzeugung einer kompletten neuen Grundform.</dd>
+	<dt>im lokalen Fall</dt><dd>wird eine neue Grundform des lokalen Bereichs erzeugt, so dieser existiert und groß genug ist (man benötigt einen gewissen zu ersetzenden Teil). Die Interpolationspunkte definieren dann eine Kurve, die den lokalen Bereich ersetzt und an den Übergängen (Start- und Endpunkt des lokalen Bereichs) wieder stetig ist. Dabei ist der Grad der Kurve bereits gegeben.</dd>
+</dl>
 </body>
 </html>

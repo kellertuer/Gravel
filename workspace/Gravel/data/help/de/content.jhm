@@ -128,12 +128,6 @@
 
 <mapID target="exp.title" url="export.html#title" />
 <mapID target="exp.tex.title" url="export_tex.html#title" />
-<mapID target="exp.tex.abs1" url="export_tex.html#abs1" /> <!-- picture, eepic, epic -->
-<mapID target="exp.tex.abs2" url="export_tex.html#abs2" /><!-- pdflatex -->
-<mapID target="exp.tex.abs3" url="export_tex.html#abs3" /><!--\setlength \unitlength -->
-<mapID target="exp.tex.abs4" url="export_tex.html#abs4" /><!--\path -->
-<mapID target="exp.tex.abs5" url="export_tex.html#abs5" /><!--\circle \fontsize \put -->
-<mapID target="exp.tex.abs6" url="export_tex.html#abs6" /><!--Anordnen, CodeBeispiel, -->
 <mapID target="exp.png.title" url="export_png.html#title" />
 
 <mapID target="graphml.title" url="graphml.html#title" />
@@ -185,11 +179,6 @@
 	maps to the anchors of the images for the Index of images
 	
 -->
-<mapID target="def.abb1" url="definitions.html#Abb1" />
-<mapID target="def.abb2" url="definitions.html#Abb2" />
-<mapID target="def.abb3" url="definitions.html#Abb3" />
-<mapID target="def.abb4" url="definitions.html#Abb4" />
-<mapID target="def.abb5" url="definitions.html#Abb5" />
 <mapID target="dia.hkan.abb1" url="dialog_hyperedge.html#Abb1" />
 <mapID target="dia.kan.abb1" url="dialog_edge.html#Abb1" />
 <mapID target="dia.kan.abb2" url="dialog_edge.html#Abb2" />

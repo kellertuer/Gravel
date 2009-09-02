@@ -1,75 +1,43 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
-
-<html lang="en">
+<html lang="de">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Gravel - Hilfe - Export - LaTeX-<tt><code>picture</code></tt>-Umgebung</title>
+    <link rel="stylesheet" type="text/css" href="format.css" />  
+	<title>Gravel - Hilfe - Export: Portable Network Graphics</title>
 </head>
-<body>
-<div align=center><a name="title"><h2>Export<br>LaTeX-<tt><code>picture</code></tt>-Umgebung</h2></a><br><a name="Abb1"><img src="img/export_tex.png"></a><br><font size="-1">Abbildung 1: Einstellungen des LaTeX-Exports nach Wahl einer Datei</div>
-<br><br>
-<p><a name="abs1">Eine</a> weitere Möglichkeit, den erstellten Graphen zu exportieren, ist der LaTeX-Export.
-Zunächst wird dabei die Größe der entstehenden Grafik festgelegt. Dabei wird wie bei dem <a href="export_png.html">Export als Pixelgrafik</a> das Seitenverhältnis der vom Graphen benötigten Fläche als Grundlage verwendet. Es wird dann entweder die Höhe oder die Breite im Dialog explizit angegeben. Die Angabe ist in Millimetern. <br>
-Eine weitere Option bietet die Möglichkeit, den Graphen entweder eingebettet in ein komplettes (minimal zusammengestelltes) LaTeX-Dokument einzubetten, oder ausschließlich die notwendige <tt><code>figure</code></tt> in der .tex-Datei zu erstellen. Im zweiten Fall kann dann mit Hilfe des <tt><code>\include</code></tt>-Befehls die Grafik direkt in das eigene Dokument eingebunden werden. Dadurch kann auch zu einem späteren Zeitpunkt der Graph neu in die Datei exportiert werden, ohne dass man an dem restlichen Dokument, in dem er integriert ist, weitere Änderungsnotwenigkeiten entstehen.<br>
-Das Programm erstellt eine Vektorgrafik basierend auf der <tt><code>picture</code></tt>-Umgebung von LaTeX und
-deren Erweiterungspakete <tt><code>epic.sty</code></tt><sup>1</sup> und <tt><code>eepic.sty</code></tt><sup>2</sup>, die bis auf die Farbinformationen alle Eigenschaften des Graphen berücksichtigt.
-Diese beiden Pakete müssen entweder der Datei im gleichen Verzeichnis bereitgestellt werden oder dem LaTeX-Compiler bekannt sein. Weitere Pakete sind nicht notwendig.<br>
-<a name="abs2">In der exportierten</a> Datei ist das Bild eingebettet in eine minimale Dokument-Definition, so dass sich die Grafik betrachten lässt.
-Aufgrund interner Befehle der beiden Pakete ist das Kompilieren der Datei nicht mit <tt><code>pdflatex</code></tt> möglich. 
-Stattdessen muss für ein PDF-Dokument zunächst mit dem normalen LaTeX-Compiler ein DVI-Dokument erstellt und dieses über Postskript in ein PDF umgewandelt werden.<br>
-Die meisten LaTeX-Editoren erkennen Pakete, bei denen dieser Weg notwendig ist. Alternativ läßt sich dies auf der Konsole mit diesen 3 Befehlen realisieren:<br><br>
-<pre><code>latex beispiel.tex && dvips beispiel.dvi -o beispiel.ps && ps2pdf beispiel.ps</code></pre><br>
-<a name="abs3">Die Größe</a> eines exportierten Graphen wird durch den direkt vor der <tt><code>picture</code></tt>-Umgebung stehenden Befehl <tt><code>\setlength\{unitlength{Maßeinheit}</code></tt>.
-Dieser gibt an, wie viele Millimeter auf dem Papier einem Punkt (pt) in der Grafik entsprechen. In der Grafik sind alle Maßangaben in pt, bis auf die Schriftgröße. Diese Angaben in pt sind dabei identisch mit den Pixelangaben des Graphen bei einem Maßstab von 100%.<br>
-Durch eine nachträgliche manuelle Änderung der Größe (durch Variation der <tt><code>unitlength</code></tt>) ist das Ergebnis nicht mehr identisch mit dem Original. Der Graph ändert seine Größe, jedoch bleibt die Schrift in ihrer alten Größe erhalten und verschiebt sich somit ebenso relativ zum veränderten Graphen. Stattdessen ist es empfehlenswert, den Graphen in der gewünschten Größe erneut zu exportieren.</p>
-<br><br>
-<b>Aufbau der Grafik</b><br>
-<p>In den Angaben innerhalb der Grafik wird, wie bei dem Export als Pixelgrafik, der ungenutzte Rand herausgerechnet.<br>
-Bei den Koordinatenangaben innerhalb der Grafik ist die vertikale Achse invertiert. Sie beginnt also am unteren Rand mit dem Wert 0 und endet mit der Höhe der Grafik am oberen Rand.</p>
-<p><a name="abs4">Betrachtet</a> man die entstandene Datei, so folgt diese einer festgelegten Struktur:<br>
-Zunächst wird nacheinander jede Kante gezeichnet. Dabei findet ausschließlich der Befehl <tt><code>\path</code></tt> Verwendung.
-Erst wird die Kante in ihrer eigentlichen Form erstellt. Hat die Kante eine Breite, die echt größer als 1 ist, so folgt danach eine mehrfach verschobene Zeichnung der Kante in dickerer Strichstärke. Dies ermöglicht die Darstellung aller Kantendicken. Ohne mehrfaches Zeichnen wären lediglich zwei unterschiedliche Kantenbreiten möglich.<br>
-Abschließend wird der Pfeil gezeichnet.<br>
-Sowohl die Kantenbreite als auch der Pfeil können im Code etwas Platz einnehmen. Bei einer gebogenen Kante etwa wird diese durch kurze gerade Linien angenähert. Der Pfeil benötigt einige Befehle, da kein direkter Befehl zum Ausfüllen eines Bereiches existiert.</p>
-<p><a name="abs5">Dann</a> folgen nacheinander die Knoten.
-Diese werden durch einen Kreis am Knotenmittelpunkt gezeichnet. Der Befehl <tt><code>\put</code></tt> setzt den mit <tt><code>\circle*{groesse}</code></tt> erzeugten gefüllten Punkt an die entsprechende Stelle.<br>
-Dahinter wird mit dem ersten Befehl ebenso der Text platziert. Dieser wird in einer rahmenlosen Box dargestellt und mit <tt><code>\fontsize{5.0mm}{10pt}\selectfont $Knotenname$</code></tt> erzeugt. Die Angabe in Millimetern bestimmt dabei die entsprechende Größe des Textes. Der Knotenname wird in einer mathematischen Umgebung dargestellt.</p>
-<br><br>
-<a name="abs6"><b>Anordnung der Graphen</b></a><br>
-<p>Nach dem Erstellen mehrerer Graphen lassen sich diese in einer Abbildung nebeneinander darstellen, indem man die <tt><code>minipage</code></tt>-Umgebung verwendet. Im folgenden Anwendungsfall werden 2 Graphen nebeneinander platziert.
-In Zeile 5 und Zeile 11 sind die Graphen einzufügen. Diese umfassen die gesamte <tt><code>picture</code></tt>-Umgebung und den direkt davor stehenden Befehl <tt><code>\setlength{\unitlength{Maßeinheit\}</code></tt>.<br>
-Die beim Exportieren gewählte Breite der Graphen ist in den Zeilen 4 und 10 einzutragen. Um zwischen beiden Graphen einen Freiraum zu erhalten, setzt man die beiden Breiten im Quellcode entsprechend größer.
-<br>Die gegebenen <tt><code>\vspace</code></tt>-Befehle ermöglichen eine Einstellung des Abstandes zum Text oberhalb bzw. unterhalb der Abbildung (Zeile 2 bzw. 19). Außerdem sind in Zeile 8 und 14 Untertitel für die einzelnen Graphen möglich.<br>
-<pre><code>
-1 \begin{figure}[htbp]
-2 	\vspace{0pt}% Abstand zum Text darueber
-3 	\centering
-4 	\begin{minipage}{6 cm}
-5 		%
-6 		%Quellcode des ersten Graphen hier einfuegen
-7 		%		
-8 		\centering\mbox{Untertitel Graph 1}
-9 	\end{minipage}
-10 	\begin{minipage}{6 cm}
-11 		%
-12 		%Quellcode des zweiten Graphen hier einfuegen
-13 		%
-14 		\centering\mbox{Untertitel Graph 2}
-15 	\end{minipage}
-16 	\vspace{0pt} %Abstand beider Graphen zur Abbildungsunterschrift
-17 	\caption{Abbildungsunterschrift}
-18 	\label{graphgrouplabel}
-19 	\vspace{0pt} %Abstand Abbildungsschrift zum Text danach
-20 \end{figure}
-</code></pre>
-<br><br>In Abbildung 2 wurden zwei Graphen mit einer Breite von jeweils 60 Millimeter exportiert und in den Quellcode eingefügt.
-Dies lässt sich für mehrere nebeneinander angeordnete Graphen analog fortführen. Die Abbildung ist ein Bild aus einem PDF-Dokument, so dass die Maße in dieser Hilfe nicht korrekt dargestellt werden.<br>  
-<div align=center><a name="Abb2"><img src="img/export_tex_example.png"></a><br><font size="-1">Abbildung 2: Beispiel des Exports zweier Graphen nebeneinander</div>
-<br><br>
-<hr>
-<sup>1</sup> Version 1.2 vom 14 Juli 1986 von Sunil Podar<br>
-<br>
-<sup>2</sup> Version 1.1b vom 7. Februar 1988 von Conrad Kwok<br>
+<h2><a name="title">Export - Portable Network Graphics</a></h2></a>
+<div class="imagebox"><img src="img/export_tex.png"></a><br><font size="-1">Abbildung 1: Einstellungen des LaTeX-Exports nach Wahl einer Datei.</div>
+	<p>Der Export zu LaTeX ist für die Weiterverndung in wissenschaftlichen Ausarbeitungen wichtig. Dabei werden zwei verschiedene Formate bereitgestellt, je nach Anforderungen und Wünschen des Benutzers. Nach Wahl einer Datei gelangt man zu dem Dialog wie in Abbildung 1.</p>
+	
+	Das Programm erstellt eine Vektorgrafik basierend auf der <tt><code>picture</code></tt>-Umgebung von LaTeX und
+	deren Erweiterungspakete <tt><code>epic.sty</code></tt><sup>1</sup> und <tt><code>eepic.sty</code></tt><sup>2</sup>, die bis auf die Farbinformationen alle Eigenschaften des Graphen berücksichtigt.
+	Diese beiden Pakete müssen entweder der Datei im gleichen Verzeichnis bereitgestellt werden oder dem LaTeX-Compiler bekannt sein. Weitere Pakete sind nicht notwendig.<br>
+
+<h3><name="einstellungen">Einstellungen des Exportes</a></h3>
+<p>Zur genaueren Angabe ist zunächst die Originalgröße des Graphen im Editor (bei 100%) nochmals genannt. Dessen Größe für den Export läßt sich nun über einen der drei Parameter
+<ul>
+	<li>Breite</li>
+	<li>Höhe</li>
+	<li>Auflösung</li>
+</ul>
+angeben. Die jeweils verbleibenden beiden werden aus diesem einen Wert ausgerechnet. Breite und Höhe eignen sich gut, wenn man in dem LaTeX-Dokument recht genau weiß, wie viel Platz die Grafik einnehmen soll. Die Auflösung hingegen ermöglicht einen Export mehrerer Grafiken in der gleichen Strichstärke/Textgröße etc., so man bei allen Exporten die gleiche Auflösung einstellt.</p>
+<p>Die darauffolgenden Einstellungen ermöglichen, entweder einen Export als gesamtes Dokument oder nur der <tt>figure</tt>-Umgebung. Das erste eignet sich, um auszuprobieren, wie der Export an sich einmal aussieht. Das Minimaldokument enthält dann alle notwendigen Angaben und kann alleine mit LaTeX kompiliert werden. Die <tt>figure</tt>-Umgebung eignet sich gut zum Einbinden in andere Dokumente. Dazu verwendet man den <tt>\input</tt>-Befehl von LaTeX. So kann mit der Zeit die Abbildung erneut erzeugt/exportiert werden, ohne dass man das LaTeX-Dokument erneut zusammen kopieren muss. Die <tt>figure</tt>-Umgebung enthält dabei auch bereits eine Bildunterschrift.</p>
+<p>Die Angabe der Export-Art wird in den folgenden beiden Abschnitten beschrieben. Zunächst der Export in ein TeX-picture, dann derjenige nach TikZ.
+<h3>Details zur <tt>picture-</tt>Umgebung</h3>
+<p>Die Pakete <tt>epic.sty</tt><sup>1</sup> und <tt>eepic.sty</tt><sup>2</sup> ermöglichen es, in der <tt>picture</tt>-Umgebug von LaTeX Vektordarstellungen zu erzeugen. Über diese Variante ist der Export organisiert. Zum Kompilieren benötigt man dann entweder <tt>latex</tt> oder das neuere <tt>pdflatex</tt>, das jedoch im dvi-Modus. Das bedeutet, dass einige neuere Pakete nicht mehr funktionieren. Außerdem sind in diesem Export keine Farben möglich, so dass diese ignoriert werden.</p>
+<p>Die Beschriftungen werden skaliert, so dass sie annähernd denen in Gravel entsprechen. Leichte Unterschiede sind vorhanden, da sich die Schriftarten (von LateX gegenüber der Java Graphcis-Darstellung) unterscheiden. Ein nachträgliches Skalieren der Grafik durch eine Veränderung des zu begin stehenden Befehls <tt>\setlength{\unithlength}{...}</tt> ist eine Möglichkeit, im Nachhinein die Größe der Grafik zu verändern, die Schriften skalieren jedoch nicht mit.</p>
+
+<h3><a name="tikz">Details zum Export in eine TikZ-Grafik</a></h3>
+<p>Der Export in eine Grafik basierend auf dem Paket TikZ<sup>3</sup> bietet zwei wesentliche Vorteile: Es kann sowohl <tt>pdflatex</tt> als auch <tt>latex</tt> (bzw. <tt>pdflatex</tt> im dvi-modus) zum kompilieren genutzt werden und der TikZ-Export unterstützt Farben. Die Beschriftungen werden nicht mit skaliert, sondern an die normale Textgröße im Dokument angepasst. Das bietet den Vorteil, dass ein einheitlicheres Schriftbild im Dokument vorherrscht. Nachteil ist hingegen, dass dadurch der Unterschied zur Darstellung im Editor recht groß sein kann.</p>
+<p>Die Farben der Untergraphen, aus denen die Farben der Knoten und Kanten bzw. Hyperkanten erzeugt werden, sind zu beginn des Dokumentes definiert. So kann auch im Nachhinein an diesen Farben eine Veränderung vorgenommen werden. In der Grafik selbst werden die Farben dann für die einzelnen Knoten „zusammengemischt“. Ebenso sind die Linienstile recht einfach in den Elementen erzeugt. Da die Elemente des Graphen in diesem Export ausführlich kommentiert erzeugt werden, ist also auch hier eine nachträgliche Änderung möglich.</p>
+<p>Ein nachträgliches Skalieren der Grafik ist möglich, indem hinter <tt>\begin{tikzpicture}</tt> ein Skalierungsfaktor angegeben wird, etwa <tt>\begin{tikzpicture}[scale=0.5]</tt>, um die Grafik in ihrer Größe zu halbieren.
+<div class="notes">
+	<sup>1</sup> Version 1.2 vom 14 Juli 1986 von Sunil Podar<br>
+	<br>
+	<sup>2</sup> Version 1.1b vom 7. Februar 1988 von Conrad Kwok<br>
+	<br>
+	<sup>3</sup> Version 2.0 vom 13. Februar 2008 von Till Tantau<br>
+</div>
 </body>
 </html>

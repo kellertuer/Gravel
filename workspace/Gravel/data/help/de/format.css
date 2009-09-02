@@ -41,7 +41,23 @@ li
 	padding-bottom:2px;
 	padding-left:-2px;
 }
-
+dl
+{
+	padding-top:10px;
+	padding-bottom:10px;
+}
+dt {
+	color:#000066;
+	font-weight:bold;
+	padding-right:10px;
+	padding-top:10px;
+	list-style-position::inside;
+}
+dd.icon{
+	padding-top:-32px;
+	
+	margin-left:40px;
+}
 .imagebox{
 	width:100%;
 	text-align:center;

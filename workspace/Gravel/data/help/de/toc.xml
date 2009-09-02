@@ -24,7 +24,7 @@
 			</tocitem>            
 					
 
-		<tocitem expand=false image="icon.chapter.todo" text="Benutzungsoberfläche" target="gui">
+		<tocitem expand=false text="Benutzungsoberfläche" target="gui">
 		 	<tocitem expand=false text="Hauptfenster" target="mainwindow">
 				<tocitem image="icon.anchor" text="grafische Darstellung" target="mainwindow.graphic"/>
 				<tocitem image="icon.anchor" text="Toolbar" target="mainwindow.toolbar"/>
@@ -32,7 +32,7 @@
 				<tocitem image="icon.anchor" text="Statistik" target="mainwindow.stats"/>
 			</tocitem> <!--Ende Hauptfenster -->            
 			<tocitem image="icon.page" text="Kontextmenüs" target="popup_menus"/>
-		 <tocitem expand=false image="icon.chapter.todo" text="Dialoge" target="dialog">
+		 <tocitem expand=false text="Dialoge" target="dialog">
 				<tocitem image="icon.page" text="Einstellungen" target="dialog.prefs"/>   
 				<tocitem image="icon.page" text="Hyperkanten" target="dialog.hyperedge"/>   
 				<tocitem image="icon.page" text="Hyperkantenumrisse" target="dialog.shape"/>   
@@ -43,10 +43,11 @@
 		</tocitem><!--Ende Oberfläche -->            
      
 
-		<tocitem expand=false image="icon.chapter.todo" text="Export" target="export">
+		<tocitem expand=false text="Export" target="export">
+			<tocitem image="icon.page" text="LaTeX-Picture-Umgebung" target="export.tex"/>
   			<tocitem image="icon.page" text="Portable Network Graphics" target="export.png"/>
-				<tocitem image="icon.page" text="LaTeX-Picture-Umgebung" target="export.tex"/>
-			</tocitem> <!--Ende Export -->
+  			<tocitem image="icon.page" text="Scalable Vector Graphics" target="export.svg"/>
+		</tocitem> <!--Ende Export -->
 
 
 			<tocitem expand=false text="Statistik" target="stats">

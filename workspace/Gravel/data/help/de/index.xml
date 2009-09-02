@@ -5,33 +5,27 @@
 <index version="1.0">
 	<indexitem text="Abbildungsverzeichnis" expand=false>
 		<indexitem text="Beispiel des Exports zweier Graphen nebeneinander" target="exp.tex.abb2"/>
-		<indexitem text="Darstellung der Parameter eines Pfeils" target="def.abb5"/>
 		<indexitem text="Der Bearbeiten-Dialog zum Eintrag 'Grad'" target="stats.abb2"/>
 		<indexitem text="Die Liste zu Beginn und mit Inhalt" target="main.abb3"/>
-		<indexitem text="Die vier Kantentypen im Überblick" target="def.abb4"/>
-		<indexitem text="Die Registerkarte 'Allgemein' der Einstellungen" target="def.abb1"/>
+		<indexitem text="Die Registerkarte 'Allgemein' der Einstellungen" target="dia.pref.abb1"/>
   	<indexitem text="Die Registerkarte 'Allgemein' des Kantendialogs" target="dia.kan.abb1"/>
   	<indexitem text="Die Registerkarte 'Allgemein' des Knotendialogs" target="dia.kno.abb1"/>
-		<indexitem text="Die Registerkarte 'Ansicht' der Einstellungen" target="def.abb2"/>
+		<indexitem text="Die Registerkarte 'Ansicht' der Einstellungen" target="dia.pref.abb2"/>
   	<indexitem text="Die Registerkarte 'Ansicht' des Kantendialogs" target="dia.kan.abb2"/>
   	<indexitem text="Die Registerkarte 'Ansicht' des Knotendialogs" target="dia.kno.abb2"/>
-		<indexitem text="Die Registerkarte 'Kante' dee Einstellungen" target="def.abb4"/>
+		<indexitem text="Die Registerkarte 'Kante' der Einstellungen" target="dia.pref.abb4"/>
 		<indexitem text="Die Registerkarte 'Kantentyp' des Kantendialogs" target="dia.kan.abb3"/>
-		<indexitem text="Die Registerkarte 'Knoten' dee Einstellungen" target="def.abb3"/>
+		<indexitem text="Die Registerkarte 'Knoten' dee Einstellungen" target="dia.pref.abb3"/>
 		<indexitem text="Die Registerkarte 'Pfeil' des Kantendialogs" target="dia.kan.abb4"/>
 		<indexitem text="Die Statistik" target="stats.abb1"/>
 		<indexitem text="Die Statistik zu Beginn und während der Benutzung" target="main.abb4"/>
 		<indexitem text="Die Toolbar" target="main.abb2"/>
-		<indexitem text="Ein Graph mit gerichteten Kanten und sein ungerichtetes Pendant" target="def.abb1"/>
-		<indexitem text="Eine Selektion" target="main.abb1"/>
+		<indexitem text="Eine Auswahl" target="main.abb1"/>
 		<indexitem text="Einstellungen des LaTeX-Exports nach Wahl einer Datei" target="exp.tex.abb1"/>
 		<indexitem text="Einstellungen des PNG-Exports nach Wahl einer Datei" target="exp.png.abb1"/>
 		<indexitem text="Erstellen eines Untergraphen" target="dia.sub.abb1"/>
-		<indexitem text="Kontextmenü der Kante #2" target="pop.abb2"/>
-		<indexitem text="Kontextmenü des Knotens #1" target="pop.abb1"/>
-		<indexitem text="Shift+Drag erzeugt mehrere Kanten." target="mouse.abb1"/>
-		<indexitem text="Vergrößerung von Vektorgrafik (links) und Pixelgrafik (rechts) im Vergleich" target="def.abb2"/>
-		<indexitem text="Zwei Darstellungen des selben Graphen" target="def.abb3"/>
+		<indexitem text="Kontextmenü einer Kante" target="pop.abb2"/>
+		<indexitem text="Kontextmenü eines Knotens" target="pop.abb1"/>
 	</indexitem>
 	<indexitem text="Stichwortverzeichnis" expand=false>
 		<indexitem text="A" expand=false>
@@ -42,12 +36,11 @@
 		<indexitem text="B" expand=false>
 			<indexitem text="Beispiel">
 				<indexitem text="Graphen in LaTeX" target="exp.tex.abs6" />
-				<indexitem text="Graphen in GravelML" target="gravelml.example" />
+				<indexitem text="Graphen in GravelML" target="graphml.example" />
 			</indexitem>
 			<indexitem text="benachbart" target="def.benachbart"/>
 			<indexitem text="Breite">
-				<indexitem text="Pixelgrafik" target="def.breite"/>
-				<indexitem text="Kante" target="def.breite2"/>
+				<indexitem text="Kante" target="def.breite"/>
 			</indexitem>
 		</indexitem>
 		<indexitem text="D" expand=false>

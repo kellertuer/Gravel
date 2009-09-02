@@ -15,15 +15,11 @@
 
 <gravel.preferences>
 	<group name="edge">
-		<value name="arralpha" type="Integer">40</value>
 		<value name="arrow_alpha" type="Integer">38</value>
 		<value name="arrow_alpha" type="Float">1.0</value>
 		<value name="arrow_part" type="Float">0.75</value>
 		<value name="arrow_pos" type="Float">1.0</value>
 		<value name="arrow_size" type="Integer">10</value>
-		<value name="arrpart" type="Integer">75</value>
-		<value name="arrpos" type="Integer">100</value>
-		<value name="arrsize" type="Integer">8</value>
 		<value name="line_distance" type="Integer">15</value>
 		<value name="line_length" type="Integer">10</value>
 		<value name="line_type" type="Integer">1</value>
@@ -31,14 +27,9 @@
 		<value name="loop_direction" type="Integer">0</value>
 		<value name="loop_length" type="Integer">33</value>
 		<value name="loop_proportion" type="Integer">100</value>
-		<value name="loopclockwise" type="Boolean">true</value>
-		<value name="loopdirection" type="Integer">0</value>
-		<value name="looplength" type="Integer">33</value>
-		<value name="loopproportion" type="Integer">100</value>
 		<value name="name" type="String">e_{$ID}</value>
 		<value name="orth_verticalfirst" type="Boolean">true</value>
 		<value name="text_distance" type="Integer">7</value>
-		<value name="text_position" type="Integer">25</value>
 		<value name="text_position" type="Float">0.25</value>
 		<value name="text_showvalue" type="Boolean">false</value>
 		<value name="text_size" type="Integer">12</value>
@@ -50,10 +41,11 @@
 	<group name="graph">
 		<value name="allowloops" type="Boolean">true</value>
 		<value name="allowmultiple" type="Boolean">true</value>
-		<value name="directed" type="Boolean">false</value>
+		<value name="directed" type="Boolean">true</value>
 		<value name="fileformat" type="String">visual</value>
 		<value name="lastfile" type="String">$NONE</value>
-		<value name="loadfileonstart" type="Boolean">true</value>
+		<value name="loadfileonstart" type="Boolean">false</value>
+		<value name="new_with_graph" type="Boolean">false</value>
 	</group>
 	<group name="grid">
 		<value name="enabled" type="Boolean">false</value>
@@ -67,16 +59,9 @@
 		<value name="trackSelection" type="Boolean">false</value>
 	</group>
 	<group name="hyperedge">
-		<value name="line_distance" type="Integer">15</value>
-		<value name="line_length" type="Integer">10</value>
-		<value name="line_type" type="Integer">1</value>
 		<value name="margin" type="Integer">8</value>
 		<value name="name" type="String">E_{$ID}</value>
-		<value name="text_distance" type="Integer">7</value>
 		<value name="text_position" type="Float">0.25</value>
-		<value name="text_showvalue" type="Boolean">false</value>
-		<value name="text_size" type="Integer">12</value>
-		<value name="text_visible" type="Boolean">false</value>
 		<value name="value" type="Integer">1</value>
 		<value name="width" type="Integer">1</value>
 	</group>
@@ -85,12 +70,8 @@
 		<value name="name_distance" type="Integer">18</value>
 		<value name="name_rotation" type="Integer">270</value>
 		<value name="name_size" type="Integer">12</value>
-		<value name="name_visible" type="Boolean">true</value>
+		<value name="name_visible" type="Boolean">false</value>
 		<value name="size" type="Integer">9</value>
-		<value name="text_distance" type="Integer">18</value>
-		<value name="text_rotation" type="Integer">270</value>
-		<value name="text_size" type="Integer">12</value>
-		<value name="text_visible" type="Boolean">false</value>
 	</group>
 	<group name="pref">
 		<value name="saveonexit" type="Boolean">true</value>
@@ -99,9 +80,6 @@
 		<value name="y" type="Integer">200</value>
 	</group>
 	<group name="subgraph">
-		<value name="name" type="String">Untergraph #$ID</value>
-	</group>
-	<group name="subset">
 		<value name="name" type="String">Untergraph #$ID</value>
 	</group>
 	<group name="vgraphic">

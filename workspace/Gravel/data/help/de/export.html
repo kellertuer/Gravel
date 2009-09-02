@@ -1,18 +1,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
-
-<html lang="en">
+<html lang="de">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="format.css" />  
 	<title>Gravel - Hilfe - Export</title>
 </head>
-<body>
-<div align=center><a name="title"><h2>Export</h2></a></div>
-<p>Der Export stellt Methoden für Dateiformate zur Verfügung, um den erstellten Graphen außerhalb von Gravel weiter zu verwenden. Dabei wird zunächst eine Datei über den entsprechenden <a href="dialog_file.html">Dialog</a> abgefragt. Anschließend werden die dem Export-Format entsprechenden Werte abgefragt.</p>
-Bisher existieren die folgenden Exporte:
-<ul>
-	<li><a href="export_png.html">Portable Network Graphics</a></li>
-	<li><a href="export_tex.html">LaTeX-Picture-Umgebung</a></li>
-</ul> 
+<h2><a name="title">Export</a></h2>
+<p>Der Export stellt Methoden für Dateiformate zur Verfügung, um den erstellten Graphen außerhalb von Gravel weiter zu verwenden. Dabei wird zunächst eine Datei über einen Dialog eine Datei ausgewählt bzw. ein neuer Dateiname angegeben. Wird kein Suffix vergeben, so wird derjenige des Entsprechenden Exportes angefügt. Stimmt das Datei-Suffix nicht mit dem üblichen Suffix des Exportes überein, wird eine Warnung ausgegeben.</p>
+<p>Anschließen wird je nach gewähltem Export nach einigen spezifischen Werten gefragt. Folgende Exporte stehen zur Verfügung:</p>
+<dl>
+	<dt>Portable Network Graphics (png)</dt><dd>Ein sehr verbreitetes Grafikformat, das vor allem bei technischen Zeichnungen bessere Kompression und Darstellung bietet als JPEG. <a href="export_png.html">zu den Einstellungen</a></dd>
+	<dt>LaTeX-Export (tex)</dt><dd> Der Export für eine Verwendung in LaTeX ist sowohl für ältere Systeme per <tt>epic/eepic</tt> möglich, aber auch als TikZ-Export für neuere LaTeX-Dokumente. Der zweite Export unterstützt zusätzlich farbige Darstellungen. <a href="export_tex.html">zu den Details</a></dd>
+	<dt>Scalable Vector Graphics (svg)</dt><dd>Das offene Format SVG wird von einigen Browsern unterstützt und stellt den üblichen Export zu einem allgemeinen Vektorformat zur Verfügung. <a href="export_svg.html">mehr Details</a></dd>
+</dl>
 </body>
 </html>
