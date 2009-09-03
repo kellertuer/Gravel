@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="de">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="format.css" />  
+		<title>Gravel - Hilfe - Tutorial II - Ein Konkurrenzhypergraph</title>
+	</head>
+	<body>
+		<h2><a name="title">Tutorial II - Ein Konkurrenzhypergraph</a></h2>
+		<p><span class="title">Ziel:</span> Dieses Tutorial zeigt die Erzeugung von Hypergraphen. Dabei wird zu Beginn eine weitere Methode dargestellt, Knoten zu platzieren. Ausgehend davon werden die verschiedenen Arten erläutert, wie man Hyperkantenumrisse erzeugt.</p>
+
+<h3>Erzeugen der Knoten</h3>
+		<p>Wir beginnen wieder im One-Click-Modus und erzeugen 11 beliebige Knoten. Dann öffnen wir die „Raster-Einstellungen “ aus dem Menü „Ansicht“ (kurz: Strg+ bzw. &#x2318;+R). Zunächst aktivieren wir den obersten Punkt „Raster aktivieren“. Wir stellen dann auf „synchron“ und bewegen einen Regler auf 50. Zusätzlich setzen wir noch einen Haken vor „Knoten am Raster ausrichten“. Diese Ausrichtung der Knoten ist jedoch lediglich im Standard-Modus aktiv, wir wechseln also in diesen unter Ansicht &#8594; Modus &#8594; Standard (kurz: Strg+ bzw. &#x2318;+4). Durch Ziehen kann nun jeder Knoten bewegt werden. Beim Loslassen der Maustaste wird der jeweilige Knoten am Raster ausgerichtet. Wir positionieren die Knoten also wie in Abbildung 1.
+	 <div class="imagebox">
+		<img src="img/tut2_Hypergraph_Knoten1.png"><br><font size="-1"><b>Abbildung 1:</b> Ausrichtung der Knoten am Raster</font>
+	</div>
+
+<h3>Erzeugen der Hyperkanten und ihrer Umrisse</h3>
+	<p>Zum Erzeugen eines Umrisses stellt „Gravel“ drei Möglichkeiten zur Verfügung. Diese schauen wir uns an drei Kanten einmal genauer an.</p>
+	<p><span="title">Ein Kreis.</p>Wir markieren die Knoten 4,5,10 und 11, die links in der Darstellung platziert sind und klicken mit der Rechten Maustaste auf den Hintergrund. In dem Menü wählen wir „Neue Hyperkante...“ und es öffnet sich ein Dialog zum Erstellen derselben. Dort sind die eben markierten Knoten bereits ausgewählt. Um eine Hyperkante mit den Standardwerten zu erzeugen ist also lediglich ein Klick auf „Hyperkante erstellen“ notwendig.</p>
+
+		<p>Damit hat der Hypergraph eine erste Hyperkante, die jedoch noch keinen Umriss besitzt. Um diesen zu erstellen, klicken wir mit der rechten Maustaste in der Liste auf die entstandene Hyperkante „E_{1}“ (im Ordner Hyperkanten) und wählen in dem Kontextmenü „Umriss bearbeiten...“. Dann ändert sich die Darstellung im Hauptfenster sowie die Elemente auf der rechten Seite: In der Anzeige werden alle bisher erstellten Hyperkanten und alle nicht an der aktuellen Hyperkante beteiligten Knoten ausgeblendet. Auf der rechten Seite werden Parameter angezeigt, die im Folgenden Beschrieben werden.</p>
+
+		<p>Das Bearbeiten eines Umrisses besteht aus zwei Schritten: Zunächst wird eine Grundform erzeugt. Diese wird im zweiten Schritt denn verändert, entweder global oder lokal. Für den Kreis genügt der erste Schritt. Dieser ist zu Beginn als Grundform bereits ausgewählt und lässt sich in der Darstellung einfach „aufziehen“. Seine Werte werden dann rechts eingetragen und können genauer angegeben werden.</p>
+
+		<p>Wir erstellen einen Kreis mit Mittelpunkt (150 150)<sup>T</sup> und einem Radius von 113, wie er in Abbildung 2 zu sehen ist. Dort sind auch die restlichen Buttons des ersten (erzeugenden) Modus zu sehen: Der „Prüfen“-Button startet die Prüfung der Validität des momentanen Umrisses. „Modifikation“ wechselt in den zweiten Modus, dazu später mehr.
+		Da der Kreis als Umriss für uns schon das passende Resultat darstellt, setzen wir diesen als Umriss der Hyperkante E<sub>1</sub>, indem wir auf „Ok“ klicken.
+		 <div class="imagebox">
+			<img src="img/tut2_Hypergraph_Umrisskreis.png"><br><font size="-1"><b>Abbildung 2:</b> Erzeugen eines Hyperkantenumrisses: Der Kreis. Er ist stets vom Grad 4 und lässt sich in seinen Daten rechts noch verändern</font>
+		</div>
+
+		<p><span class="title">Interpolation.</span> Für die nächste Hyperkante der Knoten 4,5 und 2 eignet sich die Interpolation sehr gut. Wir erstellen also mit diesen Knoten die Hyperkante „E_{2}“ und klicken wieder auf „Umriss bearbeiten…“. Allerdings wählen wir nun die Grundform „Interpolation“ in der ersten Auswahl und setzen danach den Polynomgrad auf 3. Damit sind mindestens 6 Interpolationspunkte notwendig, um einen Umriss berechnen zu können. Eine gute Anzahl sind etwa 2-3 Interpolationspunkte für jede Krümmung. Ein Klick erzeugt einen neuen Interpolationspunkt, ein Drag (Ziehen) ebenso.</p>
+
+		<p>Dabei werden in der Einstellung „Interpolationspunkte am Ende hinzufügen“ die Punkte genau in der Reihenfolge von der interpolierenden Kurve durchlaufen, wie sie erzeugt wurden. Bis zum ersten berechneten Umriss ist dies sinnvoll. Danach wird bei einem Drag die Kurve ohne den neuen Punkt weiterhin schwarz, die neue in Blau gezeichnet. So kann ein Interpolationspunkt gut platziert werden. Ebenso können existierende Interpolationspunkte verschoben werden, wenn man sie mit der Maus hin- oder herzieht.</p>
+
+		<p>In der Einstellung, Interpolationspunkte „dazwischen“ einzufügen, wird bei einem Klick die Position als neuer Interpolationspunkt zwischen zwei Bestehenden eingefügt, nämlich jenen, bei denen dieser neue Punkt am Nächsten an der Verbindungsstrecke liegt. Ein Klick mit der rechten Maustaste auf einen Interpolationspunkt löscht diesen.</p>
+
+		Eine mögliche Kurve aus Interpolationspunkten für die Kante findet sich in Abbildung 3. Eine Kurve mit weniger Punkten sieht im Allgemeinen besser aus.
+		 <div class="imagebox">
+			<img src="img/tut2_Hypergraph_UmrissIP.png"><br><font size="-1"><b>Abbildung 3:</b> Erzeugen eines Hyperkantenumrisses: Die Interpolation. Die Kurve wird dabei so berechnet, dass sie alle gegebenen blauen Kreuze interpoliert. Diese können interaktiv erstellt, verschoben und gelöscht werden.</font>
+		</div>
+
+		<p><span class="title">Konvexe Hülle.</span> Für die Kante der Knoten 2,3,7,8 und 10 nutzen wir die dritte Möglichkeit zur Erzeugung: Die konvexe Hülle. Bei ihr muss lediglich ein Polynomgrad vorgegeben werden. Der Umriss wird dann aus den Knoten und dem Innenabstand (bei einer Hyperkante unter „Einstellungen“ im Tab „Ansicht“) berechnet. In diesem Beispiel ist der Innenabstand auf 14 anstelle des Standardwertes von 8 eingestellt. Mit einem Polynomgrad von 3 erhält man zunächst den Umriss wie in Abbildung 4.
+	 <div class="imagebox">
+		<img src="img/tut2_Hypergraph_Umrissconvex.png"><br><font size="-1"><b>Abbildung 4:</b> Erzeugen eines Hyperkantenumrisses: Die konvexe Hülle. Die Kurve wird dabei um die konvexe Hülle herum unter Einhaltung des Innenabstandes erzeugt.</font>
+		</div>
+	<h3>Modifikation einer existenten Kurve</h3>
+	<p>Nun gefällt uns diese Form noch nicht ganz, aber schon fast. Wir klicken auf den Button „Modifikation“ und das Programm wechselt in den zweiten Modus, welcher der Modifikation eines Umrisses dient. Hat eine Hyperkante bereits einen Umriss und wählt man - entweder in der Liste oder per rechtem Mausklick auf die Kante - „Umriss bearbeiten…“ aus, so gelangt man ebenfalls in diesen Modus.</p>
+
+		Die gesamten Buttons, die nun rechts aufgetaucht sind, werden <a href="dialog_shape.html#Modifikation">hier</a> erläutert. Solange keiner von ihnen aktiv (also angeklickt worden) ist, kann die Kurve verändert werden, indem wir sie durch Ziehen (begonnen auf der Kurve) in ihrer Form verändern. Da der Umriss eine NURBS-Kurve ist, bleibt der Einfluss stets lokal. Da dieser Einfluss bei der konvexen Hülle sehr weitreichend ist, klicken wir einmal auf den „+“-Button. Dann werden auf der Kurve die Stellen angezeigt, an denen die Knoten (der Kurve) liegen. Wir fügen auf den beiden Schrägen je einen Knoten etwa in der Mitte hinzu, indem wir die Kurve dort anklicken. Es entstehen zwei weitere hellblaue Punkte, wie sie in Abbildung 5 dargestellt sind.
+		<div class="imagebox">
+		<img src="img/tut2_Hypergraph_UmrissKnoten.png"><br><font size="-1"><b>Abbildung 5:</b> Im „+“-Modus wurden durch Anklicken der Kurve oberhalb und unterhalb des (Graphen-)Knotens 2 zwei weitere Knoten auf der Kurve eingefügt.</font>
+		</div>
+
+		<p>Wir verlassen diesen Modus durch erneutes Anklicken des „+“-Buttons und bewegen die beiden Schrägen nach innen. Alle weiteren Modifikationen, die man mit dem Umriss vornehmen kann finden sich im <a href="dialog_shape.html">Dialog zum Umriss</a>. Wir verlassen die Bearbeitung durch Anklicken von „Ok“.</p>
+
+
+		Nun sind die Umrisse fertig und nach ein wenig Feinschliff an den Knotennamen und deren Ausrichtung erhält man die TikZ-Grafik aus Abbildung 6a.
+
+		Für eine weitere Hyperkante mit den Knoten 4 und 10 erzeugt die konvexe Hülle die direkte Verbindung, auch wenn das keinem Umriss mehr entspricht. Möchte man stattdessen einen richtigen Umriss haben, nutzt man entweder den Kreis als Ausgangsgrundform oder die Interpolation. Mit der Hyperkante E<sub>5</sub> bestehend aus den Knoten 3,2 und 8 entsteht schließlich der zweite Hypergraph Aus Abbildung 6b.
+		<div class="imagebox">
+		<img src="img/tut2_final.png"><br><font size="-1"><b>Abbildung 6:</b> 	 Die zwei Hypergraphen, die in diesem Tutorial entstanden sind.</font>
+		</div>
+	</body>
+</html>

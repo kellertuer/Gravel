@@ -59,18 +59,25 @@
 		<value name="trackSelection" type="Boolean">false</value>
 	</group>
 	<group name="hyperedge">
+		<value name="line_distance" type="Integer">10</value>
+		<value name="line_length" type="Integer">10</value>
+		<value name="line_type" type="Integer">1</value>
 		<value name="margin" type="Integer">8</value>
 		<value name="name" type="String">E_{$ID}</value>
+		<value name="text_distance" type="Integer">7</value>
 		<value name="text_position" type="Float">0.25</value>
+		<value name="text_showvalue" type="Boolean">false</value>
+		<value name="text_size" type="Integer">14</value>
+		<value name="text_visible" type="Boolean">false</value>
 		<value name="value" type="Integer">1</value>
 		<value name="width" type="Integer">1</value>
 	</group>
 	<group name="node">
-		<value name="name" type="String">v_{$ID}</value>
+		<value name="name" type="String">$ID</value>
 		<value name="name_distance" type="Integer">18</value>
 		<value name="name_rotation" type="Integer">270</value>
 		<value name="name_size" type="Integer">12</value>
-		<value name="name_visible" type="Boolean">false</value>
+		<value name="name_visible" type="Boolean">true</value>
 		<value name="size" type="Integer">9</value>
 	</group>
 	<group name="pref">

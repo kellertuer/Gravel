@@ -31,15 +31,24 @@ text-indent: 25px;
 margin:0px;
 padding:0px;
 }
+p span.title
+{
+	font-weight:bold;
+}
 code {
 	padding: 12px;
 }
+
 ul { list-style-image: url(img/icons/bullet.png); }
 li
 {
 	padding-top:2px;
 	padding-bottom:2px;
 	padding-left:-2px;
+}
+ul.versionmain
+{
+	list-style-position:inside;
 }
 dl
 {
@@ -58,11 +67,33 @@ dd.icon{
 	
 	margin-left:40px;
 }
-.imagebox{
+div.imagebox{
 	width:100%;
 	text-align:center;
 	margin-top:10px;
-	margin-bottom:10px;	
+	margin-bottom:10px;
+	margin-left:auto;
+	margin-right:auto;
+}
+div.imagebox img
+{
+	padding: 15px;
+}
+.math
+{
+	color: #000066;
+}
+span.math
+{
+	padding-left:6px;
+	padding-right:6px;
+}
+div.math
+{
+	width:100%;
+	padding-left:40px;
+	padding-top:12px;
+	padding-bottom:12px;
 }
 table.nicetable {
 	border-color:#000066;

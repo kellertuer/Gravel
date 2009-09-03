@@ -24,6 +24,7 @@
     <data>toc.xml</data>
   </view>
 
+<!-- Someone got a good idea how to automatize a word index? 
   <view>
     <name>Index</name>
     <label>alphabetischer Index</label>
@@ -31,6 +32,7 @@
     <data>index.xml</data>
   </view>
 
+-->
 <!--	<view>
 	  <name>Suche</name>
 	  <label>Search</label>

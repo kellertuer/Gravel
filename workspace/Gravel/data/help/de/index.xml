@@ -4,7 +4,6 @@
          "http://java.sun.com/products/javahelp/index_1_0.dtd">
 <index version="1.0">
 	<indexitem text="Abbildungsverzeichnis" expand=false>
-		<indexitem text="Beispiel des Exports zweier Graphen nebeneinander" target="exp.tex.abb2"/>
 		<indexitem text="Der Bearbeiten-Dialog zum Eintrag 'Grad'" target="stats.abb2"/>
 		<indexitem text="Die Liste zu Beginn und mit Inhalt" target="main.abb3"/>
 		<indexitem text="Die Registerkarte 'Allgemein' der Einstellungen" target="dia.pref.abb1"/>
@@ -13,9 +12,10 @@
 		<indexitem text="Die Registerkarte 'Ansicht' der Einstellungen" target="dia.pref.abb2"/>
   	<indexitem text="Die Registerkarte 'Ansicht' des Kantendialogs" target="dia.kan.abb2"/>
   	<indexitem text="Die Registerkarte 'Ansicht' des Knotendialogs" target="dia.kno.abb2"/>
-		<indexitem text="Die Registerkarte 'Kante' der Einstellungen" target="dia.pref.abb4"/>
+	<indexitem text="Die Registerkarte 'Kante' der Einstellungen" target="dia.pref.abb5"/>
+	<indexitem text="Die Registerkarte 'Graph' der Einstellungen" target="dia.pref.abb3"/>
 		<indexitem text="Die Registerkarte 'Kantentyp' des Kantendialogs" target="dia.kan.abb3"/>
-		<indexitem text="Die Registerkarte 'Knoten' dee Einstellungen" target="dia.pref.abb3"/>
+		<indexitem text="Die Registerkarte 'Knoten' dee Einstellungen" target="dia.pref.abb4"/>
 		<indexitem text="Die Registerkarte 'Pfeil' des Kantendialogs" target="dia.kan.abb4"/>
 		<indexitem text="Die Statistik" target="stats.abb1"/>
 		<indexitem text="Die Statistik zu Beginn und während der Benutzung" target="main.abb4"/>
@@ -23,6 +23,7 @@
 		<indexitem text="Eine Auswahl" target="main.abb1"/>
 		<indexitem text="Einstellungen des LaTeX-Exports nach Wahl einer Datei" target="exp.tex.abb1"/>
 		<indexitem text="Einstellungen des PNG-Exports nach Wahl einer Datei" target="exp.png.abb1"/>
+		<indexitem text="Einstellungen des SVG-Exports nach Wahl einer Datei" target="exp.svg.abb1"/>
 		<indexitem text="Erstellen eines Untergraphen" target="dia.sub.abb1"/>
 		<indexitem text="Kontextmenü einer Kante" target="pop.abb2"/>
 		<indexitem text="Kontextmenü eines Knotens" target="pop.abb1"/>
@@ -30,14 +31,9 @@
 	<indexitem text="Stichwortverzeichnis" expand=false>
 		<indexitem text="A" expand=false>
 				<indexitem text="Ausgrad (Knoten)" target="def.grad"/>
-				<indexitem text="Anordnen (Graphen in LaTeX)" target="exp.tex.abs6" />
 				<indexitem text="Ansicht (Einstellungen)" target="dia.pref.view" />
 		</indexitem>
 		<indexitem text="B" expand=false>
-			<indexitem text="Beispiel">
-				<indexitem text="Graphen in LaTeX" target="exp.tex.abs6" />
-				<indexitem text="Graphen in GravelML" target="graphml.example" />
-			</indexitem>
 			<indexitem text="benachbart" target="def.benachbart"/>
 			<indexitem text="Breite">
 				<indexitem text="Kante" target="def.breite"/>
@@ -222,14 +218,12 @@
 			<indexitem text="Zoom (Toolbar)" target="main.toolbar" />
 		</indexitem>
  </indexitem>  <!-- End of Stichwortverzeichnis  -->
- <indexitem text="Tabellenverzeichnis" expand=false>
-		<indexitem text="atomare Werte des Graphe für die Statistik" target="stats.atoms" />					
-		<indexitem text="Datenschlüssel in GravelML" target="gravelml.table" />					
-		<indexitem text="Mausaktionen, beide Modi" target="mouse.both" />					
-		<indexitem text="Mausaktionen, OneClick-Modus" target="mouse.oneclick" />					
-		<indexitem text="Mausaktionen, Standard-Modus" target="mouse.std" />					
-		<indexitem text="Menueinträge, tabbelarisch" target="menu.table" />					
-		<indexitem text="Tabelle der Tastenkürzel für Gravel" target="shortcuts" />					
- </indexitem>  <!-- End of Tabellenverzeichnis -->		  			
+  <indexitem text="Tabellenverzeichnis" expand="false"><!-- Tabellenverzeichnis (fold) -->
+    <indexitem text="atomare Werte des Graphe für die Statistik" target="stats.atoms" />
+    <indexitem text="Mausaktionen, beide Modi" target="mouse.both" />
+    <indexitem text="Mausaktionen, OneClick-Modus" target="mouse.oneclick" />
+    <indexitem text="Mausaktionen, Standard-Modus" target="mouse.std" />
+    <indexitem text="Tabelle der Tastenkürzel für Gravel" target="shortcuts" />
+  </indexitem>  <!-- End of Tabellenverzeichnis (end) -->
 </index>
 

@@ -29,11 +29,14 @@
 	<mapID target="intro.anforderungen" xml:lang="de" url="systemanforderungen.html" />	
   
 	<mapID target="helppage" xml:lang="de" url="help.html" />
+
+	<mapID target="tutorial1" xml:lang="de" url="tutorial_graph.html" />
+	<mapID target="tutorial2" xml:lang="de" url="tutorial_hypergraph.html" />
 	
 	<mapID target="definition" xml:lang="de" url="definitions.html" />
-	<mapID target="definition.math" xml:lang="de" url="definitions.html#math">
-	<mapID target="definition.grafik" xml:lang="de" url="definitions.html#grafik">
-	<mapID target="definition.vis" xml:lang="de" url="definitions.html#vis">
+	<mapID target="definition.graph" xml:lang="de" url="definitions.html#graph">
+	<mapID target="definition.hypergraph" xml:lang="de" url="definitions.html#hypergraph">
+	<mapID target="definition.hyperkantenumriss" xml:lang="de" url="definitions.html#umriss">
 
   <mapID target="graphml" xml:lang="de" url="graphml.html" />
 
@@ -157,7 +160,7 @@
 
 <mapID target="mouse.title" url="mouseaction.html#title" />
 <mapID target="mouse.both" url="mouseaction.html#both" />
-<mapID target="mouse.std" url="mouseaction.html#std" />
+<mapID target="mouse.std" url="mouseaction.html#Standard" />
 <mapID target="mouse.oneclick" url="mouseaction.html#OneClick" />
 
 <mapID target="pop.title" url="popup_menus.html#title" /><!--Kontextmenü, Maustaste, rechts, Löschen -->
@@ -190,10 +193,11 @@
 <mapID target="dia.pref.abb2" url="dialog_prefs.html#Abb2" />
 <mapID target="dia.pref.abb3" url="dialog_prefs.html#Abb3" />
 <mapID target="dia.pref.abb4" url="dialog_prefs.html#Abb4" />
+<mapID target="dia.pref.abb5" url="dialog_prefs.html#Abb5" />
 <mapID target="dia.sub.abb1" url="dialog_subgraph.html#Abb1" />
 <mapID target="exp.tex.abb1" url="export_tex.html#Abb1" />
-<mapID target="exp.tex.abb2" url="export_tex.html#Abb2" />
 <mapID target="exp.png.abb1" url="export_png.html#Abb1" />
+<mapID target="exp.svg.abb1" url="export_svg.html#Abb1" />
 <mapID target="pop.abb1" url="popup_menus.html#Abb1" />
 <mapID target="pop.abb2" url="popup_menus.html#Abb2" />
 <mapID target="main.abb1" url="mainwindow.html#Abb1" />

@@ -19,7 +19,7 @@ Ebenso sind in der <a href="mainwindow.html#list">Liste der Elemente</a> bei jed
 <font size=-1>Abbildung 1: Kontextmenü des Knotens #1</font></div>                                      
 <br>
 <table class="nicetable">
-	<tr class="head"><td>Eintrag</td><td>Kommentar</td>
+	<tr class="head"><td>Eintrag</td><td>Kommentar</td></tr>
 	<tr class="light"><td>v_{1} - (#1)</td><td>Der Name des Knotens und nach "-" getrennt der Index des Knotens<br>Dieser Eintrags ist stets inaktiv</td></tr>
 	<tr class="strong"><td>Kanten zu selektierten Knoten<sup>1</sup></td><td>Fügt Kanten in den Graphen ein mit dem aktuellen Knoten als Startknoten und jedem Knoten der Auswahl als Endknoten. Ist der angeklickte Knoten ausgewählt, so wird eine Schleife hinzugefpgt, falls diese erlaubt sind. Dieser Menüpunkt ist deakiviert, wenn keine ausgewählten Knoten vorliegen.</td></tr>
 	<tr class="light"><td>Kanten von selektierten Knoten<sup>1</sup></td><td>Analog zum vorherigen Eintrag, nur dass hier die ausgewählten Knoten Start und der gewählte Knoten Endknoten sind<br><br>Ist der Graph ungerichtet, sind beide Einträge identisch.</td></tr>
@@ -37,7 +37,7 @@ Ebenso sind in der <a href="mainwindow.html#list">Liste der Elemente</a> bei jed
 <font size=-1>Abbildung 2: Kontextmenü der Kante #2</font>
 </div>
 <table class="nicetable">
-	<tr class="head"><td>Eintrag</td><td>Kommentar</td>
+	<tr class="head"><td>Eintrag</td><td>Kommentar</td></tr>
 	<tr class="light"><td>e_{1} (#1, v:1)</td><td>Name der Kante gefolgt von dem Index und dem Gewicht in Klammern, stets deaktivert</td></tr>
 	<tr class="strong"><td>Eigenschaften...</td><td>ruft den <a href="dialog_edge.html">Dialog der Kanteneigenschaften</a> auf</td></tr>	
 	<tr class="light"><td>Kanten hinzufügen zu</td><td>Öffnet ein Untermenü mit allen Untergraphen, in denen die Kante nicht enthalten ist. Auswählen eines Untergraphen bewirkt, dass die Kante zu diesem Untergraphen hinzugefügt wird. <br>Dieser Eintrag ist deaktiviert, falls die Kante in allen Untergraphen enthalten ist oder keine Untergraphen existieren</td></tr>
@@ -49,6 +49,7 @@ Ebenso sind in der <a href="mainwindow.html#list">Liste der Elemente</a> bei jed
 Für eine Hyperkante ist das Menü analog zur Kante gegeben. Es gibt lediglich einen zusätzlichen Menüeintrag „Umriss bearbeiten...“ welcher den Dialog zum <a href="dialog_shape.html">Bearbeiten des Umrisses</a> aufruft.
 <a name="background"><h3>Das Hintergrund-Kontextmenü</h3></a>
 <table class="nicetable">
+	<tr class="head"><td>Eintrag</td><td>Kommentar</td></tr>
 <tr class="light"><td>Neuen Knoten einfügen...</td><td>erstellt einen neuen Knoten, dafür wird der <a href="dialog_node.html">Knotendialog</a> aufgreufen</td></tr>
 	<tr class="strong">Neuer Hypergraph...<sup>2</sup></td><td>Erzeugen einer neuen Hyperkante. Die aktuell ausgewählten Knoten werden dabei als Vorschlag für die Hyperkante verwendet.
 	<tr class="light"><td>Neuen Untergraphen...</td><td>erstellt einen neuen Untergraphen unter Benutzung des <a href="dialog_subgraph.html">Dialogs des Untergraphen</a>. Die aktuelle Auswahl an Knoten und Kanten dient dabei zur Initialisierung.</td></tr>	

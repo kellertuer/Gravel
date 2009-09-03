@@ -4,27 +4,68 @@
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" type="text/css" href="format.css" />
 	<title>Gravel - Hilfe - Definitionen</title>
 </head>
 <body>
 	<h2><a name="title">Definitionen</a></h2>
 	<p>In diesem Abschnitt werden die mathematischen und grafischen <a name="grundlagen">Grundlagen</a> kurz dargestellt, auf denen Gravel die Verarbeitung von Graphen aufbaut.</p>
-
-	<div align=Center><font color="#FF0000">TODO</font></div>
 	<h3><a name="graph">Graphen</a></h3>
-	<a name="graph">Graph</a>
-	<a name="knoten">Knoten</a>
-	<a name="kante">Kante</a>
-	<a name="start">Startknoten</a><a name="end">Endknoten</a> <a name="gerichtet"><b>gerichtet</b></a> <a name="ungerichtet"><b>ungerichtet</b></a>
-	<a name="mehrfachkante">Mehrfachkanten</a>
-	<a name="gewicht">Gewicht</a> w(e) &#x2208; &#x2115;.<br>
-	<a name="schleife">Schleifen</a>
-		<a name="inzident"><b>inzident</b></a>oder <a name="benachbart"><b>benachbart</b></a>
-	<a name="grad"><b>Grad</b></a><a name="eingrad"><b>Eingrad</b></a><a name="ausgrad"><b>Ausgrad</b></a>
-	<a name="figGraph">Abbildung Graph (Petersen)</a>
+	<p>Ein  <a name="ungerichtet"></a>Graph <span class="math">G=(V,E)</span> besteht aus einer Menge <span class="math">V</span> von <a name="knoten">Knoten</a> und einer Menge <span class="math">E</span> an <a name="kante">Kanten</a> mit <span class="math">E &#8838; {e,&#8201; | &#8201; e &#8838; V &#8743; |e| = 2}</span>  Für <span class="math">e={p,q} &#8712; E</span> sind <span class="math">p</span> und <span class="math">q</span> <a name="end">Endknoten</a> der Kante <span class="math">e</span>  Zwischen zwei Knoten <span class="math">p,q &#8712; V</span> existiert maximal eine Kante.</p>
+	<p>Je nach Literatur heißen die Knoten auch Ecken des Graphen. Diese werden durch die Kanten zueinander in Beziehung gesetzt, was einer symmetrischen Relation auf den Knoten entspricht.</p>
+
+	<p>Zusätzlich gibt es viele Variationen in der Definition, von denen die folgenden Varianten häufig Verwendung finden:</p>
+
+	<p> <span class="title">gerichteter Graph.</span>  Bei  <a name="gerichtet">gerichteten Graphen</a> oder Digraphen  <span class="math">G=(V,A)</span> besteht ein Bogen aus dem Tupel <span class="math">a=(p,q) &#8712; A</span>  Der Knoten <span class="math">p &#8712; V</span> ist der <a name="start">Startknoten</a>,  <span class="math">q &#8712; V</span> der Endknoten des Bogens. Dieser verläuft also von <span class="math">p</span> nach <span class="math">q</span>  und ist somit eine gerichtete Kante. Bei Digraphen wird die Symmetrie der durch die Kanten gegebenen Relation aufgehoben.</p>
+
+	<p> <span class="title"><a name="schleife">Schlingen.</a></span>  Kanten bzw. Bögen, die einen Knoten <span class="math">p &#8712; V</span> mit sich selbst verbinden, heißen Schlingen. Dadurch können Knoten mit sich selbst in Beziehung gesetzt werden.</p>
+
+	<p> <span class="title"><a name="mehrfachkante">Mehrfachkanten.</a></span>  Wird das Einfügen mehrerer Kanten <span class="math">e<sub>1</sub>=e<sub>2</sub>={p,q}</span> zwischen zwei Knoten <span class="math">p,q &#8712; V</span> in die Kanten(multi)menge <span class="math">E</span> zugelassen, spricht man von Mehrfachkanten im Graphen <span class="math">G</span>  Analog gibt es bei Digraphen die Erweiterung zu Mehrfachbögen <span class="math">e'<sub>1</sub>=e'<sub>2</sub>=(p,q)&#8712; A</span> zwischen zwei Knoten <span class="math">p,q &#8712; V</span>.</p>
+
+	<p>Weiter heißen zwei verschiedene Knoten adjazent, wenn sie durch eine Kante verbunden sind. Zwei verschiedene Kanten heißen adjazent, wenn sie einen Knoten gemeinsam haben. Die Endknoten einer Kante sind zu dieser <a name="inzident">inzident</a> oder <a name="benachbart">benachbart</a>.</p>
+
+	<p>Jede Kante kann zusätzlich mit einem <a name="gewicht">Gewicht</a> w(e) &#x2208; &#x2115; versehen werden. Die Anzahl zu einem Knoten inzidenter Kanten bezeichnet auch dessen <a name="grad">Grad</a>. Bei Digraphen differenziert sich der Grad noch in <a name="eingrad">Eingrad</a> bzw. <a name="ausgrad">Ausgrad</a> der eingehenden und ausgehenden Kanten in diesem Knoten.</p>
+		
+	<p>Die mathematische Definition eines Graphen ist unabhängig von ihrer Darstellung. In jener lassen sich hingegen viele Eigenschaften untersuchen und beweisen, etwa der Zusammenhang von Graphen oder Hamiltonkreise. Eine jeweils illustrierende Grafik soll dann den Sachverhalt möglichst klar und verständlich darstellen. Üblicherweise werden Knoten als Punkte dargestellt, Kanten als Verbindungen zwischen den Punkten.</p>
+
+<h4>Beispiel: Der Petersen-Graph</h4>
+	<p>Für die Knoten <span class="math">V={v<sub>1</sub>,…,v<sub>10</sub>}</span> entsteht der Petersen-Graph <span class="math">G=(V,E)</span> durch die Kantenmenge <span class="math">E=E<sub>1</sub>&#8746;E<sub>2</sub></span>, wobei 
+<div class="math">
+	E<sub>1</sub> = { {v<sub>i</sub>,v<sub>i+1 mod 5</sub> } , {v<sub>i</sub>,v<sub>i+5</sub>} | &#8201; i=1,…,5 }<br>
+	E<sub>2</sub> = { {v<sub>6</sub>,v<sub>8</sub>}, {v<sub>8</sub>,v<sub>10</sub>}, {v<sub>10</sub>,v<sub>7</sub>}, {v<sub>7</sub>,v<sub>9</sub>}, {v<sub>9</sub>,v<sub>6</sub>} }		
+</div>
+		Weiter kommt in der Kantenteilmenge
+<div class="math">
+		E' = { {v<sub>1</sub>,v<sub>2</sub>}, {v<sub>3</sub>,v<sub>4</sub>}, {v<sub>5</sub>,v<sub>10</sub>}, {v<sub>6</sub>,v<sub>8</sub>}, {v<sub>7</sub>,v<sub>9</sub>} }
+</div>
+		jeder Knoten genau einmal vor.
+
+		<p>In der Abbildung 1 sind zwei Bilder dieses Graphen dargestellt. Der äußere Kreis und die Verbindungen nach innen sind durch <span class="math">E<sub>1</sub></span> gegeben, der innere Stern durch <span class="math">E<sub>2</sub></span>, <span class="math">E'</span> ist hervorgehoben
+	<div class="imagebox">
+		<img src="img/tut1_tikz1.png">
+		<br><font size="-1"><b>Abbildung 1:</b> Der Petersen-Graph</font>
+		<a name="figGraph"></a>
+	</div>	
+
+
  	<h3><a name="hypergraph">Hypergraphen</a></h3>
-	<a name="hyperkante">Hyperkante</a>
-	<a name="hyperkantenumriss">Hyperkantenumriss</a>
-	<a name="figHypergraph">Abbildung Hypergraph (Berge)</a>	
+		<p>Ein <span class="math"><img src="img/mathcalHs.png" class="char"> = (V,<img src="img/mathcalEs.png" class="char">)</span> besteht aus einer Menge <span class="math">V</span> von Knoten und einer Menge <span class="math"><img src="img/mathcalEs.png" class="char">  &#8838;  <img src="img/mathcalPs.png"  class="char">(V)\&#8709;</span> von <a name="hyperkante">Hyperkanten</a>. Eine <a name="hyperkante">Hyperkante</a> <span class="math">E &#8712; <img src="img/mathcalEs.png"></span> besteht somit aus einer nichtleeren Menge von Knoten.</p>
+<p>	Besteht eine Hyperkante <span class="math">E  &#8712; <img src="img/mathcalEs.png" class="char"></span> aus nur einem Knoten (<span class="math">|E|=1</span>), so heißt sie auch, im Fall <span class="math">|E|=2</span> entspricht die Hyperkante der normalen Kante eines Graphen.</p>
+
+<h4>Beispiel:</h4>
+<p>		Der Hypergraph <span class="math"><img src="img/mathcalHs.png" class="char">=(V,<img src="img/mathcalEs.png" class="char">)</span> mit <span class="math">V= {v<sub>i</sub> | i=1,…,8 }</span> und den Hyperkanten <span class="math"><img src="img/mathcalEs.png" class="char"> = { E<sub>i</sub> | i=1,…,6 }</span> mit
+<div class="math">
+	E<sub>1</sub> = \{v<sub>3</sub>,v<sub>4</sub>,v<sub>5</sub>\}, E<sub>2</sub> = \{v<sub>5</sub>,v<sub>8</sub> }<br>
+				E<sub>3</sub> = \{v<sub>6</sub>,v<sub>7</sub>,v<sub>8</sub>}, E<sub>4</sub>=\{v<sub>2</sub>,v<sub>3</sub>,v<sub>7</sub>}<br>
+				E<sub>5</sub> = \{v<sub>1</sub>,v<sub>2</sub>}, E<sub>6</sub> = {v<sub>7</sub>}
+</div>
+		enthält die Schlinge <span class="math">E<sub>6</sub></span>. Die beiden Hyperkanten <span class="math">E<sub>2</sub></span> und <span class="math">E<sub>5</sub></span> entsprechen zwei Kanten eines Graphen <span class="math">G</span>. Alle andere Kanten werden in der Abbildung 2 durch einen Hyperkantenumriss dargestellt.</p>
+		<div class="imagebox">
+			<img src="img/exa_hypergraph.png">
+			<br><font size="-1"><b>Abbildung 2:</b> Ein Hypergraph</font>
+			<a name="figHypergraph"></a>	
+		</div>	
+<h3><a name="umriss">Der Hyperkantenumriss</a></h3>
+<p>Der Umriss einer Hyperkante wird dargestellt durch eine kontinulierliche Kurve, die aufgrund ihrer INjektivität genau eine Fläche umreißt. Innerhalb der Kurve liegen genau all die Knoten, die zur entsprechenden Hyperkante gehören, alle anderen liegen außerhalb. Spezialfälle sind Hyperkanten mit einem oder mit zwei Knoten. Bei einem Knoten kann außer dem Umriss eine Schleife am Knoten die Kante darstellen (siehe <span class="math">E<sub>6</sub></span> in Abb. 2), bei zwei Knoten ist auch die übliche Kantendarstellung wie bei den Graphen üblich (siehe ebenso Abb. 2).</p>
 </body>
 </html>

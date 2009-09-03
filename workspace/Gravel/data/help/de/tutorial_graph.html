@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="de">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="format.css" />  
+		<title>Gravel - Hilfe - Tutorial I - Der Petersen Graph</title>
+	</head>
+	<body>
+		<h2><a name="title">Tutorial I - Der Petersen Graph</a></h2>
+		<p><span class="title">Ziel:</span> In diesem Tutorial wird am Beispiel des Petersen-Graphen demonstriert, wie man einen Graphen erstellt und in seinen Eigenschaften verändert</p>
+		<p>Ist das Programm gestartet worden, so ist zu Beginn ein leere Graph geladen. Ist dies nicht der Fall, etwa weil bereits vorher mit dem Programm gearbeitet worden ist, so wählt man im Menü Datei &#8594; Neu und erstellt einen neuen Graphen.</p>
+		<p>Zum anfänglichen Erzeugen eines Graphen gibt es den sogenannten <em>One-Click-Modus</em>. Dieser lässt sich aktivieren unter Ansicht &#8594; Modus &#8594; One-Click (kurz:Strg+ bzw. &#x2318;+5). In diesem Modus erstellt jeder Mausklick einen Knoten an der Position des Mauszeigers, durch Ziehen (Drag) lassen sich Kanten erzeugen. Alle Aktionen lassen sich durch Bearbeiten &#8594; Widerrufen (oder kurz:Strg+ bzw. &#x2318;+Z) rückgängig machen. Bearbeiten &#8594; Wiederholen (kurz: Shift+Strg+ bzw. &#x2318;+Z) stellt die letzten zurückgenommenen Aktionen wieder her.</p>
+
+<h3>Erstellen und Anordnen der Knoten</h3>
+<p>Erstellen wir zunächst 10 beliebige Knoten durch Klicken auf den Hauptbereich. Das Ergebnis kann dann etwa so aussehen wie in Abbildung 1a. Nun sind deren Namen noch nicht zu sehen (außer dies wurde vorher aktiviert) Also markieren wir alle Knoten mit der Maus, entweder durch aufziehen eines Rechteckes, das alle Knoten enthält oder durch einzelnes Anklicken bei gedrückter Shift-Taste und wählen im Menü Bearbeiten &#8594; Auswahl bearbeiten (kurz:Strg+ bzw. &#x2318;+M). Dann öffnet sich ein Fenster, in dem man die Werte eintragen kann, die alle Knoten erhalten sollen. Bereits gemeinsame Werte (hier also alle) sind bereits ausgefüllt. Der vordere Auswahlkasten gibt an, ob dieser Wert bei allen Ausgewählten gesetzt werden soll, dahinter stehen die eigentlichen Werte. Wir setzen also bei „Knotenname anzeigen“ einen Haken im zweiten Auswahlkasten (siehe Abbildung 1b) und erhalten eine Anzeige der Knotenindizes wie in Abbildung 1c. Einzelne Knoten lassen sich auch bearbeiten, indem man diese mit der rechten Maustaste anklickt und Eigenschaften auswählt oder sie in der Liste auswählt und auf den Informations-Button („i“) darüber in der Toolbar klickt.</p>
+<div class="imagebox">
+		<img src="img/tut1_10knoten1.png">&nbsp;&nbsp;
+		<img src="img/tut1_10Knotenbearbeiten.png">&nbsp;&nbsp;
+		<img src="img/tut1_10knoten2.png">
+	<br>
+	<font size="-1"><b>Abbildung 1:</b> Erstellen von 10 Knoten (a)  und Bearbeiten der Auswahl (b), sowie das Ergebnis (c)</font>
+</div>
+<p>Da die Knoten beim Petersen Graphen in zwei Kreisen angeordnet werden sollen, wählen wir zunächst die Knoten 1 bis 5 aus. Dann wählen wir im Menü Bearbeiten den Eintrag „Auswahl anordnen…“ aus. In dessen Dialog geben wir für die Anordnung im Kreis die Daten für den Mittelpunkt und Radius an, im Beispiel ist dies der Punkt (150, 150)<sup>T</sup> mit dem Radius 130, siehe Abbildung 2a. Durch die 90 im letzten Datenfeld wird der erste Knoten oben platziert und alle Nachfolgenden im Uhrzeigersinn auf dem Kreis gleichmäßig verteilt. Die Anordnung ist stets nach dem Index sortiert. Analog verfahren wir mit den zweiten 5 Knoten und erhält, so man als kleineren Radius 75 wählt, die Anordnung der Knoten aus Abbildung 2b.
+	<div class="imagebox">
+			<img src="img/tut1_Anordnen_Kreis.png">&nbsp;&nbsp;
+			<img src="img/tut1_Kreise.png">
+	<br>
+		<font size="-1"><b>Abbildung 2:</b> Anordnen im Kreis mit den Parameters aus (a) für den äußeren Kreis erhalten wir mit einem Radius von 75 für den inneren Kreis die Darstellung in (b)</font>
+	</div>
+<h3>Erzeugen der Kanten</h3>
+		<p>Nach der (bei anderen Graphen vielleicht auch nur groben) Positionierung der Knoten werden wir nun die Kanten angeben. Dazu bewegt man die Maus auf einen Knoten und zieht die Kante zum zweiten Knoten hinüber. Alternativ wählt man alle Knoten aus, die zu einem Knoten adjazent werden sollen, etwa für den Knoten 2 die Knoten 1,7 und 3 und wählt dann nach einem Klick mit der rechten Maustaste auf Knoten 2 „Kanten zu ausgewählten Knoten“ aus. Im ungerichteten Fall sind die Menüeinträge formell identisch. Formt man einen ungerichteten Graphen in einen gerichteten Graphen um, ist die Erzeugungsrichtung entscheidend. Neben diesen beiden Möglichkeiten, die in Abbildung 3 dargestellt sind, gibt es noch eine weitere Möglichkeit: Wählen wir alle Knoten aus, von denen eine Kante zu einem speziellen Knoten $v$  erzeugt werden soll, so können wir durch Ziehen einer Kante von einem ausgewählten zu $v$ alle gewünschten Kanten erzeugen, indem wir dabei die Shift-Taste gedrückt halten.</p>
+		<div class="imagebox">
+				<img src="img/tut1_Kanten1.png">&nbsp;&nbsp;
+				<img src="img/tut1_Kanten2.png">
+		<br>
+			<font size="-1"><b>Abbildung 3:</b> Zwei Möglichkeiten zum Erstellen von Kanten: (a) Ziehen oder (b) erstellen mehrerer Kanten über das Menü.</font>
+		</div>
+<p>Nachdem wir also alle 15 Kanten des Petersen-Graphen erzeugt haben, erhalten wir eine erste Rohfassung, wie sie in Abbildung 4a dargestellt ist.</p>
+<div class="imagebox">
+		<img src="img/tut1_Rohfassung.png">&nbsp;&nbsp;
+		<img src="img/tut1_ModKnotenKanten.png">
+	<br>
+	<font size="-1"><b>Abbildung 4:</b> Zum Feinschliff: (a) Eine erste Rohfassung mit schlechten Beschriftungen und (b) Ändern des Knotennamens. Hier sehen wir, dass die Knotennamen zum Zeitpunkt der Modifikation schon nicht mehr alle unten ausgerichtet sind, da das Feld Textausrichtung ausgegraut ist.</font>
+</div>
+
+<h3>Feinschliff I: Optimieren für TeX</h3>
+<p>	In dieser Rohfassung sind die Beschriftungen nicht sonderlich gut platziert. Dies können wir auf zwei Arten ändern:<br>
+Zum einen durch Aufrufen der Eigenschaften, dort finden sich im Tab „Ansicht“ die Werte, welche die Anzeige des Textes beeinflussen: Ausrichtung, Abstand und Textgröße. Wir ändern hier einmal für den Knoten 2 die Ausrichtung auf 0, dann wird dessen Name rechts vom Knoten angezeigt. Diese Methode eignet sich sehr gut, wenn wir explizit eine spezielle Ausrichtung oder einen speziellen Abstand erzwingen möchten.</p>
+
+<p>Die zweite Methode basiert wieder auf der Interaktion mit der Maus, genauer dem Ziehen. Dies können wir gut anwenden, wenn eine explizite Angabe der genannten Werte nicht sofort möglich ist und wir lieber herumprobieren möchten, wie beispielsweise beim Knoten 1. Beginnen wir einen Drag auf dem Knoten 1 und halten dabei die Alt-Taste gedrückt, so ändert eine Bewegung der Maus in horizontaler Richtung die Ausrichtung um den Knoten herum. Eine vertikale Mausbewegung ändert den Abstand.</p>
+<p>Mit einem Klick auf einen Knoten bei gedrückter Alt-Taste lässt sich die Anzeige des entsprechenden Knotennamen umschalten. Diese Mausaktionen bei gedrückter Alt-Taste funktioniert auch analog für die Kanten bzw. Hyperkanten. So können wir nun alle Beschriftungen anordnen.</p>
+
+<p>Nun wollen wir außerdem noch einen 1-Faktor hervorheben. Dazu klicken wir bei gedrückter Shift-Taste die entsprechenden Kanten an (hier die Kanten 1-2, 5-4, 7-10,6-9 und 3-8) und wählen wieder den Menüpunkt Bearbeiten &#8594; Auswahl bearbeiten. Dort öffnet sich ein ähnlicher Dialog wie vorhin bei den Knoten. Der Dialog enthält 3 Untertabs im Bereich der Kanten; jeweils ein Unterbereich zur Angabe der Werte für Linienart, Beschriftung und (bei gerichteten Graphen) die Pfeilspitze. Im Tab „Linienart“ ändern wir den Linienstil auf gestrichelt. Die restlichen Werte entsprechen dem momentan eingestellten Standard, denn jede Kante (auch mit durchgezogenem Strich) wird mit diesen initialisiert.</p>
+
+<p>Eine letzte Änderung betrifft nochmals die Knoten. Da wir diese besser mit $v<sub>i</sub>,&nbsp;i=1,…,10 bezeichnet wollen, markieren wir wiederum (mindestens) alle Knoten. Wählt man nun Auswahl bearbeiten aus (Strg+ bzw. &#x2318;+M), so erhält man die zwei Tabs (s. Abbildung 4b), wenn Knoten und Kanten ausgewählt sind. Um nun alle Namen auf den gewünschten Namen zu setzen, tragen wir „<tt>v_{$ID}</tt>“ in das entsprechende Feld ein. Darunter erscheint eine Vorschau (stets für den Index 4), denn der Term <tt>$ID</tt> wird für jeden Knoten durch seinen Index ersetzt. Die Schreibweise ist TeX-Code und wird in dieser Art auch in der Darstellung erscheinen. In einem Export für TeX steht dann jedoch die jeweilige Nummer des Knotens im Index. Dazu brauchen wir auch die geschweiften Klammern, sonst steht bei Knoten 10 nur die 1 im Index.
+	<div class="imagebox">
+			<img src="img/tut1_Beschriftet.png">&nbsp;&nbsp;
+			<img src="img/tut1_tikz1.png">
+		<br>
+		<font size="-1"><b>Abbildung 5:</b> Gegenüberstellung der Exporte in PNG und TeX (TikZ): (a) PNG-Export mit den Indizes wie im Editor (b) TikZ-Export (Vektorgrafik) in dem die Knotennamen als mathematische Formel gesetzt, damit die Form „v<sub>i</sub>“ entsteht.</font>
+	</div>
+<p>Das Ergebnis dieser beiden Veränderungen entspricht in der Darstellung dann der Abbildung 5a. Hier sieht man einen kleinen Nachteil des Editors: Er ist nicht in der Lage, TeX-Code zu interpretieren, so unterscheidet sich das Resultat des Exports in Abbildung 5b (auch wenn hier ebenso ein PNG eingebunden wurde) ein wenig von der Darstellung im Editor. Im verwendeten TikZ-Export wird die Schriftgröße an die des Dokumentes angepasst. Basierend auf den Paketen <tt>epic</tt> und <tt>eepic</tt> ist jedoch auch ein Export möglich, der die Textgrößen beibehält. Details finden sich in der Beschreibung des entsprechenden <a href="export_tex.html">Exports</a>.</p>
+	
+<h3>Feinschliff II: Eine bunte TikZ-Grafik</h3>
+<p>Im letzte Feinschliff betrachten wir die Möglichkeit zur Farbgebung. Diese lassen sich zwar nicht im ältere TeX-Export ausgeben, sondern sind nur für den Export in eine TikZ-Grafik verfügbar.</p>
+<p>Ausgehend von der eben erstellten Fassung, wählen wir wieder den 1-Faktor aus und setzen die Linienart dieser Kanten zurück auf den normalen durchgezogenen Stil. Dann klicken wir auf den Hintergrund und wählen den Menüpunkt „Neuer Untergraph…“. In diesem Dialog sind nun in der einen Liste die Kanten des 1-Faktors ausgewählt. Ebenso wäre dies mit einer Auswahl an Knoten in deren Liste. Als Farbe wählen wir einen Blauton. Zusätzlich können wir analog einen zweiten 1-Faktor auswählen (etwa den, der nur die Kante 1-2 mit dem Ersten gemeinsam hat) und wählen für diesen Untergraphen die Farbe grün. In der Kante 1-2 werden die Farben gemischt, da diese zu beiden Untergraphen gehört.</p>
+<p>Der daraus resultierende Export in eine TikZ-Grafik ist in Abbildung 6 dargestellt und bildet den Abschluss des ersten Tutorials. In der TikZ-Datei werden zu Beginn die Farben der einzelnen Untergraphen definiert. So ist es möglich, die Farben auch im Nachhinein noch zu verändern. Dazu ist jedoch ein Vorwissen in den Farbdefinitionen nach dem <tt>xcolor</tt>-Paket notwendig.</p>
+<div class="imagebox">
+		<img src="img/tut1_tikz2.png">
+	<br>
+	<font size="-1"><b>Abbildung 6:</b> Der Petersen Graph mit zwei hervorgehobenen 1-Faktoren: Einem in Blau und einem in Grün.</font>
+	<br>
+</div>
+	</body>
+</html>

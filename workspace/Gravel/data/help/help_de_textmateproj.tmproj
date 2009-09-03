@@ -3,110 +3,128 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>de/format.css</string>
+	<string>de/toc.xml</string>
 	<key>documents</key>
 	<array>
 		<dict>
 			<key>filename</key>
 			<string>de/definitions.html</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T12:03:58Z</date>
+			<date>2009-09-03T15:31:10Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/dialog.html</string>
 			<key>lastUsed</key>
-			<date>2007-10-16T11:13:10Z</date>
+			<date>2009-09-02T11:20:00Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/dialog_edge.html</string>
 			<key>lastUsed</key>
-			<date>2008-06-02T15:51:13Z</date>
-		</dict>
-		<dict>
-			<key>filename</key>
-			<string>de/dialog_file.html</string>
-			<key>lastUsed</key>
-			<date>2007-10-16T12:16:24Z</date>
+			<date>2009-09-02T10:13:39Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/dialog_node.html</string>
 			<key>lastUsed</key>
-			<date>2007-10-16T12:13:33Z</date>
+			<date>2009-09-02T11:17:06Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>de/dialog_shape.html</string>
+			<key>lastUsed</key>
+			<date>2009-09-03T12:04:20Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>de/dialog_hyperedge.html</string>
+			<key>lastUsed</key>
+			<date>2009-09-02T10:13:40Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/dialog_prefs.html</string>
 			<key>lastUsed</key>
-			<date>2008-01-07T12:25:25Z</date>
+			<date>2009-09-02T13:17:54Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/dialog_subgraph.html</string>
 			<key>lastUsed</key>
-			<date>2007-10-16T12:59:57Z</date>
+			<date>2009-09-02T11:20:03Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/export.html</string>
 			<key>lastUsed</key>
-			<date>2007-10-16T15:17:02Z</date>
+			<date>2009-09-03T10:19:04Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/export_tex.html</string>
 			<key>lastUsed</key>
-			<date>2007-10-16T15:23:03Z</date>
+			<date>2009-09-03T15:32:52Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/export_png.html</string>
 			<key>lastUsed</key>
-			<date>2007-10-16T14:59:11Z</date>
+			<date>2009-09-02T13:41:24Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>de/export_svg.html</string>
+			<key>lastUsed</key>
+			<date>2009-09-03T15:32:44Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/graphml_exa_hypergraph.html</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T13:41:39Z</date>
+			<date>2009-09-02T07:55:58Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/graphml_exa_graph.html</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T14:03:31Z</date>
+			<date>2009-09-02T07:56:02Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/graphml_datenfelder.html</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T14:31:59Z</date>
+			<date>2009-09-03T10:26:15Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/graphml.html</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T14:54:47Z</date>
+			<date>2009-09-03T10:26:10Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>de/statistic.html</string>
+			<key>lastUsed</key>
+			<date>2009-09-02T08:21:54Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/help.html</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T13:26:10Z</date>
+			<date>2009-09-02T07:56:23Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/introduction.html</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T10:42:13Z</date>
+			<date>2009-09-03T15:09:57Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/license.html</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T13:57:37Z</date>
+			<date>2009-09-02T07:56:31Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -118,49 +136,43 @@
 			<key>filename</key>
 			<string>de/mainwindow.html</string>
 			<key>lastUsed</key>
-			<date>2007-10-17T10:53:38Z</date>
-		</dict>
-		<dict>
-			<key>filename</key>
-			<string>de/menu.html</string>
-			<key>lastUsed</key>
-			<date>2008-01-07T12:25:32Z</date>
-		</dict>
-		<dict>
-			<key>filename</key>
-			<string>de/systemanforderungen.html</string>
-			<key>lastUsed</key>
-			<date>2009-09-01T15:05:15Z</date>
+			<date>2009-09-02T11:24:39Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/mouseaction.html</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T15:23:30Z</date>
+			<date>2009-09-03T10:26:03Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>de/systemanforderungen.html</string>
+			<key>lastUsed</key>
+			<date>2009-09-02T06:55:50Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>de/gui.html</string>
+			<key>lastUsed</key>
+			<date>2009-09-02T07:14:49Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/popup_menus.html</string>
 			<key>lastUsed</key>
-			<date>2007-10-17T14:27:03Z</date>
+			<date>2009-09-03T15:34:29Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/shortcuts.html</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T15:23:03Z</date>
-		</dict>
-		<dict>
-			<key>filename</key>
-			<string>de/statistic.html</string>
-			<key>lastUsed</key>
-			<date>2009-09-01T13:24:27Z</date>
+			<date>2009-09-03T10:42:16Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/content.jhm</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T15:05:25Z</date>
+			<date>2009-09-03T15:40:13Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -172,139 +184,83 @@
 			<key>filename</key>
 			<string>de/help.hs</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T15:05:18Z</date>
+			<date>2009-09-03T15:40:10Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>de/tutorial_hypergraph.html</string>
+			<key>lastUsed</key>
+			<date>2009-09-03T12:12:23Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>de/tutorial_graph.html</string>
+			<key>lastUsed</key>
+			<date>2009-09-03T14:42:24Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/index.xml</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T15:08:05Z</date>
+			<date>2009-09-03T15:40:17Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/toc.xml</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T15:06:34Z</date>
+			<date>2009-09-03T15:40:17Z</date>
+			<key>selected</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>de/format.css</string>
 			<key>lastUsed</key>
-			<date>2009-09-01T15:23:30Z</date>
-			<key>selected</key>
-			<true/>
+			<date>2009-09-03T15:20:17Z</date>
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
 	<integer>220</integer>
 	<key>metaData</key>
 	<dict>
-		<key>de/content.jhm</key>
+		<key>de/export_png.html</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>22</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>27</integer>
+				<integer>0</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>17</integer>
-		</dict>
-		<key>de/dialog_prefs.html</key>
-		<dict>
-			<key>caret</key>
+			<integer>0</integer>
+			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>159</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>23</integer>
+				<integer>9</integer>
 			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>20</integer>
-		</dict>
-		<key>de/format.css</key>
-		<dict>
-			<key>caret</key>
+			<key>selectTo</key>
 			<dict>
 				<key>column</key>
-				<integer>18</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>19</integer>
+				<integer>0</integer>
 			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>5</integer>
 		</dict>
 		<key>de/index.xml</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>68</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>205</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>163</integer>
-		</dict>
-		<key>de/menu.html</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>9</integer>
-				<key>line</key>
-				<integer>14</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>3</integer>
-		</dict>
-		<key>de/mouseaction.html</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>373</integer>
-				<key>line</key>
-				<integer>10</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>2</integer>
-		</dict>
-		<key>de/shortcuts.html</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>60</integer>
-				<key>line</key>
-				<integer>17</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>24</integer>
-		</dict>
-		<key>de/systemanforderungen.html</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>392</integer>
-				<key>line</key>
-				<integer>12</integer>
+				<integer>37</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -316,29 +272,24 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>71</integer>
+				<integer>25</integer>
 				<key>line</key>
-				<integer>8</integer>
+				<integer>15</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>38</integer>
+			<integer>10</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
 	<array>
 		<string>de/index.xml</string>
 		<string>de/toc.xml</string>
-		<string>de/shortcuts.html</string>
-		<string>de/format.css</string>
-		<string>de/mouseaction.html</string>
-		<string>de/systemanforderungen.html</string>
-		<string>de/content.jhm</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{26, 303}, {1005, 475}}</string>
+	<string>{{21, 44}, {1018, 655}}</string>
 </dict>
 </plist>

@@ -10,8 +10,10 @@
 			<tocitem image="icon.anchor" text="Versionen" target="intro.versions"/>
 		</tocitem>
 		
+		<tocitem image="icon.page" text="Tutorial I: Graphen" target="tutorial1"/>
+		<tocitem image="icon.page" text="Tutorial II: Hypergraphen" target="tutorial2"/>
 		            
-    <tocitem expand=false image="icon.chapter.todo" text="Definition" target="definition">
+    <tocitem expand=false text="Definition" target="definition">
 			<tocitem image="icon.anchor" text="Graphen" target="definition.graph"/>
 			<tocitem image="icon.anchor" text="Hypergraphen" target="definition.hypergraph"/>
 			<tocitem image="icon.anchor" text="Hyperkantenumriss" target="definition.hyperkantenumriss"/>
