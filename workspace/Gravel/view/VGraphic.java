@@ -137,7 +137,7 @@ public class VGraphic extends VCommonGraphic
 			VEdge temp = edgeiter.next(); //Grafischer Teil
 			Vector<Point> p = temp.getControlPoints();
 			for (int i=0; i<p.size(); i++)
-				drawCP(g,p.get(i), Color.BLUE);
+				drawCP(g,p.get(i), Color.BLUE.brighter());
 		}
 	}
 	/**

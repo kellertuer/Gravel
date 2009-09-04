@@ -142,7 +142,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 	}
 	private void paintControlPolygon(Graphics2D g2)
 	{
-		g2.setColor(Color.green.brighter().brighter());
 		NURBSShape s =  vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().stripDecorations().clone();
 		s.scale(zoomfactor);
 		Iterator<Point2D> pi = s.controlPoints.iterator();
@@ -153,8 +152,10 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			if (first==null)
 				first = p;
 			g2.setStroke(new BasicStroke(1,BasicStroke.JOIN_ROUND, BasicStroke.JOIN_ROUND));
+			g2.setColor(Color.blue.brighter());
 			g2.drawLine(Math.round(((float)p.getX()-3)),Math.round((float)p.getY()),Math.round(((float)p.getX()+3)),Math.round((float)p.getY()));
 			g2.drawLine(Math.round(((float)p.getX())),Math.round(((float)p.getY()-3)),Math.round((float)p.getX()),Math.round(((float)p.getY()+3)));
+			g2.setColor(Color.blue.brighter().brighter());
 			if (last!=null)
 				g2.drawLine(Math.round((float)last.getX()),Math.round((float)last.getY()), Math.round((float)p.getX()), Math.round((float)p.getY()));
 			last = p;
