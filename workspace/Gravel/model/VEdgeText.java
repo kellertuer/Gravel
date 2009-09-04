@@ -61,11 +61,11 @@ public class VEdgeText {
 	}
 	/**
 	 * Returns the position along the edge the text middle is shown.
-	 * teh value is between 0 and 100 and
-	 * 	0 to 50 means it is shown CCW 90° to the edge direction, so if the edge is from left to right,
+	 * teh value is between 0 and 1 and
+	 * 	0 to 0.50 means it is shown CCW 90° to the edge direction, so if the edge is from left to right,
 	 * 	the text is above the edge
 	 * 
-	 * 	51 to 100 means the text is placed CW 90° to the edge direction, so again if the edge is from left to right, 
+	 * 	0.51 to 1 means the text is placed CW 90° to the edge direction, so again if the edge is from left to right, 
 	 * 	the edge text is placed below the edge line itself
 	 * 
 	 * @return position of the text
@@ -75,7 +75,7 @@ public class VEdgeText {
 	}
 	/**
 	 * Sets the position along the edge the text middle is shown.
-	 * the value is in percent.
+	 * the value is in percent (0 <=x <= 1).
 	 * On An Edge it has the following interpretation:
 	 * 0-50% means 0 to 50 means it is shown CCW 90° to the edge direction, so if the edge is from left to right,
 	 * 	the text is above the edge

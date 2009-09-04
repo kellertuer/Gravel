@@ -31,6 +31,7 @@ public class CommonEdgeDragListener
 	VCommonGraphic vgc;
 	GeneralPreferences gp;
 	Point MouseOffSet;
+	float DragStartScale=100f;
 	boolean multiplemoving=false,altwaspressed = false,shiftwaspressed = false, firstdrag;
 
 	public CommonEdgeDragListener(VGraphic g)
@@ -64,9 +65,10 @@ public class CommonEdgeDragListener
 				if (vg!=null)
 					vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,GraphConstraints.BLOCK_END));
 				else if (vhg!=null)
-					vg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
+					vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,GraphConstraints.BLOCK_END));
 			}
 		}
+		DragStartScale=100f;
 		movingEdge=null;
 		movingHyperEdge=null;
 		altwaspressed=false;
@@ -145,7 +147,21 @@ public class CommonEdgeDragListener
 		if (vg!=null)
 			edgeInRange = vg.getEdgeinRangeOf(pointInGraph,2.0*((float)vgc.getZoom()/100));
 		else if (vhg!=null)
+		{
 			hyperedgeInRange = vhg.getEdgeinRangeOf(pointInGraph,2.0*((float)vgc.getZoom()/100));
+			if ((hyperedgeInRange!=null)&&(!hyperedgeInRange.getShape().isEmpty()))
+			{
+				float pos = hyperedgeInRange.getTextProperties().getPosition();
+				if (pos > .5f)
+					pos = 1-(pos - .5f)*2f;
+				else
+					pos *= 2f;
+				double scalepos = pos+0.01f;
+				if (scalepos > 1f)
+					scalepos = pos-0.01f;
+				DragStartScale = 25f * ((float) hyperedgeInRange.getShape().CurveRelativeAt(pos).distance(hyperedgeInRange.getShape().CurveRelativeAt(scalepos)) );
+			}
+		}
 		
 		boolean alt = ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK); // alt ?
 		boolean shift = ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK); //shift ?
@@ -190,8 +206,6 @@ public class CommonEdgeDragListener
 			{ //Single Edge
 				float pos = movingEdge.getTextProperties().getPosition() + (float)horizontalMovInGraph/100f;
 				pos -= Math.floor(pos);
-				if (pos < 0)
-					pos +=100;
 				int distance = (movingEdge.getTextProperties().getDistance()+verticalMovInGraph);
 				if (distance<0)
 					distance = 0;
@@ -204,10 +218,8 @@ public class CommonEdgeDragListener
 			}
 			else if ((movingHyperEdge!=null)&&(movingHyperEdge.getTextProperties().isVisible()))
 			{ //Single Edge
-				float pos = movingHyperEdge.getTextProperties().getPosition() + (float)horizontalMovInGraph/100f;
+				float pos = movingHyperEdge.getTextProperties().getPosition() + (float)horizontalMovInGraph/DragStartScale;
 				pos -= Math.floor(pos);
-				if (pos < 0)
-					pos +=100;
 				int distance = (movingHyperEdge.getTextProperties().getDistance()+verticalMovInGraph);
 				if (distance<0)
 					distance = 0;
