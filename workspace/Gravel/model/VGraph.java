@@ -75,6 +75,28 @@ public class VGraph extends Observable implements VGraphInterface {
 			notifyObservers(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
 		}
 	}
+	public void setSelection(VGraphInterface g)
+	{
+		if (g.getType()!=getType())
+			return;
+		deselect();
+		VGraph newSel = (VGraph) g;
+		Iterator<VNode> nodeiter = newSel.modifyNodes.getIterator();
+		while (nodeiter.hasNext())
+		{
+			VNode t = nodeiter.next();
+			if (modifyNodes.get(t.getIndex())!=null)
+				modifyNodes.get(t.getIndex()).setSelectedStatus(t.getSelectedStatus());
+		}
+		Iterator<VEdge> edgeiter = newSel.modifyEdges.getIterator();
+		while (edgeiter.hasNext())
+		{
+			VEdge t = edgeiter.next();
+			if (modifyEdges.get(t.getIndex())!=null)
+				modifyEdges.get(t.getIndex()).setSelectedStatus(t.getSelectedStatus());
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see model.VGraphInterface#removeSelection()
 	 */

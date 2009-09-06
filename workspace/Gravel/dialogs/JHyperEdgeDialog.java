@@ -214,7 +214,8 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		c.gridx = 1;
 		iEdgeIndex = new IntegerTextField();
 		iEdgeIndex.setPreferredSize(new Dimension(100, 20));
-
+		//We can't change index while shape modification
+		iEdgeIndex.setEnabled(!Gui.getInstance().isShapeModificationActive()); 
 		MainContent.add(iEdgeIndex,c);
 
 		c.gridy++;
@@ -441,6 +442,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		}
 		//If we have an edge with same nodeset, existsEdge is !=null
 		MHyperEdge existsEdge = graphref.getMathGraph().modifyHyperEdges.get(checkEdge.getEndNodes());
+		int SelStatus = VItem.DESELECTED;
 		if (isNewHyperedge) //neuer Kante, index testen
 		{
 			//Index bereits vergeben ?
@@ -457,6 +459,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		}
 		else //Kantenaenderungsdialog
 		{
+			SelStatus = graphref.modifyHyperEdges.get(oldvhyperedge.getIndex()).getSelectedStatus();
 //			Auswertung der neuen Daten, Pruefung auf Korrektheit
 			//Falls sich der Kantenindex geaendert hat darf dieser nicht vergeben sein
 			if ((graphref.modifyHyperEdges.get(iEdgeIndex.getValue())!=null)&&(iEdgeIndex.getValue()!=oldmhyperedge.index)) //So einen gibt es schon
@@ -515,6 +518,7 @@ public class JHyperEdgeDialog extends JDialog implements ActionListener, ItemLis
 		VHyperEdge e = graphref.modifyHyperEdges.get(iEdgeIndex.getValue());
 		e = cText.modifyHyperEdge(e);
 		e = cLine.modifyHyperEdge(e);
+		e.setSelectedStatus(SelStatus);
 		if (!isNewHyperedge)//Change edge, end block
 		{
 			if (oldmhyperedge.index==iEdgeIndex.getValue()) //Index not changed -> Just an EdgeReplace

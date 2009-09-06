@@ -13,6 +13,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import view.Gui;
+
 import dialogs.JEdgeDialog;
 import dialogs.JHyperEdgeDialog;
 import dialogs.JNodeDialog;
@@ -39,6 +41,7 @@ public class ItemInformationComponent implements Observer, ActionListener
 		c.gridx = 0;
 		c.gridwidth=5;
 		bInformation = new JButton(new ImageIcon(IconDir+"information32.png"));	
+		bInformation.setToolTipText("Eigenschaften…");
 		bInformation.setSize(new Dimension(32,32));
 		bInformation.addActionListener(this);
 		content.add(bInformation,c);
@@ -65,26 +68,26 @@ public class ItemInformationComponent implements Observer, ActionListener
 			if ( ((m.getAffectedElementTypes()&GraphConstraints.SELECTION)==0)
 					&& ((m.getModifiedElementTypes()&GraphConstraints.SELECTION)==0))
 				return; //Only update here if selection
-				if (graphRef==o)
+			if (graphRef==o)
+			{
+				Selected = graphRef.getSingleSelectedItem();
+				bInformation.setEnabled(Selected!=null);
+				if (Selected != null)
 				{
-					Selected = graphRef.getSingleSelectedItem();
-					bInformation.setEnabled(Selected!=null);
-					if (Selected != null)
+					switch(Selected.getType())
 					{
-						switch(Selected.getType())
-						{
-							case VItem.EDGE:
-								bInformation.setToolTipText("Eigenschften der Kante #"+Selected.getIndex());
-								break;
-							case VItem.NODE:
-								bInformation.setToolTipText("Eigenschften des Kotens Kante #"+Selected.getIndex());
-								break;
-							case VItem.HYPEREDGE:
-								bInformation.setToolTipText("Eigenschften der Hyperkante #"+Selected.getIndex());
-								break;
-						}
+						case VItem.EDGE:
+							bInformation.setToolTipText("Eigenschften der Kante #"+Selected.getIndex());
+						break;
+						case VItem.NODE:
+							bInformation.setToolTipText("Eigenschften des Kotens Kante #"+Selected.getIndex());
+						break;
+						case VItem.HYPEREDGE:
+							bInformation.setToolTipText("Eigenschften der Hyperkante #"+Selected.getIndex());
+						break;
 					}
 				}
+			}
 		}
 	}
 	public void actionPerformed(ActionEvent e) {
@@ -104,5 +107,6 @@ public class ItemInformationComponent implements Observer, ActionListener
 			default:
 			break;
 		}
+		Gui.getInstance().refresh();
 	}
 }

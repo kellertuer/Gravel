@@ -63,6 +63,27 @@ public class VHyperGraph extends Observable implements VGraphInterface {
 			notifyObservers(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
 		}
 	}
+	public void setSelection(VGraphInterface g)
+	{
+		if (g.getType()!=getType())
+			return;
+		deselect();
+		VHyperGraph newSel = (VHyperGraph) g;
+		Iterator<VNode> nodeiter = newSel.modifyNodes.getIterator();
+		while (nodeiter.hasNext())
+		{
+			VNode t = nodeiter.next();
+			if (modifyNodes.get(t.getIndex())!=null)
+				modifyNodes.get(t.getIndex()).setSelectedStatus(t.getSelectedStatus());
+		}
+		Iterator<VHyperEdge> edgeiter = newSel.modifyHyperEdges.getIterator();
+		while (edgeiter.hasNext())
+		{
+			VHyperEdge t = edgeiter.next();
+			if (modifyHyperEdges.get(t.getIndex())!=null)
+				modifyHyperEdges.get(t.getIndex()).setSelectedStatus(t.getSelectedStatus());
+		}
+	}
 	/* (non-Javadoc)
 	 * @see model.VGraphInterface#removeSelection()
 	 */

@@ -27,6 +27,11 @@ public interface VGraphInterface extends Observer {
 	 */
 	public boolean hasSelection();
 	/**
+	 * Set this selection to all nodes/edges/hyperedges that are selected in the parameter graph, if they existere here
+	 * @param g
+	 */
+	public void setSelection(VGraphInterface g);
+	/**
 	 * Get a single element, if and only if just one element is selected
 	 * @return
 	 */

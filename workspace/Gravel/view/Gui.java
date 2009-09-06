@@ -219,6 +219,8 @@ public class Gui implements WindowListener
     			//Push the change as a block of changes
     			MainGraph.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,index,GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
     		}
+    		//Recreate Selection
+    		MainGraph.setSelection(shapePart.getGraph());
     	}
 
     	mainPanel.remove(mainSplit);

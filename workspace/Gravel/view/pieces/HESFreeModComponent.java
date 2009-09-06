@@ -136,12 +136,14 @@ public class HESFreeModComponent implements ActionListener {
 		c.gridwidth=2;
 		bModificationModus = new ButtonGroup();
 		rModGlobal = new JRadioButton("global");
+		rModGlobal.setToolTipText("Gesamten Umriss bearbeiten");
 		rModGlobal.setSelected(true);
 		rModGlobal.addActionListener(this);
 		bModificationModus.add(rModGlobal);
 		FreeModFields.add(rModGlobal,c);
 		c.gridx+=2;
 		rModLocal = new JRadioButton("lokal");
+		rModLocal.setToolTipText("Anwenden der Transformationen auf einen Umrissteil");
 		rModLocal.setSelected(false);
 		rModLocal.addActionListener(this);
 		bModificationModus.add(rModLocal);
@@ -151,12 +153,14 @@ public class HESFreeModComponent implements ActionListener {
 		c.gridx=0;
 		c.gridwidth=1;
 		bIncKnots = new JButton(new ImageIcon(IconDir+"plus16.png"));
+		bIncKnots.setToolTipText("Knoten (und damit Kontrollpunkte) hinzufügen"); 
 		bIncKnots.setSize(new Dimension(17,17));
 		bIncKnots.addActionListener(this);
 		FreeModFields.add(bIncKnots,c);
 
 		c.gridx++;
 		bDecKnots = new JButton(new ImageIcon(IconDir+"minus16.png"));
+		bDecKnots.setToolTipText("Knoten entfernen (falls möglch)");
 		bDecKnots.setSize(new Dimension(17,17));
 		bDecKnots.addActionListener(this);
 		FreeModFields.add(bDecKnots,c);
@@ -165,6 +169,7 @@ public class HESFreeModComponent implements ActionListener {
 		c.gridx=0;
 		c.gridwidth=1;
 		bRotation = new JButton(new ImageIcon(IconDir+"rotate32.png"));	
+		bRotation.setToolTipText("Umriss(teil) rotieren.");
 		bRotation.setSize(new Dimension(32,32));
 		bRotation.addActionListener(this);
 		FreeModFields.add(bRotation,c);
@@ -173,6 +178,7 @@ public class HESFreeModComponent implements ActionListener {
 		c.gridwidth=1;
 		
 		bTranslation = new JButton(new ImageIcon(IconDir+"translate32.png"));	
+		bTranslation.setToolTipText("Umriss(teil) verschieben.");
 		bTranslation.setSize(new Dimension(32,32));
 		bTranslation.addActionListener(this);
 		FreeModFields.add(bTranslation,c);
@@ -180,6 +186,7 @@ public class HESFreeModComponent implements ActionListener {
 		c.gridx++;
 		c.gridwidth=1;
 		bScaling = new JButton(new ImageIcon(IconDir+"scale32.png"));	
+		bScaling.setToolTipText("Umriss(teil) skalieren.");
 		bScaling.setSize(new Dimension(32,32));
 		bScaling.addActionListener(this);
 		FreeModFields.add(bScaling,c);
@@ -188,6 +195,7 @@ public class HESFreeModComponent implements ActionListener {
 		c.gridx=0;
 		c.gridwidth=1;
 		bScalingDir = new JButton(new ImageIcon(IconDir+"scaledir32.png"));	
+		bScalingDir.setToolTipText("Umriss(teil) entlang einer Richtung skalieren.");
 		bScalingDir.setSize(new Dimension(32,32));
 		bScalingDir.addActionListener(this);
 		FreeModFields.add(bScalingDir,c);
@@ -197,18 +205,21 @@ public class HESFreeModComponent implements ActionListener {
 		c.gridwidth=1;
 		
 		bLocalSetStart = new JButton(new ImageIcon(IconDir+"start32.png"));
+		bLocalSetStart.setToolTipText("Startpunkt des Umrissteils setzen.");
 		bLocalSetStart.setSize(new Dimension(32,32));
 		bLocalSetStart.addActionListener(this);
 		FreeModFields.add(bLocalSetStart,c);
 
 		c.gridx++;
 		bLocalInvert = new JButton(new ImageIcon(IconDir+"invert32.png"));
+		bLocalInvert.setToolTipText("Teilkurvenauswahl invertieren.");
 		bLocalInvert.setSize(new Dimension(32,32));
 		bLocalInvert.addActionListener(this);
 		FreeModFields.add(bLocalInvert,c);
 
 		c.gridx++;
 		bLocalSetEnd = new JButton(new ImageIcon(IconDir+"end32.png"));
+		bLocalSetEnd.setToolTipText("Endpunkt des Umrissteils setzen.");
 		bLocalSetEnd.setSize(new Dimension(32,32));
 		bLocalSetEnd.addActionListener(this);
 		FreeModFields.add(bLocalSetEnd,c);

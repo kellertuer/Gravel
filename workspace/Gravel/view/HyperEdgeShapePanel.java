@@ -261,7 +261,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 
 		c.insets.bottom += 5;
 		c.anchor = GridBagConstraints.SOUTH;
-		bModeChange = new JButton("Modifikation"); //Name suchen!
+		bModeChange = new JButton("Modifikation");
 		bModeChange.setEnabled(true);
 		//!HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().isEmpty());
 		bModeChange.addActionListener(this);
@@ -273,6 +273,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		c.gridy++;
 		c.gridx=0;
 		bCheckShape = new JButton("<html>Pr&uuml;fen</html>");
+		bCheckShape.setToolTipText("Validierung des aktuellen Hyperkantenumrisses");
 		bCheckShape.addActionListener(this);
 		cont.add(bCheckShape,c);
 		c2.insets = (Insets) c.insets.clone();
