@@ -56,8 +56,8 @@ public class MainToolbar extends JToolBar
         if (vG.getType()==VCommonGraphic.VGRAPHIC)
         	internalInfoC = new ItemInformationComponent(((VGraphic)vG).getGraph());
         else if (vG.getType()==VCommonGraphic.VHYPERGRAPHIC)
-        	internalInfoC = new ItemInformationComponent(((VHyperGraphic)vG).getGraph());
-		validate();
+       		internalInfoC = new ItemInformationComponent(((VHyperGraphic)vG).getGraph());
+        validate();
 	}
 	public void validate()
 	{

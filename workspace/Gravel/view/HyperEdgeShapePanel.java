@@ -91,7 +91,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	private int HEdgeRefIndex; //Reference to the HyperEdge in the Graph that is edited here
 	private VHyperGraph HGraphRef; //Reference to the edited Graph, should be a copy of the Graph from the main GUI because the user might cancel this dialog 
 	private VHyperShapeGraphic HShapeGraphicRef;
-	
+
 	private JPanel CircleFields, InterpolationFields, DegreeFields;
 
 	private HESFreeModComponent FreeModPanel;
@@ -212,7 +212,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 		c.gridx=0;
 		c.gridwidth=2;
 		c.gridheight=2;
-		c.insets = new Insets(15,7,0,7);
+		c.insets = new Insets(7,7,0,7);
 		
 		//
 		// Lay all Small Containers with Options at this position nonvisible
@@ -922,12 +922,12 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 			}
 		}
 	}
+
 	public void update(Observable o, Object arg)
 	{
 		if (arg instanceof GraphMessage) //All Other GraphUpdates are handled in VGRaphCommons
 		{
 			update((GraphMessage) arg);
 		}
-		
 	}
 }

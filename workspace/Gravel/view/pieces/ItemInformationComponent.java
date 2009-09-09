@@ -60,6 +60,27 @@ public class ItemInformationComponent implements Observer, ActionListener
 	{
 		return content;
 	}
+	private void updateActivity()
+	{
+		Selected = graphRef.getSingleSelectedItem();
+
+		bInformation.setEnabled(Selected!=null);
+		if (Selected != null)
+		{
+			switch(Selected.getType())
+			{
+				case VItem.EDGE:
+					bInformation.setToolTipText("Eigenschften der Kante #"+Selected.getIndex());
+				break;
+				case VItem.NODE:
+					bInformation.setToolTipText("Eigenschften des Kotens Kante #"+Selected.getIndex());
+				break;
+				case VItem.HYPEREDGE:
+					bInformation.setToolTipText("Eigenschften der Hyperkante #"+Selected.getIndex());
+				break;
+			}
+		}
+	}
 	public void update(Observable o, Object arg)
 	{
 		if (arg instanceof GraphMessage) //Not nice but haven't found a beautiful way after hours
@@ -70,23 +91,7 @@ public class ItemInformationComponent implements Observer, ActionListener
 				return; //Only update here if selection
 			if (graphRef==o)
 			{
-				Selected = graphRef.getSingleSelectedItem();
-				bInformation.setEnabled(Selected!=null);
-				if (Selected != null)
-				{
-					switch(Selected.getType())
-					{
-						case VItem.EDGE:
-							bInformation.setToolTipText("Eigenschften der Kante #"+Selected.getIndex());
-						break;
-						case VItem.NODE:
-							bInformation.setToolTipText("Eigenschften des Kotens Kante #"+Selected.getIndex());
-						break;
-						case VItem.HYPEREDGE:
-							bInformation.setToolTipText("Eigenschften der Hyperkante #"+Selected.getIndex());
-						break;
-					}
-				}
+				updateActivity();
 			}
 		}
 	}
@@ -107,6 +112,7 @@ public class ItemInformationComponent implements Observer, ActionListener
 			default:
 			break;
 		}
+		updateActivity();
 		Gui.getInstance().refresh();
 	}
 }

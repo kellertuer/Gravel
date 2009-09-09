@@ -49,10 +49,8 @@ public class VHyperShapeGraphic extends VHyperGraphic
 		highlightedHyperEdge = hyperedgeindex;
 		invalidNodesforShape = new Vector<Integer>();
 		vGh = new HyperEdgeShapeHistoryManager(this,hyperedgeindex);
-		//Subscribe to original graph to listen for changes in the actual Edge
-		((VHyperGraph)Gui.getInstance().getVGraph()).addObserver(this);
+		//Deselect Main graph to deactivate i
 		((VHyperGraph)Gui.getInstance().getVGraph()).deselect();
-		((VHyperGraph)Gui.getInstance().getVGraph()).modifyHyperEdges.get(highlightedHyperEdge).setSelectedStatus(VItem.SELECTED);
 	}	
 	
 	public void finalize()
@@ -525,21 +523,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			return null;
 	}
 	
-	/**
-	 * Renew Information about the highlighted Edge from the Graph but keep its shape we have here
-	 */
-	private void renewHighlilghtedHyperEdge()
-	{
-		NURBSShape s = vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().clone();
-
-		MHyperEdge newme = ((VHyperGraph)Gui.getInstance().getVGraph()).getMathGraph().modifyHyperEdges.get(highlightedHyperEdge);
-		VHyperEdge newe = ((VHyperGraph)Gui.getInstance().getVGraph()).modifyHyperEdges.get(highlightedHyperEdge).clone();
-		newe.setShape(s);
-		vG.modifyHyperEdges.replace(newe,newme);
-		vG.modifyHyperEdges.get(highlightedHyperEdge).setSelectedStatus(VItem.SELECTED);
-		vG.pushNotify(new GraphMessage(GraphConstraints.UPDATE,GraphConstraints.SELECTION));
-	}
-
 	public void update(Observable o, Object arg)
 	{
 		super.update(o, arg);
@@ -554,31 +537,6 @@ public class VHyperShapeGraphic extends VHyperGraphic
  				else if (firstModus!=null)
  					firstModus.resetShape();
  			}
- 			if ( ((m.getModification()&GraphConstraints.UPDATE)>0) 
- 					&& ((m.getModifiedElementTypes()&GraphConstraints.HYPEREDGE)>0) 
- 					&& (m.getElementID()==highlightedHyperEdge)
- 					&& (o==(VHyperGraph)Gui.getInstance().getVGraph())
- 					)
- 			{
- 				if ((m.getModification()&GraphConstraints.BLOCK_START)>0)
- 				{
- 					BlockWithChangeStarted=true;
- 				}
- 				else //No Start, zhis might be end
- 				{
- 					BlockWithChangeStarted=false;
- 	 				renewHighlilghtedHyperEdge(); 					
- 				}
- 			}
- 			else if ( ((m.getModification()&GraphConstraints.BLOCK_END)>0)
- 					&& ((m.getModifiedElementTypes()&GraphConstraints.HYPEREDGE)>0)
- 					&& BlockWithChangeStarted)
- 			{
- 				BlockWithChangeStarted=false;
- 				renewHighlilghtedHyperEdge();
- 			}
- 			//Redraw
- 			repaint();
 		}
 	}
 

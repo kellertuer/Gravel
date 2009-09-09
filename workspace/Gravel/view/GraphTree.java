@@ -467,8 +467,8 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				updateEdges();
 			if ((m.getAffectedElementTypes()&GraphConstraints.SUBGRAPH)==GraphConstraints.SUBGRAPH) //Sets beteiligt
 				updateSubgraphs();
-			if ((m.getAffectedElementTypes()&GraphConstraints.SELECTION)==GraphConstraints.SELECTION)
-			{
+//			if ((m.getAffectedElementTypes()&GraphConstraints.SELECTION)==GraphConstraints.SELECTION)
+//			{
 				VItem v = ((VGraphInterface)o).getSingleSelectedItem();
 				if (v==null)
 				{
@@ -495,7 +495,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 					setSelectionPath(p);
 					scrollPathToVisible(p);
 				}
-			}
+//			}
 		}	
 
 	}
