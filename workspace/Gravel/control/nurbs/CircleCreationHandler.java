@@ -31,13 +31,16 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 	Point MouseOffSet;
 	boolean firstdrag = true;
 	Point2D CircleOrigin = null;
+	Point2D LastCircleOrigin=null;
 	Point DragOrigin=null; //Both Points CircleOrigin and DragOrigin keep the same point, the reset is at different stages and the tye differs
 	int size = 0, hyperedgeindex;
 	NURBSShape lastcircle=null;
+	boolean shiftwaspressed=false;
 
 	private void reInit()
 	{
 		CircleOrigin = null;
+		LastCircleOrigin=null;
 		size = 0;
 	}
 	/**
@@ -144,30 +147,45 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 	public void mousePressed(MouseEvent e) {
 		firstdrag=true;
 		boolean alt = ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK); // alt ?
-		boolean shift = ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK); //shift ?
-		if (alt||shift)
+		shiftwaspressed = ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK); //shift ?
+		if (alt)
 			return;
 		MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed
 		DragOrigin = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //Rausrechnen des zooms
-		CircleOrigin = new Point2D.Double((double)e.getPoint().x/(vgc.getZoom()/100d),(double)e.getPoint().y/(vgc.getZoom()/100d));
-		size=0;
+		if (!shiftwaspressed)
+		{
+			CircleOrigin = new Point2D.Double((double)e.getPoint().x/(vgc.getZoom()/100d),(double)e.getPoint().y/(vgc.getZoom()/100d));
+			size=0;
+		}
+		else if (CircleOrigin!=null)
+			LastCircleOrigin = new Point2D.Double(CircleOrigin.getX(),CircleOrigin.getY());
 	}
 
 	public void mouseDragged(MouseEvent e) {
 		
-		if (((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)||((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))
+		if ((InputEvent.ALT_DOWN_MASK & e.getModifiersEx()) == InputEvent.ALT_DOWN_MASK)
 		{	
 			internalReset();
 			return;
 		}
-		
+		if ( (!shiftwaspressed && ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) == InputEvent.SHIFT_DOWN_MASK))
+				|| (shiftwaspressed && ((InputEvent.SHIFT_DOWN_MASK & e.getModifiersEx()) != InputEvent.SHIFT_DOWN_MASK)) )
+		{ //Shift toggle while drag
+			internalReset();
+			return;			
+		}
 		//Handling selection Rectangle
 		if (DragOrigin!=null)
 		{
 			//Update Values
-			MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed
 			Point pointInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //Rausrechnen des zooms
-			size = Math.round((float)CircleOrigin.distance(pointInGraph));
+//			Point LastpointInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100))); //Rausrechnen des zooms
+			Point mov = new Point(pointInGraph.x-DragOrigin.x,pointInGraph.y-DragOrigin.y);
+			MouseOffSet = e.getPoint(); //Aktuelle Position merken für eventuelle Bewegungen while pressed
+			if (!shiftwaspressed)
+				size = Math.round((float)CircleOrigin.distance(pointInGraph));
+			else if (LastCircleOrigin!=null)
+				CircleOrigin = new Point2D.Double(LastCircleOrigin.getX()+mov.x,LastCircleOrigin.getY()+mov.y);
 			buildCircle();
 			VGraphInterface notify=null;
 			if (vg!=null) //Normal Graph
@@ -199,7 +217,10 @@ public class CircleCreationHandler implements ShapeCreationMouseHandler {
 	public void mouseExited(MouseEvent e) {}
 	public void mouseClicked(MouseEvent e) {}
 	public Point getMouseOffSet() {
-		return MouseOffSet;
+		if ((shiftwaspressed)&&(LastCircleOrigin!=null))
+			return new Point(Math.round((float)(LastCircleOrigin.getX()*(vgc.getZoom()/100d))),Math.round((float)(LastCircleOrigin.getY()*(vgc.getZoom()/100d))));
+		else
+			return MouseOffSet;
 	}
 	//Ignore Grid
 	public void setGrid(int x, int y) {}
