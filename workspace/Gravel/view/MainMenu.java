@@ -123,6 +123,8 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
         	((VGraphic)graphpart).getGraph().addObserver(this);
         else
         	((VHyperGraphic)graphpart).getGraph().addObserver(this);
+		mVModusOCM.setEnabled(!Gui.getInstance().isShapeModificationActive());
+		mVModusNormal.setEnabled(!Gui.getInstance().isShapeModificationActive());
         validate();
         repaint();
 	}
@@ -578,8 +580,6 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     	    	if (mVModusShape.getText().equals("Hyperkantenumriss..."))
     	    	{
     	    		mVModusShape.setText("Umriss "+main.CONST.utf8_ue+"bernehmen");
-    	    		mVModusOCM.setEnabled(false);
-    	    		mVModusNormal.setEnabled(false);
     	    		if (((VHyperGraphic)graphpart).getGraph().modifyHyperEdges.get(getIndexofSingeSelectedHyperEdge())!=null)
     	    			Gui.getInstance().InitShapeModification(getIndexofSingeSelectedHyperEdge());
     	    	}
@@ -596,6 +596,8 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
     	    		mVModusShape.setText("Hyperkantenumruss...");
     	    		Gui.getInstance().rebuildmaingrid(true);
     	    	}   	
+	    		mVModusOCM.setEnabled(!Gui.getInstance().isShapeModificationActive());
+	    		mVModusNormal.setEnabled(!Gui.getInstance().isShapeModificationActive());
     	    }
         	else if (item == mVZoom1)
         		graphpart.setZoom(50);
@@ -736,6 +738,8 @@ public class MainMenu extends JMenuBar implements ActionListener, Observer
 		{
 			if (!(graphpart instanceof VHyperShapeGraphic))
 				mVModusShape.setEnabled(getIndexofSingeSelectedHyperEdge() > 0);
+			else
+				mVModusShape.setEnabled(((VHyperShapeGraphic)graphpart).isShapeAcceptable());
 		}
 		if (graphpart.getType()!=VCommonGraphic.VGRAPHIC)
 		{

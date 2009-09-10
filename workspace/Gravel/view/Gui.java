@@ -222,7 +222,8 @@ public class Gui implements WindowListener
     		//Recreate Selection
     		MainGraph.setSelection(shapePart.getGraph());
     	}
-
+        shapePart = null;
+    	shapeParameters = null;
     	mainPanel.remove(mainSplit);
         //Unter die GraphList noch die Statistik
     	graphpart.setViewPort(shapeScroll.getViewport());
@@ -244,8 +245,6 @@ public class Gui implements WindowListener
         gToolBar.changeVGraph(graphpart);
         MenuBar.changeVGraph(graphpart);
         getParentWindow().validate();
-        shapePart = null;
-    	shapeParameters = null;
     }
     /**
      * Indicates whether there any hyperedge shape modification going on

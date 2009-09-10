@@ -523,6 +523,11 @@ public class VHyperShapeGraphic extends VHyperGraphic
 			return null;
 	}
 	
+	public boolean isShapeAcceptable()
+	{
+		return !vG.modifyHyperEdges.get(highlightedHyperEdge).getShape().isEmpty();
+	}
+	
 	public void update(Observable o, Object arg)
 	{
 		super.update(o, arg);
