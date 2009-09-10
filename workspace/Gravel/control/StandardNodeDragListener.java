@@ -22,7 +22,7 @@ import model.Messages.GraphMessage;
  * @author ronny
  *
  */
-public class StandardNodeDragListener  implements MouseListener, MouseMotionListener {
+public class StandardNodeDragListener implements MouseListener, MouseMotionListener {
 
 	private VGraph vg=null;
 	private VHyperGraph vhg=null;

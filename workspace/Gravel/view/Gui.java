@@ -226,7 +226,8 @@ public class Gui implements WindowListener
     	shapeParameters = null;
     	mainPanel.remove(mainSplit);
         //Unter die GraphList noch die Statistik
-    	graphpart.setViewPort(shapeScroll.getViewport());
+        mainScroll.setViewportView(graphpart);
+        graphpart.setViewPort(mainScroll.getViewport());
         JSplitPane rightside = new JSplitPane(JSplitPane.VERTICAL_SPLIT,treeScroll,stats);
         rightside.setPreferredSize(new Dimension(mainPanel.getBounds().getSize().width - graphpart.getBounds().getSize().width,mainPanel.getBounds().getSize().height - graphpart.getBounds().getSize().height));
         rightside.setResizeWeight(1.0);
@@ -304,7 +305,7 @@ public class Gui implements WindowListener
         //Das Ganze als Scrollpane
         shapeScroll = new JScrollPane(shapePart);
         shapeScroll.setViewportView(shapePart);
-        shapePart.setViewPort(mainScroll.getViewport());
+        shapePart.setViewPort(shapeScroll.getViewport());
         shapeScroll.setMinimumSize(new Dimension(shapePart.getBounds().getSize()));
         shapeScroll.setPreferredSize(shapePart.getBounds().getSize());
         shapeScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);

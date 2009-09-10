@@ -13,6 +13,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Observable;
@@ -67,7 +69,7 @@ public abstract class VCommonGraphic extends Component implements Observer
 	public static final int VHYPERGRAPHIC = 2;
 //	public static final int VHYPERSHAPEGRAPHIC = 4; contained in previous Variable
 	
-	private HashMap<String,Observable> Controls;
+	protected HashMap<String,Observable> Controls;
 	protected Color selColor; //Color of selected Elements
 	protected int selWidth; //Width of selection border
 
@@ -335,6 +337,7 @@ public abstract class VCommonGraphic extends Component implements Observer
 					gp.setBoolValue("grid.enabled",gridenabled);
 					gp.setBoolValue("grid.orientated",gridorientated);
 					gp.addObserver(this);
+					handlePreferencesUpdate();
 					handleGraphUpdate(new GraphMessage(GraphConstraints.SELECTION,GraphConstraints.UPDATE));
 					repaint();
 					//UpdateGrid

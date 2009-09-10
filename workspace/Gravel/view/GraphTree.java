@@ -346,6 +346,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 				}
 				default : {return;}
 			}
+			Gui.getInstance().refresh();
 		}
 		else if (e.getSource()==HyperEdgeShape)
 		{ //Only Happens in Hypergraohs, because this item is not exitent else

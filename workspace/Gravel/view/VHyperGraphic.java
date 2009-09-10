@@ -433,7 +433,7 @@ public class VHyperGraphic extends VCommonGraphic
 		else
 			return null;
 	}
-	public void handlePreferencedUpdate()
+	public void handlePreferencesUpdate()
 	{
 		super.handlePreferencesUpdate();
 		if (Drag!=null)
@@ -451,7 +451,7 @@ public class VHyperGraphic extends VCommonGraphic
 				Click.update(o,arg);
 			repaint();
 		}
-		else if (o.equals(gp)) //We got news from gp
+		else if (super.Controls.containsKey((String)arg)) //We got news from grid or zoom
 			handlePreferencesUpdate();
 	}
 	

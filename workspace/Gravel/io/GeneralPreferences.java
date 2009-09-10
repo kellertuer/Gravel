@@ -482,7 +482,7 @@ public class GeneralPreferences extends Observable
 		BoolValues.put("node.name_visible",false);
 		BoolValues.put("pref.saveonexit",true);
 		BoolValues.put("vgraphic.cpshow",false);
-		BoolValues.put("vgraphic.directed",true);
+		BoolValues.put("graph.directed",true);
 		
 		StringValues.put("edge.name", "e_{$ID}");
 		StringValues.put("hyperedge.name", "E_{$ID}");

@@ -43,6 +43,7 @@ public class VGraphic extends VCommonGraphic
 		vG = Graph;
 		vG.addObserver(this); //Die Graphikumgebung als Observer der Datenstruktur eintragen
 		vGh = new CommonGraphHistoryManager(vG);
+		gp.addObserver(this);
 	}
 	
 	public void paint(Graphics g) 
@@ -209,7 +210,7 @@ public class VGraphic extends VCommonGraphic
 		else
 			return null;
 	}
-	public void handlePreferencedUpdate()
+	public void handlePreferencesUpdate()
 	{
 		super.handlePreferencesUpdate();
 		if (Drag!=null)
@@ -227,7 +228,7 @@ public class VGraphic extends VCommonGraphic
 				Click.update(o,arg);
 			repaint();
 		}
-		else if (o.equals(gp)) //We got news from gp
+		else if (super.Controls.containsKey((String)arg)) //We got news from grid or zoom
 			handlePreferencesUpdate();
 	}
 
