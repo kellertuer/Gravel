@@ -348,6 +348,20 @@ public class Gui implements WindowListener
         AboutLabel.setOpaque(true);
 		JOptionPane.showMessageDialog(frame, AboutLabel,"Über Gravel",JOptionPane.INFORMATION_MESSAGE);
     }
+    /**
+     * Get the actual Draing area as Graphcs-Object, e.g. for measurements
+     * @return
+     */
+    public Graphics getActualGraphics()
+    {
+    	if (shapePart!=null)
+    		return shapePart.getGraphics();
+    	else
+    		return graphpart.getGraphics();
+    }    
+    /**
+     * Refresh Gui and set it active
+     */
     public void refresh()
     {
     	frame.toFront();

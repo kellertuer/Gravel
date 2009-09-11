@@ -1,5 +1,6 @@
 package model;
 
+import view.Gui;
 import view.VCommonGraphic;
 
 import io.GeneralPreferences;
@@ -74,7 +75,7 @@ public class NURBSShapeValidator extends NURBSShape {
 	private final double TOL = 0.025d, MINRAD = 1d;
 	float zoom = GeneralPreferences.getInstance().getFloatValue("zoom");
 	int StepCount=0,maxRadius,baseIndex;
-	VCommonGraphic DebugGraphics;
+	VCommonGraphic DebugGraphics=null;
 	private Point2D CPOutside;
 	//Points we have to work on 
 	private Queue<Point2D> Points = new LinkedList<Point2D>();
@@ -201,8 +202,8 @@ public class NURBSShapeValidator extends NURBSShape {
 		initPointSets();
 		//MaxSize of any circle used, because a circle with this radius is much bigger than the whole graph
 		//We need something to measure font-size so...
-		Point MaxPoint = vG.getMaxPoint(DebugGraphics.getGraphics());
-		Point MinPoint = vG.getMinPoint(DebugGraphics.getGraphics());
+		Point MaxPoint = vG.getMaxPoint(Gui.getInstance().getActualGraphics());
+		Point MinPoint = vG.getMinPoint(Gui.getInstance().getActualGraphics());
 		maxRadius = Math.max(MaxPoint.x-MinPoint.x, MaxPoint.y-MinPoint.y);
 	}
 
@@ -236,11 +237,14 @@ public class NURBSShapeValidator extends NURBSShape {
 		}
 		if ((actualInfo.radius < maxRadius)&&(actualInfo.radius > MINRAD))
 			{	
-				Graphics2D g = ((Graphics2D)DebugGraphics.getGraphics());
+				if (DebugGraphics!=null)
+				{
+					Graphics2D g = ((Graphics2D)DebugGraphics.getGraphics());
 					g.setColor(Color.gray);
 					g.drawOval(Math.round((float)(actualP.getX()-actualInfo.radius)*zoom),
 					Math.round((float)(actualP.getY()-actualInfo.radius)*zoom),
 					Math.round((float)(2*actualInfo.radius)*zoom), Math.round((float)(2*actualInfo.radius)*zoom));
+				}
 				//Calculate Distance and direction from Point to its projection
 				boolean circlehandled = false; //Indicator whether the new circle is completely inside another
 				Iterator<Entry<Point2D,PointInfo>> RadiusIterator = pointInformation.entrySet().iterator();
@@ -284,7 +288,8 @@ public class NURBSShapeValidator extends NURBSShape {
 						{
 							Points.offer(Succ.get(j));
 						}
-						DebugGraphics.drawCP(DebugGraphics.getGraphics(), new Point(Math.round((float)Succ.get(j).getX()),Math.round((float)Succ.get(j).getY())),Color.ORANGE);
+						if (DebugGraphics!=null)
+							DebugGraphics.drawCP(DebugGraphics.getGraphics(), new Point(Math.round((float)Succ.get(j).getX()),Math.round((float)Succ.get(j).getY())),Color.ORANGE);
 						//Set split to true if we have a pre and split. that way each node may only split twice
 						pointInformation.get(Succ.get(j)).split = actualInfo.split | ((Succ.size()>=2)&&(actualInfo.previousPoint!=null));							
 					}
