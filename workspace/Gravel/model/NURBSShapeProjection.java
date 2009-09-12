@@ -5,8 +5,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Vector;
 
-import javax.vecmath.Point3d;
-
 import view.VCommonGraphic;
 
 /**
@@ -427,8 +425,8 @@ public class NURBSShapeProjection extends NURBSShape
 		int a = c.degree;
 		int b = c.degree+1;
 		Vector<NURBSShape> BezierSegments = new Vector<NURBSShape>();
-		Vector<Point3d> bezierCP = new Vector<Point3d>();
-		Vector<Point3d> nextbezierCP = new Vector<Point3d>();
+		Vector<Point2dHom> bezierCP = new Vector<Point2dHom>();
+		Vector<Point2dHom> nextbezierCP = new Vector<Point2dHom>();
 		nextbezierCP.setSize(c.degree+1);
 		for (int i=0; i<=c.degree; i++)
 			bezierCP.add(c.controlPointsHom.get(i));
@@ -452,8 +450,8 @@ public class NURBSShapeProjection extends NURBSShape
 					int s = multiplicity+j; //These many new Points
 					for (int k=c.degree; k>=s; k--) //
 					{
-						Point3d p1 = (Point3d) bezierCP.get(k).clone();
-						Point3d p2 = (Point3d) bezierCP.get(k-1).clone();
+						Point2dHom p1 = (Point2dHom) bezierCP.get(k).clone();
+						Point2dHom p2 = (Point2dHom) bezierCP.get(k-1).clone();
 						p1.scale(alpha.get(k-s)); p2.scale(1-alpha.get(k-s));						
 						p1.add(p2);
 						bezierCP.set(k,p1);
@@ -472,7 +470,7 @@ public class NURBSShapeProjection extends NURBSShape
 			if (b<m) //init next
 			{
 				bezierCP = nextbezierCP;
-				nextbezierCP = new Vector<Point3d>();
+				nextbezierCP = new Vector<Point2dHom>();
 				nextbezierCP.setSize(c.degree+1);
 				for (int k=(c.degree-multiplicity); k<=c.degree; k++)
 					bezierCP.set(k, c.controlPointsHom.get(b-c.degree+k));

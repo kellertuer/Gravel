@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.util.Vector;
 
-import javax.vecmath.Point3d;
-
 /**
  * This Class represents the Shape of an individual VHyperEdge in form of a NURBS
  * The nonuniform rational B-Spline may be
@@ -42,7 +40,7 @@ public class NURBSShape {
 	public Vector<Double> Knots;
 	public Vector<Point2D> controlPoints; //ControlPoints, TODO: Set protected after DEBUG
 	public Vector<Double> cpWeight;
-	protected Vector<Point3d> controlPointsHom; //b in homogeneous coordinates multiplied by weight
+	protected Vector<Point2dHom> controlPointsHom; //b in homogeneous coordinates multiplied by weight
 	protected int NURBSType; //May be clamped or unclamped	
 	//TODO: Set Protected after finishing debug
 	public int maxKnotIndex, //The Knots are numbered 0,1,...,maxKnotIndex
@@ -79,22 +77,22 @@ public class NURBSShape {
 	 * @param knots
 	 * @param pPw
 	 */
-	protected NURBSShape(Vector<Double> knots, Vector<Point3d> pPw)
+	protected NURBSShape(Vector<Double> knots, Vector<Point2dHom> pPw)
 	{
 		Knots = new Vector<Double>();
 		cpWeight = new Vector<Double>();
 		controlPoints = new Vector<Point2D>();
 		maxCPIndex=0; maxKnotIndex=0; degree=0;
-		controlPointsHom = new Vector<Point3d>();
+		controlPointsHom = new Vector<Point2dHom>();
 		controlPoints.setSize(pPw.size()); 
 		cpWeight.setSize(pPw.size());
 		for (int i=0; i<pPw.size(); i++)
 		{
-			double stw = pPw.get(i).z;
+			double stw = pPw.get(i).w;
 			if (stw==0)
 				controlPoints.set(i,new Point2D.Double(pPw.get(i).x,pPw.get(i).y));
 			else
-				controlPoints.set(i,new Point2D.Double(pPw.get(i).x/pPw.get(i).z,pPw.get(i).y/pPw.get(i).z));
+				controlPoints.set(i,new Point2D.Double(pPw.get(i).x/pPw.get(i).w,pPw.get(i).y/pPw.get(i).w));
 			cpWeight.set(i,stw);
 		}
 		setCurveTo(knots, controlPoints, cpWeight);
@@ -247,7 +245,7 @@ public class NURBSShape {
 		cpWeight = new Vector<Double>();
 		controlPoints = new Vector<Point2D>();
 		maxCPIndex=0; maxKnotIndex=0; degree=0;
-		controlPointsHom = new Vector<Point3d>();
+		controlPointsHom = new Vector<Point2dHom>();
 	}
 	/**
 	 * Initialization of the internal homogeneous Vector
@@ -255,14 +253,14 @@ public class NURBSShape {
 	 */
 	protected void refreshInternalValues()
 	{
-		controlPointsHom = new Vector<Point3d>();
+		controlPointsHom = new Vector<Point2dHom>();
 		Iterator<Point2D> ib =  controlPoints.iterator();
 		int i=0;
 		while (ib.hasNext()) //Modify to be 3D Coordinates (homogeneous 2D)
 		{
 			Point2D p = ib.next();
 			double weight = cpWeight.get(i);
-			Point3d newp = new Point3d(p.getX(),p.getY(),weight);
+			Point2dHom newp = new Point2dHom(p.getX(),p.getY(),weight);
 			newp.set(newp.x*weight, newp.y*weight, weight);
 			controlPointsHom.add(newp);
 			i++;
@@ -516,27 +514,27 @@ public class NURBSShape {
 	 */
 	public Point2D.Double CurveAt(double u)
 	{	
-		Point3d erg = deBoer3D(u); //Result in homogeneous Values on Our Points		
+		Point2dHom erg = deBoer3D(u); //Result in homogeneous Values on Our Points		
 		if (erg==null)
 		{
 			System.err.println("NURBSShape::CurveAt "+u+" not in "+Knots.get(degree)+","+Knots.get(maxKnotIndex-degree)+"");
 			return null;
 		}
-		if (erg.z==0) //
+		if (erg.w==0) //
 			return new Point2D.Double(erg.x,erg.y);
 		else
-			return new Point2D.Double(erg.x/erg.z,erg.y/erg.z);
+			return new Point2D.Double(erg.x/erg.w,erg.y/erg.w);
 		
 	}
 	public double WeightAt(double u)
 	{
-		Point3d erg = deBoer3D(u); //Result in homogeneous Values on Our Points
+		Point2dHom erg = deBoer3D(u); //Result in homogeneous Values on Our Points
 		if (erg==null)
 		{
 			System.err.println("NURBSShape::WeightAt3D: "+u+" not in "+Knots.get(degree)+","+Knots.get(maxKnotIndex-degree)+"");
 			return Double.NaN;
 		}
-			return erg.z;
+			return erg.w;
 	}
 	/**
 	 * get the Value of all derivates up to derivate-th Degree of the NURBSShape at Position u
@@ -562,7 +560,7 @@ public class NURBSShape {
 			CK.add(CurveAt(u));
 			return CK;
 		}
-		Vector<Point3d> AdersWders = getDerivatesHomAt(derivate, u); //x,y are the Aders, z is wders
+		Vector<Point2dHom> AdersWders = getDerivatesHomAt(derivate, u); //x,y are the Aders, z is wders
 		CK.setSize(derivate+1);
 		for (int k=0; k<=derivate; k++)
 		{ //Calculate kth Derivate
@@ -570,14 +568,14 @@ public class NURBSShape {
 			double vy = AdersWders.get(k).y;
 			for (int i=1; i<=k; i++)
 			{
-				double factor = binomial(k,i)*AdersWders.get(i).z;
+				double factor = binomial(k,i)*AdersWders.get(i).w;
 				vx -= factor*CK.get(k-i).getX();
 				vy -= factor*CK.get(k-i).getY();
 			}
-			if ((AdersWders.get(0).z!=0.0)) //wders[0]!=0
+			if ((AdersWders.get(0).w!=0.0)) //wders[0]!=0
 			{
-				vx /= AdersWders.get(0).z;
-				vy /= AdersWders.get(0).z;
+				vx /= AdersWders.get(0).w;
+				vy /= AdersWders.get(0).w;
 			}
 			CK.set(k,new Point2D.Double(vx,vy));
 		}
@@ -625,51 +623,51 @@ public class NURBSShape {
 	 * Based on Alg 3.3 with 
 	 * @param derivative
 	 */
-	private Vector<Vector<Point3d>> CurveDerivativeControlPointsHom(int d, int r1, int r2)
+	private Vector<Vector<Point2dHom>> CurveDerivativeControlPointsHom(int d, int r1, int r2)
 	{ //n==maxCPIndex, d<=degree, p==degree, U==Knots, P==ControlPointsHom
 		//
-		Vector<Vector<Point3d>> PK = new Vector<Vector<Point3d>>();
+		Vector<Vector<Point2dHom>> PK = new Vector<Vector<Point2dHom>>();
 		if (d>degree)
 			return PK;
 		PK.setSize(d+1);
 		int r = r2-r1;
-		PK.set(0,new Vector<Point3d>());PK.get(0).setSize(r+1);
+		PK.set(0,new Vector<Point2dHom>());PK.get(0).setSize(r+1);
 		for (int i=0; i<=r; i++)
-			PK.get(0).set(i, (Point3d) controlPointsHom.get(r1+i).clone());
+			PK.get(0).set(i, (Point2dHom) controlPointsHom.get(r1+i).clone());
 		for (int k=1; k<=d; k++) //through all derivatives
 		{
-			PK.set(k,new Vector<Point3d>()); PK.get(k).setSize(r-k+1);
+			PK.set(k,new Vector<Point2dHom>()); PK.get(k).setSize(r-k+1);
 			int tmp = degree-k+1;
 			for (int i=0; i<=r-k; i++)
 			{ //Code from p. 99
 				double denom = Knots.get(r1+i+degree+1)-Knots.get(r1+i+k);
 				double newx = tmp*(PK.get(k-1).get(i+1).x - PK.get(k-1).get(i).x)/denom;
 				double newy = tmp*(PK.get(k-1).get(i+1).y - PK.get(k-1).get(i).y)/denom;
-				double newz = tmp*(PK.get(k-1).get(i+1).z - PK.get(k-1).get(i).z)/denom;
-				PK.get(k).set(i, new Point3d(newx,newy,newz));
+				double newz = tmp*(PK.get(k-1).get(i+1).w - PK.get(k-1).get(i).w)/denom;
+				PK.get(k).set(i, new Point2dHom(newx,newy,newz));
 			}
 		}	
 		return PK;
 	}
-	public Vector<Point3d> getDerivatesHomAt(int d, double u)
+	public Vector<Point2dHom> getDerivatesHomAt(int d, double u)
 	{//n==maxCPIndex, p==degree, U==Knots, P==controlPointsHom
-		Vector<Point3d> CK = new Vector<Point3d>();
+		Vector<Point2dHom> CK = new Vector<Point2dHom>();
 		CK.setSize(d+1);
 		int du = Math.min(d,degree);
 		for (int k=degree+1; k<=degree; k++)
-			CK.set(k, new Point3d(0d,0d,0d));
+			CK.set(k, new Point2dHom(0d,0d,0d));
 		int span = findSpan(u);
 		Vector<Vector<Double>> N = AllBasisFunctions(u);
-		Vector<Vector<Point3d>> PK = CurveDerivativeControlPointsHom(du,span-degree,span);
+		Vector<Vector<Point2dHom>> PK = CurveDerivativeControlPointsHom(du,span-degree,span);
 		for (int k=0; k<=du; k++)
 		{
-			CK.set(k,new Point3d(0d,0d,0d));
+			CK.set(k,new Point2dHom(0d,0d,0d));
 			for (int j=0; j<=degree-k; j++)
 			{
 				double newx = CK.get(k).x + N.get(j).get(degree-k)*PK.get(k).get(j).x;
 				double newy = CK.get(k).y + N.get(j).get(degree-k)*PK.get(k).get(j).y;
-				double newz = CK.get(k).z + N.get(j).get(degree-k)*PK.get(k).get(j).z;
-				CK.set(k, new Point3d(newx,newy,newz));
+				double newz = CK.get(k).w + N.get(j).get(degree-k)*PK.get(k).get(j).w;
+				CK.set(k, new Point2dHom(newx,newy,newz));
 			}
 		}
 		return CK;
@@ -695,12 +693,12 @@ public class NURBSShape {
 	 * @param u Point u \in [a,b], whose point we want
 	 * @return a 3d-Value of the Point in the Curve or null if u is out of range
 	 */
-	private Point3d deBoer3D(double u)
+	private Point2dHom deBoer3D(double u)
 	{
 		int i = findSpan(u);
 		if (i==-1)
 			return null;
-		Vector<Point3d> fixedj = new Vector<Point3d>();
+		Vector<Point2dHom> fixedj = new Vector<Point2dHom>();
 		fixedj.setSize(degree+1); //for values 0,...,d, because only d+1 Basis Functions are nonzero
 		//Init with the Points
 		for (int l=i; l>=i-degree; l--) //Beginning with i,0 up to i-d,0
@@ -712,13 +710,13 @@ public class NURBSShape {
 		{
 			for (int l=i; l>=i-degree+k; l--) //Stop each iteration one earlier
 			{
-				Point3d bimjm = fixedj.get(l-i+degree-1);//b_i-1^j-1
+				Point2dHom bimjm = fixedj.get(l-i+degree-1);//b_i-1^j-1
 				double alpha = alpha(u,l,k);
-				Point3d bijm = fixedj.get(l-i+degree);
+				Point2dHom bijm = fixedj.get(l-i+degree);
 				double x = (1-alpha)*bimjm.x + alpha*bijm.x;
 				double y = (1-alpha)*bimjm.y + alpha*bijm.y;
-				double z = (1-alpha)*bimjm.z + alpha*bijm.z;
-				fixedj.set(l-i+degree,new Point3d(x,y,z));
+				double z = (1-alpha)*bimjm.w + alpha*bijm.w;
+				fixedj.set(l-i+degree,new Point2dHom(x,y,z));
 				//System.err.println("Computing ("+l+","+k+") :"+fixedj.get(l-i+j));
 				//saving in "+(l-i+j)+" based on pervious values in "+(l-i+j-1)+" and "+(l-i+j)+".");
 			}
@@ -922,20 +920,20 @@ public class NURBSShape {
 		//Removal with a simplificated version of ALGORITHM 5.8 from NURBSBook
 		double knotu = Knots.get(knotIndex);
 		int lastAffected = knotIndex-mult, firstAffected = knotIndex-degree, offSet = firstAffected-1; //OffSet from temporary Vector to original
-		Vector<Point3d> temp = new Vector<Point3d>();
+		Vector<Point2dHom> temp = new Vector<Point2dHom>();
 		temp.setSize(lastAffected-offSet+2);
-		temp.set(0,(Point3d)controlPointsHom.get(offSet).clone()); temp.set(lastAffected-offSet+1, (Point3d)controlPointsHom.get(lastAffected+1).clone());
+		temp.set(0,(Point2dHom)controlPointsHom.get(offSet).clone()); temp.set(lastAffected-offSet+1, (Point2dHom)controlPointsHom.get(lastAffected+1).clone());
 		int i=firstAffected, j=lastAffected, ii=1, jj=lastAffected-offSet; //i,j are the values of the actual Controlpoints, ii,jj are those of the temporary Vector
 		while ((j-i) > 0) //Just one removal, t=0 from the algorithm
 		{
 			double alphi = (knotu-Knots.get(i).doubleValue()) / (Knots.get(i+degree+1)-Knots.get(i));
 			double alphj = (knotu-Knots.get(j).doubleValue()) / (Knots.get(j+degree+1)-Knots.get(j));
-			Point3d newii = (Point3d) controlPointsHom.get(i).clone();
-			Point3d newiisummand = (Point3d)temp.get(ii-1).clone();
+			Point2dHom newii = (Point2dHom) controlPointsHom.get(i).clone();
+			Point2dHom newiisummand = (Point2dHom)temp.get(ii-1).clone();
 			newiisummand.scale(-1d*(1d-alphi));	newii.add(newiisummand);newii.scale(alphi);
 			temp.set(ii,newii);
-			Point3d newjj = (Point3d) controlPointsHom.get(j).clone();
-			Point3d newjjsummand = (Point3d)temp.get(jj+1).clone();
+			Point2dHom newjj = (Point2dHom) controlPointsHom.get(j).clone();
+			Point2dHom newjjsummand = (Point2dHom)temp.get(jj+1).clone();
 			newjjsummand.scale(-1d*(alphj)); newjj.add(newjjsummand);newjj.scale(1d-alphj);
 			temp.set(jj,newjj);
 			i++; ii++; j--; jj--;
@@ -944,9 +942,9 @@ public class NURBSShape {
 		{
 			if (temp.get(k)!=null)
 			{
-				if (temp.get(k).z<0)
+				if (temp.get(k).w<0)
 				{
-					System.err.println("Wah!");
+					System.err.println("NURBSShape::removeKnoteNear() ... Can't remove Knot!");
 					return false;
 				}
 			}
@@ -972,15 +970,15 @@ public class NURBSShape {
 		//Recompute Points & weights
 		controlPoints = new Vector<Point2D>(); 
 		cpWeight = new Vector<Double>();
-		Iterator<Point3d> Pwi = controlPointsHom.iterator();
+		Iterator<Point2dHom> Pwi = controlPointsHom.iterator();
 		while (Pwi.hasNext())
 		{
-			Point3d p1 = Pwi.next();
-			if (p1.z==0)
+			Point2dHom p1 = Pwi.next();
+			if (p1.w==0)
 				controlPoints.add(new Point2D.Double(p1.x,p1.y));
 			else
-				controlPoints.add(new Point2D.Double(p1.x/p1.z, p1.y/p1.z));
-			cpWeight.add(p1.z);
+				controlPoints.add(new Point2D.Double(p1.x/p1.w, p1.y/p1.w));
+			cpWeight.add(p1.w);
 		}
 		maxCPIndex = controlPoints.size()-1;
 		maxKnotIndex = Knots.size()-1;
@@ -1014,15 +1012,15 @@ public class NURBSShape {
 		int a = findSpan(X.firstElement()), b=findSpan(X.lastElement())+1;
 		if ((a==-1)||(b==0))
 			return; //Out of range
-		Vector<Point3d> newPw;
-		newPw = new Vector<Point3d>();
+		Vector<Point2dHom> newPw;
+		newPw = new Vector<Point2dHom>();
 		newPw.setSize(controlPointsHom.size()+X.size());
 		Vector<Double> newt = new Vector<Double>();
 		newt.setSize(Knots.size()+X.size());
 		for (int j=0; j<=a-degree; j++)//Copy the first not changed values of the CPs
-			newPw.set(j, (Point3d) controlPointsHom.get(j).clone());
+			newPw.set(j, (Point2dHom) controlPointsHom.get(j).clone());
 		for (int j=b-1; j<=maxCPIndex; j++)//Copy the last not changed values of the CPs
-			newPw.set(j+X.size(), (Point3d) controlPointsHom.get(j).clone());
+			newPw.set(j+X.size(), (Point2dHom) controlPointsHom.get(j).clone());
 		for (int j=0; j<=a; j++)//Copy the first not changed values of t
 			newt.set(j, Knots.get(j).doubleValue());
 		for (int j=b+degree; j<=maxKnotIndex; j++)//Copy the last not changed values of t
@@ -1034,23 +1032,23 @@ public class NURBSShape {
 		{ 
 			while ((X.get(j) <= Knots.get(i)) && (i > a)) //These Values are not affected by Insertion of actual Not, copy them
 			{
-				newPw.set(k-degree-1, (Point3d) controlPointsHom.get(i-degree-1).clone());
+				newPw.set(k-degree-1, (Point2dHom) controlPointsHom.get(i-degree-1).clone());
 				newt.set(k, Knots.get(i).doubleValue());
 				k--;i--;
 			}
-			newPw.set(k-degree-1, (Point3d) newPw.get(k-degree).clone());
+			newPw.set(k-degree-1, (Point2dHom) newPw.get(k-degree).clone());
 			for (int l=1; l<=degree; l++)
 			{
 				int actualindex = k-degree+l;
 				double alpha = newt.get(k+l).doubleValue()-X.get(j).doubleValue();
 				if (Math.abs(alpha) == 0.0d)
-					newPw.set(actualindex-1, (Point3d) newPw.get(actualindex).clone());
+					newPw.set(actualindex-1, (Point2dHom) newPw.get(actualindex).clone());
 				else
 				{
 					alpha = alpha/(newt.get(k+l).doubleValue()-Knots.get(i-degree+l).doubleValue());
-					Point3d p1 = (Point3d) newPw.get(actualindex-1).clone();
+					Point2dHom p1 = (Point2dHom) newPw.get(actualindex-1).clone();
 					p1.scale(alpha);
-					Point3d p2 = (Point3d) newPw.get(actualindex).clone();
+					Point2dHom p2 = (Point2dHom) newPw.get(actualindex).clone();
 					p2.scale(1.0d - alpha);
 					p1.add(p2);
 					newPw.set(actualindex-1,p1);
@@ -1062,15 +1060,15 @@ public class NURBSShape {
 		//Recompute Points & weights
 		controlPoints = new Vector<Point2D>(); 
 		cpWeight = new Vector<Double>();
-		Iterator<Point3d> Pwi = newPw.iterator();
+		Iterator<Point2dHom> Pwi = newPw.iterator();
 		while (Pwi.hasNext())
 		{
-			Point3d p1 = Pwi.next();
-			if (p1.z==0)
+			Point2dHom p1 = Pwi.next();
+			if (p1.w==0)
 				controlPoints.add(new Point2D.Double(p1.x,p1.y));
 			else
-				controlPoints.add(new Point2D.Double(p1.x/p1.z, p1.y/p1.z));
-			cpWeight.add(p1.z);
+				controlPoints.add(new Point2D.Double(p1.x/p1.w, p1.y/p1.w));
+			cpWeight.add(p1.w);
 		}
 		Knots = newt;
 		maxCPIndex = controlPoints.size()-1;

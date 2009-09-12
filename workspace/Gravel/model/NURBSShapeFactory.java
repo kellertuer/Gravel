@@ -5,8 +5,6 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
 
-import javax.vecmath.Point3d;
-
 import model.Messages.NURBSCreationMessage;
 
 /**
@@ -381,7 +379,7 @@ public class NURBSShapeFactory {
 		// Therefore the order is reversed (s2 - s1) Copy unaffected parts
 		// And first is shifted by the offset of second
 		Vector<Double> newKnots = new Vector<Double>();
-		Vector<Point3d> newP = new Vector<Point3d>();
+		Vector<Point2dHom> newP = new Vector<Point2dHom>();
 		s1.refreshInternalValues(); s2.refreshInternalValues();
 		double s2offset = s2.Knots.get(s2.maxKnotIndex-s2.degree)-s2.Knots.get(s2.degree);
 		double s1offset = s1.Knots.get(s1.maxKnotIndex-s1.degree)-s1.Knots.get(s1.degree);
@@ -389,18 +387,18 @@ public class NURBSShapeFactory {
 		for (int i=0; i<=s2.maxKnotIndex; i++)
 			newKnots.add(s2.Knots.get(i).doubleValue());
 		for (int i=0; i<=s2.maxCPIndex; i++)
-			newP.add((Point3d)s2.controlPointsHom.get(i).clone());
+			newP.add((Point2dHom)s2.controlPointsHom.get(i).clone());
 		int s1BeginKnots = newKnots.size(), s1BeginCP = newP.size();
 		for (int i=s1.degree+1; i<=s1.maxKnotIndex; i++) //0...s1.degree are equal to the end of s2
 			newKnots.add(s1.Knots.get(i).doubleValue()+shift);
 		for (int i=0; i<=s1.maxCPIndex; i++)
-			newP.add((Point3d)s1.controlPointsHom.get(i).clone());
+			newP.add((Point2dHom)s1.controlPointsHom.get(i).clone());
 		
 		NURBSShape temp = new NURBSShape(newKnots,newP);
 		temp = unclamp(temp); //So now they are unclamped, we can copy back to get s1 - s2
 		temp.updateCircular(OldOverCirc); //Update Front if over cirv else back
 		newKnots = new Vector<Double>();
-		newP = new Vector<Point3d>();
+		newP = new Vector<Point2dHom>();
 		for (int i=0; i<=s1.degree; i++)
 			newKnots.add(s1.Knots.get(i)); //Old Clamped Part
 		for (int i=s1BeginKnots; i<temp.maxKnotIndex-s1.degree; i++) //copy s1 back to beginning
@@ -409,9 +407,9 @@ public class NURBSShapeFactory {
 			newKnots.add(temp.Knots.get(i).doubleValue());
 		
 		for (int i=s1BeginCP; i<temp.maxCPIndex; i++)
-			newP.add((Point3d)temp.controlPointsHom.get(i).clone());
+			newP.add((Point2dHom)temp.controlPointsHom.get(i).clone());
 		for (int i=s2.degree-1; i<s1BeginCP; i++)
-			newP.add((Point3d)temp.controlPointsHom.get(i).clone());
+			newP.add((Point2dHom)temp.controlPointsHom.get(i).clone());
 		temp = new NURBSShape(newKnots,newP);
 		temp = unclamp(temp); //Unclamp the part that stays at endvalues of the combinational curve
 		temp.updateCircular(!OldOverCirc); //Update Front if normal, back if over circStart/End
@@ -609,7 +607,7 @@ public class NURBSShapeFactory {
 		if ((c.getType()&NURBSShape.UNCLAMPED)==NURBSShape.UNCLAMPED)
 			return c; //already unclamped
 		//Algorithm 12.1
-		Vector<Point3d> Pw = c.controlPointsHom;
+		Vector<Point2dHom> Pw = c.controlPointsHom;
 		Vector<Double> U = c.Knots;
 		int p = c.degree, n = c.maxCPIndex;
 		for (int i=0; i<=p-2; i++)
@@ -621,8 +619,8 @@ public class NURBSShapeFactory {
 				double alpha = (U.get(p)-U.get(k))/(U.get(p+j+1)-U.get(k));
 				double x = (Pw.get(j).x - alpha*Pw.get(j+1).x)/(1.0-alpha);
 				double y = (Pw.get(j).y - alpha*Pw.get(j+1).y)/(1.0-alpha);
-				double w = (Pw.get(j).z - alpha*Pw.get(j+1).z)/(1.0-alpha);
-				Pw.set(j, new Point3d(x,y,w));
+				double w = (Pw.get(j).w - alpha*Pw.get(j+1).w)/(1.0-alpha);
+				Pw.set(j, new Point2dHom(x,y,w));
 				k--;
 			}
 		}
@@ -635,8 +633,8 @@ public class NURBSShapeFactory {
 				double alpha = (U.get(n+1)-U.get(n-j))/(U.get(n-j+i+2)-U.get(n-j));
 				double x = (Pw.get(n-j).x - (1d-alpha)*Pw.get(n-j-1).x)/alpha;
 				double y = (Pw.get(n-j).y - (1d-alpha)*Pw.get(n-j-1).y)/alpha;
-				double w = (Pw.get(n-j).z - (1d-alpha)*Pw.get(n-j-1).z)/alpha;
-				Pw.set(n-j, new Point3d(x,y,w));
+				double w = (Pw.get(n-j).w - (1d-alpha)*Pw.get(n-j-1).w)/alpha;
+				Pw.set(n-j, new Point2dHom(x,y,w));
 			}
 		}
 		U.set(n+p+1, U.get(n+p) + (U.get(2*p)-U.get(2*p-1)));
