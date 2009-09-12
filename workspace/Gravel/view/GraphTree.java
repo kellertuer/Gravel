@@ -197,7 +197,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		this.revalidate();
 		this.validate();
 	}
-  
+		
 	//
 	// TreeListener-Actions
 	//
@@ -212,12 +212,23 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	
 	public void mousePressed(MouseEvent e)
 	{
-	    if (selectionHandling(e) && e.isPopupTrigger())
-	    	popuphandling(e);
+		//PopupHandlign or Selection on a Mac
+		if (System.getProperty("os.name").toLowerCase().indexOf("mac")!=-1)
+		{
+			if (selectionHandling(e) && e.isPopupTrigger())
+		    	popuphandling(e);
+		}
 	}
 	
 	public void mouseReleased(MouseEvent e) 
-	{}
+	{
+		//PopupHandlign or Selection on anything else
+		if (System.getProperty("os.name").toLowerCase().indexOf("mac")==-1)
+		{
+			if (selectionHandling(e) && e.isPopupTrigger())
+		    	popuphandling(e);
+		}
+	}
 	/**
 	 * Check whether we have to select anything and return true if clicked on an item else false
 	 * @param e
