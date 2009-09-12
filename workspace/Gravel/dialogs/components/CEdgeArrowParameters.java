@@ -165,8 +165,8 @@ public class CEdgeArrowParameters extends Observable implements CaretListener, C
 			GeneralPreferences gp = GeneralPreferences.getInstance();
 			values.set(ARROW_SIZE, gp.getIntValue("edge.arrow_size"));
 			values.set(ARROW_ANGLE, gp.getIntValue("edge.arrow_alpha"));
-			values.set(ARROW_PART, Math.round(gp.getFloatValue("edge.arrow_part")*100f));
-			values.set(ARROW_POS, Math.round(gp.getIntValue("edge.arrow_pos")*100f));
+			values.set(ARROW_PART, Math.round(gp.getFloatValue("edge.arrow_part")*100.0f));
+			values.set(ARROW_POS, Math.round(gp.getFloatValue("edge.arrow_pos")*100.0f));
 		}
 		updateUI();
 	}

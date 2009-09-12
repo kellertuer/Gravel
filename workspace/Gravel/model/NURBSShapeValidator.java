@@ -5,9 +5,7 @@ import view.VCommonGraphic;
 
 import io.GeneralPreferences;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -97,7 +95,7 @@ public class NURBSShapeValidator extends NURBSShape {
 		vG = PvG;
 		HEIndex = HyperEdgeIndex;
 		VHyperEdge e = vG.modifyHyperEdges.get(HyperEdgeIndex);
-		DebugGraphics = g;
+	//	DebugGraphics = g; disabled debug
 		if (e==null)
 			return;
 		if (Curve!=null)

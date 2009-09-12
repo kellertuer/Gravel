@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>de/toc.xml</string>
+	<string>de/introduction.html</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -118,7 +118,9 @@
 			<key>filename</key>
 			<string>de/introduction.html</string>
 			<key>lastUsed</key>
-			<date>2009-09-03T15:09:57Z</date>
+			<date>2009-09-12T16:12:36Z</date>
+			<key>selected</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -208,9 +210,7 @@
 			<key>filename</key>
 			<string>de/toc.xml</string>
 			<key>lastUsed</key>
-			<date>2009-09-03T15:40:17Z</date>
-			<key>selected</key>
-			<true/>
+			<date>2009-09-12T16:12:36Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -267,6 +267,20 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
+		<key>de/introduction.html</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>48</integer>
+				<key>line</key>
+				<integer>19</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>9</integer>
+		</dict>
 		<key>de/toc.xml</key>
 		<dict>
 			<key>caret</key>
@@ -286,10 +300,11 @@
 	<array>
 		<string>de/index.xml</string>
 		<string>de/toc.xml</string>
+		<string>de/introduction.html</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{21, 44}, {1018, 655}}</string>
+	<string>{{21, 48}, {1018, 655}}</string>
 </dict>
 </plist>

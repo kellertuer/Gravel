@@ -921,7 +921,7 @@ public class GraphMLReader {
 			VEdgeArrow a = parseEdgeArrow(n);
 			gp.setIntValue(pre + "_alpha", Math.round(a.getAngle()));
 			gp.setFloatValue(pre + "_part", a.getPart());
-			gp.setFloatValue(pre + "_alpha", a.getPos());
+			gp.setFloatValue(pre + "_pos", a.getPos());
 			gp.setIntValue(pre + "_size", Math.round(a.getSize()));
 		} else
 			System.err.print("Still TODO Type:" + keyType);

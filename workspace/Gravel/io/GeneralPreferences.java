@@ -423,7 +423,8 @@ public class GeneralPreferences extends Observable
 		IntValues = new TreeMap<String, Integer>();
 		BoolValues = new TreeMap<String, Boolean>();
 		StringValues = new TreeMap<String, String>();
-
+		FloatValues = new TreeMap<String, Float>();
+		
 		IntValues.put("edge.width",1);
 		IntValues.put("edge.value",1);		
 		IntValues.put("edge.arrow_size",10);          // Size of the arrow segment
