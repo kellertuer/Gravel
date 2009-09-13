@@ -296,6 +296,7 @@ public class NURBSShapeProjection extends NURBSShape
 			double diw = 0.0d;
 			//Now for each i there exist Degree+1 - |i-n| cases (Symmetric to n, because 0,...,2n is always odd)
 			int numberOfCases = Degree+1 - Math.abs(i-Degree);
+			long wholenum = binomial(2*Degree,Degree);
 			for (int cases=0; cases < numberOfCases; cases++)
 			{
 				//This one case has combinatorial multiplicity:
@@ -318,9 +319,9 @@ public class NURBSShapeProjection extends NURBSShape
 						foronepw += c.cpWeight.get(j1).doubleValue()*alphaP[j1]*c.cpWeight.get(j2).doubleValue()*alphaQ[j2];
 					}
 				}
-				dix += foronepx*mult;
-				diy += foronepy*mult;
-				diw += foronepw*mult;
+				dix += foronepx*mult/wholenum;
+				diy += foronepy*mult/wholenum;
+				diw += foronepw*mult/wholenum;
 				//Change the t^P and t^Q, so that t^P its first LV set to FV and t^Q its last FV set to LV
 				int changeindex = 0;
 				while ((changeindex<tP.size()-1)&&(tP.get(changeindex).doubleValue()==FirstValue))
@@ -332,9 +333,11 @@ public class NURBSShapeProjection extends NURBSShape
 					changeindex++;
 				tQ.set(changeindex, FirstValue);
 			} //End Cases
-			dix /= binomial(2*Degree,Degree);
-			diy /= binomial(2*Degree,Degree);
-			diw /= binomial(2*Degree,Degree);
+			//Moved inside the summation for smaller results inside the loop
+//			dix /= binomial(2*Degree,Degree);
+//			diy /= binomial(2*Degree,Degree);
+//			diw /= binomial(2*Degree,Degree);
+			System.err.println("Adding Point "+(dix+diy)+" w:"+diw);
 			qcControlPoints.add(dix + diy);
 			qcWeights.add(diw);
 		}	//End i
