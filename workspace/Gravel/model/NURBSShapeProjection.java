@@ -337,7 +337,6 @@ public class NURBSShapeProjection extends NURBSShape
 //			dix /= binomial(2*Degree,Degree);
 //			diy /= binomial(2*Degree,Degree);
 //			diw /= binomial(2*Degree,Degree);
-			System.err.println("Adding Point "+(dix+diy)+" w:"+diw);
 			qcControlPoints.add(dix + diy);
 			qcWeights.add(diw);
 		}	//End i
