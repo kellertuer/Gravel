@@ -89,13 +89,15 @@ public class NURBSShapeValidator extends NURBSShape {
 	private VHyperGraph vG;
 	private int HEIndex;
 	
+	boolean specialcase = false;
+	
 	public NURBSShapeValidator(VHyperGraph PvG, int HyperEdgeIndex, NURBSShape Curve, VCommonGraphic g)
 	{
 		ResultValidation=false;
 		vG = PvG;
 		HEIndex = HyperEdgeIndex;
 		VHyperEdge e = vG.modifyHyperEdges.get(HyperEdgeIndex);
-	//	DebugGraphics = g; disabled debug
+//		DebugGraphics = g; //disabled debug
 		if (e==null)
 			return;
 		if (Curve!=null)
@@ -124,6 +126,8 @@ public class NURBSShapeValidator extends NURBSShape {
 					ResultValidation = (p.distance(projP.getResultPoint()) <= (double)actual.getSize());
 					if (!ResultValidation)
 						InitRunValidator(); //perhaps its a normal shape
+					else
+						specialcase=true;
 				}
 			}
 		}
@@ -176,6 +180,7 @@ public class NURBSShapeValidator extends NURBSShape {
 						invalidNodeIndices.add(index2);											
 				}
 				ResultValidation = (invalidNodeIndices.isEmpty());
+				specialcase=true;
 			}
 			else //Closed must be normal check
 				InitRunValidator();
@@ -318,6 +323,8 @@ public class NURBSShapeValidator extends NURBSShape {
 	
 	private void prepareResult()
 	{
+		if (specialcase) //One of the special cases - don not check rest
+			return; //Don't prepare anything  further for the two special cases
 		if (ResultValidation) //Nodes are valid due to inside or outside
 		{	checkDistances();
 			//Check whether we got after all points and CheckDistance to more than 2 sets without wrong nodes
