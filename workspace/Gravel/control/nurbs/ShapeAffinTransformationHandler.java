@@ -84,7 +84,8 @@ public class ShapeAffinTransformationHandler implements ShapeModificationMouseHa
 	 */
 	public void resetShape()
 	{
-		temporaryShape=HyperEdgeRef.getShape().clone(); //Reset to actual Edge Shape;
+		HyperEdgeRef = vhg.modifyHyperEdges.get(HyperEdgeRef.getIndex());
+		temporaryShape = HyperEdgeRef.getShape().clone(); //Clone with eventual Decorations (if that decoration clones)
 	}
 
 	public NURBSShape getShape()

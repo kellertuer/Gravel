@@ -60,6 +60,7 @@ public class FreeModificationHandler implements ShapeModificationMouseHandler {
 	}
 	public void resetShape()
 	{
+		HyperEdgeRef = vhg.modifyHyperEdges.get(HyperEdgeRef.getIndex());
 		temporaryShape = HyperEdgeRef.getShape().clone(); //Clone with eventual Decorations (if that decoration clones)
 	}
 
