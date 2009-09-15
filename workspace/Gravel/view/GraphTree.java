@@ -213,7 +213,7 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 	public void mousePressed(MouseEvent e)
 	{
 		//PopupHandlign or Selection on a Mac
-		if (System.getProperty("os.name").toLowerCase().indexOf("mac")!=-1)
+		if ( (System.getProperty("os.name").toLowerCase().indexOf("mac")!=-1) ||  (System.getProperty("os.name").toLowerCase().indexOf("linux")!=-1) )
 		{
 			if (selectionHandling(e) && e.isPopupTrigger())
 		    	popuphandling(e);
