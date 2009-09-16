@@ -145,10 +145,14 @@ public class CommonEdgeDragListener
 
 		VEdge edgeInRange=null; VHyperEdge hyperedgeInRange=null;
 		if (vg!=null)
-			edgeInRange = vg.getEdgeinRangeOf(pointInGraph,2.0*((float)vgc.getZoom()/100));
+		{
+			if (vg.modifyNodes.getFirstinRangeOf(pointInGraph)==null)
+				edgeInRange = vg.getEdgeinRangeOf(pointInGraph,2.0*((float)vgc.getZoom()/100));
+		}
 		else if (vhg!=null)
 		{
-			hyperedgeInRange = vhg.getEdgeinRangeOf(pointInGraph,2.0*((float)vgc.getZoom()/100));
+			if (vhg.modifyNodes.getFirstinRangeOf(pointInGraph)==null)
+				hyperedgeInRange = vhg.getEdgeinRangeOf(pointInGraph,2.0*((float)vgc.getZoom()/100));
 			if ((hyperedgeInRange!=null)&&(!hyperedgeInRange.getShape().isEmpty()))
 			{
 				float pos = hyperedgeInRange.getTextProperties().getPosition();
