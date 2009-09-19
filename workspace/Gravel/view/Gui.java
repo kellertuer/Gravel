@@ -11,6 +11,8 @@ import java.util.TreeMap;
 
 import javax.swing.*;
 
+import dialogs.JFileDialogs;
+
 
 
 import model.MHyperEdge;
@@ -47,25 +49,38 @@ public class Gui implements WindowListener
 	private JScrollPane mainScroll, treeScroll, shapeScroll;
 	private JSplitPane mainSplit;
 	/**
-	 * gibt die GUI zurück, falls diese existiert.
-	 * <br>Existiert sie nicht, wird eine GUI erstellt und zurückgegeben
-	 * 
-	 * @return die Referenz auf die GUI
+	 * Returns the GUI, if it exists, if it does not exists, an instance is creataed
+	 * @return the reference to the GUI
 	 */
 	public synchronized static Gui getInstance()
 	{		
 		if (instance == null)
 		{
-			instance = new Gui();
+			instance = new Gui(null);
 		}
 		return instance;	
 	}
+	/**
+	 * Returns the GUI if it exists and creates one, if it doesn't
+	 * this method also starts the gui with a file if it exists
+	 */
+	public synchronized static Gui getInstance(File f)
+	{		
+		if (instance == null)
+		{
+			instance = new Gui(f);
+		}
+		else
+			instance.setFile(f);
+		return instance;	
+	}
+
 	/**
 	 * Konstruktor der GUI, erstellt das Fenster, initialisiert Komponenten
 	 * <br>Aufgrund des Singelton-Musters ist der Konstruktor private
 	 *
 	 */
-	private Gui() 
+	private Gui(File f) 
 	{
 		//Create and set up the window.
         frame = new JFrame(WindowName);
@@ -78,40 +93,14 @@ public class Gui implements WindowListener
 			gp.resettoDefault();
 			gp.writetoXML();
 		}
-		if (gp.getBoolValue("graph.loadfileonstart")&&(!gp.getStringValue("graph.lastfile").equals("$NONE")))
-		{
-			GraphMLReader R = new GraphMLReader(new File(gp.getStringValue("graph.lastfile")));
-			String error="";
-			if (R.ErrorOccured()) //An error occured and because we only save in new format, don't try gravelML
-			{
-				JOptionPane.showMessageDialog(frame, "<html><p>Der Graph konnte nicht geladen werden<br>Fehler :<br>"+error+"</p></html>","Initialisierungsfehler",JOptionPane.ERROR_MESSAGE);				
-				MainGraph = new VGraph(gp.getBoolValue("graph.directed"),gp.getBoolValue("graph.allowloops"),gp.getBoolValue("graph.allowmultiple"));
-			}
-			else //No Error in new FileFormat
-			{
-				if (R.getVGraph()!=null)
-				{
-					MainGraph=R.getVGraph(); //weiter so
-					gp.setStringValue("graph.fileformat","visual");
-					frame.setTitle(Gui.WindowName+" - "+(new File(gp.getStringValue("graph.lastfile")).getName())+"");
-				}
-				else
-				{
-					//TODO: Wizard 
-					JOptionPane.showMessageDialog(frame, "<html><p>Der letzte gespeicherte Graph ist ein mathematischer Graph. Diese können zwar geladen, danach jedoch nicht weiter verarbeitet werden.<br>Gravel startet mit einem neuen Graphen.</p></html>","Hinweis",JOptionPane.INFORMATION_MESSAGE);				
-					MainGraph = new VGraph(gp.getBoolValue("graph.directed"),gp.getBoolValue("graph.allowloops"),gp.getBoolValue("graph.allowmultiple"));
-				}
-			}
-		}
-		else
-		{
-			//don't load a Graph on start
-			if (gp.getBoolValue("graph.new_with_graph")) //Start with new graph
-				MainGraph = new VGraph(gp.getBoolValue("graph.directed"),gp.getBoolValue("graph.allowloops"),gp.getBoolValue("graph.allowmultiple"));
-			else //Start with new Hypergraph
-				MainGraph = new VHyperGraph();
-		}
-        frame.addWindowListener(this);        
+		//Init all to an empty stuff
+		
+		if (gp.getBoolValue("graph.new_with_graph")) //Start with new graph
+			MainGraph = new VGraph(gp.getBoolValue("graph.directed"),gp.getBoolValue("graph.allowloops"),gp.getBoolValue("graph.allowmultiple"));
+		else //Start with new Hypergraph
+			MainGraph = new VHyperGraph();
+		
+		frame.addWindowListener(this);        
         BorderLayout test = new BorderLayout();
         frame.setLayout(test);
         buildmaingrid(new Dimension(gp.getIntValue("window.x"),gp.getIntValue("window.y")),new Dimension(gp.getIntValue("vgraphic.x"),gp.getIntValue("vgraphic.y")));
@@ -135,7 +124,24 @@ public class Gui implements WindowListener
         }
         frame.setMinimumSize(new Dimension(300,200));
         frame.getContentPane().setMinimumSize(new Dimension(300,200));
-   	}
+
+        //Load
+		if (f!=null)
+			setFile(f);
+		else if (gp.getBoolValue("graph.loadfileonstart")&&(!gp.getStringValue("graph.lastfile").equals("$NONE")))
+			setFile(new File(gp.getStringValue("graph.lastfile")));
+	}
+	/**
+	 * Explicitly open the File f
+	 * @param f
+	 */
+	public void setFile(File f)
+	{
+		if (!f.exists())
+			JOptionPane.showMessageDialog(frame, "<html><p>Die angegebene Datei<br><br><i>"+f.getAbsolutePath()+"</i><br><br>existiert nicht.</p></html>","Initialisierungsfehler",JOptionPane.ERROR_MESSAGE);
+		JFileDialogs fD = new JFileDialogs(graphpart);
+		fD.Open(f);		
+	}
 	/**
 	 * 	Set the GUI visible
 	 */

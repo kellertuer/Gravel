@@ -116,7 +116,8 @@ public class CommonGraphHistoryManager implements Observer
 			}
 			catch (GraphActionException e)
 			{
-				act=null; System.err.println("DEBUG: Node (#"+m.getElementID()+") Action ("+action+") Failed:"+e.getMessage());
+				act=null;
+				main.DEBUG.println(main.DEBUG.MIDDLE,"Handling single action for Node (#"+m.getElementID()+") failed with action ("+action+"); Message:"+e.getMessage());
 			}
 		} //End Handling Node
 		else if (m.getModifiedElementTypes()==GraphConstraints.EDGE) //Change on Unique Edge
@@ -129,7 +130,8 @@ public class CommonGraphHistoryManager implements Observer
 			}
 			catch (GraphActionException e2)
 			{
-				act=null; System.err.println("DEBUG: ¢added.GraphAction Creation Failed:"+e2.getMessage());
+				act=null; 
+				main.DEBUG.println(main.DEBUG.MIDDLE, "Handling single action for edge (#"+m.getElementID()+")failed:"+e2.getMessage());
 			}
 		}
 		else if (m.getModifiedElementTypes()==GraphConstraints.HYPEREDGE) //Change on Unique HyperEdge
@@ -142,7 +144,8 @@ public class CommonGraphHistoryManager implements Observer
 			}
 			catch (GraphActionException e2)
 			{
-				act=null; System.err.println("DEBUG: ¢added.GraphAction Creation Failed:"+e2.getMessage());
+				act=null; 
+				main.DEBUG.println(main.DEBUG.MIDDLE,"Handling single action for hyperedge (#"+m.getElementID()+" failed:"+e2.getMessage());
 			}
 		}
 		else if (m.getModifiedElementTypes()==GraphConstraints.SUBGRAPH)
@@ -157,7 +160,8 @@ public class CommonGraphHistoryManager implements Observer
 			}
 			catch (GraphActionException e2)
 			{
-				act=null; System.err.println("DEBUG: Edge.added.GraphAction Creation Failed:"+e2.getMessage());
+				act=null; 
+				main.DEBUG.println(main.DEBUG.MIDDLE, "Handling single action for subgraph (#"+m.getElementID()+") failed:"+e2.getMessage());
 			}	
 		}
 		return act;
@@ -231,7 +235,8 @@ public class CommonGraphHistoryManager implements Observer
 			}
 			catch (GraphActionException e)
 			{
-				act=null; System.err.println("DEBUG: Edge.added.GraphAction Creation Failed:"+e.getMessage());				
+				act=null; 
+				main.DEBUG.println(main.DEBUG.MIDDLE,"Handling an acion for the graph failed:"+e.getMessage());				
 			}
 		}
 	
@@ -300,7 +305,7 @@ public class CommonGraphHistoryManager implements Observer
 		}
 		catch (GraphActionException e)
 		{
-			System.err.println("DEBUG: An Error Occured while Undoing an Action "+e.getMessage());
+			main.DEBUG.println(main.DEBUG.MIDDLE,"An Error Occured while Undoing an Action "+e.getMessage());
 		}
 		if (RedoStack.size()>=stacksize)
 			RedoStack.remove();
@@ -332,7 +337,7 @@ public class CommonGraphHistoryManager implements Observer
 		}
 		catch (GraphActionException e)
 		{
-			System.err.println("An error occured when Redoing an Action: "+e.getMessage());
+			main.DEBUG.println(main.DEBUG.MIDDLE,"An error occured when Redoing an Action: "+e.getMessage());
 		}
 		if (UndoStack.size()>=stacksize)
 		{	
@@ -450,7 +455,7 @@ public class CommonGraphHistoryManager implements Observer
 					if ((m.getModifiedElementTypes()==(GraphConstraints.NODE|GraphConstraints.EDGE)) //while that the whole graph
 					&&(m.getModification()==GraphConstraints.TRANSLATION)) //is translated
 					{ //Don't do Node/Edge-Update anymore but graph replacement
-//						System.err.println("Switching from Node replacement to graph replacement.");
+						main.DEBUG.println(main.DEBUG.HIGH,"Switching from Node replacement to graph replacement due to movement of whole graph against node movement.");
 						Blockstart = m;
 					}
 				}	

@@ -7,7 +7,8 @@ package main;
 public class CONST {
 
 	public final static String version = "0.4";
-	public final static String lastchanged = "19. August 2009";
+	public final static String lastchanged = "19. September 2009";
+	public final static String lastchangedshort = "2009-09-19";
 	
 	public final static String html_ae = "&auml;";
 	public final static String html_oe = "&ouml;";
@@ -30,4 +31,14 @@ public class CONST {
 	public final static String utf8_Ue = "\uC39C";
 
 	public final static String utf8_sz = "\uC39F";
+	
+	public static String encodetoHTML(String s)
+	{
+		String reg = s;
+		reg = reg.replaceAll("&","&amp;");
+		reg = reg.replaceAll("<","&lt;");
+		reg = reg.replaceAll(">","&gt;");
+		reg = reg.replaceAll("\n","<br>");
+		return reg;
+	}
 }

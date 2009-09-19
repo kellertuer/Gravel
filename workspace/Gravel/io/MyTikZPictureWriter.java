@@ -90,7 +90,6 @@ public class MyTikZPictureWriter implements TeXWriter {
 		offset = vg.getMinPoint(vgc.getGraphics());
 		max = vg.getMaxPoint(vgc.getGraphics());
 		linesinPT = scalelines;
-//		System.err.println(pixelpercm);
 	}
 	/**
 	 * Starts the LaTeX-Export with some parameters
@@ -374,7 +373,7 @@ public class MyTikZPictureWriter implements TeXWriter {
 					s += " ("+(x-offset.x)/pixelpercm+","+(max.y-y)/pixelpercm+")";
 		    	}
 		    	else
-		    		System.err.println("Unknown Type:"+type);
+                	main.DEBUG.println(main.DEBUG.MIDDLE,"Unknown line type ("+type+") in Graphics Path when writing TikZ-File");
 		   }
 		   lastx = x; lasty = y;
 		   if (start)

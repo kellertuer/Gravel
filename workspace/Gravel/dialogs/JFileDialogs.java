@@ -185,6 +185,129 @@ public class JFileDialogs implements Observer
 	        }
 	        return ext;
 	}
+	
+	private boolean OpenOld(File f)
+	{
+		VGraphInterface loadedVGraph=null;
+		MGraphInterface loadedMGraph=null;
+		String error="";
+		GravelMLReader R = new GravelMLReader(f);
+		error = R.checkFile();
+		if (error.equals("")) //if okay - load
+			error = R.readGraph(); // Graph einlesen, Fehler merken
+		loadedVGraph = R.getVGraph();
+		loadedMGraph = R.getMGraph();
+		if (!error.equals("")) //es liegt ein fehler vor
+		{
+			String HTMLError = error.replace("\n", "<br/>");
+			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><p>Der Graph konnte nicht geladen werden<br>Fehler :<br>"+HTMLError+"</p></html>","Fehler beim Laden",JOptionPane.ERROR_MESSAGE);				
+			return false;
+		} //kein Fehler und ein VGraph
+		else if (loadedVGraph!=null)
+		{
+			Gui.getInstance().setVGraph(loadedVGraph);
+			GeneralPreferences.getInstance().setStringValue("graph.lastfile",f.getAbsolutePath());
+			Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+"");
+			if (GraphType==VCommonGraphic.VGRAPHIC)
+			{
+				((VGraphic)vGc).getGraph().addObserver(this);
+				((VGraphic)vGc).getGraph().pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.REPLACEMENT));
+			}
+			else
+			{
+				((VHyperGraphic)vGc).getGraph().addObserver(this);
+				((VHyperGraphic)vGc).getGraph().pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.REPLACEMENT));
+			}
+			//Set actual State saved.
+			vGc.getGraphHistoryManager().setGraphSaved();
+			return true;
+		}
+		else if (loadedMGraph!=null)
+		{
+			main.DEBUG.println(main.DEBUG.LOW,"DEBUG : MGraph geladen, TODO Wizard hier einbauen.");
+			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><p>Die Datei <br><i>"+f.getName()+"</i><br>enth"+main.CONST.html_ae+"lt einen mathematischen Graphen. Diese können bisher nicht weiter verarbeitet werden.</p></html>","Hinweis",JOptionPane.INFORMATION_MESSAGE);				
+			//TODO: Wizard 
+			//Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+" (math only)");					
+			//vGc.getVGraph().getMathGraph().addObserver(this);
+			//vGc.getVGraph().deleteObserver(this);
+			//actualgraphsaved = true; //because only the math part was loaded
+			return true;
+		}
+		else
+			return false;
+	}	
+	/**
+	 * Loads a Graph from a GravelGraphML Source
+	 * 
+	 * @return true, if a Graph is loaded, else false
+	 */	
+	public boolean Open(File f)
+	{
+		VGraphInterface loadedVGraph=null;
+		MGraphInterface loadedMGraph=null;
+		String error = "";
+		GraphMLReader Reader = new GraphMLReader(f,true);
+		if ( (Reader.WarningOccured()) && (!Reader.ErrorOccured()) )
+		{
+			int sel = JOptionPane.showConfirmDialog(Gui.getInstance().getParentWindow(),
+					"<html><p width='500px' align='center'><b>Beim Laden ist eine Warnung aufgetreten, "+
+					"die Datei konnte nicht "+main.CONST.html_ue+"berpr"+main.CONST.html_ue+"ft werden.</b></p>"+
+					"<p width=500px>Sie haben entweder keine Verbindung zum Internet oder die Datei ist fehlerhaft.<br>"+
+					"Wenn Sie trotzdem den Graphen laden wollen, kann er unvollst"+main.CONST.html_ae+"ndig oder gar komplett leer sein. Im Folgenden die komplette Warnung:<br><br>" +
+							"<p width=450px><font size='-1'>"+main.CONST.encodetoHTML(Reader.getWarningMsg())+"</font></p><br>M"+main.CONST.html_oe+"chten Sie den Graphen trotzdem Laden?</p></html>",
+					"Möchten Sie den Graphen trotz Warnung Laden?", JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+		if(sel == JOptionPane.YES_OPTION)
+			Reader = new GraphMLReader(f,false); //Try without validation
+		else
+			return false; //Do not load;
+    	}
+		if (Reader.ErrorOccured())
+			error = Reader.getErrorMsg();
+		else
+		{
+			loadedVGraph = Reader.getVGraph();
+			loadedMGraph = Reader.getMGraph();						
+		}
+		//bei einem der beiden ist ein Fehler aufgetreten
+		if (!error.equals("")) //es liegt ein fehler vor
+		{
+			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(),
+					"<html><p width=300px>Der Graph konnte nicht geladen werden, da folgender Fehler aufgetreten ist:<br><font size='-1'><br>"+main.CONST.encodetoHTML(error)+"</font></p></html>","Fehler beim Laden",JOptionPane.ERROR_MESSAGE);				
+			return false;
+		} //kein Fehler und ein VGraph
+		else if (loadedVGraph!=null)
+		{
+			Gui.getInstance().setVGraph(loadedVGraph);
+			GeneralPreferences.getInstance().setStringValue("graph.lastfile",f.getAbsolutePath());
+			Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+"");
+			if (GraphType==VCommonGraphic.VGRAPHIC)
+			{
+				((VGraphic)vGc).getGraph().addObserver(this);
+				((VGraphic)vGc).getGraph().pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.REPLACEMENT));
+			}
+			else
+			{
+				((VHyperGraphic)vGc).getGraph().addObserver(this);
+				((VHyperGraphic)vGc).getGraph().pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.REPLACEMENT));
+			}
+			//Set actual State saved.
+			vGc.getGraphHistoryManager().setGraphSaved();
+			return true;
+		}
+		else if (loadedMGraph!=null)
+		{
+			main.DEBUG.println(main.DEBUG.LOW, "DEBUG : MGraph geladen, TODO Wizard hier einbauen.");
+			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><p>Die Datei <br><i>"+f.getName()+"</i><br>enth"+main.CONST.html_ae+"lt einen mathematischen Graphen. Diese können bisher nicht weiter verarbeitet werden.</p></html>","Hinweis",JOptionPane.INFORMATION_MESSAGE);				
+			//TODO: Wizard 
+			//Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+" (math only)");					
+			//vGc.getVGraph().getMathGraph().addObserver(this);
+			//vGc.getVGraph().deleteObserver(this);
+			//actualgraphsaved = true; //because only the math part was loaded
+			return true;
+		}
+		else
+			return false;
+	}
 	/**
 	 * Loads a Graph from a GravelGraphML Source
 	 * 
@@ -208,71 +331,12 @@ public class JFileDialogs implements Observer
 		fc.setFileFilter(GraphMLFilter);
 		int returnVal = fc.showOpenDialog(Gui.getInstance().getParentWindow());
 		if (returnVal == JFileChooser.APPROVE_OPTION)
-		   {
-				VGraphInterface loadedVGraph=null;
-				MGraphInterface loadedMGraph=null;
-				File f = fc.getSelectedFile();
-				String error = "";
-				if (fc.getFileFilter()==GravelMLFilter)
-				{
-					GravelMLReader R = new GravelMLReader(f);
-		    		error = R.checkFile();
-					if (error.equals("")) //if okay - load
-		    			error = R.readGraph(); // Graph einlesen, Fehler merken
-					loadedVGraph = R.getVGraph();
-					loadedMGraph = R.getMGraph();
-				}
-				else if (fc.getFileFilter()==GraphMLFilter)
-				{
-					GraphMLReader R = new GraphMLReader(f);
-					if (R.ErrorOccured())
-		    			error = R.getErrorMsg();
-					else
-					{
-						loadedVGraph = R.getVGraph();
-						loadedMGraph = R.getMGraph();						
-					}
-				}
-	    		//bei einem der beiden ist ein Fehler aufgetreten
-	    		if (!error.equals("")) //es liegt ein fehler vor
-	    		{
-	    			String HTMLError = error.replace("\n", "<br/>");
-	    			JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><p>Der Graph konnte nicht geladen werden<br>Fehler :<br>"+HTMLError+"</p></html>","Fehler beim Laden",JOptionPane.ERROR_MESSAGE);				
-	    			return false;
-	    		} //kein Fehler und ein VGraph
-	    		else if (loadedVGraph!=null)
-	    		{
-	    			Gui.getInstance().setVGraph(loadedVGraph);
-	    			GeneralPreferences.getInstance().setStringValue("graph.lastfile",f.getAbsolutePath());
-					Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+"");
-					if (GraphType==VCommonGraphic.VGRAPHIC)
-					{
-						((VGraphic)vGc).getGraph().addObserver(this);
-						((VGraphic)vGc).getGraph().pushNotify(new GraphMessage(GraphConstraints.GRAPH_ALL_ELEMENTS,GraphConstraints.REPLACEMENT));
-					}
-					else
-					{
-						((VHyperGraphic)vGc).getGraph().addObserver(this);
-						((VHyperGraphic)vGc).getGraph().pushNotify(new GraphMessage(GraphConstraints.HYPERGRAPH_ALL_ELEMENTS,GraphConstraints.REPLACEMENT));
-					}
-	    			//Set actual State saved.
-	    			vGc.getGraphHistoryManager().setGraphSaved();
-	    			return true;
-	    		}
-	    		else if (loadedMGraph!=null)
-	    		{
-	    			System.err.println("DEBUG : MGraph geladen, TODO Wizard hier einbauen.");
-					JOptionPane.showMessageDialog(Gui.getInstance().getParentWindow(), "<html><p>Die Datei <br><i>"+f.getName()+"</i><br>enth"+main.CONST.html_ae+"lt einen mathematischen Graphen. Diese können bisher nicht weiter verarbeitet werden.</p></html>","Hinweis",JOptionPane.INFORMATION_MESSAGE);				
-	    			//TODO: Wizard 
-					//Gui.getInstance().getParentWindow().setTitle(Gui.WindowName+" - "+f.getName()+" (math only)");					
-	    			//vGc.getVGraph().getMathGraph().addObserver(this);
-	    			//vGc.getVGraph().deleteObserver(this);
-	    			//actualgraphsaved = true; //because only the math part was loaded
-					return true;
-	    		}
-	    		else
-	    			return false;
-	       }
+	   {
+			if (fc.getFileFilter()==GravelMLFilter)
+				return OpenOld(fc.getSelectedFile());
+			else if (fc.getFileFilter()==GraphMLFilter)
+				return Open (fc.getSelectedFile());
+       }
 		return false; //Chosen Cancel
 	}
 	/**
@@ -375,7 +439,7 @@ public class JFileDialogs implements Observer
 		    			vGc.getGraphHistoryManager().setGraphSaved();
 					}
 					else
-						System.err.println("Error when writing "+error);
+						main.DEBUG.println(main.DEBUG.LOW, "Error when writing File:"+error);
 				}
 				else
 				{

@@ -119,7 +119,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
         			null, //its own shape (no special shape for the validator
         			HShapeGraphicRef //Debug Graphics
         	);
-        	System.err.println("Init.");
+        	main.DEBUG.println(main.DEBUG.LOW, "Inititializing Validator thread.");
         	if (runText==null)
         	runText = new DisplayRunningController(bCheckShape);
 		}
@@ -517,33 +517,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	
 	private void setIPVisibility(boolean visible)
 	{
-		InterpolationFields.setVisible(visible);
-		
-		if (visible)
-		{	//Handling Escape as Cancel
-			//Add ESC-Handling
-			InputMap iMap = Gui.getInstance().getParentWindow().getRootPane().getInputMap(	 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-			iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ALT, KeyEvent.ALT_DOWN_MASK), "alternative");
-
-			ActionMap aMap = Gui.getInstance().getParentWindow().getRootPane().getActionMap();
-			aMap.put("alternative", new AbstractAction()
-				{
-					private static final long serialVersionUID = 1L;
-					public void actionPerformed(ActionEvent e)
-					{
-						System.err.println("pressed....");
-						rAddBetween.doClick();					
-					}
-				});
-		}
-		else //remove
-		{
-    		InputMap iMap = Gui.getInstance().getParentWindow().getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-    		iMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_ALT, 0));
-
-    		ActionMap aMap = Gui.getInstance().getParentWindow().getRootPane().getActionMap();
-    		aMap.remove("alternative");
-		}
+		InterpolationFields.setVisible(visible);		
 	}
 
 	private void setEnabled(boolean enabled)
@@ -675,7 +649,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	        		else
 	        		{
 	        			myValidatorThread.stopValidation();
-	        			System.err.println("Validation abgebrochen");
+	                	main.DEBUG.println(main.DEBUG.LOW,"Validation thread was stopped by the user.");
 	        		}
 	        	}
 	        	finally {ValidatorStartLock.unlock();}

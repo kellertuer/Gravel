@@ -56,8 +56,6 @@ public class GravelMLReader
 				val += text[start+i];
 			if (data_key.equals("gt"))
 				graphtype = val;
-			//if (!data_key.equals(""))
-					//System.err.println("Found "+val+" at "+data_key);
 		}
 		public void endDocument() throws SAXException {}
 		public void endElement(String namespaceURI, String localName,String qualifiedName) throws SAXException 
@@ -71,7 +69,6 @@ public class GravelMLReader
 				position = position.substring(0, position.length()-verlassen.length()-1);	
 			if (localName.equals("key")) // Key gefunden
 			{	
-				//System.err.println("Leaving Key #ID '"+id+"' for='"+fortype+"'with type='"+type+"'. Saving to Map.");
 				keys.put((fortype+"."+id),type);
 				id = ""; //Reset id
 				fortype=""; //Reset for 
@@ -329,8 +326,6 @@ public class GravelMLReader
 		catch (SAXException e) 
 		{
 			try {
-				//System.err.println("bla");
-				//Std System-Parser holen
 				parser = XMLReaderFactory.createXMLReader();
 			}
 			catch (SAXException e2) 

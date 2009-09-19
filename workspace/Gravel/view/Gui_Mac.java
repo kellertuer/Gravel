@@ -6,6 +6,7 @@ import io.GeneralPreferences;
 
 import java.awt.Dimension;
 import java.awt.event.*;
+import java.io.File;
 
 import java.util.TreeMap;
 
@@ -39,18 +40,33 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
 	{
 		if (instance == null)
 		{
-			instance = new Gui_Mac();
+			instance = new Gui_Mac(null);
 		}
 		return instance;	
 	}
+	/**
+	 * Returns the GUI if it exists and creates one, if it doesn't
+	 * this method also starts the gui with a file if it exists, else sets the file to f
+	 */
+	public synchronized static Gui_Mac getInstance(File f)
+	{		
+		if (instance == null)
+		{
+			instance = new Gui_Mac(f);
+		}
+		else
+			instance.setFile(f);
+		return instance;	
+	}
+
 	/**
 	 * Konstruktor der GUI, erstellt das Fenster, initialisiert Komponenten
 	 * <br>Aufgrund des Singelton-Musters ist der Konstruktor private
 	 *
 	 */
-	private Gui_Mac() 
+	private Gui_Mac(File f) 
 	{
-		normalgui = Gui.getInstance();
+		normalgui = Gui.getInstance(f);
 		//Auf einem Mac das Menü nicht im Frame lassen
     	//Und die Spezifischen Menüs enablen
 		this.addAboutMenuItem();
@@ -60,6 +76,11 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
     	this.setEnabledPreferencesMenu(true);
 		normalgui.show();
 		normalgui.getParentWindow().setMinimumSize(normalgui.getParentWindow().getSize());
+	}
+	
+	public void setFile(File f)
+	{
+		normalgui.setFile(f);
 	}
     /**
      * buildmaingrid() baut ein Grid in dem oben eine Buttonliste ist und dadrunter ein
@@ -129,10 +150,7 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
 	public void handleReOpenApplication(ApplicationEvent arg0) {}
 	
 	public void windowActivated(WindowEvent arg0)
-	{
-		System.err.println("USe Menubar?"+System.getProperty("apple.laf.useScreenMenuBar"));
-		System.err.println(instance.getParentWindow().getMenuBar());
-	}
+	{}
 	public void windowClosed(WindowEvent arg0) 
 	{
 		GeneralPreferences gp = GeneralPreferences.getInstance();

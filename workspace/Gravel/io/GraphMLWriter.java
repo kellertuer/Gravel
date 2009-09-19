@@ -639,7 +639,7 @@ public class GraphMLWriter {
 			}
 			catch (Exception e)
 			{
-				System.err.println("DEBUG : Error on Writing File : "+e.getMessage());
+				main.DEBUG.println(main.DEBUG.MIDDLE,"Error on Writing File : "+e.getMessage());
 			}
 		
 		try {        

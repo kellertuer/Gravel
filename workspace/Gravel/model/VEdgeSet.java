@@ -95,9 +95,7 @@ public class VEdgeSet extends Observable implements Observer {
 		else if (b!=mG.isLoopAllowed())
 		{
 			if (mG.setLoopsAllowed(b).cardinality() > 0)
-			{
-				System.err.println("DEBUG : Beim Umwandeln ds Graphen in schleifenlos stimmt was nicht, ");
-			}
+			{}
 			setChanged();
 			//Loops done, update Edges
 			notifyObservers(new GraphMessage(GraphConstraints.LOOPS,GraphConstraints.UPDATE,GraphConstraints.EDGE));	
@@ -136,9 +134,7 @@ public class VEdgeSet extends Observable implements Observer {
 		else if (b!=mG.isMultipleAllowed())
 		{
 			if (mG.setMultipleAllowed(b).cardinality() > 0)
-			{
-				System.err.println("DEBUG : AllowMultiple set to false ERROR on that");
-			}
+			{}
 			setChanged();
 			//Allowance Updated, affected the edges
 			notifyObservers(new GraphMessage(GraphConstraints.MULTIPLE,GraphConstraints.UPDATE,GraphConstraints.EDGE));	
@@ -162,7 +158,7 @@ public class VEdgeSet extends Observable implements Observer {
 			medge.index = edge.getIndex();
 		if (getIndexWithSimilarEdgePath(edge, medge.StartIndex,medge.EndIndex) > 0)
 		{
-			System.err.println("DEBUG : Similar Edge Exists, doing nothing");
+			main.DEBUG.println(main.DEBUG.LOW,"Similar Edge Exists, not adding new edge");
 			return;
 		}
 		if (mG.modifyEdges.add(medge)) //succesfull added in MathGraph

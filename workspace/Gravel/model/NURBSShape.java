@@ -517,7 +517,7 @@ public class NURBSShape {
 		Point2dHom erg = deBoer3D(u); //Result in homogeneous Values on Our Points		
 		if (erg==null)
 		{
-			System.err.println("NURBSShape::CurveAt "+u+" not in "+Knots.get(degree)+","+Knots.get(maxKnotIndex-degree)+"");
+        	main.DEBUG.println(main.DEBUG.MIDDLE,"NURBSShape::CurveAt "+u+" not in definition intervall ["+Knots.get(degree)+","+Knots.get(maxKnotIndex-degree)+"], returning null");
 			return null;
 		}
 		if (erg.w==0) //
@@ -531,7 +531,7 @@ public class NURBSShape {
 		Point2dHom erg = deBoer3D(u); //Result in homogeneous Values on Our Points
 		if (erg==null)
 		{
-			System.err.println("NURBSShape::WeightAt3D: "+u+" not in "+Knots.get(degree)+","+Knots.get(maxKnotIndex-degree)+"");
+        	main.DEBUG.println(main.DEBUG.MIDDLE,"NURBSShape::WeightAt "+u+" not in definition intervall ["+Knots.get(degree)+","+Knots.get(maxKnotIndex-degree)+"], returning null");
 			return Double.NaN;
 		}
 			return erg.w;
@@ -552,8 +552,6 @@ public class NURBSShape {
 			else if (temp > maxMultiplicity)
 				maxMultiplicity = temp;
 		}
-//		if (Knots.indexOf(u)!=-1)
-//			System.err.println("Wah! Max Mult: "+maxMultiplicity+" and Degree "+degree+" so it is "+(degree-maxMultiplicity)+" times diff");
 		Vector<Point2D> CK = new Vector<Point2D>(); //result
 		if (derivate==0)
 		{
@@ -717,8 +715,6 @@ public class NURBSShape {
 				double y = (1-alpha)*bimjm.y + alpha*bijm.y;
 				double z = (1-alpha)*bimjm.w + alpha*bijm.w;
 				fixedj.set(l-i+degree,new Point2dHom(x,y,z));
-				//System.err.println("Computing ("+l+","+k+") :"+fixedj.get(l-i+j));
-				//saving in "+(l-i+j)+" based on pervious values in "+(l-i+j-1)+" and "+(l-i+j)+".");
 			}
 		}
 		return fixedj.get(degree);
@@ -944,7 +940,7 @@ public class NURBSShape {
 			{
 				if (temp.get(k).w<0)
 				{
-					System.err.println("NURBSShape::removeKnoteNear() ... Can't remove Knot!");
+		        	main.DEBUG.println(main.DEBUG.MIDDLE,"NURBSShape::removeKnoteNear() : Can't remove Knot, because in the calculation one weight got negative!");
 					return false;
 				}
 			}

@@ -132,11 +132,9 @@ public class NURBSShapeProjection extends NURBSShape
 					//take a look at where the minimum in the qcCP was and take the startvalue inside actual [umin,umax]
 					//(+1 and +2 ensures INSIDE umax-umin) and the first Method can't return -1 because we took min from the qcCP
 					double startvalue = umin + (double)(qcControlPoints.indexOf(min)+1)/((double)qcControlPoints.size()+2)*(umax-umin);
-					//System.err.println("Starting Newton on ["+umin+","+umax+"] with startvalue "+startvalue);
 					
 					double candidate_u = NewtonIteration(actualPart.clone(), startvalue, p);
 					candidates.add(candidate_u);
-					//System.err.println("On ["+umin+","+umax+"] the Candidate u="+candidate_u);
 					double newdistsq = CurveAt(candidate_u).distanceSq(p);
 					if (alpha > newdistsq)
 						alpha = newdistsq;
@@ -186,7 +184,6 @@ public class NURBSShapeProjection extends NURBSShape
 	
 	private double NewtonIteration(NURBSShape c, double startvalue, Point2D p)
 	{
-		//System.err.println("Start: "+startvalue);
 		//End criteria
 		double epsilon1 = 0.00002d;
 		double epsilon2 = 0.0003d;
@@ -205,7 +202,6 @@ public class NURBSShapeProjection extends NURBSShape
 			double nominator = firstDeriv.x*diff.x + firstDeriv.y*diff.y;
 			double denominator = secondDeriv.x*diff.x + secondDeriv.y*diff.y + firstDeriv.distanceSq(0d,0d);
 			double unext = u - nominator/denominator;
-//			System.err.println(iterations+" has diff "+diff+"("+(diff.distance(0,0))+" and u="+u+" and undext = "+unext);
 			if (unext > c.Knots.lastElement()) //Out of Range
 				unext = c.Knots.lastElement();
 			if (unext < c.Knots.firstElement()) //Out of Range
@@ -220,7 +216,7 @@ public class NURBSShapeProjection extends NURBSShape
 			double movementu = Math.abs(unext-u)*Math.sqrt(firstDeriv.x*firstDeriv.x + firstDeriv.y*firstDeriv.y);
 			if (iterations>100) //it sould converge fast so here we should change sth
 			{
-				System.err.println("Warning: Newton-Iteration took too long.");
+	        	main.DEBUG.println(main.DEBUG.MIDDLE,"NURBSShapeProjection::NewtonIterationInit() - Warning: Newton-Iteration took too long.");
 				return (u+unext)/2; //Try to prevent circles
 			}
 			else
@@ -268,7 +264,6 @@ public class NURBSShapeProjection extends NURBSShape
 		double LastValue = c.Knots.lastElement(); //this is 1
 		
 		int Degree = c.maxCPIndex; //Old Degree of the given Bezier Curve
-//		System.err.println("Degree: "+Degree+"   and of the product: "+(2*Degree)+" so the tP and tQ have "+(3*Degree+2)+" elements");
 		
 		Vector<Double> tP,tQ;
 		qcControlPoints = new Vector<Double>();

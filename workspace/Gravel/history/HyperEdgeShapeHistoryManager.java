@@ -129,7 +129,7 @@ public class HyperEdgeShapeHistoryManager extends CommonGraphHistoryManager
 			}
 			catch (GraphActionException e)
 			{
-				System.err.println("DEBUG: HyperEdgeshape (#"+m.getElementID()+") Action ("+m.getModification()+") Failed:"+e.getMessage());
+				main.DEBUG.println(main.DEBUG.MIDDLE,"Handling single Action for Hyperedge shape (for hyperedge #"+m.getElementID()+") and action ("+m.getModification()+") Failed:"+e.getMessage());
 				return null;
 			}
 		} //else handle as normal

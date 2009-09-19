@@ -53,10 +53,10 @@ public class GeneralPreferences extends Observable
 			String val = "";
 			for (int i=0; i<length; i++)
 				val += text[start+i];
-			//System.err.println("Get Key |"+key+"|, Type |"+type+"| Value |"+val+"|");
+			main.DEBUG.println(main.DEBUG.HIGH,"GeneralPreferences.gpExtractor::characters() Loading Key '"+key+"' ("+type+") Value:"+val+".");
 			if (type==null)
 			{
-				System.err.println(key+" has no type");
+				main.DEBUG.println(main.DEBUG.HIGH,"GeneralPreferences.gpExtractor::characters() : The key "+key+" has no type");
 				return;
 			}
 			if (type.equals("Integer"))
@@ -85,7 +85,6 @@ public class GeneralPreferences extends Observable
 			if ((localName.equals("group"))||(localName.equals("value")))
 			{	
 				String verlassen = path.pop();
-				//System.err.println("Verlasse "+verlassen);
 				if (key.equals(verlassen))
 					key = "";
 				else //sonst den Punkt auch entfernen
@@ -104,7 +103,7 @@ public class GeneralPreferences extends Observable
 			{
 				//System.err.println("Betrete "+atts.getValue("name"));
 				if (atts.getValue("name").contains("."))
-					System.err.println("Warning : The Attribute '"+atts.getValue("name")+"' may cause trouble.");
+					main.DEBUG.println(main.DEBUG.HIGH,"GeneralPreferences.gpExtractor::StartElement() : The Attribute '"+atts.getValue("name")+"' may cause trouble.");
 				if (!key.equals(""))
 					key +=".";
 				key +=atts.getValue("name");
@@ -114,7 +113,6 @@ public class GeneralPreferences extends Observable
 			}
 		}
 		public void startPrefixMapping(String arg0, String arg1) throws SAXException {}
-
 	}
 	
 	private static GeneralPreferences instance = null;
@@ -558,7 +556,7 @@ public class GeneralPreferences extends Observable
 			}
 			catch (Exception e)
 			{
-				System.err.println("DEBUG : Error Creating File : "+e.getMessage());
+				main.DEBUG.println(main.DEBUG.LOW,"Error creating preferences file '"+f.getAbsolutePath()+"' : "+e.getMessage());
 			}
 		
 		try {        
@@ -682,7 +680,7 @@ public class GeneralPreferences extends Observable
 	        out.close();
 	      }
 	      catch (Exception e) {
-	        System.err.println("Writing : "+e+" "+e.getLocalizedMessage());
+	    	  main.DEBUG.println(main.DEBUG.MIDDLE,"Error when writing preferences-file : "+e+" "+e.getLocalizedMessage());
 	      }
 	}
 	/**

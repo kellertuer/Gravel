@@ -185,15 +185,11 @@ public class VGraph extends Observable implements VGraphInterface {
 							} //End no duplicate
 						}
 					}
-					if (mG.setDirected(d).cardinality() > 0)
-						System.err.println("DEBUG ; Beim gerichtet Setzen läuft was falsch");
+//					if (mG.setDirected(d).cardinality() > 0) {}
 			} //end of if !allowedmultiple
 			else //multiple allowed - the other way around
 			{
-				if (mG.setDirected(d).cardinality() > 0)
-				{
-					System.err.println("DEBUG ; Beim gerichtet Setzen läuft was falsch");
-				} 				
+//				if (mG.setDirected(d).cardinality() > 0){} 				
 			//	modifyEdges.getEdgeIterator(); //find similar Edges
 			//	try
 			//	{		
@@ -214,14 +210,12 @@ public class VGraph extends Observable implements VGraphInterface {
 							{
 								if ((((VOrthogonalEdge)act).getVerticalFirst()!=((VOrthogonalEdge)t).getVerticalFirst())&&(!removed.get(act.getIndex())))
 								{
-									//System.err.println("removing Edge #"+t.index+" because ORTH and it is similar to #"+act.index);
 									toDelete.add(t);
 									removed.set(t.getIndex());
 								}
 							}
 							else if ((t.PathEquals(act)&&(!removed.get(act.getIndex())))&&(t.getIndex()!=act.getIndex())) //same path
 							{
-								//System.err.println("removing Edge #"+t.index+" because it is similar to #"+act.index);
 								toDelete.add(t);
 								removed.set(t.getIndex());
 							}
@@ -230,9 +224,8 @@ public class VGraph extends Observable implements VGraphInterface {
 					Iterator<VEdge> e3 = toDelete.iterator();
 					while (e3.hasNext())
 						modifyEdges.remove_(e3.next().getIndex());
-					if (mG.setDirected(d).cardinality() > 0)
-						System.err.println("DEBUG ; Beim gerichtet Setzen läuft was falsch");
-			} //end of deleting similar edges in multiple directed graphs
+					if (mG.setDirected(d).cardinality() > 0){}
+				} //end of deleting similar edges in multiple directed graphs
 			setChanged();
 			notifyObservers(new GraphMessage(GraphConstraints.EDGE|GraphConstraints.DIRECTION,GraphConstraints.UPDATE|GraphConstraints.BLOCK_END, GraphConstraints.EDGE));
 		}//end if !d
@@ -523,7 +516,6 @@ public class VGraph extends Observable implements VGraphInterface {
 		    		case PathIterator.SEG_MOVETO: break;
 		    		default:
 		    		{
-				    	//System.err.print("("+new Double(x).intValue()+","+new Double(y).intValue()+") ");
 				    	double distanceSquare = Point.distanceSq(x,y,m.x,m.y);
 				    	if (distanceSquare < (variation+(double)temp.width)) 
 				    	{

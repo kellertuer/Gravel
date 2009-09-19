@@ -30,7 +30,7 @@ public class GraphMLReader {
 	private HashMap<String, String> keyTypes = new HashMap<String, String>();
 	private VGraphInterface loadedVGraph = null;
 	private MGraphInterface loadedMGraph = null;
-	private String errorMsg = "";
+	private String errorMsg = "", WarningMsg="";
 	private GeneralPreferences gp = GeneralPreferences.getInstance();
 
 	/**
@@ -40,7 +40,7 @@ public class GraphMLReader {
 	 *
 	 * @param f
 	 */
-	public GraphMLReader(File f)
+	public GraphMLReader(File f, boolean validate)
 	{	 
 		Document doc=null;
         Validator validator;
@@ -53,14 +53,15 @@ public class GraphMLReader {
 			domFactory.setNamespaceAware(true); // never forget this
 			DocumentBuilder builder = domFactory.newDocumentBuilder();
 			doc = builder.parse(f);
-			validator.validate(new DOMSource(doc));
+			if (validate)
+				validator.validate(new DOMSource(doc));
 		}
 		catch (java.io.IOException ioe)
 		{errorMsg = "Error when opening File:\n"+ioe.getMessage();}
 		catch (SAXException e)
-		{errorMsg = "Error when Parsing File:\n"+ e.getLocalizedMessage();return;}
+		{WarningMsg = "Error when Parsing File:\n"+ e.getLocalizedMessage();return;}
 		catch (ParserConfigurationException e)
-		{errorMsg = "Error when setting up Parser:" + e.getMessage(); return;}
+		{WarningMsg = "Error when setting up Parser:" + e.getMessage(); return;}
 		if (doc==null)
 		{errorMsg = "Could not retrieve Document-XML-Tree";return;}
 		if (!doc.getDocumentElement().getNodeName().equals("graphml"))
@@ -135,8 +136,6 @@ public class GraphMLReader {
 	 * @return true if an error occured while parsing, else false
 	 */
 	public boolean ErrorOccured() {
-//		if (!errorMsg.equals(""))
-//			System.err.println("DEBUG: " + errorMsg);
 		return !errorMsg.equals("");
 	}
 	/**
@@ -145,9 +144,26 @@ public class GraphMLReader {
 	 * 
 	 * @return
 	 */
-	public String getErrorMsg()
-	{
+	public String getErrorMsg()	{
 		return errorMsg;
+	}
+	/**
+	 * Check for a Warning occured while validating
+	 * 
+	 * @return true if an error occured while parsing, else false
+	 */
+	public boolean WarningOccured() {
+		return !WarningMsg.equals("");
+	}
+	/**
+	 * Return the last ErrorMsg, this value is empty (but never null) iff no
+	 * Error occured
+	 * 
+	 * @return
+	 */
+	public String getWarningMsg()
+	{
+		return WarningMsg;
 	}
 	/**
 	 * Get the Data from the Graph-<Data>-elements needed for initialization
@@ -273,9 +289,7 @@ public class GraphMLReader {
 						resultNode.setSize(FormInfo.getSize());
 					}
 				} else
-					System.err
-							.println("Warning: Unhandled Data-Field in Node #"
-									+ index + " for key " + dataType);
+					main.DEBUG.println(main.DEBUG.HIGH,"Warning: Unhandled Data in Node #"+ index + " for key " + dataType);
 			}
 		} // End for - handle all Data Fields
 		if (loadedVGraph != null) // VGraph
@@ -445,8 +459,7 @@ public class GraphMLReader {
 					if (ErrorOccured())
 						return;
 				} else
-					System.err
-							.println("Warning: Unhandled Data-Field in Edge #"
+					main.DEBUG.println(main.DEBUG.HIGH,"Warning: Unhandled Data-Field in Edge #"
 									+ index + " with key " + dataType);
 			}
 		} // End for - handle all Data Fields
@@ -491,9 +504,14 @@ public class GraphMLReader {
 			resultEdge.setTextProperties(text);
 			resultEdge.setLinestyle(linestyle);
 			VGraph castedGraph = ((VGraph) loadedVGraph);
-			if ((castedGraph.modifyNodes.get(start) == null)
-					|| (castedGraph.modifyNodes.get(end) == null)) {
-				errorMsg = "Start or Endnode does not exist";
+			if (castedGraph.modifyNodes.get(start) == null)
+			{
+				errorMsg = "Incident node (#"+start+") does not exist for edge #"+index;
+				return;
+			}
+			else if (castedGraph.modifyNodes.get(end) == null)
+			{
+				errorMsg = "Incident node (#"+start+") does not exist for edge #"+index;
 				return;
 			}
 			Point s = castedGraph.modifyNodes.get(start).getPosition();
@@ -504,7 +522,7 @@ public class GraphMLReader {
 			MEdge me = new MEdge(index, start, end, value, name);
 			((MGraph) loadedMGraph).modifyEdges.add(me);
 		} else {
-			errorMsg = "No suitable Graph for adding an Edge found";
+			errorMsg = "No suitable Graph for adding an Edge #"+index+"found";
 			return;
 		}
 	}
@@ -643,8 +661,7 @@ public class GraphMLReader {
 						}
 						shape = ShapeParser.stripDecorations();
 					} else
-						System.err
-								.println("Warning: Unhandled Data-Field in Edge #"
+						main.DEBUG.println(main.DEBUG.HIGH,"Warning: Unhandled Data-Field in Edge #"
 										+ index + " with key " + dataType);
 				}
 			} // End if NodeType==ELEMENT
@@ -665,7 +682,7 @@ public class GraphMLReader {
 												// nonexistent
 					{
 						errorMsg = "The endnode with index " + i
-								+ " does not exist";
+								+ " does not exist for hyperedge"+index;
 						return;
 					}
 					mhe.addNode(i);
@@ -685,8 +702,7 @@ public class GraphMLReader {
 							.get(i) == null) // Node should be set but is
 												// nonexistent
 					{
-						errorMsg = "The endnode with index " + i
-								+ " does not exist";
+						errorMsg = "The endnode with index "+i+" does not exist for hyperedge"+index;
 						return;
 					}
 					mhe.addNode(i);
@@ -774,7 +790,6 @@ public class GraphMLReader {
 			if (attr.getNodeName().equals("id"))
 				keyID = attr.getNodeValue();
 		}
-		// System.err.print("\nParsing key "+keyName);
 		if (keyName.equals("") || (keyType.equals("")) || (keyID.equals(""))) // We
 																				// need
 																				// them
@@ -789,7 +804,6 @@ public class GraphMLReader {
 		Node defaultVal = getFirstChildWithElementName("default", node);
 		if (defaultVal == null) // No Default for this key
 		{
-			// System.err.print(" (no default) ");
 			return;
 		}
 		parseDefaultIntoPref(keyName, keyType, defaultVal);
@@ -924,7 +938,7 @@ public class GraphMLReader {
 			gp.setFloatValue(pre + "_pos", a.getPos());
 			gp.setIntValue(pre + "_size", Math.round(a.getSize()));
 		} else
-			System.err.print("Still TODO Type:" + keyType);
+			main.DEBUG.println(main.DEBUG.HIGH,"Unhandled preferences-key in File with keyname:" + keyType);
 
 	}
 	//

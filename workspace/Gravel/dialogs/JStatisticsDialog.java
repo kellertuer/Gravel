@@ -327,7 +327,6 @@ public class JStatisticsDialog extends JDialog implements ActionListener, TextLi
 		{
 			if (("+-*/^()".indexOf(iExpr.getText().charAt(iName.getText().length()))==-1))
 			{ //Expr beginnt zwar mit iName aber es ist ein anderer Prefix
-			//	System.out.println("anderer Name ("+iExpr.getText().charAt(iName.getText().length())+")");
 			}
 			else
 			{
@@ -346,17 +345,15 @@ public class JStatisticsDialog extends JDialog implements ActionListener, TextLi
 				{
 					if (("+-*/^()".indexOf(iExpr.getText().charAt(i-1))==-1))
 					{ //Das Zeichen vor dem gefundenen Namen gehört zu einem namen (kein Arithmetisches Zeichen)=> keine rekursion
-						//System.out.println("("+("+-*/^()".indexOf(iExpr.getText().charAt(i-1)))+")anderer Name ("+iExpr.getText().charAt(i-1)+")");
 					}
 					else if ((i+iName.getText().length()<iExpr.getText().length()&&(("+-*/^()".indexOf(iExpr.getText().charAt(i+iName.getText().length()))==-1)))) //Hinterm aktuellen iNameTest nochn Zeichen
 					{	//Das zeichen hinter dem Namen (so existent) ist kein arithmetisches => andrer Name
-						//System.out.println("anderer Name ("+iExpr.getText().charAt(i+iName.getText().length())+")");
 					}
 					else
 					{	//Kommt iName an dieser Stelle vor ?
 						if (iExpr.getText().subSequence(i,i+iName.getText().length()).equals(iName.getText()))
 						{
-							//System.out.println("iName found at"+i);
+							main.DEBUG.println(main.DEBUG.MIDDLE,"iName.getText() found at Expression-Position"+i);
 							//Kommt exakt hier vor, davor dahinter sind arithmetische Zeichen => Rekursion, direkte 
 							lError.setText("<html><font color=#AA0000>Der Ausdruck enth"+main.CONST.html_ae+"lt seinen eigenen Namen. Direkte Rekursion ist nicht erlaubt</font></html>");
 							lDoubleValue.setText("Wert : #");

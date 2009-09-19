@@ -132,8 +132,6 @@ public class VHyperGraphic extends VCommonGraphic
 //		drawCP(g2,new Point(Math.round((float)c.CurveAt(u1).getX()), Math.round((float)c.CurveAt(u1).getY())), Color.ORANGE);
 //		drawCP(g2,new Point(Math.round((float)c.CurveAt(u2).getX()), Math.round((float)c.CurveAt(u2).getY())), Color.ORANGE);
 //
-//		System.err.println(u1+" DEBUG "+u2);
-//		
 //		NURBSShapeFragment s = new NURBSShapeFragment(c.clone(),u1,u2); //Refine the selected half
 //		float selSize = (float)selWidth/2f + (float) 1;
 //		NURBSShape drawSel = s.getSubCurve().stripDecorations().clone(); //really only nurbs
@@ -225,13 +223,11 @@ public class VHyperGraphic extends VCommonGraphic
 //	}
 //	private void DerivateHelper(NURBSShape c, double pos, Graphics2D g2)
 //	{
-//		System.err.print("Eval at "+pos+" (w:"+c.WeightAt(pos)+")");
 //		Vector<Point2D> derivs = c.DerivateCurveValuesAt(2,pos);
 //		Point2D p = derivs.get(0);
 ////		drawCP(g2,new Point(Math.round((float)p.getX()),Math.round((float)p.getY())),Color.LIGHT_GRAY);
 //		Point2D deriv1 = derivs.get(1);
 //		Point2D deriv2 = derivs.get(2);
-//		System.err.println("Deriv1 is "+deriv1+" and Deriv2 is "+deriv2);
 //		
 //		double l = deriv1.distance(0d,0d)/100d;
 //		Point2D normps = new Point2D.Double(deriv1.getX()/deriv1.distance(0d,0d),deriv1.getY()/deriv1.distance(0d,0d));
@@ -288,7 +284,6 @@ public class VHyperGraphic extends VCommonGraphic
 //			VNode actual = iter.next();
 //			projectionpoints.add(actual.getPosition());
 //		}
-//	    System.err.print("#"+projectionpoints.size()+" ");
 //	    long time = System.currentTimeMillis();
 //	    for (int j=0; j<projectionpoints.size(); j++)
 //		{
@@ -299,7 +294,6 @@ public class VHyperGraphic extends VCommonGraphic
 //			else
 //				proj = new NURBSShapeProjection(c,p);
 //			double dist = p.distance(proj.getResultPoint());
-////			System.err.println("Node #"+(j+1)+" Projected onto Parameter "+proj.getResultParameter()+" in ["+c.Knots.get(c.degree)+""+c.Knots.get(c.maxKnotIndex-c.degree)+"]");
 //			Color cross = Color.magenta;
 //			if (dist<=2.0)
 //				cross = Color.green.darker().darker();
@@ -312,7 +306,7 @@ public class VHyperGraphic extends VCommonGraphic
 //        time = -time + System.currentTimeMillis();
 //        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
 //        SimpleDateFormat sdf = new SimpleDateFormat("ss:SSS");
-//        System.err.println(" "+sdf.format(time)+" Sekunden");  
+//        main.DEBUG.println(main.DEBUG.LOW,"Die "+(projectionpoints.size()-1)+" Projektionen benötigten "+sdf.format(time)+" Sekunden");  
 //	}
 	/**
 	 * @param g

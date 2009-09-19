@@ -87,7 +87,6 @@ public class GravelMLContentHandler implements ContentHandler
 			def = val;
 		else
 			CDATA += val;
-		//System.err.println(start+"/"+(start+length)+" : "+CDATA);
 	}
 	public void endDocument() throws SAXException 
 	{
@@ -100,7 +99,6 @@ public class GravelMLContentHandler implements ContentHandler
 		}
 		if (Status==PARSE_EDGES)
 		{
-			//System.err.println("Ending Edges...removing edge.edgetype");
 			gp.removeStringValue("edge.edgetype");
 		}
 	}
@@ -117,8 +115,6 @@ public class GravelMLContentHandler implements ContentHandler
 		{
 			if ((position.equals("graphml.graph.subset"))||(position.equals("graphml.graph"))||(position.equals("graphml.graph.node"))||(position.equals("graphml.graph.edge")))
 				EndElementData();
-			else
-				System.err.println("DEBUG : Non-toplevel Data <data key='"+data_key+"'>"+CDATA+"</data> at"+position);
 		}
 		else if (Status==PARSE_NODES)
 		{
@@ -144,19 +140,19 @@ public class GravelMLContentHandler implements ContentHandler
 		{
 			if (isVisual)
 			{	if ((vG==null)||(vG.getMathGraph().modifyNodes.cardinality()==0))
-						{isValid=false; System.err.println("No VGraph or no Nodes existent. Can't Parse Edges"); return;}
+						{isValid=false; main.DEBUG.println(main.DEBUG.MIDDLE,"No VGraph or no Nodes existent. Can't Parse Edges"); return;}
 			} 
 			else if (mG==null)
-			{isValid=false; System.err.println("No MGraph existent. Can't Parse Edges"); return;}
+			{isValid=false; main.DEBUG.println(main.DEBUG.MIDDLE,"No MGraph existent. Can't Parse Edges"); return;}
 		}		
 		else if (Status==PARSE_SUBGRAPHS)
 		{
 			if (isVisual)
 			{	if ((vG==null))
-						{isValid=false; System.err.println("No VGraph existent. Can't Parse Subgraphs/SubSets"); return;}
+						{isValid=false; main.DEBUG.println(main.DEBUG.MIDDLE,"No VGraph existent. Can't Parse Subgraphs/SubSets"); return;}
 			} 
 			else if (mG==null)
-				{isValid=false; System.err.println("No MGraph existent. Can't Parse Subgraphs/SubSets"); return;}
+				{isValid=false; main.DEBUG.println(main.DEBUG.MIDDLE,"No MGraph existent. Can't Parse Subgraphs/SubSets"); return;}
 		}
 		
 	}
@@ -169,7 +165,7 @@ public class GravelMLContentHandler implements ContentHandler
 			position += "."+localName;
 		if (localName.equals("hyperegde"))
 		{
-			System.err.println("DEBUG : HyperEdge Not yet implemented");
+			main.DEBUG.println(main.DEBUG.LOW,"Old file loader can't handle hypergraphs.");
 		}
 		else if (Status==PARSE_NODES)
 		{
@@ -335,7 +331,7 @@ public class GravelMLContentHandler implements ContentHandler
 					id = vG.getMathGraph().modifyNodes.getNextIndex();
 				else
 					id = mG.modifyNodes.getNextIndex();
-				System.err.println("DEBUG : Malformed ID - generating own ("+id+")");
+				main.DEBUG.println(main.DEBUG.MIDDLE,"Malformed ID - generating own ("+id+")");
 			}				
 			idString = atts.getValue("id");
 		}
@@ -373,7 +369,7 @@ public class GravelMLContentHandler implements ContentHandler
 		{
 			if ((idString.equals(""))||(id==0))
 			{
-				System.err.println("Node id wrong");
+				main.DEBUG.println(main.DEBUG.MIDDLE,"Node id invalid");
 				isValid=false;
 				return;
 			}
@@ -385,13 +381,11 @@ public class GravelMLContentHandler implements ContentHandler
 					ns = gp.getIntValue("node.size"); //StandardKnotengröße
 				if (!((nx!=0)&&(ny!=0))) //Parse error or one of them not found
 				{
-					System.err.println("Error on Parsing Node "+idString);
-					isValid=false; //kein Name => Fehler
+					isValid=false; //keine position => Fehler
 					return;
 				}
 				if (vG.modifyNodes.get(id)!=null)
 				{
-					System.err.println("DEBUG : Error Parsing File : Node Index already given another node.");
 					isValid=false;
 					return;
 				}
@@ -408,7 +402,6 @@ public class GravelMLContentHandler implements ContentHandler
 			{
 				if (mG.modifyNodes.get(id)!=null)
 				{
-					System.err.println("DEBUG : Error Parsing Node : Node Index already given another node.");
 					isValid=false;
 					return;
 				}
@@ -460,7 +453,6 @@ public class GravelMLContentHandler implements ContentHandler
 			//Check Values
 			if ((start<=0)||(ende<=0))
 			{
-				System.err.println("Error on the incident Nodes. At least one of them does not exist!");
 				isValid=false;
 				return;
 			}
@@ -504,14 +496,14 @@ public class GravelMLContentHandler implements ContentHandler
 				if (!edgepath.isEmpty())
 					toAdd = new VQuadCurveEdge(id,ew,edgepath.firstElement());
 				else
-				{isValid=false; System.err.println("An Control Point for the QuadCurveEdge is missing"); return;}
+				{isValid=false; return;}
 			}
 			else if (et.equals("Segmented"))
 			{
 				if (!edgepath.isEmpty())
 					toAdd = new VSegmentedEdge(id,ew,edgepath);
 				else
-				{isValid=false; System.err.println("At keast one Control Point for the SegmentedEdge is missing"); return;	}	
+				{isValid=false; return;	}	
 			}
 			else if (et.equals("Loop"))
 			{
@@ -524,7 +516,7 @@ public class GravelMLContentHandler implements ContentHandler
 				toAdd = new VLoopEdge(id,ew,elol,elod,elop,eloc);
 			}
 			else
-			{isValid=false; System.err.println("Unknown VEdge Standard-Type error. Please Check the key 'et' name 'edgetype' "); return;}	
+			{isValid=false; return;}	
 			//Arrow INfos
 			if (es==0.0f) es = (new Integer(gp.getIntValue("edge.arrow_size"))).floatValue();
 			if ((ep==0.0f)||(ep>1.0f)) ep = gp.getFloatValue("edge.arrow_part");
@@ -539,11 +531,7 @@ public class GravelMLContentHandler implements ContentHandler
 			//For multiple edges - similar exist ? (non multiple : edge between start end end ?)
 			//Check for the visual Part
 			if (vG.modifyEdges.getIndexWithSimilarEdgePath(toAdd, start, ende) > 0) //old : vG.getEdgeIndices(start, ende)!=-1) 
-			{
-				isValid= false; 
-				System.err.println("DEBUG : Error Parsing File : An (similar) Edge already existst between the two Nodes"); 
-				return;
-			}
+			{ isValid= false; return; }
 			vG.modifyEdges.add(
 					toAdd,
 					new MEdge(toAdd.getIndex(),start,ende,ev,en),
@@ -569,7 +557,6 @@ public class GravelMLContentHandler implements ContentHandler
 					id = vG.getMathGraph().modifySubgraphs.getNextIndex();
 				else
 					id = mG.modifySubgraphs.getNextIndex();
-				System.err.println("DEBUG : Malformed ID - generating own ("+id+")");
 			}				
 			idString = atts.getValue("id");
 			//Sonderfall, hier mal zuerst erstellen, da kein andres Subgraph schwarz ist...dies hier schwarz machen, bis eine Farbe eintrudelt
@@ -585,7 +572,7 @@ public class GravelMLContentHandler implements ContentHandler
 			String nodeid = atts.getValue("node");
 			int nodeindex = -1;
 			if (NodeIdtoIndex.get(nodeid)==null)
-				{isValid=false; System.err.println("The Subgraph has an non existent Node #'"+nodeid+"'."); return;}
+				{isValid=false; return;}
 			nodeindex = NodeIdtoIndex.get(nodeid);
 			
 			if (isVisual)
@@ -593,14 +580,14 @@ public class GravelMLContentHandler implements ContentHandler
 				if (vG.modifyNodes.get(nodeindex)!=null)
 					vG.modifySubgraphs.addNodetoSubgraph(nodeindex, id);
 				else
-					{isValid=false; System.err.println("The Node '"+nodeid+"' does not exist."); return;}
+					{isValid=false; return;}
 			}
 			else
 			{
 				if (mG.modifyNodes.get(nodeindex)!=null)
 					mG.modifySubgraphs.addNodetoSubgraph(nodeindex, id);
 				else
-					{isValid=false; System.err.println("The Node '"+nodeid+"' does not exist."); return;}
+					{isValid=false; return;}
 			}
 		}
 		else if (position.equals("graphml.graph.subset.sedge"))
@@ -608,7 +595,7 @@ public class GravelMLContentHandler implements ContentHandler
 			String edgeid = atts.getValue("edge");
 			int edgeindex = -1;
 			if (EdgeIdtoIndex.get(edgeid)==null)
-			{isValid=false; System.err.println("The Subgraph has an non existent Edge '"+edgeid+"'."); return;}
+			{isValid=false; return;}
 			edgeindex = EdgeIdtoIndex.get(edgeid);
 			
 			if (isVisual)
@@ -616,14 +603,14 @@ public class GravelMLContentHandler implements ContentHandler
 				if (vG.modifyEdges.get(edgeindex)!=null)
 					vG.modifySubgraphs.addEdgetoSubgraph(edgeindex, id);
 				else
-					{isValid=false; System.err.println("The Edge '"+edgeid+"' does not exist."); return;}
+					{isValid=false; return;}
 			}
 			else
 			{
 				if (mG.modifyEdges.get(edgeindex).Value!=-1)
 					vG.modifySubgraphs.addEdgetoSubgraph(edgeindex, id);
 				else
-					{isValid=false; System.err.println("The Node '"+edgeid+"' does not exist."); return;}
+					{isValid=false; return;}
 			}
 		}
 		else if (position.equals("graphml.graph.subset.data"))
@@ -639,7 +626,6 @@ public class GravelMLContentHandler implements ContentHandler
 			{
 				if (vG.modifySubgraphs.get(id).getColor()==Color.BLACK)
 				{
-					System.err.println("DEBUG : Error Parsing File : The Subgraph has no Color!");
 					vG.modifySubgraphs.remove(id);
 					isValid=false;
 					return;

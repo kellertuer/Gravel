@@ -265,15 +265,6 @@ public class ShapeSubcurveSelectionHandler implements
 		if (proj.getResultPoint().distance(exactPointInGraph) <= tol)
 		{			// clicked on curve with tol. -> Update subcurve in a block so that after that VHyperShapeGraphic redraws
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,HyperEdgeRef.getIndex(),GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE,GraphConstraints.HYPEREDGE));
-//			if ((e.getClickCount() == 2) && (e.getModifiers() == MouseEvent.BUTTON1_MASK))
-//			{ // DoubleClick
-//					//last Values exist becaus on the first click the else case happened
-//					double newEnd = lastStart;
-//					double newStart = lastEnd;
-//					System.err.println("Exchanging");
-//			}
-//			else
-//			{
 				if (setStartNext)
 					tempStart = proj.getResultParameter();					
 				else

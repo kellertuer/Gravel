@@ -338,7 +338,7 @@ public class GravelMLWriter {
 			}
 			catch (Exception e)
 			{
-				System.err.println("DEBUG : Error on Writing File : "+e.getMessage());
+            	main.DEBUG.println(main.DEBUG.MIDDLE," Error when writing file : "+e.getMessage());
 			}
 		
 		try {        
@@ -469,9 +469,8 @@ public class GravelMLWriter {
 			}
 			catch (Exception e)
 			{
-				System.err.println("DEBUG : Error on Creating File : "+e.getMessage());
-			}
-		
+              	main.DEBUG.println(main.DEBUG.HIGH,"Error when creating file : "+e.getMessage());
+			}		
 		try {        
 	        OutputStream fout= new FileOutputStream(f);
 	        OutputStream bout= new BufferedOutputStream(fout);

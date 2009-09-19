@@ -159,7 +159,7 @@ public class NodeDragEdgeCreationListener implements MouseListener, MouseMotionL
 							}
 						else
 						{
-							System.err.println("OCMDrag.MouseReleased: Loop - Similar Edge exists, none added.");
+							main.DEBUG.println(main.DEBUG.LOW, "OCMDrag.MouseReleased: Loop - Similar Edge exists, none added.");
 							vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,i,GraphConstraints.BLOCK_ABORT|GraphConstraints.BLOCK_END,GraphConstraints.EDGE|GraphConstraints.NODE));							
 						}
 					}
@@ -173,7 +173,7 @@ public class NodeDragEdgeCreationListener implements MouseListener, MouseMotionL
 						}
 						else
 						{
-							System.err.println("OCMDrag.MouseReleased: Straight - Similar Edge exists, none added.");
+							main.DEBUG.println(main.DEBUG.LOW,"OCMDrag.MouseReleased: Straight - Similar Edge exists, none added.");
 							vg.pushNotify(new GraphMessage(GraphConstraints.EDGE,i,GraphConstraints.BLOCK_ABORT|GraphConstraints.BLOCK_END,GraphConstraints.EDGE|GraphConstraints.NODE));							
 						}
 					}

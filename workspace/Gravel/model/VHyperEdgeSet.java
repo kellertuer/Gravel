@@ -66,11 +66,10 @@ public class VHyperEdgeSet extends Observable implements Observer {
 				return;
 		if (medge.index!=edge.getIndex())
 			medge.index = edge.getIndex();
-		if (getIndexWithSimilarShape(edge) > 0)
-		{
-			System.err.println("DEBUG : Similar Edge Exists, doing nothing");
-			return;
-		}
+//		if (getIndexWithSimilarShape(edge) > 0)
+//		{
+//			return;
+//		}
 		if (mG.modifyHyperEdges.add(medge)) //succesfull added in MathGraph
 		{
 			HyperEdgeLock.lock();

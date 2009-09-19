@@ -97,7 +97,8 @@ public class NURBSShapeValidator extends NURBSShape {
 		vG = PvG;
 		HEIndex = HyperEdgeIndex;
 		VHyperEdge e = vG.modifyHyperEdges.get(HyperEdgeIndex);
-//		DebugGraphics = g; //disabled debug
+		if (main.DEBUG.getDebugLevel()>=main.DEBUG.HIGH)
+			DebugGraphics = g; //only enable this circle drawing debug for at least HIGH output
 		if (e==null)
 			return;
 		if (Curve!=null)
@@ -267,7 +268,7 @@ public class NURBSShapeValidator extends NURBSShape {
 							int b = actualInfo.set;
 							if (a!=b) //not in the same set yet -> Union of both sets in the minimum (sameset)
 							{
-								System.err.println("Joining "+a+" "+b);
+								main.DEBUG.println(main.DEBUG.MIDDLE,"Joining the two circle sets "+a+" "+b);
 								UnionSets(a,b);
 								unionHappened=true;
 							}
@@ -299,16 +300,16 @@ public class NURBSShapeValidator extends NURBSShape {
 				}
 				if (unionHappened)
 				{
-					System.err.print(StepCount+"   -  ");
+					main.DEBUG.print(main.DEBUG.MIDDLE,StepCount+" Iterations, doing a Test\n - ");
 					boolean valid = CheckSet();
 					Iterator<MNode> nodeiter = vG.getMathGraph().modifyNodes.getIterator();
 					while (nodeiter.hasNext()) //Iterator for all node-positions
 					{
 						int id = nodeiter.next().index;
 						Point2D pos = getPointOfNode(id);
-						System.err.print(id+"in"+pointInformation.get(pos).set+"  ");
+						main.DEBUG.print(main.DEBUG.HIGH,id+"in"+pointInformation.get(pos).set+"  ");
 					}
-					System.err.println("- All nodes in #"+pointInformation.get(CPOutside).set+" are outside ("+Points.size()+" nodes left)");
+					main.DEBUG.println(main.DEBUG.MIDDLE," All nodes in #"+pointInformation.get(CPOutside).set+" are outside ("+Points.size()+" nodes left)");
 					//If either ResultValid=true Wrong.size()==0 we're ready because the shape is valid
 					//If ResultValid=false and Wrong.size()>0 we're ready because the shape is invalid
 					resultValue = !(  (valid&&(invalidNodeIndices.size()==0)) || (!valid&&(invalidNodeIndices.size()>0)) );
@@ -556,7 +557,7 @@ public class NURBSShapeValidator extends NURBSShape {
 				{
 					invalidNodeIndices.add(id);
 					result = false;
-					System.err.println("Node #"+id+" outside shape but in Edge");
+					main.DEBUG.println(main.DEBUG.HIGH,"Node #"+id+" outside shape but in Edge");
 				}
 			}
 			else //Outside
@@ -565,7 +566,7 @@ public class NURBSShapeValidator extends NURBSShape {
 				{
 					invalidNodeIndices.add(id);
 					result=false;
-					System.err.println("Node #"+id+" inside but not in Edge!");
+					main.DEBUG.println(main.DEBUG.HIGH,"Node #"+id+" inside but not in Edge!");
 				}
 			}
 			if ((set!=inSet)&&(outSet!=set))
@@ -603,7 +604,7 @@ public class NURBSShapeValidator extends NURBSShape {
 				double noderadius = (double)vG.modifyNodes.get(id).getSize()/2d;
 				if (pointInformation.get(pos).radius <= ((double)minDist + noderadius)) //shape of node must be at most mindist away from shape
 				{
-					System.err.println("Node #"+id+" does violate margin, "+pointInformation.get(pos).radius+" < "+((double)minDist + noderadius)+"");
+					main.DEBUG.println(main.DEBUG.HIGH,"Node #"+id+" does violate margin, "+pointInformation.get(pos).radius+" < "+((double)minDist + noderadius)+"");
 					invalidNodeIndices.add(id);
 					ResultValidation = false;
 				}

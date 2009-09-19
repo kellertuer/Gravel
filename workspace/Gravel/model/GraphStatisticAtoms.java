@@ -199,7 +199,7 @@ public class GraphStatisticAtoms extends Observable implements Observer {
 					    }
 						break;
 				}
-				default : {System.err.println("Unknown Edge Type !!"); break;}
+				default : break;
 			} //End Switch Edgetyoe
 		} //End While edgeiter.hasnext
 		//

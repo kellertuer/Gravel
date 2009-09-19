@@ -72,7 +72,7 @@ public class PNGWriter
 		try {
 			ImageIO.write(img, type, f);
 		} catch (IOException e) {
-			System.err.println("DEBUG : PNG Writing failed : "+e.getMessage());
+        	main.DEBUG.println(main.DEBUG.MIDDLE,"PNG Writing failed : "+e.getMessage());
 		}
 		vGc.setZoom(oldz);
 	}
