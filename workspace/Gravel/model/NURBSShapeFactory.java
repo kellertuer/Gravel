@@ -75,18 +75,12 @@ public class NURBSShapeFactory {
 		if (u1<u2) //too less stuff to cut away
 		{
 			if ((k2-k1)<origCurve.degree+1)
-			{
-	        	main.DEBUG.println(main.DEBUG.MIDDLE,"NURBSShapeFactory::SubcurveSubstitutable() - Can't replace, there is too less stuff to cut away.");
 				return false;
-			}
 		}
 		else
 		{
 			if (Math.abs(k1-keptFragment.maxKnotIndex+2*keptFragment.degree-k2)<origCurve.degree+1)
-			{
-	        	main.DEBUG.println(main.DEBUG.MIDDLE,"NURBSShapeFactory::SubcurveSubstitutable() - Can't replace, there is too less stuff that stays.");
 				return false;
-			}
 		}
 		return true;
 	}

@@ -49,12 +49,17 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 		MessageCurve=vhg.modifyHyperEdges.get(HyperEdgeIndex).getShape();
 		if (MessageCurve.isEmpty()||((MessageCurve.getDecorationTypes()&NURBSShape.FRAGMENT)!=NURBSShape.FRAGMENT))
 			MessageCurve=new NURBSShape(); //Jst keep it if its for an Subcurve Replacement
+		else
+			degree = MessageCurve.getDegree();
 	}
 	public void removeGraphObservers()
 	{} //Nothing to remove
 	public void reInit()
 	{
-		degree = 3; //TODO: Define Std-Value for nURBSShape-Degree
+		if (MessageCurve.isEmpty()||((MessageCurve.getDecorationTypes()&NURBSShape.FRAGMENT)!=NURBSShape.FRAGMENT))
+			degree = 3; //TODO: Define Std-Value for nURBSShape-Degree
+		else
+			degree = MessageCurve.getDegree();
 		InterpolationPoints = new Vector<Point2D>();
 		updateShape();
 	}
@@ -296,7 +301,8 @@ public class InterpolationCreationHandler implements ShapeCreationMouseHandler {
 				return;
 			vhg.pushNotify(new GraphMessage(GraphConstraints.HYPEREDGE,hyperedgeindex,GraphConstraints.BLOCK_START|GraphConstraints.UPDATE|GraphConstraints.HYPEREDGESHAPE|GraphConstraints.CREATION,GraphConstraints.HYPEREDGE));
 
-			InterpolationPoints.remove(index);
+			if (InterpolationPoints.size()>1)
+				InterpolationPoints.remove(index);
 			
 			updateShape();
 			vhg.modifyHyperEdges.get(hyperedgeindex).setShape(lastshape);

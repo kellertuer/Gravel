@@ -147,12 +147,16 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
 	public void handleOpenApplication(ApplicationEvent arg0) {}
 	public void handleOpenFile(ApplicationEvent arg0)
 	{
+		if ((arg0==null)||(arg0.getFilename()==null))
+			return;
 		String evt = arg0.getFilename();
 		setFile(new File(evt));
 	}
 	public void handlePrintFile(ApplicationEvent arg0) {}
 	public void handleReOpenApplication(ApplicationEvent arg0)
 	{
+		if ((arg0==null)||(arg0.getFilename()==null))
+			return;
 		String evt = arg0.getFilename();
 		setFile(new File(evt));
 	}

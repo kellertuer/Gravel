@@ -565,7 +565,7 @@ public class HyperEdgeShapePanel implements ActionListener, Observer, CaretListe
 	        	{
 	        		HShapeGraphicRef.setMouseHandling(VCommonGraphic.INTERPOLATION_MOUSEHANDLING);
 	        		InterpolationFields.setVisible(true);
-		        	DegreeFields.setVisible(true);
+		        	DegreeFields.setVisible((HGraphRef.modifyHyperEdges.get(HEdgeRefIndex).getShape().getDecorationTypes()&NURBSShape.FRAGMENT)!=NURBSShape.FRAGMENT);
 		        	iDegree.setEnabled(true);
 	        	}
 	        	else if (Shape.equals("konvexe Hülle"))
