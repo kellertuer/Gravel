@@ -2,7 +2,6 @@ package view;
 
 import history.CommonGraphHistoryManager;
 import io.GeneralPreferences;
-import io.GraphMLReader;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -139,7 +138,15 @@ public class Gui implements WindowListener
 	{
 		if (!f.exists())
 			JOptionPane.showMessageDialog(frame, "<html><p>Die angegebene Datei<br><br><i>"+f.getAbsolutePath()+"</i><br><br>existiert nicht.</p></html>","Initialisierungsfehler",JOptionPane.ERROR_MESSAGE);
+		if (!ApplyChange())
+		{
+			return; //do not proceed with loading
+		}
 		JFileDialogs fD = new JFileDialogs(graphpart);
+		if (!fD.SaveIfUnsafed()) //s.o. aborted
+		{
+			return; //Chosen cancel -> don't load
+		}
 		fD.Open(f);		
 	}
 	/**

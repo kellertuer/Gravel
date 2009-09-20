@@ -145,10 +145,17 @@ public class Gui_Mac extends Application implements  ApplicationListener, Window
 		doQuit();
 	}
 	public void handleOpenApplication(ApplicationEvent arg0) {}
-	public void handleOpenFile(ApplicationEvent arg0) {}
+	public void handleOpenFile(ApplicationEvent arg0)
+	{
+		String evt = arg0.getFilename();
+		setFile(new File(evt));
+	}
 	public void handlePrintFile(ApplicationEvent arg0) {}
-	public void handleReOpenApplication(ApplicationEvent arg0) {}
-	
+	public void handleReOpenApplication(ApplicationEvent arg0)
+	{
+		String evt = arg0.getFilename();
+		setFile(new File(evt));
+	}
 	public void windowActivated(WindowEvent arg0)
 	{}
 	public void windowClosed(WindowEvent arg0) 

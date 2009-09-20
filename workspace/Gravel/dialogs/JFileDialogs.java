@@ -317,7 +317,7 @@ public class JFileDialogs implements Observer
 	{
 		if (!Gui.getInstance().ApplyChange())
 			return false; //do not proceed with loading
-		if (!SaveOnNewOrOpen()) //s.o. aborted
+		if (!SaveIfUnsafed()) //s.o. aborted
 			return false; //Chosen cancel
 		JFileChooser fc = new JFileChooser("Öffnen einer Gravel-Datei");
 		//Letzten Ordner verwenden
@@ -580,7 +580,7 @@ public class JFileDialogs implements Observer
 	 * and return, whether it was saved or the action was canceled.
 	 * @return true if the graph was saved or Saving was denied, false if the action was canceled
 	 */
-	private boolean SaveOnNewOrOpen()
+	public boolean SaveIfUnsafed()
 	{
 		boolean existsNode=false;
 		if (vG.getType()==VGraphInterface.GRAPH)
@@ -633,7 +633,7 @@ public class JFileDialogs implements Observer
 	{
 		if (!Gui.getInstance().ApplyChange())
 			return; //s.o. aborted the apply
-		if (!SaveOnNewOrOpen()) //s.o. aborted
+		if (!SaveIfUnsafed()) //s.o. aborted
 			return;
 		VGraphInterface vg;
 		String newgraph = buildNewGraph();
