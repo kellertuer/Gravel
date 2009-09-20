@@ -63,6 +63,12 @@ public class StandardClickMouseHandler implements ClickMouseHandler {
 	}
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
-	public void mousePressed(MouseEvent e) {}
-	public void mouseReleased(MouseEvent e) {}
+	public void mousePressed(MouseEvent e)
+	{
+		PopupClickActions.mousePressed(e);
+	}
+	public void mouseReleased(MouseEvent e)
+	{
+		PopupClickActions.mouseReleased(e);
+	}
 }

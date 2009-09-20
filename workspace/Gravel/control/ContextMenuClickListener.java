@@ -328,11 +328,11 @@ public class ContextMenuClickListener
 		}
 	}	
 
-	public void mouseClicked(MouseEvent e) {
-		//Only react, if Right Click or Strg+Left Click
-		if (!((e.getModifiers() == MouseEvent.BUTTON3_MASK) || (e.getModifiers() == MouseEvent.BUTTON1_MASK+MouseEvent.CTRL_MASK)))
+	private void handlePopup(MouseEvent e)
+	{
+		if (!e.isPopupTrigger())
 			return;
-
+		
 		//Point in the Graph, without the Zoom in the Display
 		PopupCoordinates = e.getPoint();
 		Point pointInGraph = new Point(Math.round(e.getPoint().x/((float)vgc.getZoom()/100)),Math.round(e.getPoint().y/((float)vgc.getZoom()/100)));
@@ -393,14 +393,21 @@ public class ContextMenuClickListener
 				BgPopup.show(e.getComponent(), e.getX(), e.getY());
 		}
 	}
+	public void mouseClicked(MouseEvent e) {}
 
 	public void mouseEntered(MouseEvent e) {}
 
 	public void mouseExited(MouseEvent e) {}
 
-	public void mousePressed(MouseEvent e) {}
+	public void mousePressed(MouseEvent e)
+	{
+		handlePopup(e);
+	}
 
-	public void mouseReleased(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e)
+	{
+		handlePopup(e);
+	}
 
 	private void handleBackgroundItems(ActionEvent e)
 	{

@@ -216,17 +216,21 @@ public class GraphTree extends JTree implements TreeSelectionListener,
 		if ( (System.getProperty("os.name").toLowerCase().indexOf("mac")!=-1) ||  (System.getProperty("os.name").toLowerCase().indexOf("linux")!=-1) )
 		{
 			if (selectionHandling(e) && e.isPopupTrigger())
-		    	popuphandling(e);
+			{
+				popuphandling(e);
+			}
 		}
 	}
 	
 	public void mouseReleased(MouseEvent e) 
 	{
 		//PopupHandlign or Selection on anything else
-		if (System.getProperty("os.name").toLowerCase().indexOf("mac")==-1)
+		if ( (System.getProperty("os.name").toLowerCase().indexOf("mac")==-1) && (System.getProperty("os.name").toLowerCase().indexOf("linux")==-1) )
 		{
 			if (selectionHandling(e) && e.isPopupTrigger())
-		    	popuphandling(e);
+			{
+				popuphandling(e);
+			}
 		}
 	}
 	/**

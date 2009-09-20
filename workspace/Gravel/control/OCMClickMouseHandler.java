@@ -63,7 +63,10 @@ public class OCMClickMouseHandler implements ClickMouseHandler {
 	/*
 	 * Mouse Listener fuer Tastenaktionen
 	 */
-	public void mousePressed(MouseEvent e) {}
+	public void mousePressed(MouseEvent e)
+	{
+		PopupClickActions.mousePressed(e);
+	}
 	public void mouseClicked(MouseEvent e) 
 	{
 		NodeMouseActions.mouseClicked(e);
@@ -101,8 +104,10 @@ public class OCMClickMouseHandler implements ClickMouseHandler {
 	}	
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
-	public void mouseReleased(MouseEvent e) {}
-	
+	public void mouseReleased(MouseEvent e)
+	{
+		PopupClickActions.mouseReleased(e);
+	}
 	public void update(Observable o, Object arg)
 	{
 		PopupClickActions.update(o, arg);
